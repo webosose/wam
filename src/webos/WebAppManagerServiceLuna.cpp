@@ -31,14 +31,10 @@
 #define LS2_METHOD_ENTRY(FUNC) {#FUNC, QCB(FUNC)}
 #define LS2_SUBSCRIPTION_ENTRY(FUNC) {#FUNC, QCB_subscription(FUNC)}
 
-#define GET_LS2_SERVER_STATUS(FUNC, PARAMS) callPrivate<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>("palm://com.palm.lunabus/signal/registerServerStatus", PARAMS, this)
-#define LS2_PRIVATE_CALL(FUNC, SERVICE, PARAMS) callPrivate<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>(SERVICE, PARAMS, this)
+#define GET_LS2_SERVER_STATUS(FUNC, PARAMS) call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>("luna://com.palm.lunabus/signal/registerServerStatus", PARAMS, this)
+#define LS2_CALL(FUNC, SERVICE, PARAMS) call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>(SERVICE, PARAMS, this)
 
-LSMethod WebAppManagerServiceLuna::s_publicMethods[] = {
-    { 0, 0 }
-};
-
-LSMethod WebAppManagerServiceLuna::s_privateMethods[] = {
+LSMethod WebAppManagerServiceLuna::s_methods[] = {
     LS2_METHOD_ENTRY(launchApp),
     LS2_METHOD_ENTRY(killApp),
     LS2_METHOD_ENTRY(closeAllApps),
@@ -345,7 +341,7 @@ void WebAppManagerServiceLuna::didConnect()
         LOG_WARNING(MSGID_BOOTD_CONNECT_FAIL, 0, "Failed to connect to bootd");
     }
 
-    params["serviceName"] = QStringLiteral("com.palm.connectionmanager");
+    params["serviceName"] = QStringLiteral("com.webos.service.connectionmanager");
     if (!GET_LS2_SERVER_STATUS(networkConnectionStatusCallback, params)) {
         LOG_WARNING(MSGID_NETWORK_CONNECT_FAIL, 0, "Failed to connect to connectionmanager");
     }
@@ -359,8 +355,9 @@ void WebAppManagerServiceLuna::systemServiceConnectCallback(QJsonObject reply)
         QStringList localeList;
         localeList << "localeInfo";
         localeParams["keys"] = QJsonArray::fromStringList(localeList);
-        LS2_PRIVATE_CALL(getSystemLocalePreferencesCallback, "palm://com.webos.settingsservice/getSystemSettings", localeParams);
-   }
+        LS2_CALL(getSystemLocalePreferencesCallback,
+            "luna://com.webos.settingsservice/getSystemSettings", localeParams);
+    }
 }
 
 void WebAppManagerServiceLuna::getSystemLocalePreferencesCallback(QJsonObject reply)
@@ -407,27 +404,30 @@ void WebAppManagerServiceLuna::memoryManagerConnectCallback(QJsonObject reply)
         closeAppObj["subscribe"] = true;
         closeAppObj["appType"] = "web";
 
-        if(!callPrivate<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::getCloseAppIdCallback>(
-                    "luna://com.webos.memorymanager/getCloseAppId",
-                    closeAppObj, this)) {
+        if (!call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::getCloseAppIdCallback>(
+                "luna://com.webos.memorymanager/getCloseAppId",
+                closeAppObj, this)) {
+            LOG_WARNING(MSGID_MEM_MGR_API_CALL_FAIL, 0, "Failed to get close application identifier");
         }
 
         QJsonObject clearContainer;
         clearContainer["subscribe"] = true;
         clearContainer["category"] = "/com/webos/memory";
         clearContainer["method"] = "clearContainers";
-        if (!callPrivate<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::clearContainersCallback>(
-                    "palm://com.palm.bus/signal/addmatch",
-                    clearContainer, this)) {
+        if (!call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::clearContainersCallback>(
+                "luna://com.palm.bus/signal/addmatch",
+                clearContainer, this)) {
+            LOG_WARNING(MSGID_SIGNAL_REGISTRATION_FAIL, 0, "Failed to register a client for clearContainers");
         }
 
         QJsonObject thresholdChanged;
         thresholdChanged["subscribe"] = true;
         thresholdChanged["category"] = "/com/webos/memory";
         thresholdChanged["method"] = "thresholdChanged";
-        if (!callPrivate<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::thresholdChangedCallback>(
-                    "palm://com.palm.bus/signal/addmatch",
-                    thresholdChanged, this)) {
+        if (!call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::thresholdChangedCallback>(
+                "luna://com.palm.bus/signal/addmatch",
+                thresholdChanged, this)) {
+            LOG_WARNING(MSGID_SIGNAL_REGISTRATION_FAIL, 0, "Failed to register a client for thresholdChanged");
         }
     }
 }
@@ -488,14 +488,16 @@ void WebAppManagerServiceLuna::applicationManagerConnectCallback(QJsonObject rep
         QJsonObject subscribe;
         subscribe["subscribe"] = true;
 
-        if(!callPrivate<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::getAppStatusCallback>(
-                    "luna://com.webos.applicationManager/listApps",
-                    subscribe, this)) {
+        if (!call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::getAppStatusCallback>(
+                "luna://com.webos.applicationManager/listApps",
+                subscribe, this)) {
+            LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "Failed to get an application list");
         }
 
-        if(!callPrivate<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::getForegroundAppInfoCallback>(
-                   "luna://com.webos.applicationManager/getForegroundAppInfo",
-                    subscribe, this)) {
+        if (!call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::getForegroundAppInfoCallback>(
+                "luna://com.webos.applicationManager/getForegroundAppInfo",
+                subscribe, this)) {
+            LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "Failed to get foreground application Information");
         }
     }
 }
@@ -543,10 +545,10 @@ void WebAppManagerServiceLuna::getForegroundAppInfoCallback(QJsonObject reply)
 
 void WebAppManagerServiceLuna::bootdConnectCallback(QJsonObject reply)
 {
-    if(reply["connected"].toBool() == true) {
+    if (reply["connected"].toBool() == true) {
         QJsonObject subscribe;
         subscribe["subscribe"] = true;
-        if(!LS2_PRIVATE_CALL(getBootStatusCallback, "palm://com.webos.bootManager/getBootStatus", subscribe)) {
+        if (!LS2_CALL(getBootStatusCallback, "luna://com.webos.bootManager/getBootStatus", subscribe)) {
             LOG_WARNING(MSGID_BOOTD_SUBSCRIBE_FAIL, 0, "Failed to subscribe to bootManager");
         }
     }
@@ -573,7 +575,7 @@ void WebAppManagerServiceLuna::launchContainerApp(const QString& id)
     json["id"] = id;
     json["noSplash"] = true;
 
-    if(!LS2_PRIVATE_CALL(launchContainerAppCallback, "palm://com.webos.applicationManager/launch", json)) {
+    if (!LS2_CALL(launchContainerAppCallback, "luna://com.webos.applicationManager/launch", json)) {
         LOG_WARNING(MSGID_CONTAINER_LAUNCH_FAIL, 0, "Failed to launch container via applicationManager");
     }
 }
@@ -589,7 +591,7 @@ void WebAppManagerServiceLuna::closeApp(const std::string& id)
     QJsonObject json;
     json["id"] = QString::fromStdString(id);
 
-    if (!LS2_PRIVATE_CALL(closeAppCallback, "palm://com.webos.applicationManager/closeByAppId", json))
+    if (!LS2_CALL(closeAppCallback, "luna://com.webos.applicationManager/closeByAppId", json))
         LOG_WARNING(MSGID_CLOSE_CALL_FAIL, 0, "Failed to send closeByAppId command to SAM");
 }
 
@@ -632,7 +634,7 @@ void WebAppManagerServiceLuna::networkConnectionStatusCallback(QJsonObject reply
         LOG_DEBUG("connectionmanager is connected");
         QJsonObject subscribe;
         subscribe["subscribe"] = true;
-        if (!LS2_PRIVATE_CALL(getNetworkConnectionStatusCallback, "palm://com.palm.connectionmanager/getStatus", subscribe)) {
+        if (!LS2_CALL(getNetworkConnectionStatusCallback, "luna://com.palm.connectionmanager/getStatus", subscribe)) {
             LOG_WARNING(MSGID_LS2_CALL_FAIL, 0, "Fail to subscribe to connection manager");
         }
     }
@@ -640,6 +642,6 @@ void WebAppManagerServiceLuna::networkConnectionStatusCallback(QJsonObject reply
 
 void WebAppManagerServiceLuna::getNetworkConnectionStatusCallback(QJsonObject reply)
 {
-    // luna-send -f -n 1 palm://com.palm.connectionmanager/getstatus '{"subscribe": true}'
+    // luna-send -f -n 1 luna://com.webos.service.connectionmanager/getstatus '{"subscribe": true}'
     WebAppManagerService::updateNetworkStatus(reply);
 }

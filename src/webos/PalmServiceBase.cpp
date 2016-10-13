@@ -19,8 +19,6 @@
 
 PalmServiceBase::PalmServiceBase()
     : m_serviceHandle(0)
-    , m_serviceHandlePublic(0)
-    , m_serviceHandlePrivate(0)
 {
 }
 
@@ -33,32 +31,38 @@ bool PalmServiceBase::startService()
 {
     LSErrorSafe lsError;
 
-    if (!LSRegisterPalmService(serviceName(), &m_serviceHandle, &lsError) ) {
+    if (!LSRegister(serviceName(), &m_serviceHandle, &lsError)) {
         LOG_ERROR(MSGID_REG_LS2_FAIL, 2,
                   PMLOGKS("SERVICE", serviceName()),
                   PMLOGKS("ERROR", lsError.message), "");
        return false;
     }
 
-    if(!LSPalmServiceRegisterCategory(m_serviceHandle, category(),
-            publicMethods(),
-            privateMethods(),
+    if (!LSRegisterCategory(m_serviceHandle, category(),
+            methods(),
             NULL, //LSSignal - ?
-            this, //user data - used to call into class instance again
+            NULL,
             &lsError)) {
         LOG_ERROR(MSGID_REG_LS2_CAT_FAIL, 2,
                   PMLOGKS("SERVICE", serviceName()),
                   PMLOGKS("ERROR", lsError.message), "");
-       return false;
+        stopService();
+        return false;
     }
 
-    m_serviceHandlePublic =  LSPalmServiceGetPublicConnection(m_serviceHandle);
-    m_serviceHandlePrivate = LSPalmServiceGetPrivateConnection(m_serviceHandle);
+    if (!LSCategorySetData(m_serviceHandle, category(), this, &lsError)) {
+        LOG_ERROR(MSGID_REG_LS2_CAT_FAIL, 2,
+            PMLOGKS("SERVICE", serviceName()),
+            PMLOGKS("ERROR", lsError.message), "");
+        stopService();
+        return false;
+    }
 
-    if (!LSGmainAttachPalmService(m_serviceHandle, mainLoop(), &lsError)) {
+    if (!LSGmainAttach(m_serviceHandle, mainLoop(), &lsError)) {
         LOG_ERROR(MSGID_REG_LS2_ATTACH_FAIL, 2,
                   PMLOGKS("SERVICE", serviceName()),
                   PMLOGKS("ERROR", lsError.message), "");
+        stopService();
         return false;
     }
     LOG_DEBUG("Successfully registered %s on service bus", serviceName());
@@ -71,7 +75,7 @@ bool PalmServiceBase::startService()
 void PalmServiceBase::stopService()
 {
     LSErrorSafe lsError;
-    if (!LSUnregisterPalmService(m_serviceHandle, &lsError) ) {
+    if (!LSUnregister(m_serviceHandle, &lsError)) {
         LOG_WARNING(MSGID_UNREG_LS2_FAIL, 2,
                     PMLOGKS("SERVICE", serviceName()),
                     PMLOGKS("ERROR", lsError.message), "");

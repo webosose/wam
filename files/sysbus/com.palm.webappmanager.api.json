@@ -1,0 +1,15 @@
+{
+  "applications.internal": [
+    "com.palm.webappmanager/clearBrowsingData",
+    "com.palm.webappmanager/closeAllApps",
+    "com.palm.webappmanager/closeByProcessId",
+    "com.palm.webappmanager/discardCodeCache",
+    "com.palm.webappmanager/getWebProcessSize",
+    "com.palm.webappmanager/killApp",
+    "com.palm.webappmanager/launchApp",
+    "com.palm.webappmanager/listRunningApps",
+    "com.palm.webappmanager/logControl",
+    "com.palm.webappmanager/setInspectorEnable",
+    "com.palm.webappmanager/webProcessCreated"
+  ]
+}
