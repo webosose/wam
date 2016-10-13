@@ -38,12 +38,12 @@ void ServiceSenderLuna::requestActivity(WebAppBase* app)
     payload["start"]     = true;
     payload["replace"]   = true;
 
-    bool ret = WebAppManagerServiceLuna::instance()->callPrivate(
-                "palm://com.palm.activitymanager/create",
-                payload,
-                app->page()->getIdentifier().toLatin1().constData());
+    bool ret = WebAppManagerServiceLuna::instance()->call(
+        "luna://com.webos.service.activitymanager/create",
+        payload,
+        app->page()->getIdentifier().toLatin1().constData());
 
-    if(!ret) {
+    if (!ret) {
         LOG_WARNING(MSGID_ACTIVITY_MANAGER_CREATE_FAIL, 0, "Failed to call activitymanager create");
     }
 }
@@ -69,7 +69,7 @@ void ServiceSenderLuna::postlistRunningApps(std::vector<ApplicationInfo> &apps)
     reply["running"] = runningApps;
     reply["returnValue"] = true;
 
-    WebAppManagerServiceLuna::instance()->postSubscriptionPrivate("listRunningApps", reply);
+    WebAppManagerServiceLuna::instance()->postSubscription("listRunningApps", reply);
 }
 
 void ServiceSenderLuna::postWebProcessCreated(const QString& appId, uint32_t pid)
@@ -79,15 +79,15 @@ void ServiceSenderLuna::postWebProcessCreated(const QString& appId, uint32_t pid
     reply["webprocessid"] = (int)pid;
     reply["returnValue"] = true;
 
-    WebAppManagerServiceLuna::instance()->postSubscriptionPrivate("webProcessCreated", reply);
+    WebAppManagerServiceLuna::instance()->postSubscription("webProcessCreated", reply);
 }
 
 void ServiceSenderLuna::serviceCall(const QString& url, const QString& payload, const QString& appId)
 {
-    bool ret = WebAppManagerServiceLuna::instance()->callPrivate(
-                url.toLatin1().constData(),
-                QJsonDocument::fromJson(payload.toStdString().c_str()).object(),
-                appId.toLatin1().constData());
+    bool ret = WebAppManagerServiceLuna::instance()->call(
+        url.toLatin1().constData(),
+        QJsonDocument::fromJson(payload.toStdString().c_str()).object(),
+        appId.toLatin1().constData());
     if (!ret) {
         LOG_WARNING(MSGID_SERVICE_CALL_FAIL, 2, PMLOGKS("APP_ID", qPrintable(appId)), PMLOGKS("URL", qPrintable(url)), "ServiceSenderLuna::serviceCall; callPrivate() return false");
     }

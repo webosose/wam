@@ -19,7 +19,8 @@ TEMPLATE = app
 include(common.pri)
 
 # Prevent conflict with usage of "signal" in other libraries
-CONFIG += no_keywords
+CONFIG += no_keywords webos-service
+WEBOS_SYSBUS_DIR = $$PWD/files/sysbus
 
 SOURCES += \
         Main.cpp
