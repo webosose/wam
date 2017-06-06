@@ -32,15 +32,6 @@
 
 static int kLaunchFinishAssureTimeoutMs = 5000;
 
-#define URL_SIZE_LIMIT 512
-static QString truncateURL(const QString& url)
-{
-    if(url.size() < URL_SIZE_LIMIT)
-        return url;
-    QString res = QString(url);
-    return res.replace(URL_SIZE_LIMIT / 2, url.size() - URL_SIZE_LIMIT, QStringLiteral(" ... "));
-}
-
 WebAppWayland::WebAppWayland(QString type, int width, int height)
     : WebAppBase()
     , m_appWindow(0)
@@ -526,14 +517,6 @@ void WebAppWayland::webPageLoadFinishedSlot()
         setNeedReload(false);
         return;
     }
-
-    QString logUrl = truncateURL(page()->url().toString());
-    LOG_INFO_WITH_CLOCK(MSGID_APP_LOADED, 5,
-             PMLOGKS("PerfType", "AppLaunch"),
-             PMLOGKS("PerfGroup", qPrintable((page()->appId()))),
-             PMLOGKS("APP_ID", qPrintable((page()->appId()))),
-             PMLOGKS("URL", qPrintable(logUrl)),
-             PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
 
     doPendingRelaunch();
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -31,6 +31,7 @@
 #include "PalmSystemBlink.h"
 #include "WebAppManagerConfig.h"
 #include "WebAppManagerTracer.h"
+#include "WebAppManagerUtils.h"
 #include "WebPageObserver.h"
 #include "WebPageBlinkObserver.h"
 
@@ -435,7 +436,11 @@ void WebPageBlink::suspendWebPageAll()
         m_domSuspendTimer.start(suspendDelay(), this,
                             &WebPageBlink::suspendWebPagePaintingAndJSExecution);
     }
-    LOG_INFO(MSGID_SUSPEND_WEBPAGE, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), PMLOGKFV("DELAY", "%dms", suspendDelay()), "DomSuspendTimer Started");
+    LOG_INFO(MSGID_SUSPEND_WEBPAGE, 3,
+        PMLOGKS("APP_ID", qPrintable(appId())),
+        PMLOGKFV("PID", "%d", getWebProcessPID()),
+        PMLOGKFV("DELAY", "%dms", suspendDelay()),
+        "DomSuspendTimer Started");
 }
 
 void WebPageBlink::resumeWebPageAll()
@@ -654,10 +659,10 @@ void WebPageBlink::loadFinished(const std::string& url)
     LOG_INFO(MSGID_LOAD, 2,
         PMLOGKS("APP_ID", qPrintable(appId())),
         PMLOGKFV("PID", "%d", getWebProcessPID()),
-        "[FINISH ]%s", url.c_str());
+        "[FINISH ]%s", WebAppManagerUtils::truncateURL(url).c_str());
 
     if (cleaningResources()) {
-        LOG_INFO(MSGID_WEBPAGE_LOAD_FINISHED,
+        LOG_INFO(MSGID_WAM_DEBUG,
             2,
             PMLOGKS("APP_ID", qPrintable(appId())),
             PMLOGKFV("PID", "%d", getWebProcessPID()),
@@ -684,7 +689,7 @@ void WebPageBlink::didStartNavigation(const std::string& url, bool isInMainFrame
     LOG_INFO(MSGID_LOAD, 2,
         PMLOGKS("APP_ID", qPrintable(appId())),
         PMLOGKFV("PID", "%d", getWebProcessPID()),
-        "[START %s]%s", isInMainFrame?"m":"s", url.c_str());
+        "[START %s]%s", isInMainFrame?"m":"s", WebAppManagerUtils::truncateURL(url).c_str());
 }
 
 void WebPageBlink::didFinishNavigation(const std::string& url, bool isInMainFrame)
@@ -692,7 +697,7 @@ void WebPageBlink::didFinishNavigation(const std::string& url, bool isInMainFram
     LOG_INFO(MSGID_LOAD, 2,
         PMLOGKS("APP_ID", qPrintable(appId())),
         PMLOGKFV("PID", "%d", getWebProcessPID()),
-        "[CONNECT]%s", url.c_str());
+        "[CONNECT]%s", WebAppManagerUtils::truncateURL(url).c_str());
 }
 
 void WebPageBlink::loadProgressChanged(double progress)
@@ -703,7 +708,7 @@ void WebPageBlink::loadProgressChanged(double progress)
         LOG_INFO(MSGID_LOAD, 2,
             PMLOGKS("APP_ID", qPrintable(appId())),
             PMLOGKFV("PID", "%d", getWebProcessPID()),
-            "[...%3d%%]%s", static_cast<int>(progress * 100.0), m_loadingUrl.c_str());
+            "[...%3d%%]%s", static_cast<int>(progress * 100.0), WebAppManagerUtils::truncateURL(m_loadingUrl).c_str());
     }
 }
 
@@ -712,15 +717,15 @@ void WebPageBlink::loadAborted(const std::string& url)
     LOG_INFO(MSGID_LOAD, 2,
         PMLOGKS("APP_ID", qPrintable(appId())),
         PMLOGKFV("PID", "%d", getWebProcessPID()),
-        "[ABORTED]%s", url.c_str());
+        "[ABORTED]%s", WebAppManagerUtils::truncateURL(url).c_str());
 }
 
 void WebPageBlink::loadFailed(const std::string& url, int errCode, const std::string& errDesc)
 {
     LOG_INFO(MSGID_LOAD, 2,
         PMLOGKS("APP_ID", qPrintable(appId())),
-        PMLOGKFV("PID", "%d",
-        getWebProcessPID()), "[FAILED ][%d/%s]%s", errCode, errDesc.c_str(),url.c_str());
+        PMLOGKFV("PID", "%d", getWebProcessPID()),
+        "[FAILED ][%d/%s]%s", errCode, errDesc.c_str(), WebAppManagerUtils::truncateURL(url).c_str());
 
     m_loadFailedHostname = getHostname(url);
     handleLoadFailed(errCode);

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -166,3 +166,12 @@ bool WebAppManagerUtils::setGroups() {
     return true;
 }
 
+// For PmLog, to meet maximum length(1024) 824 is selected approximately
+#define URL_SIZE_LIMIT 824
+std::string WebAppManagerUtils::truncateURL(const std::string& url)
+{
+    if(url.size() < URL_SIZE_LIMIT)
+        return url;
+    std::string res = url;
+    return res.erase(URL_SIZE_LIMIT, url.size() - URL_SIZE_LIMIT);
+}

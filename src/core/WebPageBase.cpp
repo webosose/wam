@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -251,7 +251,11 @@ void WebPageBase::handleLoadStarted()
 
 void WebPageBase::handleLoadFinished()
 {
-    LOG_INFO(MSGID_WEBPAGE_LOAD_FINISHED, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "m_suspendAtLoad : %s", m_suspendAtLoad ? "true; suspend in this time" : "false");
+    LOG_INFO(MSGID_WAM_DEBUG, 2,
+        PMLOGKS("APP_ID", qPrintable(appId())),
+        PMLOGKFV("PID", "%d", getWebProcessPID()),
+        "WebPageBase::handleLoadFinished; m_suspendAtLoad : %s",
+            m_suspendAtLoad ? "true; suspend in this time" : "false");
     if (appId() == WebAppManager::instance()->getContainerAppId())
         WebAppManager::instance()->setContainerAppLaunched(true);
 

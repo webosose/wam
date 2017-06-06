@@ -134,7 +134,6 @@
 #define MSGID_START_LAUNCHURL               "START_LAUNCHURL" /** Start LaunchUrl on WebAppManager */
 #define MSGID_CLOSE_APP_INTERNAL            "CLOSE_APP_INTERNAL" /** Close App */
 #define MSGID_WEBPAGE_LOAD                  "WEBPAGE_LOAD" /** Webpage load starts */
-#define MSGID_WEBPAGE_LOAD_FINISHED         "WEBPAGE_LOAD_FINISHED" /** WebPage load finished */
 #define MSGID_WEBPAGE_LOAD_FAILED           "WEBPAGE_LOAD_FAILED" /** WebPage load failed */
 #define MSGID_WEBPAGE_CLOSED                "WEBPAGE_CLOSED" /** WebPage instance deleted */
 #define MSGID_WEBAPP_CLOSED                 "WEBAPP_CLOSED" /** WebApp instance deleted */
