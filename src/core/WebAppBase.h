@@ -84,6 +84,7 @@ public:
     virtual void doClose() = 0;
     virtual bool isKeyboardVisible() { return false; }
     static void onCursorVisibilityChanged(const QString& jsscript);
+    virtual bool hideWindow() = 0;
 
     bool getCrashState();
     void setCrashState(bool state);

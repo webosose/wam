@@ -32,7 +32,6 @@ std::string WebAppManagerService::onLaunch(const std::string& appDescString, con
 
 bool WebAppManagerService::onKillApp(const std::string& appId)
 {
-    LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("APP_ID", qPrintable(QString::fromStdString(appId))), PMLOGKS("API", "killApp"), "");
     return WebAppManager::instance()->onKillApp(appId);
 }
 

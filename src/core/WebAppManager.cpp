@@ -444,6 +444,9 @@ void WebAppManager::closeAppInternal(WebAppBase* app, bool ignoreCleanResource)
         return;
     }
 
+    if (app->keepAlive() && app->hideWindow())
+        return;
+
     LOG_INFO(MSGID_CLOSE_APP_INTERNAL, 2, PMLOGKS("APP_ID", qPrintable(app->appId())), PMLOGKFV("PID", "%d", app->page()->getWebProcessPID()), "");
 
     std::string type = app->getAppDescription()->defaultWindowType();

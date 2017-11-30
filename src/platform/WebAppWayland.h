@@ -96,6 +96,7 @@ public:
     virtual void titleChanged();
     virtual void firstFrameVisuallyCommitted();
     virtual void navigationHistoryChanged();
+    virtual bool hideWindow();
 
     QString getWindowType() const { return m_windowType; }
     bool cursorVisibility() { return InputManager::instance()->globalCursorVisibility(); }

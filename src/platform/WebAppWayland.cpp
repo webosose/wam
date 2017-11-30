@@ -553,15 +553,8 @@ void WebAppWayland::doClose()
         return;
     }
 
-    if (keepAlive() && !page()->isLoadErrorPageFinish()) {
-        LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::doClose(); KeepAlive; just Hide this app");
-        page()->closeVkb();
-        m_appWindow->hide();
-        deleteSurfaceGroup();
-        setHiddenWindow(true);
-        m_addedToWindowMgr = false;
+    if (keepAlive() && hideWindow())
         return;
-    }
 
     LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::doClose(); call closeAppInternal()");
     closeAppInternal();
@@ -591,6 +584,20 @@ void WebAppWayland::showWindow()
     m_addedToWindowMgr = true;
     WebAppBase::showWindow();
 }
+
+bool WebAppWayland::hideWindow()
+{
+    if (page()->isLoadErrorPageFinish())
+        return false;
+
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::hideWindow(); just hide this app");
+    page()->closeVkb();
+    m_appWindow->hide();
+    setHiddenWindow(true);
+    m_addedToWindowMgr = false;
+    return true;
+}
+
 
 void WebAppWayland::showWindowSlot()
 {
