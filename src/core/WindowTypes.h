@@ -1,0 +1,13 @@
+#ifndef _WINDOWTYPES_H_
+#define _WINDOWTYPES_H_
+
+#define WT_CARD QStringLiteral("_WEBOS_WINDOW_TYPE_CARD")
+#define WT_POPUP QStringLiteral("_WEBOS_WINDOW_TYPE_POPUP")
+#define WT_MINIMAL QStringLiteral("_WEBOS_WINDOW_TYPE_RESTRICTED")
+#define WT_OVERLAY QStringLiteral("_WEBOS_WINDOW_TYPE_OVERLAY")
+#define WT_NONE QStringLiteral("_WEBOS_WINDOW_TYPE_NONE")
+#define WT_FLOATING QStringLiteral("_WEBOS_WINDOW_TYPE_FLOATING")
+#define WT_UNKNOWN QStringLiteral("_WEBOS_WINDOW_TYPE_UNKNOWN")
+#define WT_SYSTEM_UI QStringLiteral("_WEBOS_WINDOW_TYPE_SYSTEM_UI")
+
+#endif // _WINDOWTYPES_H_

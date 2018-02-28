@@ -1,0 +1,226 @@
+# Copyright (c) 2013-2018 LG Electronics, Inc.
+#
+# Licensed under the Apache License, Version 2.0 (the "License");
+# you may not use this file except in compliance with the License.
+# You may obtain a copy of the License at
+#
+# http://www.apache.org/licenses/LICENSE-2.0
+#
+# Unless required by applicable law or agreed to in writing, software
+# distributed under the License is distributed on an "AS IS" BASIS,
+# WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+# See the License for the specific language governing permissions and
+# limitations under the License.
+#
+# SPDX-License-Identifier: Apache-2.0
+
+description "WebAppMgr is responsible for running Enyo applications on webOS with WebKit2"
+
+# Start on init-boot-done. Stop on surface-manager crash, or start_update.
+# Expect WebAppMgr-watcher.conf to restart us, when surface-manager comes back up.
+# Make sure that we receive both init-boot-done and lsm-ready. Some devices, such as
+# qemu are able to complete init-boot-done before surface-manager is done setting up.
+
+start on lsm-ready and init-boot-done
+stop on starting start_update or stopping surface-manager
+emits wam-ready
+emits snapshot-component-ready
+emits snapshot-component-done
+
+respawn
+
+# Comment this line out to suppress logs on the console
+#console output
+
+script
+    # Set wam executable file path
+    export WAM_EXE_PATH="/usr/bin/WebAppMgr"
+
+    # Set wam name for user-agent
+    export WAM_NAME="WebAppManager"
+
+    # Only allow UTF8 encoding for luna-service messages.
+    export LS_ENABLE_UTF8=1
+
+    # Set effective userid and groupid
+    export WAM_UID="wam"
+    export WAM_GID="compositor"
+
+    # Set location of error page (will follow localization rules based on this path)
+    export WAM_ERROR_PAGE="file:///usr/share/localization/wam/loaderror.html"
+
+    # suspending javascript execution delay for page visibility
+    export WAM_SUSPEND_DELAY_IN_MS=250
+
+    if [ -e "etc/wam/make_shm.sh" ] ; then
+        /etc/wam/make_shm.sh
+    fi
+
+    # Set user data directory for WebAppMgr
+    export WAM_DATA_PATH=$(grep ${WAM_UID} /etc/passwd | cut -f6 -d":")
+
+    # ensure that wam data directories exist
+    mkdir -p ${WAM_DATA_PATH}
+
+    # set directories permission
+    chown ${WAM_UID}:${WAM_GID} ${WAM_DATA_PATH}
+
+    # setup 50 Mb maximum for ApplicationCache
+    export WAM_APPCACHE_MAXSIZE=52428800
+
+    # setup 10 Mb maximum for ApplicationCache per domain
+    export WAM_APPCACHE_DOMAINLIMIT=10485760
+
+    # setup 50 Mb maximum for DiskCache
+    export WAM_DISKCACHE_MAXSIZE=52428800
+
+    # setup 256 Kb maximum for resource buffer allocation
+    export WAM_RESOURCE_BUFFER_MAX_ALLOC_SIZE=262144
+
+    # setup 1 Mb for resource buffer
+    export WAM_RESOURCE_BUFFER_SIZE=1048576
+
+    # setup 200 seconds for watchdog timeout of render process
+    export WATCHDOG_RENDER_TIMEOUT=200
+
+    # setup nubmer of raster threads to 1
+    export BLINK_NUM_RASTER_THREADS=WEBOS_NUM_RASTER_THREADS
+
+    # use default tile width if not sed by recipe
+    if [ "$BLINK_NUM_RASTER_THREADS" = "WEBOS${BLINK_NUM_RASTER_THREADS#WEBOS}" ]; then
+        export BLINK_NUM_RASTER_THREADS=1
+    fi
+
+    # setup 6 Mb maximum for the program GPU cache
+    export GPU_PROGRAM_CACHE_SIZE=6144
+
+    # disable using enyo system app specfic optimization
+    # currently used optimizations : inline caching off
+    export USE_SYSTEM_APP_OPTIMIZATION="0"
+
+    # Set location of NaCl modules
+    export CHROMIUM_PATH="/usr/palm/applications/com.lge.app.chromium"
+    export NACL_PLUGIN=${CHROMIUM_PATH}"/libppGoogleNaClPluginChrome.so"
+    export NACL_IRT_LIBRARY=${CHROMIUM_PATH}"/nacl_irt_arm.nexe"
+    export NACL_HELPER=${CHROMIUM_PATH}"/nacl_helper"
+    export NACL_HELPER_BOOTSTRAP=${CHROMIUM_PATH}"/nacl_helper_bootstrap"
+
+    # Set location of NPAPI plugins for all Apps including default Apps
+    # This is for the flash plugin of Signage, webOS TV doesn't use it.
+    export PRIVILEGED_PLUGIN_PATH=""
+
+    # Set location of extra libraries
+    export CDM_LIB_PATH="/usr/lib"
+
+    # Set location of all NPAPI plugins
+    export NPAPI_PLUGIN_PATH=${PRIVILEGED_PLUGIN_PATH}
+
+    if [ -e "etc/wam/make_shm.sh" ] ; then
+        /etc/wam/make_shm.sh
+    fi
+
+    # setup 8 Mb minimum codecache capacity
+    export JSC_minGlobalCodeCacheCapacity=8388608
+
+    # Enable more explicit logging of timing with regards to rendering
+    # export WAM2_ENABLE_DEBUG_RENDER_TIMING=1
+
+    # enable Web Inspector and Tellurium if in developer mode
+    export TELLURIUM_NUB_PATH=WEBOS_PREFIX/tellurium/telluriumnub.js
+    export ENABLE_INSPECTOR=1
+
+    # Enable cursor by default
+    export ENABLE_CURSOR_BY_DEFAULT=1
+
+    # Enable launch optimization
+    export ENABLE_LAUNCH_OPTIMIZATION=1
+
+    # Set the duration(seconds) passed from last network activity (e.g. FMP Detector)
+    # If set to a positive value, adjust a custom timeout for a network stable timer in FMPDetector
+    export NETWORK_STABLE_TIMEOUT=3
+
+    # please keep it in alphabetical order
+    export WAM_EXTRA_FLAGS=""
+    export WAM_JS_FLAGS=""
+    export WAM_COMMON_SWITCHES=" \
+        --application-cache-domain-limit=$WAM_APPCACHE_DOMAINLIMIT \
+        --application-cache-size=$WAM_APPCACHE_MAXSIZE \
+        --browser-subprocess-path=$WAM_EXE_PATH \
+        --disable-direct-npapi-requests \
+        --disable-extensions \
+        --disable-low-res-tiling \
+        --disk-cache-size=$WAM_DISKCACHE_MAXSIZE \
+        --enable-aggressive-release-policy \
+        --enable-gpu-rasterization \
+        --enable-impl-side-painting \
+        --enable-key-event-throttling \
+        --enable-pinch-virtual-viewport \
+        --enable-threaded-compositing \
+        --enable-watchdog \
+        --hide-selection-handles \
+        --ignore-gpu-blacklist \
+        --ignore-netif=p2p \
+        --in-process-gpu \
+        --max-unused-resource-memory-usage-percentage=0 \
+        --network-stable-timeout=$NETWORK_STABLE_TIMEOUT \
+        --noerrdialogs \
+        --num-raster-threads=$BLINK_NUM_RASTER_THREADS \
+        --ozone-platform=wayland \
+        --remote-debugging-port=9998 \
+        --resource-buffer-max-allocation-size=$WAM_RESOURCE_BUFFER_MAX_ALLOC_SIZE \
+        --resource-buffer-size=$WAM_RESOURCE_BUFFER_SIZE \
+        --touch-events=disabled \
+        --ui-disable-opaque-shader-program \
+        --user-data-dir=$WAM_DATA_PATH \
+        --v8-use-lightweight-gc-on-idle \
+        --enable-devtools-experiments \
+        --webos-wam \ "
+
+    export WAM_LITE_SWITCHES=" \
+        --disable-v8-crankshaft \
+        --in-process-zygote \ "
+
+    export WAM_WEBOS_LITE=NO
+    if [ "${WAM_WEBOS_LITE}" = "YES" ] ; then
+        export WAM_SWITCHES=${WAM_COMMON_SWITCHES}${WAM_LITE_SWITCHES}
+        export SKIA_FONT_CACHE_SIZE=1
+        export SKIA_IMAGE_CACHE_SIZE=40
+        export SKIA_BACKGROUND_FONT_CACHE_SIZE=0
+    else
+        export WAM_SWITCHES=${WAM_COMMON_SWITCHES}
+        export SKIA_FONT_CACHE_SIZE=8
+        export SKIA_IMAGE_CACHE_SIZE=80
+        export SKIA_BACKGROUND_FONT_CACHE_SIZE=512
+    fi
+
+    export WAM_EXTRA_SKIA_CACHE_SWITCHES=" \
+        --skia-font-cache-size-mb=$SKIA_FONT_CACHE_SIZE \
+        --skia-image-cache-size-mb=$SKIA_IMAGE_CACHE_SIZE \
+        --skia-background-font-cache-size-kb=$SKIA_BACKGROUND_FONT_CACHE_SIZE \
+        "
+
+    export WAM_EXTRA_GPU_TUNING_SWITCHES=" \
+        --gpu-program-cache-size-kb=$GPU_PROGRAM_CACHE_SIZE \
+        "
+    export WAM_WATCHDOG_RENDER_TIMEOUT_SWITCHES=" \
+        --watchdog-render-timeout=$WATCHDOG_RENDER_TIMEOUT \
+        "
+
+    export WEBOS_LOAD_ACCESSIBILITY_PLUGIN=1
+
+    export WAM_V8_CODE_CACHE_SWITCHES=" \
+        --enable-local-resource-code-cache \
+        --disallow-code-cache-from-file-uris-with-query-string \
+    "
+
+    # Load any special configuration from plugins
+    if [ -e "/etc/wam/plugins/conf.sh" ] ; then
+        . /etc/wam/plugins/conf.sh || true
+    fi
+
+    # Use centralized nice script
+    if [ -f /etc/init.d/webos-nicer.sh ] ; then
+        . /etc/init.d/webos-nicer.sh
+    fi
+    exec $WEBOS_NICE $WAM_EXE_PATH $WAM_SWITCHES $WAM_EXTRA_SKIA_CACHE_SWITCHES $WAM_EXTRA_GPU_TUNING_SWITCHES $WAM_WATCHDOG_RENDER_TIMEOUT_SWITCHES $WAM_EXTRA_FLAGS $WAM_V8_CODE_CACHE_SWITCHES --js-flags="$WAM_JS_FLAGS"
+end script

@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <title x-mojo-loc="">Application Error</title>
+        <meta name="description" content="">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+        <link rel="stylesheet" type="text/css" href="file:///usr/palm/frameworks/enyo/2.3.0/lib/moonstone/moonstone.css">
+        <script src="file:///usr/palm/frameworks/enyo/2.3.0/enyo/enyo.js"></script>
+        <script>
+            enyo.path.addPath("enyo", "/usr/palm/frameworks/enyo/2.3.0/enyo");
+            enyo.path.addPath("lib/layout", "/usr/palm/frameworks/enyo/2.3.0/lib/layout");
+            enyo.path.addPath("lib/enyo-ilib", "/usr/palm/frameworks/enyo/2.3.0/lib/enyo-ilib");
+        </script>
+        <script src="file:///usr/palm/frameworks/enyo/2.3.0/lib/enyo-ilib/enyo-ilib1.js"></script>
+        <script src="file:///usr/palm/frameworks/enyo/2.3.0/lib/enyo-ilib/enyo-ilib2.js"></script>
+        <script src="file:///usr/palm/frameworks/enyo/2.3.0/lib/enyo-ilib/full-package.js"></script>
+        <script src="file:///usr/share/localization/wam/geterror.js"></script>
+
+        <style type="text/css">
+        /*reset code,must keep it so no extra margin in between elements*/
+            body, div, h1, h2, p{
+                margin:0;
+                padding:0;
+            }
+            .moon-button {
+                max-width: none;
+            }
+            .moon-application-global-wrapper {
+                width: 100%;
+                padding: 6.25% 6.25% 12% 6.25%;
+                background-color: #ededed;
+                box-sizing: border-box;
+            }
+            .moon-application-header-container {
+                width: 100%;
+            }
+            .moon-application-content-container {
+              width: 100%;
+            }
+            .moon-header-title{
+                color:#4b4b4b;
+                height:auto;
+                font-size: 6.5vw;
+            }
+            .moon-header-title-below {
+                font-size: 1.56vw;
+                height: auto;
+                top: 10px;
+            }
+            .button-container {
+              position: absolute;
+              bottom: 12%;
+              right: 6.25%;
+              left: 6.25%;
+            }
+            .button-position-left {
+              display: inline-block;
+              float: left;
+            }
+            .button-position-right {
+              display: inline-block;
+              float: right;
+            }
+
+        </style>
+        <style type="text/css" id="viVN_font_css">
+            @font-face {
+              font-family:"Moonstone Miso";
+              src:local('LG Display-Light');
+            }
+            @font-face {
+              font-family:"Moonstone Miso Bold";
+              src:local('LG Display-Light');
+            }
+            @font-face {
+              font-family:"MuseoSans 700";
+              src:local('LG Display-Regular');
+            }
+        </style>
+        <style type="text/css" id="jaJP_font_css">
+            @font-face {
+                font-family:"Moonstone Miso";
+                src:local('LG Display_JP');
+            }
+            @font-face {
+                font-family:"Moonstone Miso Bold";
+                src:local('LG Display_JP');
+            }
+            @font-face {
+                font-family:"MuseoSans 700";
+                src:local('LG Display_JP');
+            }
+        </style>
+        <style type="text/css" id="urIN_font_css">
+            @font-face {
+                font-family:"Moonstone Miso";
+                src:local('LG Display_Urdu');
+            }
+            @font-face {
+                font-family:"Moonstone Miso Bold";
+                src:local('LG Display_Urdu');
+            }
+            @font-face {
+                font-family:"MuseoSans 700";
+                src:local('LG Display_Urdu');
+            }
+	</style>
+	<style type="text/css" id="zhHK_font_css">
+            @font-face {
+                font-family:"Moonstone Miso";
+                src:local('LG Display GP4_HK');
+            }
+            @font-face {
+                font-family:"Moonstone Miso Bold";
+                src:local('LG Display GP4_HK');
+            }
+            @font-face {
+                font-family:"MuseoSans 700";
+                src:local('LG Display GP4_HK');
+            }
+	</style>
+	<script>
+            if(navigator.language == 'ja-JP') {
+                console.log("use jaJP_font_css");
+                document.styleSheets[ "jaJP_font_css" ].disabled = false;
+                document.styleSheets[ "urIN_font_css" ].disabled = true;
+                document.styleSheets[ "zhHK_font_css" ].disabled = true;
+                document.styleSheets[ "viVN_font_css" ].disabled = true;
+            }
+            else if(navigator.language == 'ur-IN') {
+                console.log("use urIN_font_css");
+                document.styleSheets[ "urIN_font_css" ].disabled = false;
+                document.styleSheets[ "jaJP_font_css" ].disabled = true;
+                document.styleSheets[ "zhHK_font_css" ].disabled = true;
+                document.styleSheets[ "viVN_font_css" ].disabled = true;
+            }
+            else if(navigator.language == 'zh-Hant-HK') {
+                console.log("use zhHK_font_css");
+                document.styleSheets[ "zhHK_font_css" ].disabled = false;
+                document.styleSheets[ "jaJP_font_css" ].disabled = true;
+                document.styleSheets[ "urIN_font_css" ].disabled = true;
+                document.styleSheets[ "viVN_font_css" ].disabled = true;
+            }
+            else if(navigator.language == 'vi-VN') {
+                console.log("use viVN_font_css");
+                 document.styleSheets[ "viVN_font_css" ].disabled = false;
+                 document.styleSheets[ "urIN_font_css" ].disabled = true;
+                 document.styleSheets[ "jaJP_font_css" ].disabled = true;
+                 document.styleSheets[ "zhHK_font_css" ].disabled = true;
+            }
+            else {
+                document.styleSheets[ "zhHK_font_css" ].disabled = true;
+                document.styleSheets[ "jaJP_font_css" ].disabled = true;
+                document.styleSheets[ "urIN_font_css" ].disabled = true;
+                document.styleSheets[ "viVN_font_css" ].disabled = true;
+            }
+	</script>
+    </head>
+    <body class="moon-application-global-wrapper enyo-unselectable" onload="onload()">
+        <div class="moon-application-header-container" id="error_header">
+            <h1 class="moon-header-title" id="error_title"></h1>
+            <h2 class="moon-header-title-below" id="error_details"></h2>
+            <h2 class="moon-header-title-below" id="error_guide"></h2>
+            <h3 class="moon-header-title-below" id="error_info"></h3>
+        </div>
+        <div class="moon-application-content-container">
+          <div id="Button_Container" class="button-container">
+            <div id="Button_Left" class="button-position-left"></div>
+            <div id="Button_Right" class="button-position-right"></div>
+          </div>
+        </div>
+    </body>
+</html>
