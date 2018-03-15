@@ -63,9 +63,7 @@ public:
     ~WebPageBlinkPrivate()
     {
         delete pageView;
-
-        if (m_palmSystem)
-            delete m_palmSystem;
+        delete m_palmSystem;
     }
 
 

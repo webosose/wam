@@ -39,8 +39,7 @@ public:
 
     ~WebAppBasePrivate()
     {
-        if(m_page)
-            delete m_page;
+        delete m_page;
 
         LOG_DEBUG("Delete webapp base for App ID %s", qPrintable(m_appId));
     }
@@ -189,10 +188,8 @@ void WebAppBase::cleanResources()
     // does nothing if m_page has already been deleted and set to 0 by ~WindowedWebApp
     d->destroyActivity();
 
-    if (d->m_appDesc) {
-        delete d->m_appDesc;
-        d->m_appDesc = 0;
-    }
+    delete d->m_appDesc;
+    d->m_appDesc = 0;
 }
 
 int WebAppBase::currentUiWidth()
@@ -360,10 +357,7 @@ void WebAppBase::showWindowSlot()
 
 void WebAppBase::setAppDescription(ApplicationDescription* appDesc)
 {
-    if (d->m_appDesc) {
-        delete d->m_appDesc;
-        d->m_appDesc = 0;
-    }
+    delete d->m_appDesc;
     d->m_appDesc = appDesc;
 
     // set appId here from appDesc

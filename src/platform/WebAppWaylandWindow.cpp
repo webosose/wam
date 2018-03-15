@@ -25,12 +25,12 @@ WebAppWaylandWindow* WebAppWaylandWindow::take()
 {
     WebAppWaylandWindow* window;
 
-    if (!s_instance)
-        s_instance = new WebAppWaylandWindow();
-
     if (!s_instance) {
-        LOG_CRITICAL(MSGID_TAKE_FAIL, 0, "Failed to take WebAppWaylandWindow");
-        return NULL;
+        s_instance = new WebAppWaylandWindow();
+        if (!s_instance) {
+            LOG_CRITICAL(MSGID_TAKE_FAIL, 0, "Failed to take WebAppWaylandWindow");
+            return NULL;
+        }
     }
 
     window = s_instance;

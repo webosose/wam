@@ -64,16 +64,11 @@ WebAppManager::WebAppManager()
 
 WebAppManager::~WebAppManager()
 {
-    if (m_containerAppManager)
-        delete m_containerAppManager;
-    if (m_serviceSender)
-        delete m_serviceSender;
-    if (m_webProcessManager)
-        delete m_webProcessManager;
-    if (m_deviceInfo)
-        delete m_deviceInfo;
-    if (m_networkStatusManager)
-        delete m_networkStatusManager;
+    delete m_containerAppManager;
+    delete m_serviceSender;
+    delete m_webProcessManager;
+    delete m_deviceInfo;
+    delete m_networkStatusManager;
 }
 
 void WebAppManager::notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level)

@@ -186,8 +186,7 @@ void ContainerAppManager::closeContainerApp()
     WebAppManager::instance()->deleteAppIntoList(m_containerApp);
 #endif
 
-    if (m_containerApp)
-        delete m_containerApp;
+    delete m_containerApp;
 
     m_containerApp = 0;
     m_containerAppIsLaunched = false;
