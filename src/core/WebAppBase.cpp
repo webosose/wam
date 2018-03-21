@@ -33,7 +33,7 @@ public:
     , m_page(0)
     , m_keepAlive(false)
     , m_forceClose(false)
-    , m_appDesc(0)
+    , m_appDesc(nullptr)
     {
     }
 
@@ -61,7 +61,7 @@ public:
     QString m_appId;
     QString m_instanceId;
     QString m_url;
-    ApplicationDescription* m_appDesc;
+    std::shared_ptr<ApplicationDescription> m_appDesc;
 };
 
 WebAppBase::WebAppBase()
@@ -180,7 +180,7 @@ QString WebAppBase::launchingAppId() const
 
 ApplicationDescription* WebAppBase::getAppDescription() const
 {
-    return d->m_appDesc;
+    return d->m_appDesc.get();
 }
 
 void WebAppBase::cleanResources()
@@ -188,8 +188,7 @@ void WebAppBase::cleanResources()
     // does nothing if m_page has already been deleted and set to 0 by ~WindowedWebApp
     d->destroyActivity();
 
-    delete d->m_appDesc;
-    d->m_appDesc = 0;
+    d->m_appDesc.reset();
 }
 
 int WebAppBase::currentUiWidth()
@@ -355,9 +354,8 @@ void WebAppBase::showWindowSlot()
     showWindow();
 }
 
-void WebAppBase::setAppDescription(ApplicationDescription* appDesc)
+void WebAppBase::setAppDescription(std::shared_ptr<ApplicationDescription> appDesc)
 {
-    delete d->m_appDesc;
     d->m_appDesc = appDesc;
 
     // set appId here from appDesc

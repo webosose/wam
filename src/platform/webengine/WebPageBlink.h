@@ -39,7 +39,7 @@ public:
         HINTING_FULL = 3
     };
 
-    WebPageBlink(const QUrl& url, ApplicationDescription* desc, const QString& launchParams);
+    WebPageBlink(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const QString& launchParams);
     ~WebPageBlink() override;
 
     // WebPageBase

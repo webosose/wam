@@ -26,17 +26,13 @@
 
 #include <QString>
 
-WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, ApplicationDescription* desc)
+WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc)
 {
-    WebAppBase* app = 0;
+    WebAppBase* app = nullptr;
 
-    if(winType == WT_CARD || winType == WT_POPUP || winType == WT_MINIMAL || winType == WT_FLOATING) {
+    if (winType == WT_CARD || winType == WT_POPUP || winType == WT_MINIMAL || winType == WT_FLOATING) {
         app = new WebAppWaylandWebOS(winType, desc);
-    } else if(winType == WT_OVERLAY) {
-        app = new WebAppWayland(winType);
-    } else if(winType == WT_SYSTEM_UI) {
-        app = new WebAppWayland(winType);
-    } else if(winType == WT_NONE) {
+    } else if (winType == WT_OVERLAY || winType == WT_SYSTEM_UI || winType == WT_NONE) {
         app = new WebAppWayland(winType);
     } else {
         LOG_WARNING(MSGID_BAD_WINDOW_TYPE, 1,
@@ -45,12 +41,12 @@ WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, ApplicationDescript
     return app;
 }
 
-WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, WebPageBase* page, ApplicationDescription* desc)
+WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc)
 {
     return createWebApp(winType, desc);
 }
 
-WebPageBase* WebAppFactoryLuna::createWebPage(QUrl url, ApplicationDescription* desc, QString launchParams)
+WebPageBase* WebAppFactoryLuna::createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, QString launchParams)
 {
     return new WebPageBlink(url, desc, launchParams);
 }

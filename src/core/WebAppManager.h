@@ -19,6 +19,7 @@
 
 #include <list>
 #include <map>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -166,11 +167,11 @@ private:
     void loadEnvironmentVariable();
 
     WebAppBase* onLaunchUrl(const std::string& url, QString winType,
-        const ApplicationDescription* appDesc, const std::string& instanceId,
+        std::shared_ptr<ApplicationDescription> appDesc, const std::string& instanceId,
         const std::string& args, const std::string& launchingAppId,
         int& errCode, std::string& errMsg);
     void onLaunchContainerBasedApp(const std::string& url, QString& winType,
-        const ApplicationDescription* appDesc, const std::string& args, const std::string& launchingAppId);
+        std::shared_ptr<ApplicationDescription> appDesc, const std::string& args, const std::string& launchingAppId);
     std::string onLaunchContainerApp(const std::string& appDesc);
     void onRelaunchApp(const std::string& instanceId, const std::string& appId,
         const std::string& args, const std::string& launchingAppId);

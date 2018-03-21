@@ -17,6 +17,8 @@
 #ifndef WEBAPPFACTORYMANAGER_H
 #define WEBAPPFACTORYMANAGER_H
 
+#include <memory>
+
 #include <QMap>
 #include <QStringList>
 
@@ -25,9 +27,9 @@
 class WebAppFactoryManager {
 public:
     static WebAppFactoryManager* instance();
-    WebAppBase* createWebApp(QString winType, ApplicationDescription* desc = 0, QString appType = "");
-    WebAppBase* createWebApp(QString winType, WebPageBase* page, ApplicationDescription* desc = 0, QString appType = "");
-    WebPageBase* createWebPage(QString winType, QUrl url, ApplicationDescription* desc, QString appType = "", QString launchParams = "");
+    WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "");
+    WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "");
+    WebPageBase* createWebPage(QString winType, QUrl url, std::shared_ptr<ApplicationDescription> desc, QString appType = "", QString launchParams = "");
     WebAppFactoryInterface* getPluggable(QString appType);
     WebAppFactoryInterface* loadPluggable(QString appType = "");
 

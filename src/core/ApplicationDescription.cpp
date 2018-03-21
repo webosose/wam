@@ -126,18 +126,18 @@ const ApplicationDescription::WindowClientInfo ApplicationDescription::getWindow
     return info;
 }
 
-ApplicationDescription* ApplicationDescription::fromJsonString(const char* jsonStr)
+std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(const char* jsonStr)
 {
     QJsonParseError parseError;
     QJsonDocument jsonDoc = QJsonDocument::fromJson(QByteArray(jsonStr), &parseError);
     if (parseError.error != QJsonParseError::NoError) {
         LOG_WARNING(MSGID_APP_DESC_PARSE_FAIL, 1,
                     PMLOGKFV("JSON", "%s", jsonStr), "Failed to parse JSON string");
-        return 0;
+        return nullptr;
     }
     QJsonObject jsonObj = jsonDoc.object();
 
-    ApplicationDescription* appDesc = new ApplicationDescription();
+    auto appDesc = std::unique_ptr<ApplicationDescription>(new ApplicationDescription());
 
     appDesc->m_transparency = jsonObj["transparent"].toBool();
     appDesc->m_vendorExtension = QJsonDocument(jsonObj["vendorExtension"].toObject()).toJson().data();

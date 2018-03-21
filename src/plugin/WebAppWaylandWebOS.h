@@ -23,7 +23,7 @@ class ApplicationDescription;
 
 class WebAppWaylandWebOS : public WebAppWayland {
 public:
-    WebAppWaylandWebOS(QString& winType, ApplicationDescription* desc = 0);
+    WebAppWaylandWebOS(QString& winType, std::shared_ptr<ApplicationDescription> desc = nullptr);
 };
 
 #endif /* WEBAPPWAYLANDWEBOS_H */

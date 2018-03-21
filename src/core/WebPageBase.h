@@ -17,6 +17,8 @@
 #ifndef WEBPAGEBASE_H
 #define WEBPAGEBASE_H
 
+#include <memory>
+
 #include <QObject>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
@@ -51,7 +53,7 @@ public:
     };
 
     WebPageBase();
-    WebPageBase(const QUrl& url, ApplicationDescription* desc, const QString& params);
+    WebPageBase(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const QString& params);
     virtual ~WebPageBase();
 
     // WebPageBase
@@ -59,6 +61,7 @@ public:
     virtual void* getWebContents() = 0;
     virtual void setLaunchParams(const QString& params);
     virtual void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level) {}
+
     virtual QString getIdentifier() const;
     virtual QUrl url() const = 0; /* return current url */
     virtual QUrl defaultUrl() const { return m_defaultUrl; } /* return default url */
@@ -117,7 +120,7 @@ public:
     virtual bool isInputMethodActive() const { return false; }
 
     QString launchParams() const;
-    void setApplicationDescription(ApplicationDescription* desc);
+    void setApplicationDescription(std::shared_ptr<ApplicationDescription> desc);
     void load();
     void setEnableBackgroundRun(bool enable) { m_enableBackgroundRun = enable; }
     void sendLocaleChangeEvent(const QString& language);
@@ -127,7 +130,7 @@ public:
     void sendRelaunchEvent();
     void setAppId(const QString& appId) { m_appId = appId; }
     const QString& appId() const { return m_appId; }
-    ApplicationDescription* getAppDescription() { return m_appDesc; }
+    ApplicationDescription* getAppDescription() { return m_appDesc.get(); }
 
     void setClosing(bool status) { m_isClosing = status; }
     bool isClosing() { return m_isClosing; }
@@ -185,7 +188,7 @@ protected:
     void postWebProcessCreated(uint32_t pid);
     bool isAccessibilityEnabled() const;
 
-    ApplicationDescription* m_appDesc;
+    std::shared_ptr<ApplicationDescription> m_appDesc;
     QString m_appId;
     bool m_suspendAtLoad;
     bool m_isClosing;

@@ -14,7 +14,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "WebPageBase.h"
+#include <memory>
 
 #include <QDir>
 #include <QFileInfo>
@@ -25,13 +25,14 @@
 #include "LogManager.h"
 #include "WebAppManagerConfig.h"
 #include "WebAppManager.h"
+#include "WebPageBase.h"
 #include "WebPageObserver.h"
 #include "WebProcessManager.h"
 
 #define CONSOLE_DEBUG(AAA) evaluateJavaScript(QStringLiteral("console.debug('") + QStringLiteral(AAA) + QStringLiteral("');"))
 
 WebPageBase::WebPageBase()
-    : m_appDesc(0)
+    : m_appDesc(nullptr)
     , m_suspendAtLoad(false)
     , m_isClosing(false)
     , m_isLoadErrorPageFinish(false)
@@ -43,7 +44,7 @@ WebPageBase::WebPageBase()
 {
 }
 
-WebPageBase::WebPageBase(const QUrl& url, ApplicationDescription* desc, const QString& params)
+WebPageBase::WebPageBase(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const QString& params)
     : m_appDesc(desc)
     , m_appId(QString::fromStdString(desc->id()))
     , m_suspendAtLoad(false)
@@ -74,7 +75,7 @@ void WebPageBase::setLaunchParams(const QString& params)
     m_launchParams = params;
 }
 
-void WebPageBase::setApplicationDescription(ApplicationDescription* desc)
+void WebPageBase::setApplicationDescription(std::shared_ptr<ApplicationDescription> desc)
 {
     m_appDesc = desc;
     setPageProperties();

@@ -74,7 +74,7 @@ public:
 };
 
 
-WebPageBlink::WebPageBlink(const QUrl& url, ApplicationDescription* desc, const QString& params)
+WebPageBlink::WebPageBlink(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const QString& params)
     : WebPageBase(url, desc, params)
     , d(new WebPageBlinkPrivate(this))
     , m_isPaused(false)

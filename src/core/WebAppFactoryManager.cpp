@@ -27,7 +27,7 @@
 #include "WebAppManager.h"
 #include "WebPageBase.h"
 
-WebAppFactoryManager* WebAppFactoryManager::m_instance = NULL;
+WebAppFactoryManager* WebAppFactoryManager::m_instance = nullptr;
 
 WebAppFactoryManager* WebAppFactoryManager::instance()
 {
@@ -67,7 +67,7 @@ WebAppFactoryInterface* WebAppFactoryManager::getPluggable(QString appType)
 WebAppFactoryInterface* WebAppFactoryManager::loadPluggable(QString appType)
 {
     if (!appType.isEmpty() && !m_factoryEnv.contains(appType))
-        return 0;
+        return nullptr;
 
     WebAppFactoryInterface* interface;
     QDir pluginsDir(m_webAppFactoryPluginPath);
@@ -89,34 +89,34 @@ WebAppFactoryInterface* WebAppFactoryManager::loadPluggable(QString appType)
                 if (pluginLoader.isLoaded())
                     pluginLoader.unload();
                 if (!appType.isEmpty())
-                    return 0;
+                    return nullptr;
             }
         }
     }
-    return 0;
+    return nullptr;
 }
 
-WebAppBase* WebAppFactoryManager::createWebApp(QString winType, ApplicationDescription* desc, QString appType)
+WebAppBase* WebAppFactoryManager::createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc, QString appType)
 {
     WebAppFactoryInterface* interface = getPluggable(appType);
     if (interface)
         return interface->createWebApp(winType, desc);
 
-    return NULL;
+    return nullptr;
 }
 
-WebAppBase* WebAppFactoryManager::createWebApp(QString winType, WebPageBase* page, ApplicationDescription* desc, QString appType)
+WebAppBase* WebAppFactoryManager::createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc, QString appType)
 {
     WebAppFactoryInterface* interface = getPluggable(appType);  
     if (interface)
         return interface->createWebApp(winType, page, desc);
 
-    return NULL;
+    return nullptr;
 }
 
-WebPageBase* WebAppFactoryManager::createWebPage(QString winType, QUrl url, ApplicationDescription* desc, QString appType, QString launchParams)
+WebPageBase* WebAppFactoryManager::createWebPage(QString winType, QUrl url, std::shared_ptr<ApplicationDescription> desc, QString appType, QString launchParams)
 {
-    WebPageBase *page = NULL;
+    WebPageBase *page = nullptr;
 
     WebAppFactoryInterface* interface = getPluggable(appType);
     if (interface) {

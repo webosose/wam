@@ -17,6 +17,8 @@
 #ifndef WEBAPPBASE_H
 #define WEBAPPBASE_H
 
+#include <memory>
+
 #include <QObject>
 #include <QString>
 
@@ -70,7 +72,7 @@ public:
     virtual void focus() = 0;
     virtual void unfocus() = 0;
     virtual void setOpacity(float opacity) = 0;
-    virtual void setAppDescription(ApplicationDescription*);
+    virtual void setAppDescription(std::shared_ptr<ApplicationDescription>);
     virtual void setPreferredLanguages(QString language);
     virtual void stagePreparing();
     virtual void stageReady();

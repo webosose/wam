@@ -125,21 +125,19 @@ WebAppBase* ContainerAppManager::launchContainerAppInternal(const std::string& i
 #ifndef PRELOADMANAGER_ENABLED
     if (!m_containerDesc.size()) {
         WebAppManager::instance()->sendLaunchContainerApp();
-        return 0;
+        return nullptr;
     }
 #endif
 
-    ApplicationDescription* desc = ApplicationDescription::fromJsonString(m_containerDesc.c_str());
+    std::shared_ptr<ApplicationDescription> desc(ApplicationDescription::fromJsonString(m_containerDesc.c_str()));
     if (!desc) {
         LOG_ERROR(MSGID_LAUNCH_URL_BAD_APP_DESC, 1, PMLOGKS("APP_DESC", m_containerDesc.c_str()), "");
-        return 0;
+        return nullptr;
     }
     WebAppBase* app = WebAppFactoryManager::instance()->createWebApp(WT_CARD, desc, desc->subType().c_str());
 
-    if (!app) {
-        delete desc;
-        return 0;
-    }
+    if (!app)
+        return nullptr;
 
     std::string url = desc->entryPoint();
     WebPageBase* page = WebAppFactoryManager::instance()->createWebPage(WT_CARD, QUrl(url.c_str()), desc, desc->subType().c_str());

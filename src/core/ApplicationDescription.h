@@ -17,6 +17,8 @@
 #ifndef APPLICATIONDESCRIPTION_H
 #define APPLICATIONDESCRIPTION_H
 
+#include <memory>
+
 #include <QJsonObject>
 #include <QMap>
 #include <QPair>
@@ -125,7 +127,7 @@ public:
         return m_v8ExtraFlags;
     }
 
-    static ApplicationDescription* fromJsonString(const char* jsonStr);
+    static std::unique_ptr<ApplicationDescription> fromJsonString(const char* jsonStr);
 
     bool isInspectable() const { return m_inspectable; }
     bool useCustomPlugin() const { return m_customPlugin; }

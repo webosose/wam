@@ -19,7 +19,7 @@
 #include "WebAppWayland.h"
 #include "WebAppWaylandWindow.h"
 
-WebAppWaylandWindow* WebAppWaylandWindow::s_instance = 0;
+WebAppWaylandWindow* WebAppWaylandWindow::s_instance = nullptr;
 
 WebAppWaylandWindow* WebAppWaylandWindow::take()
 {

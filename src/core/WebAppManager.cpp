@@ -149,7 +149,7 @@ bool WebAppManager::getDeviceInfo(QString name, QString &value)
 }
 
 void WebAppManager::onLaunchContainerBasedApp(const std::string& url, QString& winType,
-                                              const ApplicationDescription* appDesc,
+                                              std::shared_ptr<ApplicationDescription> appDesc,
                                               const std::string& args, const std::string& launchingAppId)
 {
     if (!m_containerAppManager)
@@ -179,7 +179,7 @@ void WebAppManager::onLaunchContainerBasedApp(const std::string& url, QString& w
     page->replaceBaseUrl(QUrl(url.c_str()));
     page->setDefaultUrl(QUrl(url.c_str()));
 
-    app->setAppDescription((ApplicationDescription *)appDesc);
+    app->setAppDescription(appDesc);
     app->setAppProperties(QString::fromStdString(args));
     app->setPreloadState(QString::fromStdString(args));
 
@@ -190,7 +190,7 @@ void WebAppManager::onLaunchContainerBasedApp(const std::string& url, QString& w
     webPageRemoved(page);
 
     appId = appDesc->id();
-    page->setApplicationDescription((ApplicationDescription *)appDesc);
+    page->setApplicationDescription(appDesc);
     page->setLaunchParams(args.c_str());
 
     app->setWasContainerApp(true);
@@ -355,19 +355,19 @@ std::list<const WebAppBase*> WebAppManager::runningApps(uint32_t pid)
 }
 
 WebAppBase* WebAppManager::onLaunchUrl(const std::string& url, QString winType,
-                                       const ApplicationDescription* appDesc, const std::string& instanceId,
+                                       std::shared_ptr<ApplicationDescription> appDesc, const std::string& instanceId,
                                        const std::string& args, const std::string& launchingAppId,
                                        int& errCode, std::string& errMsg)
 {
-    WebAppBase* app = WebAppFactoryManager::instance()->createWebApp(winType, (ApplicationDescription *)appDesc, appDesc->subType().c_str());
+    WebAppBase* app = WebAppFactoryManager::instance()->createWebApp(winType, appDesc, appDesc->subType().c_str());
 
     if (!app) {
         errCode = ERR_CODE_LAUNCHAPP_UNSUPPORTED_TYPE;
         errMsg = err_unsupportedType;
-        return 0;
+        return nullptr;
     }
 
-    WebPageBase* page = WebAppFactoryManager::instance()->createWebPage(winType, QUrl(url.c_str()), (ApplicationDescription *)appDesc, appDesc->subType().c_str(), args.c_str());
+    WebPageBase* page = WebAppFactoryManager::instance()->createWebPage(winType, QUrl(url.c_str()), appDesc, appDesc->subType().c_str(), args.c_str());
 
     //set use launching time optimization true while app loading.
     page->setUseLaunchOptimization(true);
@@ -375,14 +375,14 @@ WebAppBase* WebAppManager::onLaunchUrl(const std::string& url, QString winType,
     // Set system app optimization - currently turning off inline caching
     // this include the case that container based app is launched
     // not by using container app.
-    if (m_webAppManagerConfig->isUseSystemAppOptimization() && isContainerUsedApp(appDesc)) {
+    if (m_webAppManagerConfig->isUseSystemAppOptimization() && isContainerUsedApp(appDesc.get())) {
       page->setUseSystemAppOptimization(true);
     }
 
     if (winType == WT_FLOATING)
       page->setEnableBackgroundRun(appDesc->isEnableBackgroundRun());
 
-    app->setAppDescription((ApplicationDescription *)appDesc);
+    app->setAppDescription(appDesc);
     app->setAppProperties(QString::fromStdString(args));
     app->setInstanceId(QString::fromStdString(instanceId));
     app->setLaunchingAppId(QString::fromStdString(launchingAppId));
@@ -409,7 +409,7 @@ WebAppBase* WebAppManager::onLaunchUrl(const std::string& url, QString winType,
     LOG_INFO(MSGID_START_LAUNCHURL, 2, PMLOGKS("APP_ID", qPrintable(app->appId())), PMLOGKFV("PID", "%d", app->page()->getWebProcessPID()), "");
 
 #ifndef PRELOADMANAGER_ENABLED
-    if (m_containerAppManager && m_containerAppManager->getLaunchContainerAppOnDemand() && getContainerAppProxyID() == m_webProcessManager->getWebProcessProxyID(appDesc)) {
+    if (m_containerAppManager && m_containerAppManager->getLaunchContainerAppOnDemand() && getContainerAppProxyID() == m_webProcessManager->getWebProcessProxyID(appDesc.get())) {
         m_containerAppManager->setLaunchContainerAppOnDemand(false);
         m_containerAppManager->startContainerTimer();
     }
@@ -717,9 +717,8 @@ uint32_t WebAppManager::getContainerAppProxyID()
     if (!m_containerAppManager || m_containerAppManager->getContainerAppDescription().empty())
         return 0;
 
-    ApplicationDescription* containerDesc = ApplicationDescription::fromJsonString(m_containerAppManager->getContainerAppDescription().c_str());
-    uint32_t proxyID = m_webProcessManager->getWebProcessProxyID(containerDesc);
-    delete containerDesc;
+    auto containerDesc(ApplicationDescription::fromJsonString(m_containerAppManager->getContainerAppDescription().c_str()));
+    uint32_t proxyID = m_webProcessManager->getWebProcessProxyID(containerDesc.get());
     return proxyID;
 }
 
@@ -747,7 +746,7 @@ void WebAppManager::killCustomPluginProcess(const QString &basePath)
 std::string WebAppManager::launch(const std::string& appDescString, const std::string& params,
         const std::string& launchingAppId, int& errCode, std::string& errMsg)
 {
-    ApplicationDescription* desc = ApplicationDescription::fromJsonString(appDescString.c_str());
+    std::shared_ptr<ApplicationDescription> desc(ApplicationDescription::fromJsonString(appDescString.c_str()));
     if (!desc)
         return std::string();
 
@@ -764,17 +763,14 @@ std::string WebAppManager::launch(const std::string& appDescString, const std::s
             LOG_INFO(MSGID_CONTAINER_APP_RELAUNCHED, 2, PMLOGKS("APP_ID", qPrintable(QString::fromStdString(desc->id()))),
                   PMLOGKS("INSTANCE_ID", qPrintable(QString::fromStdString(instanceId))), "ContainerApp; Already Running");
         }
-        delete desc;
     }
     // Check if app is already running
     else if (isRunningApp(desc->id(), instanceId)) {
         onRelaunchApp(instanceId, desc->id().c_str(), params.c_str(), launchingAppId.c_str());
-        delete desc;
     }
     // Check if app is container-based
-    else if (isContainerBasedApp(desc)) {
+    else if (isContainerBasedApp(desc.get())) {
         if (desc->trustLevel() != "default" && desc->trustLevel() != "trusted") {
-            delete desc;
             errCode = ERR_CODE_LAUNCHAPP_INVALID_TRUSTLEVEL;
             errMsg = err_invalidTrustLevel;
             return std::string();
@@ -789,7 +785,6 @@ std::string WebAppManager::launch(const std::string& appDescString, const std::s
     else {
         instanceId = generateInstanceId();
         if (!onLaunchUrl(url, winType, desc, instanceId, params, launchingAppId, errCode, errMsg)) {
-            delete desc;
             return std::string();
         }
     }
