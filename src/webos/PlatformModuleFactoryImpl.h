@@ -30,11 +30,11 @@ public:
     PlatformModuleFactoryImpl();
 
 protected:
-    virtual ServiceSender* createServiceSender();
-    virtual WebProcessManager* createWebProcessManager();
-    virtual ContainerAppManager* createContainerAppManager();
-    virtual DeviceInfo* createDeviceInfo();
-    virtual WebAppManagerConfig* createWebAppManagerConfig();
+    virtual std::unique_ptr<ServiceSender> createServiceSender();
+    virtual std::unique_ptr<WebProcessManager> createWebProcessManager();
+    virtual std::unique_ptr<ContainerAppManager> createContainerAppManager();
+    virtual std::unique_ptr<DeviceInfo> createDeviceInfo();
+    virtual std::unique_ptr<WebAppManagerConfig> createWebAppManagerConfig();
 
 private:
     bool useContainerApp();

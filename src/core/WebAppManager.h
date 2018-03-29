@@ -67,11 +67,11 @@ public:
     bool getDeviceInfo(QString name, QString& value);
     void broadcastWebAppMessage(WebAppMessageType type, const QString& message);
 
-    WebProcessManager* getWebProcessManager() { return m_webProcessManager; }
+    WebProcessManager* getWebProcessManager() { return m_webProcessManager.get(); }
 
     virtual ~WebAppManager();
 
-    void setPlatformModules(PlatformModuleFactory* factory);
+    void setPlatformModules(std::unique_ptr<PlatformModuleFactory> factory);
     bool run();
     void quit();
 
@@ -118,7 +118,7 @@ public:
 
     void setSystemLanguage(QString value);
     void setDeviceInfo(QString name, QString value);
-    WebAppManagerConfig* config() { return m_webAppManagerConfig; }
+    WebAppManagerConfig* config() { return m_webAppManagerConfig.get(); }
 
     void requestActivity(WebAppBase* app);
     const QString windowTypeFromString(const std::string& str);
@@ -199,12 +199,12 @@ private:
 
     QString m_activeAppId;
 
-    ServiceSender* m_serviceSender;
-    ContainerAppManager* m_containerAppManager;
-    WebProcessManager* m_webProcessManager;
-    DeviceInfo* m_deviceInfo;
-    WebAppManagerConfig* m_webAppManagerConfig;
-    NetworkStatusManager* m_networkStatusManager;
+    std::unique_ptr<ServiceSender> m_serviceSender;
+    std::unique_ptr<ContainerAppManager> m_containerAppManager;
+    std::unique_ptr<WebProcessManager> m_webProcessManager;
+    std::unique_ptr<DeviceInfo> m_deviceInfo;
+    std::unique_ptr<WebAppManagerConfig> m_webAppManagerConfig;
+    std::unique_ptr<NetworkStatusManager> m_networkStatusManager;
 
     QMap<QString, int> m_lastCrashedAppIds;
 

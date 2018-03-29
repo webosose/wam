@@ -17,26 +17,28 @@
 #ifndef PLATFORMMODULEFACTORY_H
 #define PLATFORMMODULEFACTORY_H
 
-class ServiceSender;
-class WebProcessManager;
-class ContainerAppManager;
-class DeviceInfo;
-class WebAppManagerConfig;
+#include <memory>
+
+#include "ServiceSender.h"
+#include "WebProcessManager.h"
+#include "ContainerAppManager.h"
+#include "DeviceInfo.h"
+#include "WebAppManagerConfig.h"
 
 class PlatformModuleFactory {
 public:
-    ServiceSender* getServiceSender() { return createServiceSender(); }
-    WebProcessManager* getWebProcessManager() { return createWebProcessManager(); }
-    ContainerAppManager* getContainerAppManager() { return createContainerAppManager(); }
-    DeviceInfo* getDeviceInfo() { return createDeviceInfo(); }
-    WebAppManagerConfig* getWebAppManagerConfig() { return createWebAppManagerConfig(); }
+    std::unique_ptr<ServiceSender> getServiceSender() { return createServiceSender(); }
+    std::unique_ptr<WebProcessManager> getWebProcessManager() { return createWebProcessManager(); }
+    std::unique_ptr<ContainerAppManager> getContainerAppManager() { return createContainerAppManager(); }
+    std::unique_ptr<DeviceInfo> getDeviceInfo() { return createDeviceInfo(); }
+    std::unique_ptr<WebAppManagerConfig> getWebAppManagerConfig() { return createWebAppManagerConfig(); }
 
 protected:
-    virtual ServiceSender* createServiceSender() = 0;
-    virtual WebProcessManager* createWebProcessManager() = 0;
-    virtual ContainerAppManager* createContainerAppManager() = 0;
-    virtual DeviceInfo* createDeviceInfo() = 0;
-    virtual WebAppManagerConfig* createWebAppManagerConfig() = 0;
+    virtual std::unique_ptr<ServiceSender> createServiceSender() = 0;
+    virtual std::unique_ptr<WebProcessManager> createWebProcessManager() = 0;
+    virtual std::unique_ptr<ContainerAppManager> createContainerAppManager() = 0;
+    virtual std::unique_ptr<DeviceInfo> createDeviceInfo() = 0;
+    virtual std::unique_ptr<WebAppManagerConfig> createWebAppManagerConfig() = 0;
 };
 
 #endif /* PLATFORMMODULEFACTORY_H */

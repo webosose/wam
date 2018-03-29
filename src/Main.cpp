@@ -97,7 +97,7 @@ static void startWebAppManager()
     assert(webAppManagerServiceLuna);
     bool result = webAppManagerServiceLuna->startService();
     assert(result);
-    WebAppManager::instance()->setPlatformModules(new PlatformModuleFactoryImpl());
+    WebAppManager::instance()->setPlatformModules(std::unique_ptr<PlatformModuleFactoryImpl>(new PlatformModuleFactoryImpl()));
 }
 
 class WebOSMainDelegateWAM : public webos::WebOSMainDelegate {

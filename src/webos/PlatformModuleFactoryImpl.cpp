@@ -28,34 +28,34 @@ PlatformModuleFactoryImpl::PlatformModuleFactoryImpl()
     prepareRenderingContext();
 }
 
-ServiceSender* PlatformModuleFactoryImpl::createServiceSender()
+std::unique_ptr<ServiceSender> PlatformModuleFactoryImpl::createServiceSender()
 {
-    return new ServiceSenderLuna();
+    return std::unique_ptr<ServiceSenderLuna>(new ServiceSenderLuna());
 }
 
-WebProcessManager* PlatformModuleFactoryImpl::createWebProcessManager()
+std::unique_ptr<WebProcessManager> PlatformModuleFactoryImpl::createWebProcessManager()
 {
-    return new BlinkWebProcessManager();
+    return std::unique_ptr<BlinkWebProcessManager>(new BlinkWebProcessManager());
 }
 
-ContainerAppManager* PlatformModuleFactoryImpl::createContainerAppManager()
+std::unique_ptr<ContainerAppManager> PlatformModuleFactoryImpl::createContainerAppManager()
 {
     if(useContainerApp()) {
-        return new ContainerAppManager();
+        return std::unique_ptr<ContainerAppManager>(new ContainerAppManager());
     }
 
-    return 0;
+    return nullptr;
 
 }
 
-DeviceInfo* PlatformModuleFactoryImpl::createDeviceInfo()
+std::unique_ptr<DeviceInfo> PlatformModuleFactoryImpl::createDeviceInfo()
 {
-    return new DeviceInfoImpl();
+    return std::unique_ptr<DeviceInfoImpl>(new DeviceInfoImpl());
 }
 
-WebAppManagerConfig* PlatformModuleFactoryImpl::createWebAppManagerConfig()
+std::unique_ptr<WebAppManagerConfig> PlatformModuleFactoryImpl::createWebAppManagerConfig()
 {
-    return new WebAppManagerConfig();
+    return std::unique_ptr<WebAppManagerConfig>(new WebAppManagerConfig());
 }
 
 bool PlatformModuleFactoryImpl::useContainerApp()

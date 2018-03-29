@@ -51,11 +51,6 @@ WebAppManager* WebAppManager::instance()
 
 WebAppManager::WebAppManager()
     : m_deletingPages(false)
-    , m_serviceSender(0)
-    , m_containerAppManager(0)
-    , m_webProcessManager(0)
-    , m_deviceInfo(0)
-    , m_webAppManagerConfig(0)
     , m_networkStatusManager(new NetworkStatusManager())
     , m_suspendDelay(0)
     , m_isAccessibilityEnabled(false)
@@ -64,11 +59,6 @@ WebAppManager::WebAppManager()
 
 WebAppManager::~WebAppManager()
 {
-    delete m_containerAppManager;
-    delete m_serviceSender;
-    delete m_webProcessManager;
-    delete m_deviceInfo;
-    delete m_networkStatusManager;
 }
 
 void WebAppManager::notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level)
@@ -81,7 +71,7 @@ void WebAppManager::notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel
     }
 }
 
-void WebAppManager::setPlatformModules(PlatformModuleFactory* factory)
+void WebAppManager::setPlatformModules(std::unique_ptr<PlatformModuleFactory> factory)
 {
     m_webAppManagerConfig = factory->getWebAppManagerConfig();
     m_containerAppManager = factory->getContainerAppManager();
