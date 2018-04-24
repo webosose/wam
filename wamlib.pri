@@ -26,14 +26,9 @@ SOURCES += \
     BlinkWebView.cpp \
     BlinkWebViewProfileHelper.cpp \
     DeviceInfoImpl.cpp \
-    PalmServiceBase.cpp \
     PalmSystemBlink.cpp \
     PalmSystemWebOS.cpp \
     PlatformModuleFactoryImpl.cpp \
-    PlugInServiceLuna.cpp \
-    ServiceSenderLuna.cpp \
-    WebAppManagerServiceLuna.cpp \
-    WebAppManagerServiceLunaImpl.cpp \
     WebAppWayland.cpp \
     WebAppWaylandWindow.cpp \
     WebPageBlink.cpp \
@@ -44,14 +39,9 @@ HEADERS += \
     BlinkWebView.h \
     BlinkWebViewProfileHelper.h \
     DeviceInfoImpl.h \
-    PalmServiceBase.h \
     PalmSystemBlink.h \
     PalmSystemWebOS.h \
     PlatformModuleFactoryImpl.h \
-    PlugInServiceLuna.h \
-    ServiceSenderLuna.h \
-    WebAppManagerServiceLuna.h \
-    WebAppManagerServiceLunaImpl.h \
     WebAppWayland.h \
     WebAppWaylandWindow.h \
     WebPageBlinkDelegate.h \
@@ -60,7 +50,25 @@ HEADERS += \
 
 TARGET = WebAppMgr
 
-LIBS += -llunaservice
+luna_service {
+    DEFINES += HAS_LUNA_SERVICE
+
+    SOURCES += \
+            PalmServiceBase.cpp \
+            PlugInServiceLuna.cpp \
+            ServiceSenderLuna.cpp \
+            WebAppManagerServiceLuna.cpp \
+            WebAppManagerServiceLunaImpl.cpp
+
+    HEADERS += \
+            PalmServiceBase.h \
+            PlugInServiceLuna.h \
+            ServiceSenderLuna.h \
+            WebAppManagerServiceLuna.h \
+            WebAppManagerServiceLunaImpl.h
+
+    LIBS += -llunaservice
+}
 
 headers.files = $$HEADERS
 headers.path = $${PREFIX}/include/webappmanager
