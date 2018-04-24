@@ -17,7 +17,9 @@
 #ifndef LOGMANAGER_H
 #define LOGMANAGER_H
 
-#ifdef DISABLE_LOGMANAGER
+#include "LogMsgId.h"
+
+#if defined(DISABLE_LOGMANAGER) || !defined(HAS_PMLOG)
 
 #define LOG_INFO_APPID(...) \
     do {                    \
@@ -38,10 +40,19 @@
     do {                  \
     } while (0)
 
+#define PMLOGKFV(literal_key, literal_fmt, value) \
+  literal_key, literal_fmt, value
+
+#define PMLOGKS(literal_key, string_value) \
+  literal_key, "\"%s\"", string_value
+
+#define LOG_INFO_WITH_CLOCK(__msgid, ...) \
+    do {                                  \
+    } while (0)
+
 #else
 
 #include "LogManagerPmLog.h"
-#include "LogMsgId.h"
 
 #endif
 
