@@ -85,11 +85,15 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
         if (params.size() > 0)
             setKeepAlive(params[0] == "true");
     } else if (message == "PmLogInfoWithClock") {
+#ifdef HAS_PMLOG
         if (params.size() == 3)
             pmLogInfoWithClock(params[0], params[1], params[2]);
+#endif
     } else if (message == "PmLogString") {
+#ifdef HAS_PMLOG
         if (params.size() > 3)
             pmLogString(static_cast<PmLogLevel>(params[0].toInt()), params[1], params[2], params[3]);
+#endif
     } else if (message == "setWindowProperty") {
         if (params.size() > 1) {
             LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()),
