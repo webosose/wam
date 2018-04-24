@@ -37,7 +37,7 @@ QT = core
 ################################################################################
 # Decide MACHINE_NAME and PLATFORM
 
-MACHINE_NAME = $$(MACHINE)
+MACHINE_NAME = "minnowboard"
 
 isEmpty(PLATFORM) {
     error("PLATFORM wasn't set")
