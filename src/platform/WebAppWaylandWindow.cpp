@@ -117,7 +117,9 @@ void WebAppWaylandWindow::setCursor(const QString & cursorArg, int hotspot_x, in
         type = webos::CUSTOM_CURSOR_PATH;
     }
 
+#if defined(OS_WEBOS)
     SetCustomCursor(type, cursorArg.toUtf8().data(), hotspot_x, hotspot_y);
+#endif
 
     if (type == webos::CUSTOM_CURSOR_BLANK)
         m_cursorEnabled = false;
@@ -358,9 +360,11 @@ void WebAppWaylandWindow::logEventDebugging(WebOSEvent* event)
 
 void WebAppWaylandWindow::sendKeyCode(int keyCode)
 {
+#if defined(OS_WEBOS)
     if (!m_xinputActivated) {
         XInputActivate();
         m_xinputActivated = true;
     }
     XInputInvokeAction(keyCode);
+#endif
 }

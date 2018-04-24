@@ -322,10 +322,12 @@ void WebAppWayland::setKeyMask(webos::WebOSKeyMask keyMask, bool value)
 
 void WebAppWayland::applyInputRegion()
 {
+#if defined(OS_WEBOS)
     if (!m_enableInputRegion && !m_inputRegion.empty()) {
         m_enableInputRegion = true;
         m_appWindow->SetInputRegion(m_inputRegion);
     }
+#endif
 }
 
 void WebAppWayland::setInputRegion(const QJsonDocument& jsonDoc)
@@ -345,7 +347,9 @@ void WebAppWayland::setInputRegion(const QJsonDocument& jsonDoc)
         }
     }
 
+#if defined(OS_WEBOS)
     m_appWindow->SetInputRegion(m_inputRegion);
+#endif
 }
 
 
@@ -412,12 +416,16 @@ void WebAppWayland::setKeyMask(const QJsonDocument& jsonDoc)
             keyMask |= mapTable.value(jsonArray[i].toString());
     }
 
+#if defined(OS_WEBOS)
     m_appWindow->SetKeyMask(static_cast<webos::WebOSKeyMask>(keyMask));
+#endif
 }
 
 void WebAppWayland::setKeyMask(webos::WebOSKeyMask keyMask)
 {
+#if defined(OS_WEBOS)
     m_appWindow->SetKeyMask(keyMask);
+#endif
 }
 
 void WebAppWayland::focusOwner()
@@ -723,7 +731,9 @@ void WebAppWayland::moveInputRegion(int height)
     }
     m_inputRegion.clear();
     m_inputRegion = newRegion;
+#if defined(OS_WEBOS)
     m_appWindow->SetInputRegion(m_inputRegion);
+#endif
 }
 
 void WebAppWayland::keyboardVisibilityChanged(bool visible, int height) {
