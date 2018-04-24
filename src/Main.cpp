@@ -25,7 +25,11 @@
 #include "LogManager.h"
 #include "PlatformModuleFactoryImpl.h"
 #include "WebAppManager.h"
+
+#ifdef HAS_LUNA_SERVICE
 #include "WebAppManagerServiceLuna.h"
+#endif
+
 #include <webos/app/webos_main.h>
 
 namespace
@@ -92,11 +96,12 @@ static void startWebAppManager()
     qInstallMessageHandler(qMessageHandler);
 
     changeUserIDGroupID();
-
+#ifdef HAS_LUNA_SERVICE
     WebAppManagerServiceLuna* webAppManagerServiceLuna = WebAppManagerServiceLuna::instance();
     assert(webAppManagerServiceLuna);
     bool result = webAppManagerServiceLuna->startService();
     assert(result);
+#endif
     WebAppManager::instance()->setPlatformModules(new PlatformModuleFactoryImpl());
 }
 

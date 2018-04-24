@@ -17,7 +17,9 @@
 #include "PlatformModuleFactory.h"
 
 #include "PlatformModuleFactoryImpl.h"
+#ifdef HAS_LUNA_SERVICE
 #include "ServiceSenderLuna.h"
+#endif
 #include "ContainerAppManager.h"
 #include "DeviceInfoImpl.h"
 #include "WebAppManagerConfig.h"
@@ -30,7 +32,11 @@ PlatformModuleFactoryImpl::PlatformModuleFactoryImpl()
 
 ServiceSender* PlatformModuleFactoryImpl::createServiceSender()
 {
+#ifdef HAS_LUNA_SERVICE
     return new ServiceSenderLuna();
+#else
+    return nullptr;
+#endif
 }
 
 WebProcessManager* PlatformModuleFactoryImpl::createWebProcessManager()
