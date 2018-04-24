@@ -23,7 +23,6 @@ SOURCES += \
         ContainerAppManager.cpp \
         DeviceInfo.cpp \
         LogManager.cpp \
-        LogManagerPmLog.cpp \
         NetworkStatus.cpp \
         NetworkStatusManager.cpp \
         PalmSystemBase.cpp \
@@ -44,7 +43,6 @@ HEADERS += \
         ContainerAppManager.h \
         DeviceInfo.h \
         LogManager.h \
-        LogManagerPmLog.h \
         LogMsgId.h \
         NetworkStatus.h \
         NetworkStatusManager.h \
@@ -66,6 +64,12 @@ HEADERS += \
         WebProcessManager.h \
         WebViewBase.h \
         WindowTypes.h
+
+pmlog {
+    DEFINES += HAS_PMLOG
+    SOURCES += LogManagerPmLog.cpp
+    HEADERS += LogManagerPmLog.h
+}
 
 lttng {
     DEFINES += HAS_LTTNG

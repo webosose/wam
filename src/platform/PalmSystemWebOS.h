@@ -18,7 +18,10 @@
 #define PALMSYSTEMWEBOS_H_
 
 #include "PalmSystemBase.h"
+
+#ifdef HAS_PMLOG
 #include <PmLogLib.h>
+#endif
 
 class WebAppBase;
 class WebAppWayland;
@@ -65,9 +68,10 @@ protected:
     virtual void setLoadErrorPolicy(const QString& params) {}
     virtual void setInputRegion(const QByteArray& params);
     virtual void setGroupClientEnvironment(GroupClientCallKey callKey, const QByteArray& params);
-
+#ifdef HAS_PMLOG
     virtual void pmLogInfoWithClock(const QVariant& msgid, const QVariant& perfType, const QVariant& perfGroup);
     virtual void pmLogString(PmLogLevel level, const QVariant& msgid, const QVariant& kvpairs, const QVariant& message);
+#endif
     virtual bool cursorVisibility();
     virtual void updateLaunchParams(const QString& launchParams);
 

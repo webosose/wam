@@ -161,6 +161,7 @@ void PalmSystemWebOS::setKeepAlive(bool keep)
     m_app->setKeepAlive(keep);
 }
 
+#ifdef HAS_PMLOG
 void PalmSystemWebOS::pmLogInfoWithClock(const QVariant& msgid, const QVariant& perfType, const QVariant& perfGroup)
 {
     PmLogContext context;
@@ -177,6 +178,7 @@ void PalmSystemWebOS::pmLogString(PmLogLevel level, const QVariant& msgid, const
     PmLogString(context, level, msgid.toByteArray().size() ? msgid.toByteArray().data() : NULL,
             kvpairs.toByteArray().size() ? kvpairs.toByteArray().data() : NULL, message.toByteArray().data());
 }
+#endif
 
 bool PalmSystemWebOS::cursorVisibility()
 {
