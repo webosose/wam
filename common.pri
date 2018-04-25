@@ -69,12 +69,47 @@ snapshot_boot {
     LIBS += -lsnapshot-boot
 }
 
+###############################################################################
+# pmlog
+#
+# Please use CONFIG_BUILD in your recipe.
+#
+#       EXTRA_QMAKEVARS_PRE +=  "CONFIG_BUILD+=pmlog"
+contains(CONFIG_BUILD, pmlog) {
+    CONFIG += pmlog
+    message($$MACHINE_NAME $$PLATFORM use pmlog)
+}
+
+###############################################################################
+# luna-service
+#
+# Please use CONFIG_BUILD in your recipe.
+#
+#       EXTRA_QMAKEVARS_PRE +=  "CONFIG_BUILD+=luna_service"
+contains(CONFIG_BUILD, luna_service) {
+    CONFIG += luna_service
+    message($$MACHINE_NAME $$PLATFORM use luna service)
+}
+
+
+################################################################################
+# agl-service
+#
+# Please use CONFIG_BUILD in your recipe.
+#
+#       EXTRA_QMAKEVARS_PRE +=  "CONFIG_BUILD+=agl_service"
+contains(CONFIG_BUILD, agl_service) {
+    CONFIG += agl_service
+    message($$MACHINE_NAME $$PLATFORM use agl service)
+}
+
 
 ################################################################################
 # Path and CFLAGS
 
 VPATH += \
     ./src \
+    ./src/agl \
     ./src/core \
     ./src/platform \
     ./src/platform/webengine \
