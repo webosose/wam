@@ -26,8 +26,10 @@
 #include "PlatformModuleFactoryImpl.h"
 #include "WebAppManager.h"
 
-#ifdef HAS_LUNA_SERVICE
+#if defined(HAS_LUNA_SERVICE)
 #include "WebAppManagerServiceLuna.h"
+#elif defined(HAS_AGL_SERVICE)
+#include "WebAppManagerServiceAGL.h"
 #endif
 
 #include <webos/app/webos_main.h>
@@ -96,10 +98,15 @@ static void startWebAppManager()
     qInstallMessageHandler(qMessageHandler);
 
     changeUserIDGroupID();
-#ifdef HAS_LUNA_SERVICE
-    WebAppManagerServiceLuna* webAppManagerServiceLuna = WebAppManagerServiceLuna::instance();
-    assert(webAppManagerServiceLuna);
-    bool result = webAppManagerServiceLuna->startService();
+#if defined(HAS_LUNA_SERVICE) || defined(HAS_AGL_SERVICE)
+    WebAppManagerService* webAppManagerService = nullptr;
+#if defined(HAS_LUNA_SERVICE)
+    webAppManagerService = WebAppManagerServiceLuna::instance();
+#elif defineD(HAS_AGL_SERVICE)
+    webAppManagerService = WebAppManagerServiceAGL::instance();
+#endif
+    assert(webAppManagerService);
+    bool result = webAppManagerService->startService();
     assert(result);
 #endif
     WebAppManager::instance()->setPlatformModules(std::unique_ptr<PlatformModuleFactoryImpl>(new PlatformModuleFactoryImpl()));
