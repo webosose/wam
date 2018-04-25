@@ -70,6 +70,12 @@ luna_service {
     LIBS += -llunaservice
 }
 
+agl_service {
+    DEFINES += HAS_AGL_SERVICE
+    SOURCES += WebAppManagerServiceAGL.cpp
+    HEADERS += WebAppManagerServiceAGL.h
+}
+
 headers.files = $$HEADERS
 headers.path = $${PREFIX}/include/webappmanager
 target.path = $${PREFIX}/lib
