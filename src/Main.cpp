@@ -92,7 +92,7 @@ static void changeUserIDGroupID()
     }
 }
 
-static void startWebAppManager()
+static void startWebAppManager(const std::string& app)
 {
     // FIXME: Remove this when we don't use qDebug, qWarning any more.
     qInstallMessageHandler(qMessageHandler);
@@ -102,8 +102,10 @@ static void startWebAppManager()
     WebAppManagerService* webAppManagerService = nullptr;
 #if defined(HAS_LUNA_SERVICE)
     webAppManagerService = WebAppManagerServiceLuna::instance();
-#elif defineD(HAS_AGL_SERVICE)
+#elif defined(HAS_AGL_SERVICE)
     webAppManagerService = WebAppManagerServiceAGL::instance();
+    if (webAppManagerService)
+        static_cast<WebAppManagerServiceAGL*>(webAppManagerService)->setStartupApplication(app);
 #endif
     assert(webAppManagerService);
     bool result = webAppManagerService->startService();
@@ -114,14 +116,35 @@ static void startWebAppManager()
 
 class WebOSMainDelegateWAM : public webos::WebOSMainDelegate {
 public:
+    WebOSMainDelegateWAM(const std::string& app)
+      : app_(app) {}
+
     void AboutToCreateContentBrowserClient() override {
-        startWebAppManager();
+        startWebAppManager(app_);
     }
+
+private:
+
+    std::string app_;
 };
 
 int main (int argc, const char** argv)
 {
-    WebOSMainDelegateWAM delegate;
+    std::string app;
+    std::vector<const char*> args;
+    for (int i=0; i < argc; i++) {
+      if (std::string(argv[i]) == "--launch-app") {
+          if (i + 1 < argc) {
+              app = argv[++i];
+          } else {
+              fprintf(stderr, "--launch-app option requires one argument.\r\n");
+              return 1;
+          }
+      } else {
+          args.push_back(argv[i]);
+      }
+    }
+    WebOSMainDelegateWAM delegate(app);
     webos::WebOSMain webOSMain(&delegate);
-    return webOSMain.Run(argc, argv);
+    return webOSMain.Run(args.size(), args.data());
 }

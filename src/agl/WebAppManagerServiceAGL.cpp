@@ -14,10 +14,26 @@ WebAppManagerService* WebAppManagerServiceAGL::instance()
     return srv;
 }
 
+void WebAppManagerServiceAGL::setStartupApplication(const std::string& app)
+{
+  startup_app_ = app;
+}
+
 bool WebAppManagerServiceAGL::startService()
 {
     fprintf(stderr, "WebAppManagerServiceAGL::startService\r\n");
+    if (!startup_app_.empty()) {
+      fprintf(stderr, "    Startup app: %s\r\n", startup_app_.c_str());
+      startup_app_timer_.start(1000, this, 
+          &WebAppManagerServiceAGL::launchStartupApp);
+    }
     return true;
+}
+
+void WebAppManagerServiceAGL::launchStartupApp()
+{
+  fprintf(stderr, "WebAppManagerServiceAGL::launchStartupApp\r\n");
+
 }
 
 QJsonObject WebAppManagerServiceAGL::launchApp(QJsonObject request)
