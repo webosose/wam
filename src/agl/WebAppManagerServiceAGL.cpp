@@ -1,5 +1,8 @@
 #include "WebAppManagerServiceAGL.h"
 
+#include <QFile>
+#include <QJsonDocument>
+
 WebAppManagerServiceAGL::WebAppManagerServiceAGL()
 {
 }
@@ -21,9 +24,8 @@ void WebAppManagerServiceAGL::setStartupApplication(const std::string& app)
 
 bool WebAppManagerServiceAGL::startService()
 {
-    fprintf(stderr, "WebAppManagerServiceAGL::startService\r\n");
     if (!startup_app_.empty()) {
-      fprintf(stderr, "    Startup app: %s\r\n", startup_app_.c_str());
+      fprintf(stderr, "Startup app: %s\r\n", startup_app_.c_str());
       startup_app_timer_.start(1000, this, 
           &WebAppManagerServiceAGL::launchStartupApp);
     }
@@ -32,8 +34,25 @@ bool WebAppManagerServiceAGL::startService()
 
 void WebAppManagerServiceAGL::launchStartupApp()
 {
-  fprintf(stderr, "WebAppManagerServiceAGL::launchStartupApp\r\n");
+    QString filename = QString::fromStdString(startup_app_);
+    filename.append("/appinfo.json");
+    QFile file;
+    file.setFileName(filename);
+    file.open(QIODevice::ReadOnly | QIODevice::Text);
+    QString appinfo = file.readAll();
+    file.close();
 
+    QJsonDocument json = QJsonDocument::fromJson(appinfo.toUtf8());
+    QJsonObject obj = json.object();
+    obj["folderPath"] = QJsonValue(startup_app_.c_str());
+
+    QJsonDocument doc(obj);
+    std::string appDesc = doc.toJson(QJsonDocument::Compact).toStdString();
+    std::string params;
+    std::string id = obj["id"].toString().toStdString();
+    int errCode = 0;
+    std::string errMsg;
+    WebAppManagerService::onLaunch(appDesc, params, id, errCode, errMsg);
 }
 
 QJsonObject WebAppManagerServiceAGL::launchApp(QJsonObject request)
