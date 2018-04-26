@@ -50,8 +50,6 @@ HEADERS += \
 TARGET = WebAppMgr
 
 luna_service {
-    DEFINES += HAS_LUNA_SERVICE
-
     SOURCES += \
             PalmServiceBase.cpp \
             PlugInServiceLuna.cpp \
@@ -70,7 +68,6 @@ luna_service {
 }
 
 agl_service {
-    DEFINES += HAS_AGL_SERVICE
     SOURCES += WebAppManagerServiceAGL.cpp
     HEADERS += WebAppManagerServiceAGL.h
 }

@@ -4,14 +4,17 @@
 #include <QJsonObject>
 
 #include "WebAppManagerService.h"
+#include "Timer.h"
+
 
 class WebAppManagerServiceAGL : public WebAppManagerService {
 public:
     static WebAppManagerService* instance();
 
-    bool startService();
+    void setStartupApplication(const std::string& app);
 
     // WebAppManagerService
+    bool startService() override;
     QJsonObject launchApp(QJsonObject request) override;
     QJsonObject killApp(QJsonObject request) override;
     QJsonObject logControl(QJsonObject request) override;
@@ -28,6 +31,11 @@ private:
 
     WebAppManagerServiceAGL();
     ~WebAppManagerServiceAGL();
+
+    void launchStartupApp();
+
+    std::string startup_app_;
+    OneShotTimer<WebAppManagerServiceAGL> startup_app_timer_;
 };
 
 #endif // WEBAPPMANAGERSERVICEAGL_H

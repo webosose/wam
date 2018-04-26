@@ -76,6 +76,7 @@ snapshot_boot {
 #
 #       EXTRA_QMAKEVARS_PRE +=  "CONFIG_BUILD+=pmlog"
 contains(CONFIG_BUILD, pmlog) {
+    DEFINES += HAS_PMLOG
     CONFIG += pmlog
     message($$MACHINE_NAME $$PLATFORM use pmlog)
 }
@@ -87,6 +88,7 @@ contains(CONFIG_BUILD, pmlog) {
 #
 #       EXTRA_QMAKEVARS_PRE +=  "CONFIG_BUILD+=luna_service"
 contains(CONFIG_BUILD, luna_service) {
+    DEFINES += HAS_LUNA_SERVICE
     CONFIG += luna_service
     message($$MACHINE_NAME $$PLATFORM use luna service)
 }
@@ -99,6 +101,7 @@ contains(CONFIG_BUILD, luna_service) {
 #
 #       EXTRA_QMAKEVARS_PRE +=  "CONFIG_BUILD+=agl_service"
 contains(CONFIG_BUILD, agl_service) {
+    DEFINES += HAS_AGL_SERVICE
     CONFIG += agl_service
     message($$MACHINE_NAME $$PLATFORM use agl service)
 }
