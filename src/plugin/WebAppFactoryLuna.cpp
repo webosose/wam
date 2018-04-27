@@ -16,6 +16,7 @@
 
 #include "WebAppFactoryLuna.h"
 
+#include "ApplicationDescription.h"
 #include "WebAppWaylandWebOS.h"
 #include "WebPageBase.h"
 #include "WebAppBase.h"
@@ -30,10 +31,15 @@ WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, std::shared_ptr<App
 {
     WebAppBase* app = nullptr;
 
-    if (winType == WT_CARD || winType == WT_POPUP || winType == WT_MINIMAL || winType == WT_FLOATING) {
+    if(winType == WT_CARD || winType == WT_POPUP || winType == WT_MINIMAL || winType == WT_FLOATING) {
+      fprintf(stderr, "createWebApp\r\n");
         app = new WebAppWaylandWebOS(winType, desc);
-    } else if (winType == WT_OVERLAY || winType == WT_SYSTEM_UI || winType == WT_NONE) {
-        app = new WebAppWayland(winType);
+    } else if(winType == WT_OVERLAY) {
+        app = new WebAppWayland(winType, desc->surfaceId());
+    } else if(winType == WT_SYSTEM_UI) {
+        app = new WebAppWayland(winType, desc->surfaceId());
+    } else if(winType == WT_NONE) {
+        app = new WebAppWayland(winType, desc->surfaceId());
     } else {
         LOG_WARNING(MSGID_BAD_WINDOW_TYPE, 1,
                     PMLOGKS("WINDOW_TYPE", qPrintable(winType)), "");

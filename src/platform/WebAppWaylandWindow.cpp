@@ -21,7 +21,7 @@
 
 WebAppWaylandWindow* WebAppWaylandWindow::s_instance = nullptr;
 
-WebAppWaylandWindow* WebAppWaylandWindow::take()
+WebAppWaylandWindow* WebAppWaylandWindow::take(int surface_id)
 {
     WebAppWaylandWindow* window;
 
@@ -35,6 +35,8 @@ WebAppWaylandWindow* WebAppWaylandWindow::take()
 
     window = s_instance;
     s_instance = NULL;
+    fprintf(stderr, "SETTIGN SURFACE ID\r\n");
+    window->SetWindowSurfaceId(surface_id);
     return window;
 }
 
@@ -58,6 +60,7 @@ void WebAppWaylandWindow::prepare()
 }
 
 WebAppWaylandWindow* WebAppWaylandWindow::createWindow() {
+   fprintf(stderr, "WebAppWaylandWindow::createWindow - NOT SETTING SURFACE ID\r\n");
     WebAppWaylandWindow *window = new WebAppWaylandWindow();
     if (!window) {
         LOG_CRITICAL(MSGID_PREPARE_FAIL, 0, "Failed to prepare WindowedWebAppWindow");

@@ -140,6 +140,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
 
     auto appDesc = std::unique_ptr<ApplicationDescription>(new ApplicationDescription());
 
+    appDesc->m_surfaceId = jsonObj["surfaceId"].toInt();
     appDesc->m_transparency = jsonObj["transparent"].toBool();
     appDesc->m_vendorExtension = QJsonDocument(jsonObj["vendorExtension"].toObject()).toJson().data();
     appDesc->m_trustLevel = jsonObj["trustLevel"].toString().toStdString();
