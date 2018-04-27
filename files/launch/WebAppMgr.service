@@ -1,0 +1,26 @@
+# @@@LICENSE
+#
+# Copyright (c) 2017-2018 LG Electronics, Inc.
+#
+# Confidential computer software. Valid license from LG required for
+# possession, use or copying. Consistent with FAR 12.211 and 12.212,
+# Commercial Computer Software, Computer Software Documentation, and
+# Technical Data for Commercial Items are licensed to the U.S. Government
+# under vendor's standard commercial license.
+#
+# LICENSE@@@
+
+[Unit]
+Description="WebAppMgr is responsible for running web apps and manage their lifecycle"
+After=weston.service
+BindsTo=weston.service
+
+[Service]
+Type=simple
+OOMScoreAdjust=-1000
+EnvironmentFile=-/etc/default/WebAppMgr.env
+ExecStart=/usr/bin/WebAppMgr --no-sandbox --remote-debugging-port=9998 --user-data-dir="/home/root/wamdata" --webos-wam --launch-app /opt/com.lgsvl.app.bareapp
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
