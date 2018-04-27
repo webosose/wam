@@ -92,7 +92,7 @@ static void changeUserIDGroupID()
     }
 }
 
-static void startWebAppManager(const std::string& app)
+static void startWebAppManager(const std::string& app, bool start_service)
 {
     // FIXME: Remove this when we don't use qDebug, qWarning any more.
     qInstallMessageHandler(qMessageHandler);
@@ -103,32 +103,36 @@ static void startWebAppManager(const std::string& app)
 #if defined(HAS_LUNA_SERVICE)
     webAppManagerService = WebAppManagerServiceLuna::instance();
 #elif defined(HAS_AGL_SERVICE)
-    webAppManagerService = WebAppManagerServiceAGL::instance();
-    if (webAppManagerService)
-        static_cast<WebAppManagerServiceAGL*>(webAppManagerService)->setStartupApplication(app);
+    if (start_service)
+       webAppManagerService = WebAppManagerServiceAGL::instance();
+    if (!app.empty())
+       WebAppManagerServiceAGL::instance()->setStartupApplication(app, (int)getpid());
 #endif
-    assert(webAppManagerService);
-    bool result = webAppManagerService->startService();
-    assert(result);
+    if (start_service) {
+      assert(webAppManagerService);
+      bool result = webAppManagerService->startService();
+      assert(result);
+    }
 #endif
     WebAppManager::instance()->setPlatformModules(std::unique_ptr<PlatformModuleFactoryImpl>(new PlatformModuleFactoryImpl()));
 }
 
 class WebOSMainDelegateWAM : public webos::WebOSMainDelegate {
 public:
-    WebOSMainDelegateWAM(const std::string& app)
-      : app_(app) {}
+    WebOSMainDelegateWAM(const std::string& app, bool start_service)
+      : app_(app), start_service_(start_service) {}
 
     void AboutToCreateContentBrowserClient() override {
-        startWebAppManager(app_);
+        startWebAppManager(app_, start_service_);
     }
 
 private:
 
     std::string app_;
+    bool start_service_;
 };
 
-int main (int argc, const char** argv)
+static int runWamMain(int argc, const char** argv, bool startService)
 {
     std::string app;
     std::vector<const char*> args;
@@ -144,7 +148,65 @@ int main (int argc, const char** argv)
           args.push_back(argv[i]);
       }
     }
-    WebOSMainDelegateWAM delegate(app);
+    WebOSMainDelegateWAM delegate(app, startService);
     webos::WebOSMain webOSMain(&delegate);
     return webOSMain.Run(args.size(), args.data());
 }
+
+static bool isUIProcess(int argc, const char** argv)
+{
+    for (int i=0; i < argc; i++) {
+      std::string typeParam("--type");
+      std::size_t found = std::string(argv[i]).find(typeParam);
+      if (found != std::string::npos)
+        return false;
+    }
+    return true;
+}
+
+int main (int argc, const char** argv)
+{
+    if (isUIProcess(argc, argv)) {
+      fprintf(stderr, "UIProcess!!!!!\r\n");
+      if (WebAppManagerServiceAGL::instance()->isHostService()) {
+          runWamMain(argc, argv, true);
+      } else {
+         bool surface_id_set(false);
+         std::vector<const char*> args;
+         for (int i=0; i < argc; i++) {
+             if (std::string(argv[i]) == "--launch-app") {
+                 if (i + 1 < argc) {
+                     fprintf(stderr, "Launch app: %s\r\n", argv[i+1]);
+                     args.push_back(argv[++i]);
+                 } else {
+                     fprintf(stderr, "--launch-app option requires one argument.\r\n");
+                     return 1;
+                }
+             }
+             if (std::string(argv[i]) == "--surface-id") {
+                 if (i + 1 < argc) {
+                     args.push_back(argv[++i]);
+                     surface_id_set = true;
+                 } else {
+                     fprintf(stderr, "--surface-id option requires one argument.\r\n");
+                     return 1;
+                }
+             }
+         }
+
+         std::string pid = std::to_string((int)getpid());
+         if (!surface_id_set)
+             args.push_back(pid.c_str());
+
+         WebAppManagerServiceAGL::instance()->launchOnHost(args.size(), args.data());
+         while (1)
+             sleep(1);
+      }
+    } else {
+      fprintf(stderr, "Not UIProcess\r\n");
+      return runWamMain(argc, argv, false);
+    }
+
+    return EXIT_SUCCESS;
+}
+

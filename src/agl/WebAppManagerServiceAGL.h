@@ -6,12 +6,16 @@
 #include "WebAppManagerService.h"
 #include "Timer.h"
 
+class singleton_socket;
 
 class WebAppManagerServiceAGL : public WebAppManagerService {
 public:
-    static WebAppManagerService* instance();
+    static WebAppManagerServiceAGL* instance();
 
-    void setStartupApplication(const std::string& app);
+    bool isHostService();
+    void setStartupApplication(const std::string& app, int surface_id);
+
+    void launchOnHost(int argc, const char **argv);
 
     // WebAppManagerService
     bool startService() override;
@@ -27,6 +31,8 @@ public:
     QJsonObject clearBrowsingData(QJsonObject request) override;
     QJsonObject webProcessCreated(QJsonObject request, bool subscribed) override;
 
+    void triggerStartupApp();
+
 private:
 
     WebAppManagerServiceAGL();
@@ -35,7 +41,10 @@ private:
     void launchStartupApp();
 
     std::string startup_app_;
+    int surface_id_;
     OneShotTimer<WebAppManagerServiceAGL> startup_app_timer_;
+ 
+    singleton_socket *socket_;
 };
 
 #endif // WEBAPPMANAGERSERVICEAGL_H
