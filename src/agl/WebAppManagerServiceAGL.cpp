@@ -1,6 +1,7 @@
 #include "WebAppManagerServiceAGL.h"
 
-#include <QFile>
+#include <libxml/parser.h>
+
 #include <QJsonDocument>
 
 WebAppManagerServiceAGL::WebAppManagerServiceAGL()
@@ -34,25 +35,72 @@ bool WebAppManagerServiceAGL::startService()
 
 void WebAppManagerServiceAGL::launchStartupApp()
 {
-    QString filename = QString::fromStdString(startup_app_);
-    filename.append("/appinfo.json");
-    QFile file;
-    file.setFileName(filename);
-    file.open(QIODevice::ReadOnly | QIODevice::Text);
-    QString appinfo = file.readAll();
-    file.close();
+    std::string configfile;
+    configfile.append(startup_app_);
+    configfile.append("/config.xml");
 
-    QJsonDocument json = QJsonDocument::fromJson(appinfo.toUtf8());
-    QJsonObject obj = json.object();
+    xmlDoc *doc = xmlReadFile(configfile.c_str(), nullptr, 0);
+    xmlNode *root = xmlDocGetRootElement(doc);
+
+    xmlChar *id = nullptr;
+    xmlChar *version = nullptr;
+    xmlChar *name = nullptr;
+    xmlChar *content = nullptr;
+    xmlChar *description = nullptr;
+    xmlChar *author = nullptr;
+    xmlChar *icon = nullptr;
+
+    id = xmlGetProp(root, (const xmlChar*)"id");
+    version = xmlGetProp(root, (const xmlChar*)"version");
+    for (xmlNode *node = root->children; node; node = node->next) {
+      if (!xmlStrcmp(node->name, (const xmlChar*)"name"))
+        name = xmlNodeListGetString(doc, node->xmlChildrenNode, 1);
+      if (!xmlStrcmp(node->name, (const xmlChar*)"icon"))
+        icon = xmlGetProp(node, (const xmlChar*)"src");
+      if (!xmlStrcmp(node->name, (const xmlChar*)"content"))
+        content = xmlGetProp(node, (const xmlChar*)"src");
+      if (!xmlStrcmp(node->name, (const xmlChar*)"description"))
+        description = xmlNodeListGetString(doc, node->xmlChildrenNode, 1);
+      if (!xmlStrcmp(node->name, (const xmlChar*)"author"))
+        author = xmlNodeListGetString(doc, node->xmlChildrenNode, 1);
+    }
+    fprintf(stdout, "...\n");
+    fprintf(stderr, "id: %s\r\n", id);
+    fprintf(stderr, "version: %s\r\n", version);
+    fprintf(stderr, "name: %s\r\n", name);
+    fprintf(stderr, "content: %s\r\n", content);
+    fprintf(stderr, "description: %s\r\n", description);
+    fprintf(stderr, "author: %s\r\n", author);
+    fprintf(stderr, "icon: %s\r\n", icon);
+
+
+    QJsonObject obj;
+    obj["id"] = QJsonValue((const char*)id);
+    obj["version"] = QJsonValue((const char*)version);
+    obj["vendor"] = QJsonValue((const char*)author);
+    obj["type"] = QJsonValue("web");
+    obj["main"] = QJsonValue((const char*)content);
+    obj["title"] = QJsonValue((const char*)name);
+    obj["uiRevision"] = QJsonValue("2");
+    obj["icon"] = QJsonValue((const char*)icon);
     obj["folderPath"] = QJsonValue(startup_app_.c_str());
 
-    QJsonDocument doc(obj);
-    std::string appDesc = doc.toJson(QJsonDocument::Compact).toStdString();
+    xmlFree(id);
+    xmlFree(version);
+    xmlFree(name);
+    xmlFree(content);
+    xmlFree(description);
+    xmlFree(author);
+    xmlFree(icon);
+    xmlFreeDoc(doc);
+
+    QJsonDocument appDoc(obj);
+    std::string appDesc = appDoc.toJson(QJsonDocument::Compact).toStdString();
     std::string params;
-    std::string id = obj["id"].toString().toStdString();
+    std::string app_id = obj["id"].toString().toStdString();
     int errCode = 0;
     std::string errMsg;
-    WebAppManagerService::onLaunch(appDesc, params, id, errCode, errMsg);
+    WebAppManagerService::onLaunch(appDesc, params, app_id, errCode, errMsg);
 }
 
 QJsonObject WebAppManagerServiceAGL::launchApp(QJsonObject request)
