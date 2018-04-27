@@ -120,7 +120,7 @@ VPATH += \
     ./src/util \
     ./src/webos
 
-PKGCONFIG += glib-2.0
+PKGCONFIG += glib-2.0 libxml-2.0
 
 INCLUDEPATH += $$VPATH
 
