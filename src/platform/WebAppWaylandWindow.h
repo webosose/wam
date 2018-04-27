@@ -25,7 +25,7 @@ class WebAppWaylandWindow : public webos::WebAppWindowBase {
 public:
     WebAppWaylandWindow();
     virtual ~WebAppWaylandWindow() {}
-    static WebAppWaylandWindow* take();
+    static WebAppWaylandWindow* take(int surface_id);
     static void prepareRenderingContext();
     static void prepare();
 
