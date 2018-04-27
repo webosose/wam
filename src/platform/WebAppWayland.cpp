@@ -39,7 +39,7 @@ static QString truncateURL(const QString& url)
     return res.replace(URL_SIZE_LIMIT / 2, url.size() - URL_SIZE_LIMIT, QStringLiteral(" ... "));
 }
 
-WebAppWayland::WebAppWayland(QString type, int width, int height)
+WebAppWayland::WebAppWayland(QString type, int surface_id, int width, int height)
     : WebAppBase()
     , m_appWindow(0)
     , m_windowType(type)
@@ -50,7 +50,7 @@ WebAppWayland::WebAppWayland(QString type, int width, int height)
     , m_vkbHeight(0)
     , m_lostFocusBySetWindowProperty(false)
 {
-    init(width, height);
+    init(width, height, surface_id);
 }
 
 WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window, int width, int height)
@@ -63,7 +63,7 @@ WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window, int widt
     , m_vkbHeight(0)
     , m_lostFocusBySetWindowProperty(false)
 {
-    init(width, height);
+    init(width, height, 0);
 }
 
 WebAppWayland::~WebAppWayland()
@@ -71,10 +71,10 @@ WebAppWayland::~WebAppWayland()
     delete m_appWindow;
 }
 
-void WebAppWayland::init(int width, int height)
+void WebAppWayland::init(int width, int height, int surface_id)
 {
     if (!m_appWindow)
-        m_appWindow = WebAppWaylandWindow::take();
+        m_appWindow = WebAppWaylandWindow::take(surface_id);
     if (!(width && height)) {
         setUiSize(m_appWindow->DisplayWidth(), m_appWindow->DisplayHeight());
         m_appWindow->InitWindow(m_appWindow->DisplayWidth(), m_appWindow->DisplayHeight());

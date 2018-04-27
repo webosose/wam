@@ -49,13 +49,13 @@ class WebAppWayland : public WebAppBase {
     Q_OBJECT
 
 public:
-    WebAppWayland(QString type, int width = 0, int height = 0);
+    WebAppWayland(QString type, int surface_id, int width = 0, int height = 0);
     WebAppWayland(QString type, WebAppWaylandWindow* window, int width = 0, int height = 0);
 
     ~WebAppWayland() override;
 
     // WebAppBase
-    void init(int width, int height) override;
+    void init(int width, int height, int surface_id) override;
     void attach(WebPageBase*) override;
     void suspendAppRendering() override;
     void resumeAppRendering() override;

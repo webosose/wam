@@ -184,6 +184,8 @@ public:
     const WindowOwnerInfo getWindowOwnerInfo();
     const WindowClientInfo getWindowClientInfo();
 
+    int surfaceId() { return m_surfaceId; }
+
 private:
     std::string m_id;
     std::string m_title;
@@ -226,6 +228,7 @@ private:
     bool m_usePrerendering;
     double m_networkStableTimeout;
     bool m_disallowScrollingInMainFrame;
+    int m_surfaceId;
 };
 
 #endif /* APPLICATIONDESCRIPTION_H */

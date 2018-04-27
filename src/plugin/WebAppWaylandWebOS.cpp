@@ -18,6 +18,6 @@
 #include "ApplicationDescription.h"
 
 WebAppWaylandWebOS::WebAppWaylandWebOS(QString& winType, ApplicationDescription* desc)
-    : WebAppWayland(winType, desc->widthOverride(), desc->heightOverride())
+    : WebAppWayland(winType, desc->surfaceId(), desc->widthOverride(), desc->heightOverride())
 {
 }

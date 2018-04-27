@@ -139,6 +139,7 @@ ApplicationDescription* ApplicationDescription::fromJsonString(const char* jsonS
 
     ApplicationDescription* appDesc = new ApplicationDescription();
 
+    appDesc->m_surfaceId = jsonObj["surfaceId"].toInt();
     appDesc->m_transparency = jsonObj["transparent"].toBool();
     appDesc->m_vendorExtension = QJsonDocument(jsonObj["vendorExtension"].toObject()).toJson().data();
     appDesc->m_trustLevel = jsonObj["trustLevel"].toString().toStdString();
