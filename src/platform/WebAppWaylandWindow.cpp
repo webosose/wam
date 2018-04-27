@@ -35,8 +35,6 @@ WebAppWaylandWindow* WebAppWaylandWindow::take(int surface_id)
 
     window = s_instance;
     s_instance = NULL;
-    fprintf(stderr, "SETTIGN SURFACE ID\r\n");
-    window->SetWindowSurfaceId(surface_id);
     return window;
 }
 
