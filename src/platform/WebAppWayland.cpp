@@ -76,6 +76,8 @@ void WebAppWayland::init(int width, int height, int surface_id)
 {
     if (!m_appWindow)
         m_appWindow = WebAppWaylandWindow::take(surface_id);
+    fprintf(stderr, "SETTIGN SURFACE ID\r\n");
+    m_appWindow->SetWindowSurfaceId(surface_id);
     if (!(width && height)) {
         setUiSize(m_appWindow->DisplayWidth(), m_appWindow->DisplayHeight());
         m_appWindow->InitWindow(m_appWindow->DisplayWidth(), m_appWindow->DisplayHeight());
@@ -84,8 +86,6 @@ void WebAppWayland::init(int width, int height, int surface_id)
         setUiSize(width, height);
         m_appWindow->InitWindow(width, height);
     }
-    fprintf(stderr, "SETTIGN SURFACE ID\r\n");
-    m_appWindow->SetWindowSurfaceId(surface_id);
 
     m_appWindow->setWebApp(this);
 
