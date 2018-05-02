@@ -17,86 +17,132 @@
 
 #include <QJsonDocument>
 
-using namespace std;
-
-class singleton_socket {
+class WamSocketLockFile {
 public:
-  singleton_socket()
-  {
-    const char wam_socket_lock_path[] = "/tmp/wamsocket.lock";
-
-    // Create the socket file descriptor
-    socket_fd_ = socket(AF_UNIX, SOCK_DGRAM, 0);
-    if (socket_fd_ == -1) {
-      fprintf(stderr, "Failed to open socket file descriptor\r\n");
-      return;
-    }
-
-    // Create the lock file
-    lock_fd_ = open(wam_socket_lock_path, O_CREAT | O_TRUNC, S_IRWXU);
-    if (lock_fd_ == -1) {
-      close(socket_fd_);
-      fprintf(stderr, "Failed to open lock file descriptor\r\n");
-      return;
-    }
-    sock_addr.sun_family = AF_UNIX;
-    strncpy(sock_addr.sun_path, wam_socket_path, sizeof(sock_addr.sun_path));
-  }
-  ~singleton_socket()
-  {
+  ~WamSocketLockFile() {
+    if (lock_fd_ != -1)
+      releaseLock(lock_fd_);
     if (lock_fd_ != -1)
       close(lock_fd_);
+  }
+
+  bool createAndLock() {
+    lock_fd_ = openLockFile();
+    if (!acquireLock(lock_fd_)) {
+      fprintf(stderr, "Failed to lock file %d\r\n", lock_fd_);
+      return false;
+    }
+    return true;
+  }
+
+  bool ownsLock() {
+    return lock_fd_ != -1;
+  }
+
+  bool tryAcquireLock() {
+    int fd = openLockFile();
+    if (fd != -1) {
+      if (acquireLock(fd)) {
+        releaseLock(fd);
+        return true;
+      }
+    }
+    return false;
+  }
+
+private:
+
+  int openLockFile() {
+    int fd = open(lock_file_.c_str(), O_CREAT | O_TRUNC, S_IRWXU);
+    if (fd == -1) {
+      fprintf(stderr, "Failed to open lock file descriptor\r\n");
+      return fd;
+    }
+
+    int flags = fcntl(fd, F_GETFD);
+    if (flags == -1)
+      fprintf(stderr, "Could not get flags for lock file %d\r\n", fd);
+
+     flags |= FD_CLOEXEC;
+
+     if (fcntl(fd, F_SETFD, flags) == -1)
+       fprintf(stderr, "Could not set flags for lock file %d\r\n", fd);
+
+     return fd;
+  }
+
+  bool acquireLock(int fd) {
+    if (flock(fd, LOCK_EX | LOCK_NB) != 0)
+      return false;
+    return true;
+  }
+
+  void releaseLock(int fd) {
+    flock(fd, LOCK_UN);
+  }
+
+  std::string lock_file_ = std::string("/tmp/wamsocket.lock");
+  int lock_fd_ = -1;
+};
+
+class WamSocket {
+public:
+  ~WamSocket() {
     if (socket_fd_ != -1)
       close(socket_fd_);
   }
-  bool am_i_the_first()
-  {
-    int ret;
 
-    // Obtain the lock
-    ret = flock(lock_fd_, LOCK_EX | LOCK_NB);
-    if (ret != 0) {
-      close(lock_fd_);
-      lock_fd_ = -1;
-
-      ret = connect(socket_fd_, (struct sockaddr *) &sock_addr, sizeof(struct sockaddr_un));
-      if (ret != 0)
-        fprintf(stderr, "Failed to connect to named socket");
+  bool createSocket(bool server) {
+        // Create the socket file descriptor
+    socket_fd_ = socket(AF_UNIX, SOCK_DGRAM, 0);
+    if (socket_fd_ == -1) {
+      fprintf(stderr, "Failed to open socket file descriptor\r\n");
       return false;
     }
-    // Unlink the named socket, otherwise bind may give address already in use
-    unlink(wam_socket_path);
 
-    // Bind it to the named socket
-    ret = bind(socket_fd_, (struct sockaddr *) &sock_addr, sizeof(struct sockaddr_un));
-    if (ret != 0)
-      fprintf(stderr, "Failed to bind to named socket");
+    sock_addr.sun_family = AF_UNIX;
+    strncpy(sock_addr.sun_path, wam_socket_path_.c_str(), sizeof(sock_addr.sun_path));
+
+    if (server) {
+      fprintf(stderr, "service binding\r\n");
+      unlink(wam_socket_path_.c_str());
+      if (bind(socket_fd_, (struct sockaddr *) &sock_addr, sizeof(struct sockaddr_un)) != 0) {
+        fprintf(stderr, "Failed to bind to named socket");
+        return false;
+      }
+    } else {
+      fprintf(stderr, "client connecting\r\n");
+      if (connect(socket_fd_, (struct sockaddr *) &sock_addr, sizeof(struct sockaddr_un)) != 0) {
+        fprintf(stderr, "Failed to connect to named socket");
+        return false;
+      }
+    }
     return true;
   }
-  void send_msg(int argc, const char **argv)
-  {
-    string cmd;
+
+  void sendMsg(int argc, const char **argv) {
+    std::string cmd;
     for (int i = 0; i < argc; ++i)
       cmd.append(argv[i]).append(" ");
     // Remove the last appended space if any
     if (argc > 1)
       cmd.pop_back();
-    cout << "Sending message=[" << cmd << "]" << endl;
+    std::cout << "Sending message=[" << cmd << "]" << std::endl;
     ssize_t bytes = write(socket_fd_, cmd.c_str(), cmd.length());
-    cout << "Wrote " << bytes << "bytes" << endl;
+    std::cout << "Wrote " << bytes << "bytes" << std::endl;
   }
-  int wait_for_msg()
-  {
+
+  int waitForMsg() {
     char buf[PATH_MAX] = {};
     ssize_t bytes;
 
-    cout << "Waiting for data..." << endl;
+    std::cout << "Waiting for data..." << std::endl;
     while (TEMP_FAILURE_RETRY((bytes = recv(socket_fd_, (void *)buf, sizeof(buf), 0)) != -1)) {
       int last = bytes - 1;
       // Remove the new line if there's one
       if (buf[last] == '\n')
         buf[last] = '\0';
-      cout << "Got " << bytes << " bytes=[" << buf << "]" << endl;
+      std::cout << "Got " << bytes << " bytes=[" << buf << "]" << std::endl;
 
       std::string data(buf);
       std::istringstream iss(data);
@@ -107,43 +153,47 @@ public:
 
       WebAppManagerServiceAGL::instance()->setStartupApplication(std::string(res[0]), atoi(res[1]));
       WebAppManagerServiceAGL::instance()->triggerStartupApp();
-      return 0;
+      return 1;
     }
     return 0;
   }
+
 private:
-  static const char wam_socket_path[];
-  int lock_fd_;
+
+  const std::string wam_socket_path_ = std::string("/tmp/wamsocket");
   int socket_fd_;
   struct sockaddr_un sock_addr;
 };
-// static
-const char singleton_socket::wam_socket_path[]      = "/tmp/wamsocket";
 
 WebAppManagerServiceAGL::WebAppManagerServiceAGL()
-  : socket_(new singleton_socket())
+  : socket_(std::make_unique<WamSocket>()),
+  lock_file_(std::make_unique<WamSocketLockFile>())
 {
 }
 
-WebAppManagerServiceAGL::~WebAppManagerServiceAGL()
-{
-   delete socket_;
+WebAppManagerServiceAGL* WebAppManagerServiceAGL::instance() {
+  static WebAppManagerServiceAGL *srv = new WebAppManagerServiceAGL();
+  return srv;
 }
 
-WebAppManagerServiceAGL* WebAppManagerServiceAGL::instance()
-{
-    static WebAppManagerServiceAGL *srv = new WebAppManagerServiceAGL();
-    return srv;
+bool WebAppManagerServiceAGL::initializeAsHostService() {
+  if (lock_file_->createAndLock())
+    return socket_->createSocket(true);
+  return false;
+}
+
+bool WebAppManagerServiceAGL::initializeAsHostClient() {
+  return socket_->createSocket(false);
 }
 
 bool WebAppManagerServiceAGL::isHostService()
 {
-    return socket_->am_i_the_first();
+    return lock_file_->tryAcquireLock();
 }
 
 void WebAppManagerServiceAGL::launchOnHost(int argc, const char **argv)
 {
-    socket_->send_msg(argc, argv);
+    socket_->sendMsg(argc, argv);
 }
 
 void WebAppManagerServiceAGL::setStartupApplication(const std::string& app, int surface_id)
@@ -153,17 +203,20 @@ void WebAppManagerServiceAGL::setStartupApplication(const std::string& app, int 
 }
 
 void *run_socket(void *socket) {
-  singleton_socket *s = (singleton_socket*)socket;
-  s->wait_for_msg();
+  WamSocket *s = (WamSocket*)socket;
+  while(s->waitForMsg());
   return 0;
 }
 
 bool WebAppManagerServiceAGL::startService()
 {
-    pthread_t thread_id;
-    if( pthread_create( &thread_id , nullptr,  run_socket, socket_) < 0) {
-        perror("could not create thread");
-        return false;
+    if (lock_file_->ownsLock()) {
+      pthread_t thread_id;
+      if( pthread_create( &thread_id , nullptr,  run_socket, socket_.get()) < 0) {
+          perror("could not create thread");
+          fprintf(stderr, "Coudlnt create thread...\r\n");
+          return false;
+      }
     }
 
     triggerStartupApp();
@@ -173,9 +226,10 @@ bool WebAppManagerServiceAGL::startService()
 
 void WebAppManagerServiceAGL::triggerStartupApp()
 {
+  fprintf(stderr, "WebAppManagerServiceAGL::triggerStartupApp - app: %s\r\n", startup_app_.c_str());
     if (!startup_app_.empty()) {
       fprintf(stderr, "Startup app: %s\r\n", startup_app_.c_str());
-      startup_app_timer_.start(1000, this, 
+      startup_app_timer_.start(1000, this,
           &WebAppManagerServiceAGL::launchStartupApp);
     }
 }
