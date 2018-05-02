@@ -1,16 +1,22 @@
 #ifndef WEBAPPMANAGERSERVICEAGL_H
 #define WEBAPPMANAGERSERVICEAGL_H
 
+#include <memory>
+
 #include <QJsonObject>
 
 #include "WebAppManagerService.h"
 #include "Timer.h"
 
-class singleton_socket;
+class WamSocket;
+class WamSocketLockFile;
 
 class WebAppManagerServiceAGL : public WebAppManagerService {
 public:
     static WebAppManagerServiceAGL* instance();
+
+    bool initializeAsHostService();
+    bool initializeAsHostClient();
 
     bool isHostService();
     void setStartupApplication(const std::string& app, int surface_id);
@@ -36,15 +42,15 @@ public:
 private:
 
     WebAppManagerServiceAGL();
-    ~WebAppManagerServiceAGL();
 
     void launchStartupApp();
 
     std::string startup_app_;
     int surface_id_;
     OneShotTimer<WebAppManagerServiceAGL> startup_app_timer_;
- 
-    singleton_socket *socket_;
+
+    std::unique_ptr<WamSocket> socket_;
+    std::unique_ptr<WamSocketLockFile> lock_file_;
 };
 
 #endif // WEBAPPMANAGERSERVICEAGL_H
