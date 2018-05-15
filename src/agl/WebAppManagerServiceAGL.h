@@ -43,7 +43,8 @@ private:
 
     WebAppManagerServiceAGL();
 
-    void launchStartupApp();
+    void launchStartupAppFromConfig();
+    void launchStartupAppFromURL();
 
     std::string startup_app_;
     int surface_id_;

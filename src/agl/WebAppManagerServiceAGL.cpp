@@ -226,15 +226,18 @@ bool WebAppManagerServiceAGL::startService()
 
 void WebAppManagerServiceAGL::triggerStartupApp()
 {
-  fprintf(stderr, "WebAppManagerServiceAGL::triggerStartupApp - app: %s\r\n", startup_app_.c_str());
     if (!startup_app_.empty()) {
-      fprintf(stderr, "Startup app: %s\r\n", startup_app_.c_str());
-      startup_app_timer_.start(1000, this,
-          &WebAppManagerServiceAGL::launchStartupApp);
+      if (startup_app_.find("http://") == 0) {
+        startup_app_timer_.start(1000, this,
+              &WebAppManagerServiceAGL::launchStartupAppFromURL);
+      } else {
+        startup_app_timer_.start(1000, this,
+              &WebAppManagerServiceAGL::launchStartupAppFromConfig);
+      }
     }
 }
 
-void WebAppManagerServiceAGL::launchStartupApp()
+void WebAppManagerServiceAGL::launchStartupAppFromConfig()
 {
     std::string configfile;
     configfile.append(startup_app_);
@@ -295,6 +298,29 @@ void WebAppManagerServiceAGL::launchStartupApp()
     xmlFree(author);
     xmlFree(icon);
     xmlFreeDoc(doc);
+
+    QJsonDocument appDoc(obj);
+    std::string appDesc = appDoc.toJson(QJsonDocument::Compact).toStdString();
+    std::string params;
+    std::string app_id = obj["id"].toString().toStdString();
+    int errCode = 0;
+    std::string errMsg;
+    WebAppManagerService::onLaunch(appDesc, params, app_id, errCode, errMsg);
+}
+
+void WebAppManagerServiceAGL::launchStartupAppFromURL()
+{
+    QJsonObject obj;
+    obj["id"] = QJsonValue("some.id");
+    obj["version"] = QJsonValue("1.0");
+    obj["vendor"] = QJsonValue("some vendor");
+    obj["type"] = QJsonValue("web");
+    obj["main"] = QJsonValue((const char*)startup_app_.c_str());
+    obj["title"] = QJsonValue("webapp");
+    obj["uiRevision"] = QJsonValue("2");
+    //obj["icon"] = QJsonValue((const char*)icon);
+    //obj["folderPath"] = QJsonValue(startup_app_.c_str());
+    obj["surfaceId"] = QJsonValue(surface_id_);
 
     QJsonDocument appDoc(obj);
     std::string appDesc = appDoc.toJson(QJsonDocument::Compact).toStdString();
