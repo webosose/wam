@@ -29,6 +29,7 @@
 #if defined(HAS_LUNA_SERVICE)
 #include "WebAppManagerServiceLuna.h"
 #elif defined(HAS_AGL_SERVICE)
+#include "RunWAMAGL.h"
 #include "WebAppManagerServiceAGL.h"
 #endif
 
@@ -144,9 +145,13 @@ static bool isUIProcessService(int argc, const char** argv) {
     std::vector<std::string> args(argv + 1, argv + argc);
     for (size_t i=0; i < args.size(); i++) {
       // if launch-app is given then dont start socket service
-      std::string param("--launch-app=");
-      std::size_t found = args[i].find(param);
-      if (found != std::string::npos)
+      std::string param1("--launch-app=");
+      std::size_t found1 = args[i].find(param1);
+      if (found1 != std::string::npos)
+          return false;
+      std::string param2("http://");
+      std::size_t found2 = args[i].find(param2);
+      if (found2 != std::string::npos)
           return false;
     }
   }
@@ -157,10 +162,14 @@ static std::string getStartUpApp(int argc, const char** argv) {
   if (argc > 0) {
     std::vector<std::string> args(argv + 1, argv + argc);
     for (size_t i=0; i < args.size(); i++) {
-      std::string param("--launch-app=");
-      std::size_t found = args[i].find(param);
-      if (found != std::string::npos)
-          return args[i].substr(found+param.length());
+      std::string param1("--launch-app=");
+      std::size_t found1 = args[i].find(param1);
+      if (found1 != std::string::npos)
+          return args[i].substr(found1+param1.length());
+      std::string param2("http://");
+      std::size_t found2 = args[i].find(param2);
+      if (found2 != std::string::npos)
+          return args[i];
     }
   }
   return std::string();
@@ -183,9 +192,7 @@ int main (int argc, const char** argv)
 {
 #if defined(HAS_AGL_SERVICE)
   if (isUIProcess(argc, argv)) {
-    fprintf(stderr, "UIProcess!!!!!\r\n");
     if (isUIProcessService(argc, argv)) {
-      fprintf(stderr, "UIProcessService!!!!!\r\n");
       if (WebAppManagerServiceAGL::instance()->initializeAsHostService()) {
         runWamMain(argc, argv);
       } else {
@@ -200,13 +207,14 @@ int main (int argc, const char** argv)
       }
 
       if (WebAppManagerServiceAGL::instance()->isHostService()) {
-        WebAppManagerServiceAGL::instance()->setStartupApplication(app, (int)getpid());
-        return runWamMain(argc, argv);
+        RunWAMAGL runAGL(app);
+        return runAGL.run(argc, argv);
       } else {
         if (!WebAppManagerServiceAGL::instance()->initializeAsHostClient()) {
           fprintf(stderr,"Failed to initialize as host client\r\n");
           return -1;
         }
+
         std::string surface_id(getSurfaceId(argc, argv));
         if (surface_id.empty())
           surface_id = std::to_string((int)getpid());
@@ -220,7 +228,6 @@ int main (int argc, const char** argv)
       }
     }
   } else {
-    fprintf(stderr, "Not UIProcess\r\n");
     return runWamMain(argc, argv);
   }
 #else

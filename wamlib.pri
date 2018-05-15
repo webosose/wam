@@ -69,8 +69,12 @@ luna_service {
 }
 
 agl_service {
-    SOURCES += WebAppManagerServiceAGL.cpp
-    HEADERS += WebAppManagerServiceAGL.h
+    SOURCES += \
+            RunWAMAGL.cpp \
+            WebAppManagerServiceAGL.cpp
+    HEADERS += \
+            RunWAMAGL.h \
+            WebAppManagerServiceAGL.h
 }
 
 headers.files = $$HEADERS
