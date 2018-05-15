@@ -58,7 +58,6 @@ void WebAppWaylandWindow::prepare()
 }
 
 WebAppWaylandWindow* WebAppWaylandWindow::createWindow() {
-   fprintf(stderr, "WebAppWaylandWindow::createWindow - NOT SETTING SURFACE ID\r\n");
     WebAppWaylandWindow *window = new WebAppWaylandWindow();
     if (!window) {
         LOG_CRITICAL(MSGID_PREPARE_FAIL, 0, "Failed to prepare WindowedWebAppWindow");
