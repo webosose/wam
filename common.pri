@@ -103,6 +103,7 @@ contains(CONFIG_BUILD, luna_service) {
 contains(CONFIG_BUILD, agl_service) {
     DEFINES += HAS_AGL_SERVICE
     CONFIG += agl_service
+    PKGCONFIG += libwindowmanager libhomescreen ilmControl
     message($$MACHINE_NAME $$PLATFORM use agl service)
 }
 
