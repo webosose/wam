@@ -18,7 +18,7 @@ public:
     bool initializeAsHostService();
     bool initializeAsHostClient();
 
-    bool isHostService();
+    bool isHostServiceRunning();
     void setStartupApplication(const std::string& app, int surface_id);
 
     void launchOnHost(int argc, const char **argv);
