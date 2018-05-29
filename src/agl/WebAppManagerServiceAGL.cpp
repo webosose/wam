@@ -186,9 +186,9 @@ bool WebAppManagerServiceAGL::initializeAsHostClient() {
   return socket_->createSocket(false);
 }
 
-bool WebAppManagerServiceAGL::isHostService()
+bool WebAppManagerServiceAGL::isHostServiceRunning()
 {
-    return lock_file_->tryAcquireLock();
+    return !lock_file_->tryAcquireLock();
 }
 
 void WebAppManagerServiceAGL::launchOnHost(int argc, const char **argv)
