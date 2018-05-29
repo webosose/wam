@@ -56,25 +56,27 @@ luna_service {
             PlugInServiceLuna.cpp \
             ServiceSenderLuna.cpp \
             WebAppManagerServiceLuna.cpp \
-            WebAppManagerServiceLunaImpl.cpp
+            WebAppManagerServiceLunaImpl.cpp \
+            WebRuntimeWebOS.cpp
 
     HEADERS += \
             PalmServiceBase.h \
             PlugInServiceLuna.h \
             ServiceSenderLuna.h \
             WebAppManagerServiceLuna.h \
-            WebAppManagerServiceLunaImpl.h
+            WebAppManagerServiceLunaImpl.h \
+            WebRuntimeWebOS.h
 
     LIBS += -llunaservice
 }
 
 agl_service {
     SOURCES += \
-            RunWAMAGL.cpp \
-            WebAppManagerServiceAGL.cpp
+            WebAppManagerServiceAGL.cpp \
+            WebRuntimeAGL.cpp
     HEADERS += \
-            RunWAMAGL.h \
-            WebAppManagerServiceAGL.h
+            WebAppManagerServiceAGL.h \
+            WebRuntimeAGL.h
 }
 
 headers.files = $$HEADERS
