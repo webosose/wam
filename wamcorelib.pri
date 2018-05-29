@@ -63,6 +63,7 @@ HEADERS += \
         WebPageObserver.h \
         WebProcessManager.h \
         WebViewBase.h \
+        WebRuntime.h \
         WindowTypes.h
 
 pmlog {

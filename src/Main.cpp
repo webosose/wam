@@ -23,17 +23,12 @@
 #include <unistd.h>
 
 #include "LogManager.h"
-#include "PlatformModuleFactoryImpl.h"
-#include "WebAppManager.h"
 
 #if defined(HAS_LUNA_SERVICE)
-#include "WebAppManagerServiceLuna.h"
+#include "WebRuntimeWebOS.h"
 #elif defined(HAS_AGL_SERVICE)
-#include "RunWAMAGL.h"
-#include "WebAppManagerServiceAGL.h"
+#include "WebRuntimeAGL.h"
 #endif
-
-#include <webos/app/webos_main.h>
 
 namespace
 {
@@ -93,145 +88,19 @@ static void changeUserIDGroupID()
     }
 }
 
-static void startWebAppManager()
-{
-    // FIXME: Remove this when we don't use qDebug, qWarning any more.
-    qInstallMessageHandler(qMessageHandler);
-
-    changeUserIDGroupID();
-#if defined(HAS_LUNA_SERVICE) || defined(HAS_AGL_SERVICE)
-    WebAppManagerService* webAppManagerService = nullptr;
-#if defined(HAS_LUNA_SERVICE)
-    webAppManagerService = WebAppManagerServiceLuna::instance();
-#elif defined(HAS_AGL_SERVICE)
-     webAppManagerService = WebAppManagerServiceAGL::instance();
-#endif
-    assert(webAppManagerService);
-    bool result = webAppManagerService->startService();
-    assert(result);
-#endif
-    WebAppManager::instance()->setPlatformModules(std::unique_ptr<PlatformModuleFactoryImpl>(new PlatformModuleFactoryImpl()));
-}
-
-class WebOSMainDelegateWAM : public webos::WebOSMainDelegate {
-public:
-    void AboutToCreateContentBrowserClient() override {
-        startWebAppManager();
-    }
-};
-
-static int runWamMain(int argc, const char** argv)
-{
-    WebOSMainDelegateWAM delegate;
-    webos::WebOSMain webOSMain(&delegate);
-    return webOSMain.Run(argc, argv);
-}
-
-static bool isUIProcess(int argc, const char** argv) {
-  if (argc > 0) {
-    std::vector<std::string> args(argv + 1, argv + argc);
-    for (size_t i=0; i < args.size(); i++) {
-      std::string param("--type=");
-      std::size_t found = args[i].find(param);
-      if (found != std::string::npos)
-          return false;
-    }
-  }
-  return true;
-}
-
-static bool isUIProcessService(int argc, const char** argv) {
-  if (argc > 0) {
-    std::vector<std::string> args(argv + 1, argv + argc);
-    for (size_t i=0; i < args.size(); i++) {
-      // if launch-app is given then dont start socket service
-      std::string param1("--launch-app=");
-      std::size_t found1 = args[i].find(param1);
-      if (found1 != std::string::npos)
-          return false;
-      std::string param2("http://");
-      std::size_t found2 = args[i].find(param2);
-      if (found2 != std::string::npos)
-          return false;
-    }
-  }
-  return true;
-}
-
-static std::string getStartUpApp(int argc, const char** argv) {
-  if (argc > 0) {
-    std::vector<std::string> args(argv + 1, argv + argc);
-    for (size_t i=0; i < args.size(); i++) {
-      std::string param1("--launch-app=");
-      std::size_t found1 = args[i].find(param1);
-      if (found1 != std::string::npos)
-          return args[i].substr(found1+param1.length());
-      std::string param2("http://");
-      std::size_t found2 = args[i].find(param2);
-      if (found2 != std::string::npos)
-          return args[i];
-    }
-  }
-  return std::string();
-}
-
-static std::string getSurfaceId(int argc, const char** argv) {
-  if (argc > 0) {
-    std::vector<std::string> args(argv + 1, argv + argc);
-    for (size_t i=0; i < args.size(); i++) {
-      std::string param("--surface-id=");
-      std::size_t found = args[i].find(param);
-      if (found != std::string::npos)
-          return args[i].substr(found+param.length());
-    }
-  }
-  return std::string();
-}
-
 int main (int argc, const char** argv)
 {
+  // FIXME: Remove this when we don't use qDebug, qWarning any more.
+  qInstallMessageHandler(qMessageHandler);
+
+  changeUserIDGroupID();
+
 #if defined(HAS_AGL_SERVICE)
-  if (isUIProcess(argc, argv)) {
-    if (isUIProcessService(argc, argv)) {
-      if (WebAppManagerServiceAGL::instance()->initializeAsHostService()) {
-        runWamMain(argc, argv);
-      } else {
-        fprintf(stderr, "Trying to start as UIProcess service but there's service already running\r\n");
-        return 1;
-      }
-    } else {
-      std::string app(getStartUpApp(argc, argv));
-      if (app.empty()) {
-        fprintf(stderr, "--launch-app parameter is required\r\n");
-        return -1;
-      }
-
-      if (WebAppManagerServiceAGL::instance()->isHostService()) {
-        RunWAMAGL runAGL(app);
-        return runAGL.run(argc, argv);
-      } else {
-        if (!WebAppManagerServiceAGL::instance()->initializeAsHostClient()) {
-          fprintf(stderr,"Failed to initialize as host client\r\n");
-          return -1;
-        }
-
-        std::string surface_id(getSurfaceId(argc, argv));
-        if (surface_id.empty())
-          surface_id = std::to_string((int)getpid());
-
-        std::vector<const char*> args;
-        args.push_back(app.c_str());
-        args.push_back(surface_id.c_str());
-        WebAppManagerServiceAGL::instance()->launchOnHost(args.size(), args.data());
-        while (1)
-          sleep(1);
-      }
-    }
-  } else {
-    return runWamMain(argc, argv);
-  }
+  WebRuntimeAGL runtime;
 #else
-    return runWamMain(argc, argv);
+  WebRuntimeWebOS runtime;
 #endif
+
+  return runtime.run(argc, argv);
 }
 
