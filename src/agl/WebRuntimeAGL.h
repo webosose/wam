@@ -33,7 +33,7 @@ public:
   virtual void register_surfpid(pid_t surf_pid);
   virtual void unregister_surfpid(pid_t surf_pid);
   virtual pid_t find_surfpid_by_rid(pid_t app_pid);
-  virtual int launch(std::string& name) = 0;
+  virtual int launch(const std::string& id, const std::string& uri) = 0;
   virtual int loop(int argc, const char** argv, volatile sig_atomic_t& e_flag) = 0;
 
   int m_rid = 0;
@@ -42,13 +42,13 @@ public:
 
 class SharedBrowserProcessWebAppLauncher : public Launcher {
 public:
-  int launch(std::string& name) override;
+  int launch(const std::string& id, const std::string& uri) override;
   int loop(int argc, const char** argv, volatile sig_atomic_t& e_flag) override;
 };
 
 class SingleBrowserProcessWebAppLauncher : public Launcher {
 public:
-  int launch(std::string& name) override;
+  int launch(const std::string& id, const std::string& uri) override;
   int loop(int argc, const char** argv, volatile sig_atomic_t& e_flag) override;
 };
 
