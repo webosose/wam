@@ -151,7 +151,7 @@ public:
           res.push_back(strdup(s.c_str()));
       }
 
-      WebAppManagerServiceAGL::instance()->setStartupApplication(std::string(res[0]), atoi(res[1]));
+      WebAppManagerServiceAGL::instance()->setStartupApplication(std::string(res[0]), std::string(res[1]), atoi(res[2]));
       WebAppManagerServiceAGL::instance()->triggerStartupApp();
       return 1;
     }
@@ -196,10 +196,11 @@ void WebAppManagerServiceAGL::launchOnHost(int argc, const char **argv)
     socket_->sendMsg(argc, argv);
 }
 
-void WebAppManagerServiceAGL::setStartupApplication(const std::string& app, int surface_id)
+void WebAppManagerServiceAGL::setStartupApplication(const std::string& startup_app_id, const std::string& startup_app_uri, int startup_app_surface_id)
 {
-    startup_app_ = app;
-    surface_id_ = surface_id;
+    startup_app_id_ = startup_app_id;
+    startup_app_uri_ = startup_app_uri;
+    startup_app_surface_id_ = startup_app_surface_id;
 }
 
 void *run_socket(void *socket) {
@@ -226,8 +227,8 @@ bool WebAppManagerServiceAGL::startService()
 
 void WebAppManagerServiceAGL::triggerStartupApp()
 {
-    if (!startup_app_.empty()) {
-      if (startup_app_.find("http://") == 0) {
+    if (!startup_app_uri_.empty()) {
+      if (startup_app_uri_.find("http://") == 0) {
         startup_app_timer_.start(1000, this,
               &WebAppManagerServiceAGL::launchStartupAppFromURL);
       } else {
@@ -240,7 +241,7 @@ void WebAppManagerServiceAGL::triggerStartupApp()
 void WebAppManagerServiceAGL::launchStartupAppFromConfig()
 {
     std::string configfile;
-    configfile.append(startup_app_);
+    configfile.append(startup_app_uri_);
     configfile.append("/config.xml");
 
     xmlDoc *doc = xmlReadFile(configfile.c_str(), nullptr, 0);
@@ -287,8 +288,8 @@ void WebAppManagerServiceAGL::launchStartupAppFromConfig()
     obj["title"] = QJsonValue((const char*)name);
     obj["uiRevision"] = QJsonValue("2");
     obj["icon"] = QJsonValue((const char*)icon);
-    obj["folderPath"] = QJsonValue(startup_app_.c_str());
-    obj["surfaceId"] = QJsonValue(surface_id_);
+    obj["folderPath"] = QJsonValue(startup_app_uri_.c_str());
+    obj["surfaceId"] = QJsonValue(startup_app_surface_id_);
 
     xmlFree(id);
     xmlFree(version);
@@ -310,17 +311,19 @@ void WebAppManagerServiceAGL::launchStartupAppFromConfig()
 
 void WebAppManagerServiceAGL::launchStartupAppFromURL()
 {
+fprintf(stderr, "WebAppManagerServiceAGL::launchStartupAppFromURL\r\n");
+fprintf(stderr, "    url: %s\r\n", startup_app_uri_.c_str());
     QJsonObject obj;
-    obj["id"] = QJsonValue("some.id");
+    obj["id"] = QJsonValue((const char*)startup_app_id_.c_str());
     obj["version"] = QJsonValue("1.0");
     obj["vendor"] = QJsonValue("some vendor");
     obj["type"] = QJsonValue("web");
-    obj["main"] = QJsonValue((const char*)startup_app_.c_str());
+    obj["main"] = QJsonValue((const char*)startup_app_uri_.c_str());
     obj["title"] = QJsonValue("webapp");
     obj["uiRevision"] = QJsonValue("2");
     //obj["icon"] = QJsonValue((const char*)icon);
     //obj["folderPath"] = QJsonValue(startup_app_.c_str());
-    obj["surfaceId"] = QJsonValue(surface_id_);
+    obj["surfaceId"] = QJsonValue(startup_app_surface_id_);
 
     QJsonDocument appDoc(obj);
     std::string appDesc = appDoc.toJson(QJsonDocument::Compact).toStdString();
