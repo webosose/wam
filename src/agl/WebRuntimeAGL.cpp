@@ -109,9 +109,9 @@ pid_t Launcher::find_surfpid_by_rid(pid_t rid)
   return -1;
 }
 
-int SingleBrowserProcessWebAppLauncher::launch(std::string& name) {
+int SingleBrowserProcessWebAppLauncher::launch(const std::string& id, const std::string& uri) {
   m_rid = (int)getpid();
-  WebAppManagerServiceAGL::instance()->setStartupApplication(name, m_rid);
+  WebAppManagerServiceAGL::instance()->setStartupApplication(id, uri, m_rid);
   return m_rid;
 }
 
@@ -121,7 +121,7 @@ int SingleBrowserProcessWebAppLauncher::loop(int argc, const char** argv, volati
   return webOSMain.Run(argc, argv);
 }
 
-int SharedBrowserProcessWebAppLauncher::launch(std::string& name) {
+int SharedBrowserProcessWebAppLauncher::launch(const std::string& id, const std::string& uri) {
   if (!WebAppManagerServiceAGL::instance()->initializeAsHostClient()) {
     fprintf(stderr,"Failed to initialize as host client\r\n");
     return -1;
@@ -130,7 +130,8 @@ int SharedBrowserProcessWebAppLauncher::launch(std::string& name) {
   m_rid = (int)getpid();
   std::string m_rid_s = std::to_string(m_rid);
   std::vector<const char*> data;
-  data.push_back(name.c_str());
+  data.push_back(id.c_str());
+  data.push_back(uri.c_str());
   data.push_back(m_rid_s.c_str());
   WebAppManagerServiceAGL::instance()->launchOnHost(data.size(), data.data());
   return m_rid;
@@ -165,7 +166,7 @@ fprintf(stderr, "WebAppLauncherRuntime::run - creating SingleBrowserProcessWebAp
     return -1;
 
   /* Launch WAM application */
-  m_launcher->m_rid = m_launcher->launch(m_url);
+  m_launcher->m_rid = m_launcher->launch(m_id, m_url);
 
   if (m_launcher->m_rid < 0) {
     fprintf(stderr, "cannot launch WAM app (%s)\r\n", m_id.c_str());
@@ -416,7 +417,7 @@ void WebAppLauncherRuntime::notify_ivi_control_cb (ilmObjectType object, t_ilm_u
     struct ilmSurfaceProperties surf_props;
 
     ilm_getPropertiesOfSurface(id, &surf_props);
-    pid_t surf_pid = surf_props.creatorPid;
+    pid_t surf_pid = id;//surf_props.creatorPid;
 
     if (!created) {
       fprintf(stderr, "ivi surface (id=%d, pid=%d) destroyed.\r\n", id, surf_pid);
