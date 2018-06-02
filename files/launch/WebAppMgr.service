@@ -13,7 +13,7 @@
 [Unit]
 Description="WebAppMgr is responsible for running web apps and manage their lifecycle"
 After=weston.service
-BindsTo=weston.service
+Wants=weston.service
 
 [Service]
 Type=simple
