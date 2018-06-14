@@ -122,6 +122,12 @@ script
     # setup 8 Mb minimum codecache capacity
     export JSC_minGlobalCodeCacheCapacity=8388608
 
+    # setup 4 Mb limitation mse audio buffer size
+    export MSE_AUDIO_BUFFER_SIZE_LIMIT=4194304
+
+    # setup 50 Mb limitation mse video buffer size
+    export MSE_VIDEO_BUFFER_SIZE_LIMIT=52428800
+
     # Enable more explicit logging of timing with regards to rendering
     # export WAM2_ENABLE_DEBUG_RENDER_TIMING=1
 
@@ -171,7 +177,11 @@ script
         --ui-disable-opaque-shader-program \
         --user-data-dir=$WAM_DATA_PATH \
         --enable-devtools-experiments \
-        --webos-wam \ "
+        --webos-wam \
+        --enable-neva-ime \
+        --mse-audio-buffer-size-limit=$MSE_AUDIO_BUFFER_SIZE_LIMIT \
+        --mse-video-buffer-size-limit=$MSE_VIDEO_BUFFER_SIZE_LIMIT \
+        --no-sandbox \ "
 
     export WAM_LITE_SWITCHES=" \
         --in-process-zygote \ "
