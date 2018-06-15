@@ -971,7 +971,7 @@ void WebPageBlink::setHasOnCloseCallback(bool hasCloseCallback)
 void WebPageBlink::executeCloseCallback(bool forced)
 {
     QString script = QStringLiteral(
-       "window.PalmSystem._onCloseWithNotify_('%1');").arg(forced?"forced" : "normal");
+       "window.webOSSystem._onCloseWithNotify_('%1');").arg(forced?"forced" : "normal");
 
     evaluateJavaScript(script);
 
