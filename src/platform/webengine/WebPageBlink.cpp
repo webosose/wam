@@ -544,8 +544,8 @@ QString WebPageBlink::escapeData(const QString& value)
 void WebPageBlink::reloadExtensionData()
 {
     QString eventJS = QStringLiteral(
-       "if (typeof(PalmSystem) != 'undefined') {"
-       "  PalmSystem.reloadInjectionData();"
+       "if (typeof(webOSSystem) != 'undefined') {"
+       "  webOSSystem.reloadInjectionData();"
        "};"
     );
     LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "Reload");
@@ -562,8 +562,8 @@ void WebPageBlink::updateExtensionData(const QString& key, const QString& value)
         return;
     }
     QString eventJS = QStringLiteral(
-       "if (typeof(PalmSystem) != 'undefined') {"
-       "  PalmSystem.updateInjectionData('%1', '%2');"
+       "if (typeof(webOSSystem) != 'undefined') {"
+       "  webOSSystem.updateInjectionData('%1', '%2');"
        "};"
     ).arg(escapeData(key)).arg(escapeData(value));
     LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "Update; key:%s; value:%s",
