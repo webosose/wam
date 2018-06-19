@@ -558,7 +558,7 @@ void WebPageBlink::updateExtensionData(const QString& key, const QString& value)
         LOG_WARNING(MSGID_PALMSYSTEM, 2,
             PMLOGKS("APP_ID", qPrintable(appId())),
             PMLOGKFV("PID", "%d", getWebProcessPID()),
-            "PalmSystem is not initialized. key:%s, value:%s", qPrintable(key), qPrintable(value));
+            "webOSSystem is not initialized. key:%s, value:%s", qPrintable(key), qPrintable(value));
         return;
     }
     QString eventJS = QStringLiteral(
@@ -915,8 +915,8 @@ QString WebPageBlink::defaultTrustLevel() const
 
 void WebPageBlink::loadExtension()
 {
-    LOG_DEBUG("WebPageBlink::loadExtension(); Extension : palmsystem");
-    d->pageView->LoadExtension("palmsystem");
+    LOG_DEBUG("WebPageBlink::loadExtension(); Extension : webossystem");
+    d->pageView->LoadExtension("webossystem");
 }
 
 void WebPageBlink::clearExtensions()
@@ -1148,7 +1148,7 @@ void WebPageBlink::updateIsLoadErrorPageFinish()
 
     if (trustLevel().compare("trusted") && wasErrorPage != m_isLoadErrorPageFinish) {
         if (m_isLoadErrorPageFinish) {
-            LOG_DEBUG("[%s] WebPageBlink::updateIsLoadErrorPageFinish(); m_isLoadErrorPageFinish : %s, set trustLevel : trusted to WAM and PalmSystem_injection", qPrintable(appId()), m_isLoadErrorPageFinish ? "true" : "false");
+            LOG_DEBUG("[%s] WebPageBlink::updateIsLoadErrorPageFinish(); m_isLoadErrorPageFinish : %s, set trustLevel : trusted to WAM and webOSSystem_injection", qPrintable(appId()), m_isLoadErrorPageFinish ? "true" : "false");
             setTrustLevel("trusted");
             updateExtensionData("trustLevel", "trusted");
         }

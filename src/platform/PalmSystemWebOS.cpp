@@ -75,14 +75,14 @@ void PalmSystemWebOS::activate()
 
     // ask compositor to raise window. Compositor should raise us, then
     // give us focus, so we shouldn't have to specifically request focus.
-    LOG_DEBUG("[%s] called PalmSystem.activate() from the app, call raise() to make full screen", qPrintable(m_app->appId()));
+    LOG_DEBUG("[%s] called webOSSystem.activate() from the app, call raise() to make full screen", qPrintable(m_app->appId()));
 
     m_app->raise();
 }
 
 void PalmSystemWebOS::deactivate()
 {
-    LOG_DEBUG("[%s] called PalmSystem.deactivate() from the app, call goBackground() to go background", qPrintable(m_app->appId()));
+    LOG_DEBUG("[%s] called webOSSystem.deactivate() from the app, call goBackground() to go background", qPrintable(m_app->appId()));
     m_app->goBackground();
 }
 

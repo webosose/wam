@@ -56,10 +56,10 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
     } else if (message == "containerReady") {
         setContainerAppReady(m_app->appId());
     } else if (message == "activate") {
-        LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "PalmSystem.activate()");
+        LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.activate()");
         activate();
     } else if (message == "deactivate") {
-        LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "PalmSystem.deactivate()");
+        LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.deactivate()");
         deactivate();
     } else if (message == "isActivated") {
         if(isActivated())
@@ -74,7 +74,7 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
     } else if (message == "getIdentifier" || message == "identifier") {
         return QString(identifier().toUtf8());
     } else if (message == "launchParams") {
-        LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "PalmSystem.launchParams Updated by app; %s", qPrintable(params[0]));
+        LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.launchParams Updated by app; %s", qPrintable(params[0]));
         updateLaunchParams(params[0]);
     } else if (message == "screenOrientation") {
         QByteArray res;
@@ -93,11 +93,11 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
     } else if (message == "setWindowProperty") {
         if (params.size() > 1) {
             LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()),
-                "PalmSystem.window.setProperty('%s', '%s')", qPrintable(params[0]), qPrintable(params[1]));
+                "webOSSystem.window.setProperty('%s', '%s')", qPrintable(params[0]), qPrintable(params[1]));
             m_app->setWindowProperty(params[0], params[1]);
         }
     } else if (message == "platformBack") {
-        LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "PalmSystem.platformBack()");
+        LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.platformBack()");
         m_app->platformBack();
     } else if (message == "setCursor") {
         QVariant v1, v2, v3;
@@ -125,19 +125,19 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
         hide();
     } else if (message == "setLoadErrorPolicy") {
         if (params.size() > 0) {
-            LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "PalmSystem.setLoadErrorPolicy(%s)", qPrintable(params[0]));
+            LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.setLoadErrorPolicy(%s)", qPrintable(params[0]));
             setLoadErrorPolicy(params[0]);
         }
     } else if (message == "onCloseNotify") {
         if (params.size() > 0) {
-            LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "PalmSystem.onCloseNotify(%s)", qPrintable(params[0]));
+            LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.onCloseNotify(%s)", qPrintable(params[0]));
             onCloseNotify(params[0]);
         }
     } else if (message == "cursorVisibility") {
         return cursorVisibility() ? "true" : "false";
     } else if (message == "serviceCall") {
         if (m_app->page()->isClosing()) {
-          LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "PalmSystem.serviceCall(%s, %s)", qPrintable(params[0]), qPrintable(params[1]));
+          LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.serviceCall(%s, %s)", qPrintable(params[0]), qPrintable(params[1]));
           m_app->serviceCall(params[0], params[1], m_app->appId());
         } else {
             LOG_WARNING(MSGID_SERVICE_CALL_FAIL, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())),
