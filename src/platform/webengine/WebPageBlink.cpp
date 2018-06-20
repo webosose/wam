@@ -371,9 +371,9 @@ void WebPageBlink::setLaunchParams(const QString& params)
         d->m_palmSystem->setLaunchParams(params);
 }
 
-void WebPageBlink::setUseLaunchOptimization(bool enabled){
+void WebPageBlink::setUseLaunchOptimization(bool enabled, int delayMs) {
     if (getWebAppManagerConfig()->isLaunchOptimizationEnabled())
-        d->pageView->SetUseLaunchOptimization(enabled);
+        d->pageView->SetUseLaunchOptimization(enabled, delayMs);
 }
 
 void WebPageBlink::setUseSystemAppOptimization(bool enabled) {
@@ -622,7 +622,12 @@ void WebPageBlink::didFirstFrameFocused()
 {
     LOG_DEBUG("[%s] render process frame focused for the first time", qPrintable(appId()));
     //App load is finished, set use launching time optimization false.
-    setUseLaunchOptimization(false);
+    //If Launch optimization had to be done late, use delayMsForLaunchOptmization
+    int delayMs = m_appDesc->delayMsForLaunchOptimization();
+    if (delayMs > 0)
+        setUseLaunchOptimization(false, delayMs);
+    else
+        setUseLaunchOptimization(false);
 }
 
 void WebPageBlink::didDropAllPeerConnections()

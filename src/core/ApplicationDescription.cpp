@@ -60,6 +60,7 @@ ApplicationDescription::ApplicationDescription()
     , m_usePrerendering(false)
     , m_networkStableTimeout(std::numeric_limits<double>::quiet_NaN())
     , m_disallowScrollingInMainFrame(true)
+    , m_delayMsForLanchOptimization(0)
 {
 }
 
@@ -269,6 +270,12 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
                 PMLOGKFV("DATA_TYPE", "%d", jsonObj["networkStableTimeout"].type()),  "Invaild QJsonValue type");
         else
             appDesc->m_networkStableTimeout = jsonObj["networkStableTimeout"].toDouble();
+    }
+
+    // Set delay millisecond for launch optimization
+    if (jsonObj.contains("delayMsForLaunchOptimization")) {
+        int delayMs = jsonObj["delayMsForLaunchOptimization"].toInt();
+        appDesc->m_delayMsForLanchOptimization = (delayMs >= 0) ? delayMs : 0;
     }
 
     return appDesc;

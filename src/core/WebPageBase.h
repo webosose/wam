@@ -93,7 +93,7 @@ public:
     virtual uint32_t getWebProcessProxyID() = 0;
     virtual uint32_t getWebProcessPID() const = 0;
     virtual void createPalmSystem(WebAppBase* app) = 0;
-    virtual void setUseLaunchOptimization(bool enabled) {}
+    virtual void setUseLaunchOptimization(bool enabled, int delayMs = 0) {}
     virtual void setUseSystemAppOptimization(bool enabled) {}
     virtual void setUseAccessibility(bool enabled) {}
     virtual void setBlockWriteDiskcache(bool blocked) {}

@@ -73,7 +73,7 @@ public:
     uint32_t getWebProcessProxyID() override;
     uint32_t getWebProcessPID() const override { return renderProcessPid(); }
     void createPalmSystem(WebAppBase* app) override;
-    void setUseLaunchOptimization(bool enabled) override;
+    void setUseLaunchOptimization(bool enabled, int delayMs = 0);
     void setUseSystemAppOptimization(bool enabled) override;
     void setUseAccessibility(bool enabled) override;
     void setBlockWriteDiskcache(bool blocked) override;
