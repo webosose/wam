@@ -152,9 +152,7 @@ script
         --disk-cache-size=$WAM_DISKCACHE_MAXSIZE \
         --enable-aggressive-release-policy \
         --enable-gpu-rasterization \
-        --enable-impl-side-painting \
         --enable-key-event-throttling \
-        --enable-pinch-virtual-viewport \
         --enable-threaded-compositing \
         --enable-watchdog \
         --hide-selection-handles \
@@ -172,12 +170,10 @@ script
         --touch-events=disabled \
         --ui-disable-opaque-shader-program \
         --user-data-dir=$WAM_DATA_PATH \
-        --v8-use-lightweight-gc-on-idle \
         --enable-devtools-experiments \
         --webos-wam \ "
 
     export WAM_LITE_SWITCHES=" \
-        --disable-v8-crankshaft \
         --in-process-zygote \ "
 
     export WAM_WEBOS_LITE=NO
