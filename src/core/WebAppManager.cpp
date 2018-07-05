@@ -66,7 +66,10 @@ void WebAppManager::notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel
     std::list<const WebAppBase*> appList = runningApps();
     for (auto it = appList.begin(); it != appList.end(); ++it) {
         const WebAppBase* app = *it;
-        if (app->isActivated() && !app->page()->isPreload())
+        // Skip memory pressure on preloaded apps if pressure is low because they will
+        // be killed anyway
+        if (app->isActivated() && (level == webos::WebViewBase::MEMORY_PRESSURE_LOW ||
+                                   !app->page()->isPreload()))
             app->page()->notifyMemoryPressure(level);
     }
 }
