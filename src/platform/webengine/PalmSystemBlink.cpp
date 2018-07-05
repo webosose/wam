@@ -14,6 +14,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include "ApplicationDescription.h"
 #include "LogManager.h"
 #include "PalmSystemBlink.h"
 #include "WebAppBase.h"
@@ -23,9 +24,9 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 #include <QtCore/QDataStream>
-
 PalmSystemBlink::PalmSystemBlink(WebAppBase* app)
     : PalmSystemWebOS(app)
+    , m_initialized(false)
 {
 }
 
@@ -149,8 +150,7 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
 
 void PalmSystemBlink::setCountry()
 {
-    if (m_initialized)
-        static_cast<WebPageBlink*>(m_app->page())->updateExtensionData(QStringLiteral("country"), country());
+    static_cast<WebPageBlink*>(m_app->page())->updateExtensionData(QStringLiteral("country"), country());
 }
 
 void PalmSystemBlink::setLaunchParams(const QString& params)
@@ -161,8 +161,7 @@ void PalmSystemBlink::setLaunchParams(const QString& params)
 
 void PalmSystemBlink::setLocale(const QString& params)
 {
-    if (m_initialized)
-        static_cast<WebPageBlink*>(m_app->page())->updateExtensionData(QStringLiteral("locale"), params);
+    static_cast<WebPageBlink*>(m_app->page())->updateExtensionData(QStringLiteral("locale"), params);
 }
 
 QString PalmSystemBlink::identifier() const
@@ -200,9 +199,25 @@ double PalmSystemBlink::devicePixelRatio()
 
 QJsonDocument PalmSystemBlink::initialize()
 {
-    QJsonObject data = PalmSystemWebOS::initialize().object();
-    data["devicePixelRatio"] = devicePixelRatio();
-    data["trustLevel"] = trustLevel();
+    m_initialized = true;
+
+    QJsonObject data;
+    data.insert(QStringLiteral("launchParams"), launchParams());
+    data.insert(QStringLiteral("country"), country());
+    data.insert(QStringLiteral("tvSystemName"), getDeviceInfo("TvSystemName"));
+    data.insert(QStringLiteral("currentCountryGroup"), getDeviceInfo("CountryGroup"));
+    data.insert(QStringLiteral("locale"), locale());
+    data.insert(QStringLiteral("localeRegion"), localeRegion());
+    data.insert(QStringLiteral("isMinimal"), isMinimal());
+    data.insert(QStringLiteral("identifier"), identifier());
+    data.insert(QStringLiteral("screenOrientation"), screenOrientation());
+    data.insert(QStringLiteral("deviceInfo"), getDeviceInfo("TvDeviceInfo"));
+    data.insert(QStringLiteral("activityId"), QJsonValue((double)activityId()));
+    data.insert(QStringLiteral("phoneRegion"), phoneRegion());
+    data.insert(QStringLiteral("folderPath"), QString::fromStdString((m_app->getAppDescription())->folderPath()));
+
+    data.insert(QStringLiteral("devicePixelRatio"), devicePixelRatio());
+    data.insert(QStringLiteral("trustLevel"), trustLevel());
     QJsonDocument doc(data);
     return doc;
 }

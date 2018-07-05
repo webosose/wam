@@ -27,8 +27,6 @@ class PalmSystemWebOS : public PalmSystemBase {
 public:
     PalmSystemWebOS(WebAppBase* app);
 
-    void setInitialized(bool initialize) { m_initialized = initialize; }
-
     virtual void setCountry() {}
     virtual void setFolderPath(const QString& params) {}
     virtual void setLaunchParams(const QString& params);
@@ -39,8 +37,6 @@ protected:
         FocusOwner,
         FocusLayer
     };
-
-    virtual QJsonDocument initialize();
 
     virtual QString identifier() const = 0;
     virtual QString launchParams() const { return m_launchParams; }
@@ -73,7 +69,6 @@ protected:
 
 protected:
     WebAppWayland* m_app;
-    bool m_initialized;
     QString m_launchParams;
 };
 

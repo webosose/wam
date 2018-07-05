@@ -28,7 +28,6 @@
 
 PalmSystemWebOS::PalmSystemWebOS(WebAppBase* app)
     : m_app(static_cast<WebAppWayland*>(app))
-    , m_initialized(false)
     , m_launchParams(QString())
 {
 }
@@ -43,28 +42,6 @@ void PalmSystemWebOS::setLaunchParams(const QString& params)
         p = QString();
 
     m_launchParams = p;
-}
-
-QJsonDocument PalmSystemWebOS::initialize()
-{
-    m_initialized = true;
-
-    // Setup initial data set
-    QJsonObject data;
-
-    data.insert(QStringLiteral("launchParams"), launchParams());
-    data.insert(QStringLiteral("country"), country());
-    data.insert(QStringLiteral("currentCountryGroup"), getDeviceInfo("CountryGroup"));
-    data.insert(QStringLiteral("locale"), locale());
-    data.insert(QStringLiteral("localeRegion"), localeRegion());
-    data.insert(QStringLiteral("isMinimal"), isMinimal());
-    data.insert(QStringLiteral("identifier"), identifier());
-    data.insert(QStringLiteral("screenOrientation"), screenOrientation());
-    data.insert(QStringLiteral("activityId"), QJsonValue((double)activityId()));
-    data.insert(QStringLiteral("phoneRegion"), phoneRegion());
-    data.insert(QStringLiteral("folderPath"), QString::fromStdString((m_app->getAppDescription())->folderPath()));
-    QJsonDocument doc(data);
-    return doc;
 }
 
 bool PalmSystemWebOS::isActivated() const

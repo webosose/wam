@@ -550,6 +550,13 @@ void WebPageBlink::reloadExtensionData()
 
 void WebPageBlink::updateExtensionData(const QString& key, const QString& value)
 {
+    if (!d->m_palmSystem->isInitialized()) {
+        LOG_WARNING(MSGID_PALMSYSTEM, 2,
+            PMLOGKS("APP_ID", qPrintable(appId())),
+            PMLOGKFV("PID", "%d", getWebProcessPID()),
+            "PalmSystem is not initialized. key:%s, value:%s", qPrintable(key), qPrintable(value));
+        return;
+    }
     QString eventJS = QStringLiteral(
        "if (typeof(PalmSystem) != 'undefined') {"
        "  PalmSystem.updateInjectionData('%1', '%2');"
@@ -770,7 +777,7 @@ void WebPageBlink::renderProcessCrashed()
         return;
     }
 
-    d->m_palmSystem->setInitialized(false);
+    d->m_palmSystem->resetInitialized();
     recreateWebView();
     if (!processCrashed())
         handleForceDeleteWebPage();

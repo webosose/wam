@@ -31,15 +31,20 @@ public:
 
     virtual void setLocale(const QString& params);
     virtual double devicePixelRatio();
+    void resetInitialized() { m_initialized = false; }
+    bool isInitialized() { return m_initialized; }
 
 protected:
     // PalmSystemWebOS
-    QJsonDocument initialize() override;
+    QJsonDocument initialize();
     QString identifier() const override;
     void setLoadErrorPolicy(const QString& params) override;
 
     virtual QString trustLevel() const;
     virtual void onCloseNotify(const QString& params);
+
+private:
+    bool m_initialized;
 };
 
 #endif // PALMSYSTEMBLINK_H_
