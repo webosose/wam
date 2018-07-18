@@ -122,9 +122,11 @@ WebPageBase* WebAppFactoryManager::createWebPage(QString winType, QUrl url, std:
     if (interface) {
         page = interface->createWebPage(url, desc, launchParams);
     } else {
-        // use default factory if cannot find appType.
-        if (m_interfaces.find("default") != m_interfaces.end())
-            page = m_interfaces.value("default")->createWebPage(url, desc, launchParams);
+        interface = m_interfaces.value("default");
+        if (interface) {
+            // use default factory if cannot find appType.
+            page = interface->createWebPage(url, desc, launchParams);
+        }
     }
 
     if (page) page->init();
