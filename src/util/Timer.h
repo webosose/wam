@@ -56,6 +56,8 @@ public:
 
     BaseTimer()
         : Timer(kIsRepeating)
+        , m_receiver(nullptr)
+        , m_method(nullptr)
     {
     }
 
