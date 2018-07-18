@@ -104,7 +104,7 @@ QString WebProcessManager::getWebProcessMemSize(uint32_t pid) const
 
     while (fgets(line, 128, fd) != NULL) {
         if(!strncmp(line, "VmRSS:", 6)) {
-            vmrss = strdup(&line[8]);
+            vmrss = QString(&line[8]);
             break;
         }
     }
