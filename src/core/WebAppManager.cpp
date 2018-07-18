@@ -16,6 +16,7 @@
 
 #include "WebAppManager.h"
 
+#include <assert.h>
 #include <string>
 #include <sstream>
 #include <unistd.h>
@@ -429,7 +430,8 @@ void WebAppManager::removeClosingAppList(const QString& appId)
 void WebAppManager::closeAppInternal(WebAppBase* app, bool ignoreCleanResource)
 {
     WebPageBase* page = app->page();
-    if (page && page->isClosing()) {
+    assert(page);
+    if (page->isClosing()) {
         LOG_INFO(MSGID_CLOSE_APP_INTERNAL, 2, PMLOGKS("APP_ID", qPrintable(app->appId())), PMLOGKFV("PID", "%d", app->page()->getWebProcessPID()), "In Closing; return");
         return;
     }
