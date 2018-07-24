@@ -90,7 +90,7 @@ public:
     bool getHiddenWindow();
     void setWasContainerApp(bool contained);
     bool wasContainerApp() const;
-    bool keepAlive();
+    bool keepAlive() const;
     void setForceClose();
     bool forceClose();
     WebPageBase* page() const;

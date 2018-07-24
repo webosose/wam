@@ -32,6 +32,7 @@
 #include "WebAppManagerConfig.h"
 #include "WebAppManagerTracer.h"
 #include "WebPageObserver.h"
+#include "WebPageBlinkObserver.h"
 
 /**
  * Hide dirty implementation details from
@@ -85,6 +86,7 @@ WebPageBlink::WebPageBlink(const QUrl& url, std::shared_ptr<ApplicationDescripti
     , m_vkbWasOverlap(false)
     , m_hasCloseCallback(false)
     , m_trustLevel(QString::fromStdString(desc->trustLevel()))
+    , m_observer(nullptr)
 {
 }
 
@@ -641,6 +643,13 @@ void WebPageBlink::didDropAllPeerConnections()
 {
 }
 
+void WebPageBlink::didSwapCompositorFrame()
+{
+    if (m_observer)
+        m_observer->didSwapPageCompositorFrame();
+}
+
+
 void WebPageBlink::loadFinished(const std::string& url)
 {
     LOG_INFO(MSGID_WEBPAGE_LOAD_FINISHED, 2,
@@ -1170,6 +1179,10 @@ void WebPageBlink::setVisibilityState(WebPageVisibilityState visibilityState)
 
 bool WebPageBlink::allowMouseOnOffEvent() const {
     return false;
+}
+
+void WebPageBlink::setObserver(WebPageBlinkObserver* observer) {
+    m_observer = observer;
 }
 
 #include "WebPageBlink.moc"
