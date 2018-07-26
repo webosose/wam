@@ -51,6 +51,7 @@ WebAppWayland::WebAppWayland(QString type, int width, int height)
     , m_isFocused(false)
     , m_vkbHeight(0)
     , m_lostFocusBySetWindowProperty(false)
+    , m_stageActivated(false)
 {
     init(width, height);
 }
@@ -64,6 +65,7 @@ WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window, int widt
     , m_isFocused(false)
     , m_vkbHeight(0)
     , m_lostFocusBySetWindowProperty(false)
+    , m_stageActivated(false)
 {
     init(width, height);
 }
@@ -210,6 +212,13 @@ bool WebAppWayland::isNormal()
 
 void WebAppWayland::onStageActivated()
 {
+    // NOTE!!!
+    // Calling WebAppWaylandWindow::show() at the end of this function
+    // might lead back to onStageActivated() call again and thus
+    // m_stageActivated guard.
+    if (m_stageActivated)
+        return;
+
     if (getCrashState()) {
         LOG_INFO(MSGID_WEBAPP_STAGE_ACITVATED, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), PMLOGKS("getCrashState()", "true; Reload default Page"), "");
         page()->reloadDefaultPage();
@@ -223,8 +232,10 @@ void WebAppWayland::onStageActivated()
     setActiveAppId(page()->getIdentifier());
     focus();
 
+    m_stageActivated = true;
+
     if (getHiddenWindow() || keepAlive())
-        m_appWindow->Show();
+        m_appWindow->show();
 
     LOG_INFO(MSGID_WEBAPP_STAGE_ACITVATED, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
 }
@@ -235,6 +246,8 @@ void WebAppWayland::onStageDeactivated()
     unfocus();
     page()->setVisibilityState(WebPageBase::WebPageVisibilityState::WebPageVisibilityStateHidden);
     page()->suspendWebPageAll();
+
+    m_stageActivated = false;
 
     LOG_INFO(MSGID_WEBAPP_STAGE_DEACITVATED, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
 }
