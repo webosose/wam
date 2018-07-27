@@ -145,7 +145,6 @@ private:
     OneShotTimer<WebAppWayland> m_launchTimeoutTimer;
 
     bool m_lostFocusBySetWindowProperty;
-    bool m_stageActivated;
 };
 
 #endif /* WEBAPPWAYLAND_H */
