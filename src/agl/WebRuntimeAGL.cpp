@@ -329,7 +329,7 @@ bool WebAppLauncherRuntime::init_hs() {
         json_object_object_add(obj, this->m_wm->kKeyDrawingArea,
                                json_object_new_string("normal.full"));
 
-        this->m_wm->activateSurface(obj);
+        this->m_wm->activateWindow(obj);
       }
     }
   };
@@ -418,7 +418,7 @@ void WebAppLauncherRuntime::setup_surface (int id)
                            json_object_new_string(m_role.c_str()));
     json_object_object_add(obj, m_wm->kKeyDrawingArea,
                            json_object_new_string("normal.full"));
-    m_wm->activateSurface(obj);
+    m_wm->activateWindow(obj);
   }
 }
 
