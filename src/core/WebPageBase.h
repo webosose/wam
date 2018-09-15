@@ -82,7 +82,6 @@ public:
     virtual QString title() = 0;
     virtual bool canGoBack() = 0;
     virtual void closeVkb() = 0;
-    virtual bool isKeyboardVisible() const { return false; }
     virtual void keyboardVisibilityChanged(bool visible) {}
     virtual void updatePageSettings() = 0;
     virtual void handleDeviceInfoChanged(const QString& deviceInfo) = 0;

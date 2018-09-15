@@ -51,7 +51,7 @@ bool PalmSystemWebOS::isActivated() const
 
 bool PalmSystemWebOS::isKeyboardVisible() const
 {
-    return m_app->page()->isKeyboardVisible();
+    return m_app->isKeyboardVisible();
 }
 
 bool PalmSystemWebOS::isMinimal() const

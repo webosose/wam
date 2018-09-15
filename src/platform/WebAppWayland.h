@@ -85,6 +85,7 @@ public:
     void doClose() override;
 
     // WebAppWayland
+    virtual bool isKeyboardVisible() override;
     virtual void setKeyMask(webos::WebOSKeyMask keyMask, bool value);
     virtual void setKeyMask(webos::WebOSKeyMask keyMask);
     virtual void focusOwner();

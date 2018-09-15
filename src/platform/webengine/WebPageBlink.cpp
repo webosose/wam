@@ -870,11 +870,6 @@ void WebPageBlink::closeVkb()
 {
 }
 
-bool WebPageBlink::isKeyboardVisible() const
-{
-    return d->pageView->IsKeyboardVisible();
-}
-
 bool WebPageBlink::isInputMethodActive() const
 {
     return d->pageView->IsInputMethodActive();

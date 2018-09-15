@@ -62,7 +62,6 @@ public:
     QString title() override;
     bool canGoBack() override;
     void closeVkb() override;
-    bool isKeyboardVisible() const override;
     bool isInputMethodActive() const override;
     void keyboardVisibilityChanged(bool visible) override;
     void updatePageSettings() override;

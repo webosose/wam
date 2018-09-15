@@ -295,6 +295,11 @@ void WebAppWayland::setupWindowGroup(ApplicationDescription* desc)
     }
 }
 
+bool WebAppWayland::isKeyboardVisible()
+{
+    return m_appWindow->IsKeyboardVisible();
+}
+
 void WebAppWayland::setKeyMask(webos::WebOSKeyMask keyMask, bool value)
 {
     m_appWindow->SetKeyMask(keyMask, value);
