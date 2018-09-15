@@ -129,7 +129,6 @@ private:
     QString m_windowType;
     int m_lastSwappedTime;
 
-    unsigned m_windowHandle;
     std::vector<gfx::Rect> m_inputRegion;
     bool m_enableInputRegion;
 
