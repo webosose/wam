@@ -55,7 +55,6 @@ HEADERS += \
     WebAppWayland.h \
     WebAppWaylandWindow.h \
     WebPageBlinkDelegate.h \
-    WebPageBlinkObserver.h \
     WebPageBlink.h \
 
 TARGET = WebAppMgr

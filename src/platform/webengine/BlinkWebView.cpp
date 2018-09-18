@@ -126,12 +126,6 @@ void BlinkWebView::DidDropAllPeerConnections(webos::DropPeerConnectionReason rea
     LOG_DEBUG("Dropped all WebRTC peer connections with reason %d", reason);
 }
 
-void BlinkWebView::DidSwapCompositorFrame()
-{
-    if (m_delegate)
-        m_delegate->didSwapCompositorFrame();
-}
-
 void BlinkWebView::DidFirstFrameFocused()
 {
     if (!m_delegate)

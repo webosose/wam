@@ -25,8 +25,6 @@
 #include "WebPageBase.h"
 #include "WindowTypes.h"
 
-#include "WebPageBlink.h"
-
 #include "webos/common/webos_constants.h"
 #include "webos/window_group_configuration.h"
 
@@ -160,15 +158,7 @@ void WebAppWayland::attach(WebPageBase *page)
     setKeyMask(webos::WebOSKeyMask::KEY_MASK_EXIT,
         getAppDescription()->handleExitKey());
 
-    doAttach();
-
-    static_cast<WebPageBlink*>(this->page())->setObserver(this);
-}
-
-WebPageBase* WebAppWayland::detach()
-{
-    static_cast<WebPageBlink*>(page())->setObserver(nullptr);
-    return WebAppBase::detach();
+   doAttach();
 }
 
 void WebAppWayland::suspendAppRendering()
@@ -626,12 +616,6 @@ void WebAppWayland::webViewRecreatedSlot()
     m_appWindow->RecreatedWebContents();
     page()->setPageProperties();
     focus();
-}
-
-void WebAppWayland::didSwapPageCompositorFrame()
-{
-    if (m_appWindow)
-        m_appWindow->didSwapPageCompositorFrame();
 }
 
 void WebAppWayland::setForceActivateVtgIfRequired()

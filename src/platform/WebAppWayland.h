@@ -20,8 +20,6 @@
 #include "Timer.h"
 #include "WebAppBase.h"
 
-#include "WebPageBlinkObserver.h"
-
 #include <QtCore/QVariant>
 
 #include "webos/common/webos_constants.h"
@@ -47,7 +45,7 @@ public:
     void OnCursorVisibilityChanged(bool visible) override;
 };
 
-class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
+class WebAppWayland : public WebAppBase {
     Q_OBJECT
 
 public:
@@ -59,7 +57,6 @@ public:
     // WebAppBase
     void init(int width, int height) override;
     void attach(WebPageBase*) override;
-    WebPageBase* detach() override;
     void suspendAppRendering() override;
     void resumeAppRendering() override;
     bool isFocused() const override;
@@ -108,9 +105,6 @@ public:
     void applyInputRegion();
     void forwardWebOSEvent(WebOSEvent* event) const;
     void stateAboutToChange(webos::NativeWindowState willBe);
-
-    // from WebPageBlinkObserver
-    void didSwapPageCompositorFrame();
 
 protected:
     // WebAppBase

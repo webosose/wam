@@ -118,7 +118,7 @@ void WebAppBase::setKeepAlive(bool keepAlive)
     d->m_keepAlive = keepAlive;
 }
 
-bool WebAppBase::keepAlive() const
+bool WebAppBase::keepAlive()
 {
     return d->m_keepAlive;
 }

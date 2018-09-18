@@ -42,8 +42,6 @@ public:
 
     void sendKeyCode(int keyCode);
 
-    void didSwapPageCompositorFrame();
-
     // webos::WebAppWindowBase
     bool event(WebOSEvent* event) override;
     unsigned int CheckKeyFilterTable(unsigned keycode, unsigned* modifier) override;
@@ -73,8 +71,6 @@ private:
     bool m_xinputActivated;
 
     WebOSMouseEvent m_lastMouseEvent;
-    bool m_hasPageFrameBeenSwapped;
-    bool m_pendingShow;
 };
 
 #endif

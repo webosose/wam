@@ -44,7 +44,6 @@ public:
     virtual void didHistoryBackOnTopPage() {}
     virtual void didClearWindowObject() {}
     virtual void didDropAllPeerConnections() {}
-    virtual void didSwapCompositorFrame() {}
     virtual bool allowMouseOnOffEvent() const = 0;
 };
 
