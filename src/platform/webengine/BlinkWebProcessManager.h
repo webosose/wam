@@ -31,6 +31,7 @@ public:
     uint32_t getInitialWebViewProxyID() const override;
     void clearBrowsingData(const int removeBrowsingDataMask) override;
     int maskForBrowsingDataType(const char* type) override;
+    void setProxyRules(const char* proxyRules) override;
 };
 
 #endif /* BLINKEBPROCESSMANAGER_H */

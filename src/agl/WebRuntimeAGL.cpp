@@ -1,6 +1,10 @@
 #include "WebRuntimeAGL.h"
 
+#include <assert.h>
+#include <netinet/in.h>
 #include <regex>
+#include <sys/types.h>
+#include <sys/socket.h>
 #include <unistd.h>
 
 #include <libxml/parser.h>
@@ -127,6 +131,10 @@ int SharedBrowserProcessWebAppLauncher::launch(const std::string& id, const std:
     return -1;
   }
 
+  tiny_proxy = std::make_unique<TinyProxy>();
+  int port = tiny_proxy->port();
+  std::string proxy_rules = "localhost:" + std::to_string(port);
+  WebAppManager::instance()->setProxyRules(proxy_rules.data());
   m_rid = (int)getpid();
   std::string m_rid_s = std::to_string(m_rid);
   std::vector<const char*> data;
@@ -484,4 +492,25 @@ int WebRuntimeAGL::run(int argc, const char** argv) {
   }
 
   return m_runtime->run(argc, argv);
+}
+
+TinyProxy::TinyProxy() {
+  // Get a free port to listen
+  int test_socket = socket(AF_INET, SOCK_STREAM, 0);
+  struct sockaddr_in test_socket_addr;
+  memset(&test_socket_addr, 0, sizeof(test_socket_addr));
+  test_socket_addr.sin_port = htons(0);
+  test_socket_addr.sin_family = AF_INET;
+  bind(test_socket, (struct sockaddr*) &test_socket_addr, sizeof(struct sockaddr_in));
+  socklen_t len = sizeof(test_socket_addr);
+  getsockname(test_socket, (struct sockaddr*) &test_socket_addr, &len);
+  int port = ntohs(test_socket_addr.sin_port);
+  close(test_socket);
+
+  setPort(port);
+
+  std::string cmd = "tinyproxy -p " + std::to_string(port);
+  int res = std::system(cmd.data());
+  if (res == -1)
+    fprintf(stderr, "Error while running %s\r\n", cmd.data());
 }

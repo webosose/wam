@@ -1057,3 +1057,8 @@ int WebAppManager::maskForBrowsingDataType(const char* type)
 {
     return m_webProcessManager->maskForBrowsingDataType(type);
 }
+
+void WebAppManager::setProxyRules(const char* proxyRules)
+{
+    m_webProcessManager->setProxyRules(proxyRules); 
+}
