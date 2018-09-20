@@ -64,3 +64,8 @@ int BlinkWebViewProfileHelper::maskForBrowsingDataType(const char* type) {
 
     return 0;
 }
+
+void BlinkWebViewProfileHelper::setProxyServer(const std::string& ip, const std::string& port)
+{
+    webos::WebViewProfile::GetDefaultProfile()->SetProxyServer(ip, port, nullptr, nullptr);
+}
