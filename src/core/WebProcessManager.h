@@ -49,7 +49,7 @@ public:
     virtual uint32_t getInitialWebViewProxyID() const = 0;
     virtual void clearBrowsingData(const int removeBrowsingDataMask) = 0;
     virtual int maskForBrowsingDataType(const char* type) = 0;
-
+    virtual void setProxyServer(const std::string& ip, const std::string& port) = 0;
 protected:
     std::list<const WebAppBase*> runningApps();
     std::list<const WebAppBase*> runningApps(uint32_t pid);
