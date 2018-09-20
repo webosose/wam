@@ -2,6 +2,7 @@
 #define WEBRUNTIME_AGL_H
 
 #include <map>
+#include <memory>
 #include <signal.h>
 #include <string>
 #include <vector>
@@ -40,10 +41,22 @@ public:
   std::vector<pid_t> m_pid_v;
 };
 
+class TinyProxy {
+ public:
+  int port() { return port_; }
+  void setPort(int port) { port_ = port; }
+
+  TinyProxy();
+private:
+  int port_;
+};
+
 class SharedBrowserProcessWebAppLauncher : public Launcher {
 public:
   int launch(const std::string& id, const std::string& uri) override;
   int loop(int argc, const char** argv, volatile sig_atomic_t& e_flag) override;
+private:
+  std::unique_ptr<TinyProxy> tiny_proxy;
 };
 
 class SingleBrowserProcessWebAppLauncher : public Launcher {

@@ -1049,3 +1049,8 @@ int WebAppManager::maskForBrowsingDataType(const char* type)
 {
     return m_webProcessManager->maskForBrowsingDataType(type);
 }
+
+void WebAppManager::setProxyServer(const std::string& ip, const std::string& port)
+{
+    m_webProcessManager->setProxyServer(ip, port);
+}
