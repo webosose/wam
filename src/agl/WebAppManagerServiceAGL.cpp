@@ -151,7 +151,10 @@ public:
           res.push_back(strdup(s.c_str()));
       }
 
-      WebAppManagerServiceAGL::instance()->setStartupApplication(std::string(res[0]), std::string(res[1]), atoi(res[2]));
+      WebAppManagerServiceAGL::instance()->setStartupApplication(
+        std::string(res[0]), std::string(res[1]), atoi(res[2]),
+        std::string(res[3]));
+
       WebAppManagerServiceAGL::instance()->triggerStartupApp();
       return 1;
     }
@@ -196,11 +199,15 @@ void WebAppManagerServiceAGL::launchOnHost(int argc, const char **argv)
     socket_->sendMsg(argc, argv);
 }
 
-void WebAppManagerServiceAGL::setStartupApplication(const std::string& startup_app_id, const std::string& startup_app_uri, int startup_app_surface_id)
+void WebAppManagerServiceAGL::setStartupApplication(
+    const std::string& startup_app_id,
+    const std::string& startup_app_uri, int startup_app_surface_id,
+    const std::string& startup_proxy_rules)
 {
     startup_app_id_ = startup_app_id;
     startup_app_uri_ = startup_app_uri;
     startup_app_surface_id_ = startup_app_surface_id;
+    startup_proxy_rules_ = startup_proxy_rules;
 }
 
 void *run_socket(void *socket) {
@@ -331,6 +338,10 @@ fprintf(stderr, "    url: %s\r\n", startup_app_uri_.c_str());
     std::string app_id = obj["id"].toString().toStdString();
     int errCode = 0;
     std::string errMsg;
+
+    if (!startup_proxy_rules_.empty())
+        WebAppManagerService::setProxyRules(startup_proxy_rules_);
+
     WebAppManagerService::onLaunch(appDesc, params, app_id, errCode, errMsg);
 }
 

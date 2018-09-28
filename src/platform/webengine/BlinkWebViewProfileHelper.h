@@ -17,6 +17,8 @@
 #ifndef BLINK_WEB_VIEW_PROFILE_HELPER_H_
 #define BLINK_WEB_VIEW_PROFILE_HELPER_H_
 
+#include <string>
+
 namespace webos {
 class WebViewProfile;
 }
@@ -45,7 +47,7 @@ public:
         webos::WebViewProfile* profile = nullptr);
     static void clearDefaultBrowsingData(const int removeBrowsingDataMask);
     static int maskForBrowsingDataType(const char* key);
-    static void setProxyRules(const char* proxyRules);
+    static void setProxyRules(const std::string& proxy_rules);
 };
 
 #endif // BLINK_WEB_VIEW_PROFILE_HELPER_H_

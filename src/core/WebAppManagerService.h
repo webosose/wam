@@ -82,6 +82,7 @@ protected:
     QJsonObject closeByInstanceId(QString instanceId);
     int maskForBrowsingDataType(const char* type);
     void onClearBrowsingData(const int removeBrowsingDataMask);
+    void setProxyRules(const std::string& proxy_rules);
 
     WebAppBase* getContainerApp();
 #ifndef PRELOADMANAGER_ENABLED
