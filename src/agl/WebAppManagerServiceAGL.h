@@ -19,7 +19,10 @@ public:
     bool initializeAsHostClient();
 
     bool isHostServiceRunning();
-    void setStartupApplication(const std::string& startup_app_id, const std::string& startup_app_uri, int startup_app_surface_id);
+
+    void setStartupApplication(const std::string& startup_app_id,
+        const std::string& startup_app_uri, int startup_app_surface_id,
+        const std::string& startup_proxy_port =  std::string());
 
     void launchOnHost(int argc, const char **argv);
 
@@ -48,6 +51,7 @@ private:
 
     std::string startup_app_id_;
     std::string startup_app_uri_;
+    std::string startup_proxy_port_;
     int startup_app_surface_id_;
     OneShotTimer<WebAppManagerServiceAGL> startup_app_timer_;
 

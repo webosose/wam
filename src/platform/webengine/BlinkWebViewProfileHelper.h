@@ -17,6 +17,8 @@
 #ifndef BLINK_WEB_VIEW_PROFILE_HELPER_H_
 #define BLINK_WEB_VIEW_PROFILE_HELPER_H_
 
+#include <string>
+
 namespace webos {
 class WebViewProfile;
 }
