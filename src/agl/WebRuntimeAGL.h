@@ -56,7 +56,7 @@ public:
   int launch(const std::string& id, const std::string& uri) override;
   int loop(int argc, const char** argv, volatile sig_atomic_t& e_flag) override;
 private:
-  std::unique_ptr<TinyProxy> tiny_proxy;
+  std::unique_ptr<TinyProxy> tiny_proxy_;
 };
 
 class SingleBrowserProcessWebAppLauncher : public Launcher {
