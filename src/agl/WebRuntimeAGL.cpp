@@ -131,15 +131,18 @@ int SharedBrowserProcessWebAppLauncher::launch(const std::string& id, const std:
     return -1;
   }
 
-  tiny_proxy = std::make_unique<TinyProxy>();
-  int port = tiny_proxy->port();
-  WebAppManager::instance()->setProxyServer("localhost", std::to_string(port));
+  tiny_proxy_ = std::make_unique<TinyProxy>();
+  int port = tiny_proxy_->port();
+  std::string proxy_port = std::to_string(port);
+
   m_rid = (int)getpid();
   std::string m_rid_s = std::to_string(m_rid);
   std::vector<const char*> data;
   data.push_back(id.c_str());
   data.push_back(uri.c_str());
   data.push_back(m_rid_s.c_str());
+  data.push_back(proxy_port.c_str());
+
   WebAppManagerServiceAGL::instance()->launchOnHost(data.size(), data.data());
   return m_rid;
 }
