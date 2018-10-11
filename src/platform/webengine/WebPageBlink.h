@@ -28,6 +28,7 @@
 class WebAppBase;
 class BlinkWebView;
 class WebPageBlinkPrivate;
+class WebPageBlinkObserver;
 
 class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
     Q_OBJECT
@@ -41,6 +42,8 @@ public:
 
     WebPageBlink(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const QString& launchParams);
     ~WebPageBlink() override;
+
+    void setObserver(WebPageBlinkObserver* observer);
 
     // WebPageBase
     void init() override;
@@ -133,6 +136,7 @@ public:
 
     void forwardEvent(void* event) override;
     bool allowMouseOnOffEvent() const override;
+    void didSwapCompositorFrame();
 
     // Timer callback
     void timeoutCloseCallback();
@@ -146,6 +150,7 @@ Q_SIGNALS:
     void webPageTitleChanged();
     void webViewRecreated();
     void moveInputRegion(qreal);
+    void compositorFrameSwapped();
 
 protected:
     BlinkWebView* pageView() const;
@@ -192,6 +197,8 @@ private:
     OneShotTimer<WebPageBlink> m_closeCallbackTimer;
     QString m_trustLevel;
     QString m_loadFailedHostname;
+
+    WebPageBlinkObserver *m_observer;
 };
 
 #endif /* WEBPAGEBLINK_H */

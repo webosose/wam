@@ -72,6 +72,8 @@ WebAppWaylandWindow::WebAppWaylandWindow()
     , m_cursorVisible(false)
     , m_xinputActivated(false)
     , m_lastMouseEvent(WebOSMouseEvent(WebOSEvent::None, -1., -1.))
+    , m_hasPageFrameBeenSwapped(false)
+    , m_pendingShow(false)
 {
     m_cursorEnabled = (qgetenv("ENABLE_CURSOR_BY_DEFAULT") == "1") ? true : false;;
 }
@@ -81,13 +83,20 @@ void WebAppWaylandWindow::hide()
     LOG_INFO(MSGID_WAM_DEBUG, 1, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), "WebAppWaylandWindow::hide(); call onStageDeactivated");
     onStageDeactivated();
     WebAppWindowBase::Hide();
+
+    m_hasPageFrameBeenSwapped = false;
 }
 
 void WebAppWaylandWindow::show()
 {
-    LOG_INFO(MSGID_WAM_DEBUG, 1, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), "WebAppWaylandWindow::show(); call onStageActivated");
-    onStageActivated();
-    WebAppWindowBase::Show();
+    if (!m_hasPageFrameBeenSwapped) {
+        m_pendingShow = true;
+    } else {
+        LOG_INFO(MSGID_WAM_DEBUG, 1, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), "WebAppWaylandWindow::show(); call onStageActivated");
+        onStageActivated();
+        WebAppWindowBase::Show();
+        m_pendingShow = false;
+    }
 }
 
 void WebAppWaylandWindow::platformBack()
@@ -119,6 +128,16 @@ void WebAppWaylandWindow::setCursor(const QString & cursorArg, int hotspot_x, in
 void WebAppWaylandWindow::attachWebContents(void* webContents)
 {
     WebAppWindowBase::AttachWebContents(webContents);
+}
+
+void WebAppWaylandWindow::didSwapPageCompositorFrame()
+{
+    if (!m_hasPageFrameBeenSwapped) {
+        m_hasPageFrameBeenSwapped = true;
+        if (m_pendingShow) {
+            show();
+        }
+    }
 }
 
 bool WebAppWaylandWindow::event(WebOSEvent* event)

@@ -59,6 +59,7 @@ public:
     void DidHistoryBackOnTopPage() {}
     void DidClearWindowObject() {}
     virtual void DidDropAllPeerConnections(webos::DropPeerConnectionReason reason);
+    void DidSwapCompositorFrame();
     virtual bool AllowMouseOnOffEvent() const;
     void HandleBrowserControlCommand(const std::string& command, const std::vector<std::string>& arguments) override;
     void HandleBrowserControlFunction(const std::string& command, const std::vector<std::string>& arguments, std::string* result) override;
