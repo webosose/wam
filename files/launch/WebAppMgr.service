@@ -12,8 +12,8 @@
 
 [Unit]
 Description="WebAppMgr is responsible for running web apps and manage their lifecycle"
+Requires=weston.service
 After=weston.service
-Wants=weston.service
 
 [Service]
 Type=simple
@@ -21,6 +21,7 @@ OOMScoreAdjust=-1000
 EnvironmentFile=-/etc/default/WebAppMgr.env
 ExecStart=/usr/bin/WebAppMgr --no-sandbox --remote-debugging-port=9998 --user-data-dir="/home/0/wamdata" --webos-wam
 Restart=on-failure
+RestartSec=50
 
 [Install]
 WantedBy=multi-user.target
