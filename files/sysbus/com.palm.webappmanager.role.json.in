@@ -4,7 +4,6 @@
     \"allowedNames\": [
         \"com.palm.webappmanager\",
         \"com.webos.service.webappmanager\",
-        \"com.webos.media.client.*\",
         \"com.webos.rm.client.*\"
     ],
     \"permissions\": [
@@ -20,10 +19,6 @@
           \"com.webos.service.connectionmanager\",
           \"com.webos.settingsservice\"
         ]
-      },
-      {
-        \"service\":\"com.webos.media.client.*\",
-        \"outbound\":[\"com.webos.media\"]
       },
       {
         \"service\":\"com.webos.rm.client.*\",
