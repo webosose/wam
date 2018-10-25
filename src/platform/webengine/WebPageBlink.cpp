@@ -139,7 +139,6 @@ void WebPageBlink::init()
     d->pageView->SetV8DateUseSystemLocaloffset(false);
     d->pageView->SetLocalStorageEnabled(true);
     d->pageView->SetShouldSuppressDialogs(true);
-    d->pageView->SetFixedPositionCreatesStackingContext(false);
     d->pageView->SetNotifyFMPDirectly(m_appDesc->usePrerendering());
     setDisallowScrolling(m_appDesc->disallowScrollingInMainFrame());
 
