@@ -67,11 +67,18 @@ void WebAppManager::notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel
     std::list<const WebAppBase*> appList = runningApps();
     for (auto it = appList.begin(); it != appList.end(); ++it) {
         const WebAppBase* app = *it;
-        // Skip memory pressure on preloaded apps if pressure is low because they will
-        // be killed anyway
-        if (app->isActivated() && (level == webos::WebViewBase::MEMORY_PRESSURE_LOW ||
-                                   !app->page()->isPreload()))
-            app->page()->notifyMemoryPressure(level);
+        // Skip memory pressure handling on preloaded apps if chromium pressure is critical
+        // (when system is on low or critical) because they will be killed anyway
+        if (app->isActivated() &&
+            (!app->page()->isPreload() ||
+             level != webos::WebViewBase::MEMORY_PRESSURE_CRITICAL))
+          app->page()->notifyMemoryPressure(level);
+        else {
+          LOG_DEBUG("Skipping memory pressure handler for"
+                    " appId(%s) isActivated(%d) isPreload(%d) Level(%d)",
+                    qPrintable(app->appId()), app->isActivated(),
+                    app->page()->isPreload(), level);
+        }
     }
 }
 
