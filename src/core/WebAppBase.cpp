@@ -414,7 +414,7 @@ void WebAppBase::setPreloadState(QString properties)
             // TODO : implement full preload when rule is set.
             break;
         case PARTIAL_PRELOAD :
-            d->m_page->setBlockWriteDiskcache(true);
+            d->m_page->setAppPreloadHint(true);
             d->m_page->suspendWebPageMedia();
             break;
         case MINIMAL_PRELOAD :
@@ -439,7 +439,7 @@ void WebAppBase::clearPreloadState()
             // TODO : implement full preload when rule is set.
             break;
         case PARTIAL_PRELOAD :
-            d->m_page->setBlockWriteDiskcache(false);
+            d->m_page->setAppPreloadHint(false);
             d->m_page->resumeWebPageMedia();
             break;
         case MINIMAL_PRELOAD :

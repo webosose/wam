@@ -95,7 +95,8 @@ public:
     virtual void setUseLaunchOptimization(bool enabled, int delayMs = 0) {}
     virtual void setUseSystemAppOptimization(bool enabled) {}
     virtual void setUseAccessibility(bool enabled) {}
-    virtual void setBlockWriteDiskcache(bool blocked) {}
+    virtual void setAppPreloadHint(bool is_preload) {}
+
     virtual void suspendWebPageAll() = 0;
     virtual void resumeWebPageAll() = 0;
     virtual void suspendWebPageMedia() = 0;

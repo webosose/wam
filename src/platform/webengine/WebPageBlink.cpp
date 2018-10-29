@@ -386,9 +386,9 @@ void WebPageBlink::setUseAccessibility(bool enabled)
     d->pageView->SetUseAccessibility(enabled);
 }
 
-void WebPageBlink::setBlockWriteDiskcache(bool blocked)
+void WebPageBlink::setAppPreloadHint(bool is_preload)
 {
-    d->pageView->SetBlockWriteDiskcache(blocked);
+    d->pageView->SetAppPreloadHint(is_preload);
 }
 
 void WebPageBlink::setForceActivateVtg(bool enabled)

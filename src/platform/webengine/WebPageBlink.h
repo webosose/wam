@@ -78,7 +78,7 @@ public:
     void setUseLaunchOptimization(bool enabled, int delayMs = 0);
     void setUseSystemAppOptimization(bool enabled) override;
     void setUseAccessibility(bool enabled) override;
-    void setBlockWriteDiskcache(bool blocked) override;
+    void setAppPreloadHint(bool is_preload) override;
     void suspendWebPageAll() override;
     void resumeWebPageAll() override;
     void suspendWebPageMedia() override;
