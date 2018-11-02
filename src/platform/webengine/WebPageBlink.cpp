@@ -160,6 +160,7 @@ void WebPageBlink::init()
     getSystemLanguage(language);
     setPreferredLanguages(language);
     d->pageView->SetAppId(appId().toStdString());
+    d->pageView->SetSecurityOrigin(appId().toStdString());
     updateHardwareResolution();
     updateBoardType();
     updateDatabaseIdentifier();
