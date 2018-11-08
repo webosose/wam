@@ -341,7 +341,7 @@ void WebAppManagerServiceAGL::launchStartupAppFromURL()
     std::string errMsg;
 
     if (!startup_proxy_rules_.empty())
-        WebAppManagerService::setProxyRules(startup_proxy_rules_);
+        WebAppManagerService::buildWebViewProfile(app_id, startup_proxy_rules_);
 
     WebAppManagerService::onLaunch(appDesc, params, app_id, errCode, errMsg);
 }

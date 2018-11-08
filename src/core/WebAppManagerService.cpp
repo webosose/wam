@@ -227,7 +227,7 @@ int WebAppManagerService::maskForBrowsingDataType(const char* type)
     return WebAppManager::instance()->maskForBrowsingDataType(type);
 }
 
-void WebAppManagerService::setProxyRules(const std::string& proxy_rules)
+void WebAppManagerService::buildWebViewProfile(const std::string& app_id, const std::string& proxy_rules)
 {
-    WebAppManager::instance()->setProxyRules(proxy_rules);
+    WebAppManager::instance()->buildWebViewProfile(app_id, proxy_rules);
 }
