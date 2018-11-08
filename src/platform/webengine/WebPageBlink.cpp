@@ -248,13 +248,15 @@ uint32_t WebPageBlink::getWebProcessProxyID()
 
 void WebPageBlink::setPreferredLanguages(const QString& language)
 {
+    if (d->m_palmSystem)
+        d->m_palmSystem->setLocale(language);
+
+#ifndef TARGET_DESKTOP
     // just set system language for accept-language for http header, navigator.language, navigator.languages
     // even window.languagechange event too
     d->pageView->SetAcceptLanguages(language.toStdString());
     d->pageView->UpdatePreferences();
-
-    if (d->m_palmSystem)
-        d->m_palmSystem->setLocale(language);
+#endif
 }
 
 void WebPageBlink::setDefaultFont(const QString& font)
