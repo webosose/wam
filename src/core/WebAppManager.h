@@ -164,7 +164,7 @@ public:
 
     void clearBrowsingData(const int removeBrowsingDataMask);
     int maskForBrowsingDataType(const char* type);
-    void setProxyServer(const std::string& ip, const std::string& port);
+    void buildWebViewProfile(const std::string& app_id, const std::string& proxy_host, const std::string& proxy_port);
 
 protected:
 private:
