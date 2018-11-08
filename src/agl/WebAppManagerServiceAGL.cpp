@@ -340,7 +340,7 @@ void WebAppManagerServiceAGL::launchStartupAppFromURL()
     std::string params, errMsg;
 
     if (!startup_proxy_port_.empty())
-        WebAppManagerService::setProxyServer("localhost", startup_proxy_port_);
+        WebAppManagerService::buildWebViewProfile(app_id, "localhost", startup_proxy_port_);
 
     WebAppManagerService::onLaunch(appDesc, params, app_id, errCode, errMsg);
 }

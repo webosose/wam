@@ -17,6 +17,7 @@
 #ifndef BLINK_WEB_VIEW_PROFILE_HELPER_H_
 #define BLINK_WEB_VIEW_PROFILE_HELPER_H_
 
+#include <map>
 #include <string>
 
 namespace webos {
@@ -40,14 +41,20 @@ const char kWebSQL[] = "webSQL";
 
 class BlinkWebViewProfileHelper {
 public:
-    BlinkWebViewProfileHelper() {}
-    virtual ~BlinkWebViewProfileHelper() {}
+    static BlinkWebViewProfileHelper* instance();
 
     static void clearBrowsingData(const int removeBrowsingDataMask,
         webos::WebViewProfile* profile = nullptr);
     static void clearDefaultBrowsingData(const int removeBrowsingDataMask);
     static int maskForBrowsingDataType(const char* key);
-    static void setProxyServer(const std::string& ip, const std::string& port);
+    webos::WebViewProfile* getProfile(const std::string& app_id);
+    void buildProfile(const std::string& app_id, const std::string& proxy_host, const std::string& proxy_port);
+
+private:
+    BlinkWebViewProfileHelper() {}
+    virtual ~BlinkWebViewProfileHelper() = default;
+
+    std::map<const std::string, webos::WebViewProfile*> m_appProfileMap;
 };
 
 #endif // BLINK_WEB_VIEW_PROFILE_HELPER_H_
