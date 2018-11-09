@@ -274,8 +274,9 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     }
 
     // Set delay millisecond for launch optimization
-    if (jsonObj.contains("delayMsForLaunchOptimization")) {
-        int delayMs = jsonObj["delayMsForLaunchOptimization"].toInt();
+    auto delayMsForLaunchOptimization = jsonObj["delayMsForLaunchOptimization"];
+    if (delayMsForLaunchOptimization.isInt()) {
+        int delayMs = delayMsForLaunchOptimization.asInt();
         appDesc->m_delayMsForLanchOptimization = (delayMs >= 0) ? delayMs : 0;
     }
 

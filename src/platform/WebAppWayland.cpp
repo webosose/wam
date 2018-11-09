@@ -16,8 +16,7 @@
 
 #include "WebAppWayland.h"
 
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
+#include <json/json.h>
 
 #include "ApplicationDescription.h"
 #include "LogManager.h"
@@ -324,20 +323,17 @@ void WebAppWayland::applyInputRegion()
 #endif
 }
 
-void WebAppWayland::setInputRegion(const QJsonDocument& jsonDoc)
+void WebAppWayland::setInputRegion(const Json::Value& jsonDoc)
 {
     m_inputRegion.clear();
 
     if (jsonDoc.isArray()) {
-        QJsonArray jsonArray = jsonDoc.array();
-
-        for (int i = 0; i < jsonArray.size(); i++) {
-            QVariantMap map = jsonArray[i].toObject().toVariantMap();
+        for (const Json::Value& map : jsonDoc) {
             m_inputRegion.push_back(gfx::Rect(
-                                map["x"].toInt() * m_scaleFactor,
-                                map["y"].toInt() * m_scaleFactor,
-                                map["width"].toInt() * m_scaleFactor,
-                                map["height"].toInt() * m_scaleFactor));
+                                map["x"].asInt() * m_scaleFactor,
+                                map["y"].asInt() * m_scaleFactor,
+                                map["width"].asInt() * m_scaleFactor,
+                                map["height"].asInt() * m_scaleFactor));
         }
     }
 
@@ -398,16 +394,14 @@ static QMap<QString, webos::WebOSKeyMask>& getKeyMaskTable()
     return mapTable;
 }
 
-void WebAppWayland::setKeyMask(const QJsonDocument& jsonDoc)
+void WebAppWayland::setKeyMask(const Json::Value& jsonDoc)
 {
     static QMap<QString, webos::WebOSKeyMask>& mapTable = getKeyMaskTable();
     unsigned int keyMask = 0;
 
     if (jsonDoc.isArray()) {
-        QJsonArray jsonArray = jsonDoc.array();
-
-        for (int i = 0; i < jsonArray.size(); i++)
-            keyMask |= mapTable.value(jsonArray[i].toString());
+        for (const Json::Value& child : jsonDoc)
+            keyMask |= mapTable.value(QString::fromStdString(child.asString()));
     }
 
 #if defined(OS_WEBOS)

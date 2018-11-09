@@ -23,6 +23,10 @@
 #include <PmLogLib.h>
 #endif
 
+namespace Json {
+class Value;
+};
+
 class WebAppBase;
 class WebAppWayland;
 

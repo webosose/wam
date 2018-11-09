@@ -16,9 +16,7 @@
 
 #include "WebAppBase.h"
 
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
-
+#include "JsonHelper.h"
 #include "ApplicationDescription.h"
 #include "LogManager.h"
 #include "WebAppManagerConfig.h"
@@ -370,24 +368,24 @@ void WebAppBase::setAppDescription(std::shared_ptr<ApplicationDescription> appDe
 
 void WebAppBase::setAppProperties(QString properties)
 {
-    QJsonDocument doc = QJsonDocument::fromJson(properties.toStdString().c_str());
-    QJsonObject obj = doc.object();
+    Json::Value obj;
+    readJsonFromString(properties.toStdString(), obj);
 
-    if (obj["keepAlive"].toBool())
+    if (obj["keepAlive"].asBool())
         setKeepAlive(true);
     else
         setKeepAlive(false);
 
-    if (obj["launchedHidden"].toBool())
+    if (obj["launchedHidden"].asBool())
         setHiddenWindow(true);
 }
 
 void WebAppBase::setPreloadState(QString properties)
 {
-    QJsonDocument doc = QJsonDocument::fromJson(properties.toStdString().c_str());
-    QJsonObject obj = doc.object();
+    Json::Value obj;
+    readJsonFromString(properties.toStdString(), obj);
 
-    std::string preload = obj["preload"].toString().toStdString().c_str();
+    std::string preload = obj["preload"].asString();
 
     if (preload == "full") {
         m_preloadState = FULL_PRELOAD;
@@ -398,7 +396,7 @@ void WebAppBase::setPreloadState(QString properties)
     else if (preload == "minimal") {
         m_preloadState = MINIMAL_PRELOAD;
     }
-    else if (obj["launchedHidden"].toBool()) {
+    else if (obj["launchedHidden"].asBool()) {
         m_preloadState = PARTIAL_PRELOAD;
     }
 
