@@ -16,10 +16,8 @@
 
 #include "ContainerAppManager.h"
 
-#include <QtCore/QFile>
-#include <QtCore/QJsonDocument>
-
 #include "ApplicationDescription.h"
+#include "JsonHelper.h"
 #include "LogManager.h"
 #include "WebAppBase.h"
 #include "WebAppFactoryManager.h"
@@ -62,22 +60,20 @@ ContainerAppManager::~ContainerAppManager()
 
 void ContainerAppManager::loadContainerInfo()
 {
-    QFile file;
-    file.setFileName("/var/luna/preferences/container.json");
-    if(file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        QString str;
-        str = file.readAll();
-        file.close();
+    Json::Value containerSettings;
+    if (readJsonFromFile("/var/luna/preferences/container.json", containerSettings)) {
+        if(containerSettings.isObject()) {
+            auto appId = containerSettings["appId"];
+            if(appId.isString())
+                s_containerAppId = QString::fromStdString(appId.asString());
 
-        QJsonDocument containerDoc = QJsonDocument::fromJson(str.toUtf8());
-        if(!containerDoc.isNull()) {
-            QJsonObject containerSettings = containerDoc.object();
-            if(!containerSettings["appId"].isUndefined())
-                s_containerAppId = containerSettings["appId"].toString();
-            if(!containerSettings["relaunchDelay"].isUndefined())
-                kContainerAppLaunchDuration = containerSettings["relaunchDelay"].toDouble();
-            if(!containerSettings["relaunchCpuThresh"].isUndefined())
-                kContainerAppLaunchCpuThresh = containerSettings["relaunchCpuThresh"].toDouble();
+            auto relaunchDelay = containerSettings["relaunchDelay"];
+            if(relaunchDelay.isDouble())
+                kContainerAppLaunchDuration = relaunchDelay.asDouble();
+
+            auto relaunchCpuThresh = containerSettings["relaunchCpuThresh"];
+            if(relaunchCpuThresh.isDouble())
+                kContainerAppLaunchCpuThresh = relaunchCpuThresh.asDouble();
         }
     }
 
