@@ -19,7 +19,6 @@
 
 #include <memory>
 
-#include <QJsonObject>
 #include <QMap>
 #include <QPair>
 #include <QString>
