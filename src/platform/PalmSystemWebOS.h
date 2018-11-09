@@ -23,6 +23,10 @@
 #include <PmLogLib.h>
 #endif
 
+namespace Json {
+class Value;
+};
+
 class WebAppBase;
 class WebAppWayland;
 
@@ -43,7 +47,7 @@ protected:
         FocusLayer
     };
 
-    virtual QJsonDocument initialize();
+    virtual Json::Value initialize();
 
     virtual QString identifier() const = 0;
     virtual QString launchParams() const { return m_launchParams; }

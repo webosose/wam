@@ -14,14 +14,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include "JsonHelper.h"
 #include "LogManager.h"
 #include "PalmSystemBlink.h"
 #include "WebAppBase.h"
 #include "WebAppWayland.h"
 #include "WebPageBlink.h"
 
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonDocument>
 #include <QtCore/QDataStream>
 
 PalmSystemBlink::PalmSystemBlink(WebAppBase* app)
@@ -32,7 +31,9 @@ PalmSystemBlink::PalmSystemBlink(WebAppBase* app)
 QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, const QStringList& params)
 {
     if (message == "initialize") {
-        return initialize().toJson();
+        std::string json;
+        dumpJsonToString(initialize(), json);
+        return QString::fromStdString(json);
     } else if (message == "country") {
         return country();
     } else if (message == "locale") {
@@ -202,13 +203,12 @@ double PalmSystemBlink::devicePixelRatio()
     return static_cast<WebPageBlink*>(m_app->page())->devicePixelRatio();
 }
 
-QJsonDocument PalmSystemBlink::initialize()
+Json::Value PalmSystemBlink::initialize()
 {
-    QJsonObject data = PalmSystemWebOS::initialize().object();
+    Json::Value data = PalmSystemWebOS::initialize();
     data["devicePixelRatio"] = devicePixelRatio();
-    data["trustLevel"] = trustLevel();
-    QJsonDocument doc(data);
-    return doc;
+    data["trustLevel"] = trustLevel().toStdString();
+    return std::move(data);
 }
 
 
