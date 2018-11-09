@@ -3,8 +3,6 @@
 
 #include <memory>
 
-#include <QJsonObject>
-
 #include "WebAppManagerService.h"
 #include "Timer.h"
 
@@ -28,17 +26,17 @@ public:
 
     // WebAppManagerService
     bool startService() override;
-    QJsonObject launchApp(QJsonObject request) override;
-    QJsonObject killApp(QJsonObject request) override;
-    QJsonObject logControl(QJsonObject request) override;
-    QJsonObject setInspectorEnable(QJsonObject request) override;
-    QJsonObject closeAllApps(QJsonObject request) override;
-    QJsonObject discardCodeCache(QJsonObject request) override;
-    QJsonObject listRunningApps(QJsonObject request, bool subscribed) override;
-    QJsonObject closeByProcessId(QJsonObject request) override;
-    QJsonObject getWebProcessSize(QJsonObject request) override;
-    QJsonObject clearBrowsingData(QJsonObject request) override;
-    QJsonObject webProcessCreated(QJsonObject request, bool subscribed) override;
+    Json::Value launchApp(const Json::Value &request) override;
+    Json::Value killApp(const Json::Value &request) override;
+    Json::Value logControl(const Json::Value &request) override;
+    Json::Value setInspectorEnable(const Json::Value &request) override;
+    Json::Value closeAllApps(const Json::Value &request) override;
+    Json::Value discardCodeCache(const Json::Value &request) override;
+    Json::Value listRunningApps(const Json::Value &request, bool subscribed) override;
+    Json::Value closeByProcessId(const Json::Value &request) override;
+    Json::Value getWebProcessSize(const Json::Value &request) override;
+    Json::Value clearBrowsingData(const Json::Value &request) override;
+    Json::Value webProcessCreated(const Json::Value &request, bool subscribed) override;
 
     void triggerStartupApp();
 
