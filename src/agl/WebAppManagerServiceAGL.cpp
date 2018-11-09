@@ -13,9 +13,10 @@
 #include <sstream>
 #include <pthread.h>
 
+#include <json/value.h>
 #include <libxml/parser.h>
 
-#include <QJsonDocument>
+#include "JsonHelper.h"
 
 class WamSocketLockFile {
 public:
@@ -286,17 +287,17 @@ void WebAppManagerServiceAGL::launchStartupAppFromConfig()
     fprintf(stderr, "icon: %s\r\n", icon);
 
 
-    QJsonObject obj;
-    obj["id"] = QJsonValue((const char*)id);
-    obj["version"] = QJsonValue((const char*)version);
-    obj["vendor"] = QJsonValue((const char*)author);
-    obj["type"] = QJsonValue("web");
-    obj["main"] = QJsonValue((const char*)content);
-    obj["title"] = QJsonValue((const char*)name);
-    obj["uiRevision"] = QJsonValue("2");
-    obj["icon"] = QJsonValue((const char*)icon);
-    obj["folderPath"] = QJsonValue(startup_app_uri_.c_str());
-    obj["surfaceId"] = QJsonValue(startup_app_surface_id_);
+    Json::Value obj(Json::objectValue);
+    obj["id"] = (const char*)id;
+    obj["version"] = (const char*)version;
+    obj["vendor"] = (const char*)author;
+    obj["type"] = "web";
+    obj["main"] = (const char*)content;
+    obj["title"] = (const char*)name;
+    obj["uiRevision"] = "2";
+    obj["icon"] = (const char*)icon;
+    obj["folderPath"] = startup_app_uri_.c_str();
+    obj["surfaceId"] = startup_app_surface_id_;
 
     xmlFree(id);
     xmlFree(version);
@@ -307,10 +308,10 @@ void WebAppManagerServiceAGL::launchStartupAppFromConfig()
     xmlFree(icon);
     xmlFreeDoc(doc);
 
-    QJsonDocument appDoc(obj);
-    std::string appDesc = appDoc.toJson(QJsonDocument::Compact).toStdString();
+    std::string appDesc;
+    dumpJsonToString(obj, appDesc);
     std::string params;
-    std::string app_id = obj["id"].toString().toStdString();
+    std::string app_id = obj["id"].asString();
     int errCode = 0;
     std::string errMsg;
     WebAppManagerService::onLaunch(appDesc, params, app_id, errCode, errMsg);
@@ -320,22 +321,22 @@ void WebAppManagerServiceAGL::launchStartupAppFromURL()
 {
     fprintf(stderr, "WebAppManagerServiceAGL::launchStartupAppFromURL\r\n");
     fprintf(stderr, "    url: %s\r\n", startup_app_uri_.c_str());
-    QJsonObject obj;
-    obj["id"] = QJsonValue((const char*)startup_app_id_.c_str());
-    obj["version"] = QJsonValue("1.0");
-    obj["vendor"] = QJsonValue("some vendor");
-    obj["type"] = QJsonValue("web");
-    obj["main"] = QJsonValue((const char*)startup_app_uri_.c_str());
-    obj["title"] = QJsonValue("webapp");
-    obj["uiRevision"] = QJsonValue("2");
-    //obj["icon"] = QJsonValue((const char*)icon);
-    //obj["folderPath"] = QJsonValue(startup_app_.c_str());
-    obj["surfaceId"] = QJsonValue(startup_app_surface_id_);
+    Json::Value obj(Json::objectValue);
+    obj["id"] = (const char*)startup_app_id_.c_str();
+    obj["version"] = "1.0";
+    obj["vendor"] = "some vendor";
+    obj["type"] = "web";
+    obj["main"] = (const char*)startup_app_uri_.c_str();
+    obj["title"] = "webapp";
+    obj["uiRevision"] = "2";
+    //obj["icon"] = (const char*)icon;
+    //obj["folderPath"] = startup_app_.c_str();
+    obj["surfaceId"] = startup_app_surface_id_;
 
-    QJsonDocument appDoc(obj);
-    std::string appDesc = appDoc.toJson(QJsonDocument::Compact).toStdString();
+    std::string appDesc;
+    dumpJsonToString(obj, appDesc);
     std::string params;
-    std::string app_id = obj["id"].toString().toStdString();
+    std::string app_id = obj["id"].asString();
     int errCode = 0;
     std::string errMsg;
 
@@ -345,58 +346,57 @@ void WebAppManagerServiceAGL::launchStartupAppFromURL()
     WebAppManagerService::onLaunch(appDesc, params, app_id, errCode, errMsg);
 }
 
-QJsonObject WebAppManagerServiceAGL::launchApp(QJsonObject request)
+Json::Value WebAppManagerServiceAGL::launchApp(const Json::Value &request)
 {
-    return QJsonObject();
+    return Json::Value(Json::objectValue);
 }
 
-QJsonObject WebAppManagerServiceAGL::killApp(QJsonObject request)
+Json::Value WebAppManagerServiceAGL::killApp(const Json::Value &request)
 {
-    return QJsonObject();
+    return Json::Value(Json::objectValue);
 }
 
-QJsonObject WebAppManagerServiceAGL::logControl(QJsonObject request)
+Json::Value WebAppManagerServiceAGL::logControl(const Json::Value &request)
 {
-    return QJsonObject();
+    return Json::Value(Json::objectValue);
 }
 
-QJsonObject WebAppManagerServiceAGL::setInspectorEnable(QJsonObject request)
+Json::Value WebAppManagerServiceAGL::setInspectorEnable(const Json::Value &request)
 {
-    return QJsonObject();
+    return Json::Value(Json::objectValue);
 }
 
-QJsonObject WebAppManagerServiceAGL::closeAllApps(QJsonObject request)
+Json::Value WebAppManagerServiceAGL::closeAllApps(const Json::Value &request)
 {
-    return QJsonObject();
+    return Json::Value(Json::objectValue);
 }
 
-
-QJsonObject WebAppManagerServiceAGL::discardCodeCache(QJsonObject request)
+Json::Value WebAppManagerServiceAGL::discardCodeCache(const Json::Value &request)
 {
-    return QJsonObject();
+    return Json::Value(Json::objectValue);
 }
 
-QJsonObject WebAppManagerServiceAGL::listRunningApps(QJsonObject request, bool subscribed)
+Json::Value WebAppManagerServiceAGL::listRunningApps(const Json::Value &request, bool subscribed)
 {
-    return QJsonObject();
+    return Json::Value(Json::objectValue);
 }
 
-QJsonObject WebAppManagerServiceAGL::closeByProcessId(QJsonObject request)
+Json::Value WebAppManagerServiceAGL::closeByProcessId(const Json::Value &request)
 {
-    return QJsonObject();
+    return Json::Value(Json::objectValue);
 }
 
-QJsonObject WebAppManagerServiceAGL::getWebProcessSize(QJsonObject request)
+Json::Value WebAppManagerServiceAGL::getWebProcessSize(const Json::Value &request)
 {
-    return QJsonObject();
+    return Json::Value(Json::objectValue);
 }
 
-QJsonObject WebAppManagerServiceAGL::clearBrowsingData(QJsonObject request)
+Json::Value WebAppManagerServiceAGL::clearBrowsingData(const Json::Value &request)
 {
-    return QJsonObject();
+    return Json::Value(Json::objectValue);
 }
 
-QJsonObject WebAppManagerServiceAGL::webProcessCreated(QJsonObject request, bool subscribed)
+Json::Value WebAppManagerServiceAGL::webProcessCreated(const Json::Value &request, bool subscribed)
 {
-    return QJsonObject();
+    return Json::Value(Json::objectValue);
 }
