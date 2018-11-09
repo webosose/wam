@@ -19,6 +19,10 @@
 
 #include "PalmSystemWebOS.h"
 
+namespace Json {
+class Value;
+}
+
 class PalmSystemBlink : public PalmSystemWebOS {
 public:
     PalmSystemBlink(WebAppBase* app);
@@ -36,7 +40,7 @@ public:
 
 protected:
     // PalmSystemWebOS
-    QJsonDocument initialize();
+    Json::Value initialize();
     QString identifier() const override;
     void setLoadErrorPolicy(const QString& params) override;
 

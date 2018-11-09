@@ -25,6 +25,10 @@
 #include "WebAppManager.h"
 #include "WebPageObserver.h"
 
+namespace Json {
+class Value;
+}
+
 class ApplicationDescription;
 class WebAppBasePrivate;
 class WebPageBase;
@@ -66,8 +70,8 @@ public:
     virtual void setWindowProperty(const QString& name, const QVariant& value) = 0;
     virtual void platformBack() = 0;
     virtual void setCursor(const QString& cursorArg, int hotspot_x, int hotspot_y) = 0;
-    virtual void setInputRegion(const QJsonDocument& jsonDoc) = 0;
-    virtual void setKeyMask(const QJsonDocument& jsonDoc) = 0;
+    virtual void setInputRegion(const Json::Value& jsonDoc) = 0;
+    virtual void setKeyMask(const Json::Value& jsonDoc) = 0;
     virtual void hide(bool forcedHide = false) = 0;
     virtual void focus() = 0;
     virtual void unfocus() = 0;
