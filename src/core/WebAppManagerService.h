@@ -17,9 +17,6 @@
 #ifndef WEBAPPMANAGERSERVICE_H
 #define WEBAPPMANAGERSERVICE_H
 
-//FIXME: Remove once QJson* is fully dropped from WebAppManagerService
-#include <QJsonObject>
-
 #include "WebAppManager.h"
 
 #include "webos/webview_base.h"
@@ -57,17 +54,17 @@ public:
 
     virtual bool startService() = 0;
     // methods published to the bus
-    virtual QJsonObject launchApp(QJsonObject request) = 0;
-    virtual QJsonObject killApp(QJsonObject request) = 0;
-    virtual QJsonObject logControl(QJsonObject request) = 0;
-    virtual QJsonObject setInspectorEnable(QJsonObject request) = 0;
-    virtual QJsonObject closeAllApps(QJsonObject request) = 0;
-    virtual QJsonObject discardCodeCache(QJsonObject request) = 0;
-    virtual QJsonObject listRunningApps(QJsonObject request, bool subscribed) = 0;
-    virtual QJsonObject closeByProcessId(QJsonObject request) = 0;
-    virtual QJsonObject getWebProcessSize(QJsonObject request) = 0;
-    virtual QJsonObject clearBrowsingData(QJsonObject request) = 0;
-    virtual QJsonObject webProcessCreated(QJsonObject request, bool subscribed) = 0;
+    virtual Json::Value launchApp(const Json::Value &request) = 0;
+    virtual Json::Value killApp(const Json::Value &request) = 0;
+    virtual Json::Value logControl(const Json::Value &request) = 0;
+    virtual Json::Value setInspectorEnable(const Json::Value &request) = 0;
+    virtual Json::Value closeAllApps(const Json::Value &request) = 0;
+    virtual Json::Value discardCodeCache(const Json::Value &request) = 0;
+    virtual Json::Value listRunningApps(const Json::Value &request, bool subscribed) = 0;
+    virtual Json::Value closeByProcessId(const Json::Value &request) = 0;
+    virtual Json::Value getWebProcessSize(const Json::Value &request) = 0;
+    virtual Json::Value clearBrowsingData(const Json::Value &request) = 0;
+    virtual Json::Value webProcessCreated(const Json::Value &request, bool subscribed) = 0;
 
 protected:
     std::string onLaunch(const std::string& appDescString,
@@ -77,14 +74,14 @@ protected:
         std::string& errMsg);
 
     bool onKillApp(const std::string& appId);
-    QJsonObject onLogControl(const std::string& keys, const std::string& value);
+    Json::Value onLogControl(const std::string& keys, const std::string& value);
     bool onCloseAllApps(uint32_t pid = 0);
     bool closeContainerApp();
     bool isDiscardCodeCacheRequired();
     void onDiscardCodeCache(uint32_t pid);
     bool onPurgeSurfacePool(uint32_t pid);
     Json::Value getWebProcessProfiling();
-    QJsonObject closeByInstanceId(QString instanceId);
+    Json::Value closeByInstanceId(QString instanceId);
     int maskForBrowsingDataType(const char* type);
     void onClearBrowsingData(const int removeBrowsingDataMask);
     void setProxyServer(const std::string& ip, const std::string& port);
