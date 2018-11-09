@@ -222,7 +222,7 @@ bool WebAppManagerServiceAGL::startService()
       pthread_t thread_id;
       if( pthread_create( &thread_id , nullptr,  run_socket, socket_.get()) < 0) {
           perror("could not create thread");
-          fprintf(stderr, "Coudlnt create thread...\r\n");
+          fprintf(stderr, "Couldnt create thread...\r\n");
           return false;
       }
     }
@@ -318,8 +318,8 @@ void WebAppManagerServiceAGL::launchStartupAppFromConfig()
 
 void WebAppManagerServiceAGL::launchStartupAppFromURL()
 {
-fprintf(stderr, "WebAppManagerServiceAGL::launchStartupAppFromURL\r\n");
-fprintf(stderr, "    url: %s\r\n", startup_app_uri_.c_str());
+    fprintf(stderr, "WebAppManagerServiceAGL::launchStartupAppFromURL\r\n");
+    fprintf(stderr, "    url: %s\r\n", startup_app_uri_.c_str());
     QJsonObject obj;
     obj["id"] = QJsonValue((const char*)startup_app_id_.c_str());
     obj["version"] = QJsonValue("1.0");
