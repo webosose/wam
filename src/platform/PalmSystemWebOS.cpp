@@ -17,14 +17,13 @@
 #include "PalmSystemWebOS.h"
 
 #include "ApplicationDescription.h"
+#include "JsonHelper.h"
 #include "LogManager.h"
 #include "WebAppBase.h"
 #include "WebAppWayland.h"
 #include "WebPageBase.h"
 
 #include <QFile>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonDocument>
 
 PalmSystemWebOS::PalmSystemWebOS(WebAppBase* app)
     : m_app(static_cast<WebAppWayland*>(app))
@@ -35,10 +34,10 @@ PalmSystemWebOS::PalmSystemWebOS(WebAppBase* app)
 void PalmSystemWebOS::setLaunchParams(const QString& params)
 {
     QString p = params;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(QByteArray(params.toStdString().c_str()));
-    QJsonObject jsonObject = jsonDoc.object();
+    Json::Value jsonDoc;
+    readJsonFromString(params.toStdString(), jsonDoc);
 
-    if (jsonDoc.isEmpty() || jsonObject.isEmpty())
+    if (jsonDoc.isNull())
         p = QString();
 
     m_launchParams = p;
@@ -104,8 +103,9 @@ void PalmSystemWebOS::hide()
 void PalmSystemWebOS::setInputRegion(const QByteArray& params)
 {
     // this function is not related to windowGroup anymore
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(params);
-    m_app->setInputRegion(jsonDoc);
+    Json::Value obj;
+    readJsonFromString(params.toStdString(), obj);
+    m_app->setInputRegion(obj);
 }
 
 void PalmSystemWebOS::setGroupClientEnvironment(GroupClientCallKey callKey, const QByteArray& params)
@@ -114,7 +114,8 @@ void PalmSystemWebOS::setGroupClientEnvironment(GroupClientCallKey callKey, cons
     if (appDesc) {
         ApplicationDescription::WindowGroupInfo groupInfo = appDesc->getWindowGroupInfo();
         if (!groupInfo.name.isEmpty() && !groupInfo.isOwner) {
-            QJsonDocument jsonDoc = QJsonDocument::fromJson(params);
+            Json::Value jsonDoc;
+            readJsonFromString(params.toStdString(), jsonDoc);
             switch (callKey) {
                 case KeyMask:
                     m_app->setKeyMask(jsonDoc);

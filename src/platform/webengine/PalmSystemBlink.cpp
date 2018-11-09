@@ -15,14 +15,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "ApplicationDescription.h"
+#include "JsonHelper.h"
 #include "LogManager.h"
 #include "PalmSystemBlink.h"
 #include "WebAppBase.h"
 #include "WebAppWayland.h"
 #include "WebPageBlink.h"
 
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonDocument>
 #include <QtCore/QDataStream>
 PalmSystemBlink::PalmSystemBlink(WebAppBase* app)
     : PalmSystemWebOS(app)
@@ -33,7 +32,9 @@ PalmSystemBlink::PalmSystemBlink(WebAppBase* app)
 QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, const QStringList& params)
 {
     if (message == "initialize") {
-        return initialize().toJson();
+        std::string json;
+        dumpJsonToString(initialize(), json);
+        return QString::fromStdString(json);
     } else if (message == "country") {
         return country();
     } else if (message == "locale") {
@@ -201,29 +202,27 @@ double PalmSystemBlink::devicePixelRatio()
     return static_cast<WebPageBlink*>(m_app->page())->devicePixelRatio();
 }
 
-QJsonDocument PalmSystemBlink::initialize()
+Json::Value PalmSystemBlink::initialize()
 {
     m_initialized = true;
 
-    QJsonObject data;
-    data.insert(QStringLiteral("launchParams"), launchParams());
-    data.insert(QStringLiteral("country"), country());
-    data.insert(QStringLiteral("tvSystemName"), getDeviceInfo("TvSystemName"));
-    data.insert(QStringLiteral("currentCountryGroup"), getDeviceInfo("CountryGroup"));
-    data.insert(QStringLiteral("locale"), locale());
-    data.insert(QStringLiteral("localeRegion"), localeRegion());
-    data.insert(QStringLiteral("isMinimal"), isMinimal());
-    data.insert(QStringLiteral("identifier"), identifier());
-    data.insert(QStringLiteral("screenOrientation"), screenOrientation());
-    data.insert(QStringLiteral("deviceInfo"), getDeviceInfo("TvDeviceInfo"));
-    data.insert(QStringLiteral("activityId"), QJsonValue((double)activityId()));
-    data.insert(QStringLiteral("phoneRegion"), phoneRegion());
-    data.insert(QStringLiteral("folderPath"), QString::fromStdString((m_app->getAppDescription())->folderPath()));
+    // Setup initial data set
+    Json::Value data;
 
-    data.insert(QStringLiteral("devicePixelRatio"), devicePixelRatio());
-    data.insert(QStringLiteral("trustLevel"), trustLevel());
-    QJsonDocument doc(data);
-    return doc;
+    data["launchParams"] = launchParams().toStdString();
+    data["country"] = country().toStdString();
+    data["currentCountryGroup"] = getDeviceInfo("CountryGroup").toStdString();
+    data["locale"] = locale().toStdString();
+    data["localeRegion"] = localeRegion().toStdString();
+    data["isMinimal"] = isMinimal();
+    data["identifier"] = identifier().toStdString();
+    data["screenOrientation"] = screenOrientation().toStdString();
+    data["activityId"] = (double)activityId();
+    data["phoneRegion"] = phoneRegion().toStdString();
+    data["folderPath"] = m_app->getAppDescription()->folderPath();
+    data["devicePixelRatio"] = devicePixelRatio();
+    data["trustLevel"] = trustLevel().toStdString();
+    return std::move(data);
 }
 
 
