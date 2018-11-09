@@ -28,6 +28,10 @@
 #include "webos/common/webos_event.h"
 #include "webos/webos_platform.h"
 
+namespace Json {
+class Value;
+}
+
 class ApplicationDescription;
 class WebAppWaylandWindow;
 
@@ -75,8 +79,8 @@ public:
     void setWindowProperty(const QString& name, const QVariant& value) override;
     void platformBack() override;
     void setCursor(const QString& cursorArg, int hotspot_x = -1, int hotspot_y = -1) override;
-    void setInputRegion(const QJsonDocument& jsonDoc) override;
-    void setKeyMask(const QJsonDocument& jsonDoc) override;
+    void setInputRegion(const Json::Value& jsonDoc) override;
+    void setKeyMask(const Json::Value& jsonDoc) override;
     void setOpacity(float opacity) override;
     void hide(bool forcedHide = false) override;
     void focus() override;
