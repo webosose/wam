@@ -18,10 +18,9 @@
 
 #include <QDir>
 #include <QFileInfo>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonObject>
 
 #include "ApplicationDescription.h"
+#include "JsonHelper.h"
 #include "LogManager.h"
 #include "WebAppManagerConfig.h"
 #include "WebAppManager.h"
@@ -180,11 +179,12 @@ bool WebPageBase::doHostedWebAppRelaunch(const QString& launchParams)
     To support backward compatibility, should cover the case not having "handledBy"
     */
     // check deeplinking relaunch condition
-    QJsonObject obj = QJsonDocument::fromJson(launchParams.toUtf8()).object();
+    Json::Value obj;
+    readJsonFromString(launchParams.toStdString(), obj);
     if (url().scheme() ==  "file"
         || m_defaultUrl.scheme() != "file"
-        || obj.isEmpty() /* no launchParams, { }, and this should be check with object().isEmpty()*/
-        || obj.value("contentTarget").isUndefined()
+        || !obj.isObject() /* no launchParams, { }, and this should be check with object().isEmpty()*/
+        || obj["contentTarget"].isNull()
         || (m_appDesc && !m_appDesc->handlesDeeplinking())) {
         LOG_INFO(MSGID_WEBPAGE_RELAUNCH, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()),
             "%s; NOT enough deeplinking condition; return false", __func__);
@@ -196,15 +196,17 @@ bool WebPageBase::doHostedWebAppRelaunch(const QString& launchParams)
     return doDeeplinking(launchParams);
 }
 
+// TODO: Optimization: Consider use previously parsed Json::Object here instead of std::string
 bool WebPageBase::doDeeplinking(const QString& launchParams)
 {
-    QJsonObject obj = QJsonDocument::fromJson(launchParams.toUtf8()).object();
-    if (obj.isEmpty() || obj.value("contentTarget").isUndefined())
+    Json::Value obj;
+    readJsonFromString(launchParams.toStdString(), obj);
+    if (!obj.isObject() || obj["contentTarget"].isNull())
         return false;
 
-    std::string handledBy = obj.value("handledBy").isUndefined() ? "default" : obj.value("handledBy").toString().toStdString();
+    std::string handledBy = obj["handledBy"].isNull() ? "default" : obj["handledBy"].asString();
     if (handledBy == "platform") {
-        std::string targetUrl = obj.value("contentTarget").toString().toStdString();
+        std::string targetUrl = obj["contentTarget"].asString();
         LOG_INFO(MSGID_DEEPLINKING, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()),
             PMLOGKS("handledBy", handledBy.c_str()),
             "%s; load target URL:%s", __func__, targetUrl.c_str());
