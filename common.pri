@@ -132,7 +132,7 @@ INCLUDEPATH += $${CHROMIUM_SRC_DIR}
 
 DEFINES += PRELOADMANAGER_ENABLED
 
-QMAKE_CXXFLAGS += -fno-rtti -fno-exceptions -Wall -fpermissive -funwind-tables
+QMAKE_CXXFLAGS += -fno-rtti -Wall -fpermissive -funwind-tables
 QMAKE_CXXFLAGS += -std=c++14
 QMAKE_LFLAGS += -rdynamic
 
