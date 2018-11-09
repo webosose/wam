@@ -14,8 +14,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <time.h>
 #include "NetworkStatus.h"
+
+#include <json/json.h>
+#include <time.h>
+
 
 NetworkStatus::NetworkStatus()
     : m_isInternetConnectionAvailable(false)
@@ -23,20 +26,20 @@ NetworkStatus::NetworkStatus()
 {
 }
 
-void NetworkStatus::fromJsonObject(const QJsonObject& object)
+void NetworkStatus::fromJsonObject(const Json::Value& object)
 {
-    m_returnValue = object["returnValue"].toBool();
-    m_isInternetConnectionAvailable = object["isInternetConnectionAvailable"].toBool();
+    m_returnValue = object["returnValue"].asBool();
+    m_isInternetConnectionAvailable = object["isInternetConnectionAvailable"].asBool();
     if (m_returnValue) {
-        if (!object["wired"].isUndefined()) {
+        if (object["wired"].isObject()) {
             m_type = "wired";
-            m_information.fromJsonObject(object["wired"].toObject());
-        } else if (!object["wifi"].isUndefined()) {
+            m_information.fromJsonObject(object["wired"]);
+        } else if (object["wifi"].isObject()) {
             m_type = "wifi";
-            m_information.fromJsonObject(object["wifi"].toObject());
-        } else {
+            m_information.fromJsonObject(object["wifi"]);
+        } else if (object["wifiDirect"].isObject()) {
             m_type = "wifiDirect";
-            m_information.fromJsonObject(object["wifiDirect"].toObject());
+            m_information.fromJsonObject(object["wifiDirect"]);
         }
     }
 
@@ -46,16 +49,16 @@ void NetworkStatus::fromJsonObject(const QJsonObject& object)
     m_savedDate = m_savedDate.trimmed();
 }
 
-void NetworkStatus::Information::fromJsonObject(const QJsonObject& info)
+void NetworkStatus::Information::fromJsonObject(const Json::Value& info)
 {
-    m_netmask = info["netmask"].toString();
-    m_dns1 = info["dns1"].toString();
-    if (!info["dns2"].isUndefined())
-        m_dns2 = info["dns2"].toString();
-    m_ipAddress = info["ipAddress"].toString();
-    m_method = info["method"].toString();
-    m_state = info["state"].toString();
-    m_gateway = info["gateway"].toString();
-    m_interfaceName = info["interfaceName"].toString();
-    m_onInternet = info["onInternet"].toString();
+    m_netmask = QString::fromStdString(info["netmask"].asString());
+    m_dns1 = QString::fromStdString(info["dns1"].asString());
+    if (info["dns2"].isString())
+        m_dns2 = QString::fromStdString(info["dns2"].asString());
+    m_ipAddress = QString::fromStdString(info["ipAddress"].asString());
+    m_method = QString::fromStdString(info["method"].asString());
+    m_state = QString::fromStdString(info["state"].asString());
+    m_gateway = QString::fromStdString(info["gateway"].asString());
+    m_interfaceName = QString::fromStdString(info["interfaceName"].asString());
+    m_onInternet = QString::fromStdString(info["onInternet"].asString());
 }

@@ -17,8 +17,11 @@
 #ifndef NETWORKSTATUS_H
 #define NETWORKSTATUS_H
 
-#include <QJsonObject>
 #include <QString>
+
+namespace Json {
+class Value;
+};
 
 class NetworkStatus {
 public:
@@ -26,7 +29,7 @@ public:
 
     class Information {
     public:
-        void fromJsonObject(const QJsonObject&);
+        void fromJsonObject(const Json::Value&);
         QString netmask() const { return m_netmask; }
         QString dns1() const { return m_dns1; }
         QString dns2() const { return m_dns2; }
@@ -49,7 +52,7 @@ public:
         QString m_onInternet;
     };
 
-    void fromJsonObject(const QJsonObject&);
+    void fromJsonObject(const Json::Value&);
     QString type() const { return m_type; }
     Information information() const { return m_information; }
     QString savedDate() const { return m_savedDate; }
