@@ -21,11 +21,10 @@
 #include <sstream>
 #include <unistd.h>
 
-#include <QtCore/QJsonDocument>
-
 #include "ApplicationDescription.h"
 #include "ContainerAppManager.h"
 #include "DeviceInfo.h"
+#include "JsonHelper.h"
 #include "LogManager.h"
 #include "NetworkStatusManager.h"
 #include "PlatformModuleFactory.h"
@@ -262,12 +261,13 @@ void WebAppManager::onRelaunchApp(const std::string& instanceId, const std::stri
 
     // Do not relaunch when preload args is setted
     // luna-send -n 1 luna://com.webos.applicationManager/launch '{"id":<AppId> "preload":<PreloadState> }'
-    QJsonDocument doc = QJsonDocument::fromJson(args.c_str());
-    QJsonObject obj = doc.object();
+    Json::Value obj;
+    readJsonFromString(args, obj);
 
     if (app->instanceId() == QString::fromStdString(instanceId)
         && !obj["preload"].isString()
-        && !obj["launchedHidden"].toBool()) {
+        && obj["launchedHidden"].isBool()
+        && !obj["launchedHidden"].asBool()) {
         app->relaunch(args.c_str(), launchingAppId.c_str());
     } else {
         LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(app->appId())), PMLOGKFV("PID", "%d", app->page()->getWebProcessPID()), "Relaunch with preload option, ignore");
@@ -867,7 +867,7 @@ std::vector<ApplicationInfo> WebAppManager::list( bool includeSystemApps )
     return list;
 }
 
-QJsonObject WebAppManager::getWebProcessProfiling()
+Json::Value WebAppManager::getWebProcessProfiling()
 {
     return m_webProcessManager->getWebProcessProfiling();
 }
@@ -1022,7 +1022,7 @@ void WebAppManager::serviceCall(const QString& url, const QString& payload, cons
         m_serviceSender->serviceCall(url, payload, appId);
 }
 
-void WebAppManager::updateNetworkStatus(const QJsonObject& object)
+void WebAppManager::updateNetworkStatus(const Json::Value& object)
 {
     NetworkStatus status;
     status.fromJsonObject(object);
