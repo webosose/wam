@@ -16,6 +16,7 @@
 
 #include "WebAppManagerService.h"
 
+#include <json/value.h>
 #include <vector>
 
 #include "LogManager.h"
@@ -77,7 +78,7 @@ bool WebAppManagerService::onPurgeSurfacePool(uint32_t pid)
     return WebAppManager::instance()->purgeSurfacePool(pid);
 }
 
-QJsonObject WebAppManagerService::getWebProcessProfiling()
+Json::Value WebAppManagerService::getWebProcessProfiling()
 {
     return WebAppManager::instance()->getWebProcessProfiling();
 }
@@ -206,7 +207,7 @@ uint32_t WebAppManagerService::getWebProcessId(const QString& appId)
     return WebAppManager::instance()->getWebProcessId(appId);
 }
 
-void WebAppManagerService::updateNetworkStatus(const QJsonObject& object)
+void WebAppManagerService::updateNetworkStatus(const Json::Value& object)
 {
     WebAppManager::instance()->updateNetworkStatus(object);
 }

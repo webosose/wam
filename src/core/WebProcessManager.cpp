@@ -18,10 +18,9 @@
 
 #include <signal.h>
 #include <QFile>
-#include <QJsonDocument>
-#include <QJsonArray>
 
 #include "ApplicationDescription.h"
+#include "JsonHelper.h"
 #include "LogManager.h"
 #include "WebAppBase.h"
 #include "WebAppManagerConfig.h"
@@ -115,39 +114,37 @@ QString WebProcessManager::getWebProcessMemSize(uint32_t pid) const
 
 void WebProcessManager::readWebProcessPolicy()
 {
-    QString webProcessConfigurationPath = WebAppManager::instance()->config()->getWebProcessConfigPath();
+    Json::Value webProcessEnvironment;
+    std::string configPath = WebAppManager::instance()->config()->getWebProcessConfigPath().toStdString();
+    bool configOk = readJsonFromFile(configPath, webProcessEnvironment);
 
-    QFile file(webProcessConfigurationPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    QString jsonStr = file.readAll();
-    file.close();
-
-    QJsonDocument webProcessEnvironment = QJsonDocument::fromJson(jsonStr.toUtf8());
-    if (webProcessEnvironment.isNull()) {
-        LOG_ERROR(MSGID_WEBPROCESSENV_READ_FAIL, 1, PMLOGKS("CONTENT", jsonStr.toStdString().c_str()), "");
+    if (!configOk || webProcessEnvironment.isNull()) {
+        LOG_ERROR(MSGID_WEBPROCESSENV_READ_FAIL, 1, PMLOGKS("PATH", configPath.c_str()), "JSON parsging failed");
         return;
     }
 
-    bool createProcessForEachApp = webProcessEnvironment.object().value("createProcessForEachApp").toBool();
-    if (createProcessForEachApp)
+    auto createProcessForEachApp = webProcessEnvironment["createProcessForEachApp"];
+    if (createProcessForEachApp.isBool() && createProcessForEachApp.asBool())
         m_maximumNumberOfProcesses = UINT_MAX;
     else {
-        QJsonArray webProcessArray = webProcessEnvironment.object().value("webProcessList").toArray();
-        Q_FOREACH (const QJsonValue &value, webProcessArray) {
-            QJsonObject obj = value.toObject();
-            if (!obj.value("id").isUndefined()) {
-                QString id = obj.value("id").toString();
+        auto webProcessArray = webProcessEnvironment["webProcessList"];
+        if (webProcessArray.isArray()) {
+            for (const auto &value : webProcessArray) {
+                if (!value.isObject())
+                    continue;
+                auto id = value["id"];
+                if (id.isString()) {
+                    QString qid = QString::fromStdString(id.asString());
+                    m_webProcessGroupAppIDList.append(qid);
+                    setWebProcessCacheProperty(value, qid);
+                }
+                auto trustLevel = value["trustLevel"];
+                if (trustLevel.isString()) {
+                    QString qtl = QString::fromStdString(trustLevel.asString());
+                    m_webProcessGroupTrustLevelList.append(qtl);
+                    setWebProcessCacheProperty(value, qtl);
+                }
 
-                m_webProcessGroupAppIDList.append(id);
-                setWebProcessCacheProperty(obj, id);
-            }
-            else if (!obj.value("trustLevel").isUndefined()) {
-                QString trustLevel = obj.value("trustLevel").toString();
-
-                m_webProcessGroupTrustLevelList.append(trustLevel);
-                setWebProcessCacheProperty(obj, trustLevel);
             }
         }
         m_maximumNumberOfProcesses = (m_webProcessGroupTrustLevelList.size() + m_webProcessGroupAppIDList.size());
@@ -158,20 +155,22 @@ void WebProcessManager::readWebProcessPolicy()
             PMLOGKFV("GROUP_APP_IDS_COUNT", "%d", m_webProcessGroupAppIDList.size()), "");
 }
 
-void WebProcessManager::setWebProcessCacheProperty(QJsonObject object, QString key)
+void WebProcessManager::setWebProcessCacheProperty(const Json::Value &object, QString key)
 {
     WebProcessInfo info = WebProcessInfo(0, 0);
     QString memoryCacheStr, codeCacheStr;
-    if (!object.value("memoryCache").isUndefined()) {
-        memoryCacheStr = object.value("memoryCache").toString();
+    auto memoryCache = object["memoryCache"];
+    if (memoryCache.isString()) {
+        memoryCacheStr = QString::fromStdString(memoryCache.asString());
         if (memoryCacheStr.contains("MB"))
             memoryCacheStr.remove(QString("MB"));
 
         if (memoryCacheStr.toUInt())
             info.memoryCacheSize = memoryCacheStr.toUInt();
     }
-    if (!object.value("codeCache").isUndefined()) {
-        codeCacheStr = object.value("codeCache").toString();
+    auto codeCahe = object["codeCahe"];
+    if (codeCahe.isString()) {
+        codeCacheStr = QString::fromStdString(codeCahe.asString());
         if (codeCacheStr.contains("MB"))
             codeCacheStr.remove(QString("MB"));
 
