@@ -38,17 +38,17 @@ bool WebAppManagerService::onKillApp(const std::string& appId)
     return WebAppManager::instance()->onKillApp(appId);
 }
 
-QJsonObject WebAppManagerService::onLogControl(const std::string& keys, const std::string& value)
+Json::Value WebAppManagerService::onLogControl(const std::string& keys, const std::string& value)
 {
     LogManager::setLogControl(keys, value);
 
-    QJsonObject reply;
+    Json::Value reply(Json::objectValue);
 
     reply["event"] = LogManager::getDebugEventsEnabled();
     reply["bundleMessage"] = LogManager::getDebugBundleMessagesEnabled();
     reply["mouseMove"] = LogManager::getDebugMouseMoveEnabled();
 
-    return reply;
+    return std::move(reply);
 }
 
 bool WebAppManagerService::onCloseAllApps(uint32_t pid)
@@ -172,7 +172,7 @@ std::vector<ApplicationInfo> WebAppManagerService::list(bool includeSystemApps)
     return WebAppManager::instance()->list(includeSystemApps);
 }
 
-QJsonObject WebAppManagerService::closeByInstanceId(QString instanceId)
+Json::Value WebAppManagerService::closeByInstanceId(QString instanceId)
 {
     LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("INSTANCE_ID", qPrintable(instanceId)), PMLOGKS("API", "closeByInstanceId"), "");
     WebAppBase* app = WebAppManager::instance()->findAppByInstanceId(instanceId);
@@ -182,15 +182,15 @@ QJsonObject WebAppManagerService::closeByInstanceId(QString instanceId)
         WebAppManager::instance()->forceCloseAppInternal(app);
     }
 
-    QJsonObject reply;
+    Json::Value reply(Json::objectValue);
     if(!appId.isNull()) {
-        reply["appId"] = appId;
-        reply["processId"] = instanceId;
+        reply["appId"] = appId.toStdString();
+        reply["processId"] = instanceId.toStdString();
         reply["returnValue"] = true;
     }
     else {
         LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("INSTANCE_ID", qPrintable(instanceId)), PMLOGKS("API", "closeByInstanceId"), "No matched App; return false");
-        QString errMsg("Unknown Process");
+        std::string errMsg("Unknown Process");
         reply["returnValue"] = false;
         reply["errorText"] = errMsg;
     }
