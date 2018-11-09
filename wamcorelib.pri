@@ -22,6 +22,7 @@ SOURCES += \
         ApplicationDescription.cpp \
         ContainerAppManager.cpp \
         DeviceInfo.cpp \
+        JsonHelper.cpp \
         LogManager.cpp \
         NetworkStatus.cpp \
         NetworkStatusManager.cpp \
@@ -42,6 +43,7 @@ HEADERS += \
         ApplicationDescription.h \
         ContainerAppManager.h \
         DeviceInfo.h \
+        JsonHelper.h \
         LogManager.h \
         LogMsgId.h \
         NetworkStatus.h \
