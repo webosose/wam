@@ -17,7 +17,6 @@
 #ifndef APPLICATIONDESCRIPTION_H
 #define APPLICATIONDESCRIPTION_H
 
-#include <QJsonObject>
 #include <QMap>
 #include <QPair>
 #include <QString>
