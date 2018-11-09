@@ -19,7 +19,6 @@
 
 #include <list>
 
-#include <QJsonObject>
 #include <QList>
 #include <QMap>
 #include <QString>
@@ -27,6 +26,10 @@
 class ApplicationDescription;
 class WebPageBase;
 class WebAppBase;
+
+namespace Json {
+class Value;
+}
 
 class WebProcessManager {
 public:
@@ -39,11 +42,11 @@ public:
     void killWebProcess(uint32_t pid);
     void requestKillWebProcess(uint32_t pid);
     bool webProcessInfoMapReady();
-    void setWebProcessCacheProperty(QJsonObject object, QString key); //change name from setWebProcessProperty()
+    void setWebProcessCacheProperty(const Json::Value &object, QString key); //change name from setWebProcessProperty()
     void readWebProcessPolicy(); //chane name from setWebProcessEnvironment()
     QString getProcessKey(const ApplicationDescription* desc) const; //change name from getKey()
 
-    virtual QJsonObject getWebProcessProfiling() = 0;
+    virtual Json::Value getWebProcessProfiling() = 0;
     virtual uint32_t getWebProcessPID(const WebAppBase* app) const = 0;
     virtual void deleteStorageData(const QString& identifier) = 0;
     virtual uint32_t getInitialWebViewProxyID() const = 0;

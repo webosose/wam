@@ -22,10 +22,14 @@
 class QString;
 class WebAppBase;
 
+namespace Json {
+class Value;
+}
+
 class BlinkWebProcessManager : public WebProcessManager {
 public:
     // WebProcessManager
-    QJsonObject getWebProcessProfiling() override;
+    Json::Value getWebProcessProfiling() override;
     uint32_t getWebProcessPID(const WebAppBase* app) const override;
     void deleteStorageData(const QString& identifier) override;
     uint32_t getInitialWebViewProxyID() const override;
