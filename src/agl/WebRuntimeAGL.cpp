@@ -161,10 +161,10 @@ int WebAppLauncherRuntime::run(int argc, const char** argv) {
   m_role = "WebApp";
 
   if(WebAppManagerServiceAGL::instance()->isHostServiceRunning()) {
-fprintf(stderr, "WebAppLauncherRuntime::run - creating SharedBrowserProcessWebAppLauncher\r\n");
+    fprintf(stderr, "WebAppLauncherRuntime::run - creating SharedBrowserProcessWebAppLauncher\r\n");
     m_launcher = new SharedBrowserProcessWebAppLauncher();
   } else {
-fprintf(stderr, "WebAppLauncherRuntime::run - creating SingleBrowserProcessWebAppLauncher\r\n");
+    fprintf(stderr, "WebAppLauncherRuntime::run - creating SingleBrowserProcessWebAppLauncher\r\n");
     m_launcher = new SingleBrowserProcessWebAppLauncher();
   }
 
