@@ -17,11 +17,16 @@
 #ifndef WEBAPPMANAGERSERVICE_H
 #define WEBAPPMANAGERSERVICE_H
 
+//FIXME: Remove once QJson* is fully dropped from WebAppManagerService
 #include <QJsonObject>
 
 #include "WebAppManager.h"
 
 #include "webos/webview_base.h"
+
+namespace Json {
+class Value;
+}
 
 enum ErrorCode {
     ERR_CODE_LAUNCHAPP_MISS_PARAM = 1000,
@@ -78,7 +83,7 @@ protected:
     bool isDiscardCodeCacheRequired();
     void onDiscardCodeCache(uint32_t pid);
     bool onPurgeSurfacePool(uint32_t pid);
-    QJsonObject getWebProcessProfiling();
+    Json::Value getWebProcessProfiling();
     QJsonObject closeByInstanceId(QString instanceId);
     int maskForBrowsingDataType(const char* type);
     void onClearBrowsingData(const int removeBrowsingDataMask);
@@ -99,7 +104,7 @@ protected:
     void killCustomPluginProcess(const QString& appBasePath);
     void requestKillWebProcess(uint32_t pid);
     bool shouldLaunchContainerAppOnDemand();
-    void updateNetworkStatus(const QJsonObject& object);
+    void updateNetworkStatus(const Json::Value& object);
     void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level);
     void setAccessibilityEnabled(bool enable);
     uint32_t getWebProcessId(const QString& appId);

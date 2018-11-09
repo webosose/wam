@@ -23,7 +23,6 @@
 #include <string>
 #include <vector>
 
-#include <QJsonObject>
 #include <QMultiMap>
 #include <QString>
 
@@ -39,6 +38,10 @@ class WebProcessManager;
 class WebAppManagerConfig;
 class WebAppBase;
 class WebPageBase;
+
+namespace Json {
+class Value;
+};
 
 class ApplicationInfo {
 public:
@@ -88,7 +91,7 @@ public:
 
     std::vector<ApplicationInfo> list(bool includeSystemApps = false);
 
-    QJsonObject getWebProcessProfiling();
+    Json::Value getWebProcessProfiling();
 #ifndef PRELOADMANAGER_ENABLED
     void sendLaunchContainerApp();
     void startContainerTimer();
@@ -152,7 +155,7 @@ public:
     uint32_t getWebProcessId(const QString& appId);
     void sendEventToAllAppsAndAllFrames(const QString& jsscript);
     void serviceCall(const QString& url, const QString& payload, const QString& appId);
-    void updateNetworkStatus(const QJsonObject& object);
+    void updateNetworkStatus(const Json::Value& object);
     void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level);
 
     bool isEnyoApp(const QString& appId);
