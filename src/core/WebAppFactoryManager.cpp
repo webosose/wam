@@ -17,9 +17,11 @@
 #include "WebAppFactoryManager.h"
 
 #include <QtCore/QDir>
+#include <QtCore/QPluginLoader>
+
+// FIXME: Remove once WebAppFactory pluggable system is dropped.
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
-#include <QtCore/QPluginLoader>
 
 #include "LogManager.h"
 #include "WebAppBase.h"
@@ -71,6 +73,8 @@ WebAppFactoryInterface* WebAppFactoryManager::loadPluggable(QString appType)
 
     WebAppFactoryInterface* interface;
     QDir pluginsDir(m_webAppFactoryPluginPath);
+
+    // FIXME: Remove once WebAppFactory pluggable system is dropped.
     Q_FOREACH (QString fileName, pluginsDir.entryList(QDir::Files)) {
         QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
         QString key = pluginLoader.metaData().value("MetaData").toObject().value("Keys").toArray().at(0).toString();
