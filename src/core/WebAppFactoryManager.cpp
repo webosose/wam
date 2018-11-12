@@ -16,13 +16,6 @@
 
 #include "WebAppFactoryManager.h"
 
-#include <QtCore/QDir>
-#include <QtCore/QPluginLoader>
-
-// FIXME: Remove once WebAppFactory pluggable system is dropped.
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
-
 #include "LogManager.h"
 #include "WebAppBase.h"
 #include "WebAppManagerConfig.h"
@@ -31,78 +24,22 @@
 
 WebAppFactoryManager* WebAppFactoryManager::m_instance = nullptr;
 
-WebAppFactoryManager* WebAppFactoryManager::instance()
+WebAppFactoryManager::~WebAppFactoryManager()
 {
-    if(!m_instance) {
-        m_instance = new WebAppFactoryManager();
-    }
-    return m_instance;
 }
 
-WebAppFactoryManager::WebAppFactoryManager()
-    : m_loadPluggableOnDemand(false)
-{
-    WebAppManagerConfig* webAppManagerConfig = WebAppManager::instance()->config();
-
-    QString factoryEnv = webAppManagerConfig->getWebAppFactoryPluginTypes();
-    m_factoryEnv = factoryEnv.split(QLatin1Char(':'));
-    m_factoryEnv.append(QStringLiteral("default"));
-
-    m_webAppFactoryPluginPath = webAppManagerConfig->getWebAppFactoryPluginPath();
-
-    if (webAppManagerConfig->isDynamicPluggableLoadEnabled())
-        m_loadPluggableOnDemand = true;
-
-    if (!m_loadPluggableOnDemand)
-        loadPluggable();
-}
-
-WebAppFactoryInterface* WebAppFactoryManager::getPluggable(QString appType)
+WebAppFactoryInterface* WebAppFactoryManager::getInterfaceInstance(QString appType)
 {
     QMap<QString, WebAppFactoryInterface*>::iterator iter = m_interfaces.find(appType);
     if (iter != m_interfaces.end())
         return iter.value();
 
-    return loadPluggable(appType);
-}
-
-WebAppFactoryInterface* WebAppFactoryManager::loadPluggable(QString appType)
-{
-    if (!appType.isEmpty() && !m_factoryEnv.contains(appType))
-        return nullptr;
-
-    WebAppFactoryInterface* interface;
-    QDir pluginsDir(m_webAppFactoryPluginPath);
-
-    // FIXME: Remove once WebAppFactory pluggable system is dropped.
-    Q_FOREACH (QString fileName, pluginsDir.entryList(QDir::Files)) {
-        QPluginLoader pluginLoader(pluginsDir.absoluteFilePath(fileName));
-        QString key = pluginLoader.metaData().value("MetaData").toObject().value("Keys").toArray().at(0).toString();
-
-        if (key.contains(appType) || !m_loadPluggableOnDemand) {
-            QObject *plugin = pluginLoader.instance();
-
-            if (plugin) {
-                interface = qobject_cast<WebAppFactoryInterface*>(plugin);
-                if (interface)
-                    m_interfaces.insert(key, interface);
-                if (!appType.isEmpty())
-                    return interface;
-            } else {
-                LOG_WARNING(MSGID_PLUGIN_LOAD_FAIL, 1, PMLOGKS("ERROR", pluginLoader.errorString().toStdString().c_str()), "");
-                if (pluginLoader.isLoaded())
-                    pluginLoader.unload();
-                if (!appType.isEmpty())
-                    return nullptr;
-            }
-        }
-    }
-    return nullptr;
+    return loadInterfaceInstance(appType);
 }
 
 WebAppBase* WebAppFactoryManager::createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc, QString appType)
 {
-    WebAppFactoryInterface* interface = getPluggable(appType);
+    WebAppFactoryInterface* interface = getInterfaceInstance(appType);
     if (interface)
         return interface->createWebApp(winType, desc);
 
@@ -111,7 +48,7 @@ WebAppBase* WebAppFactoryManager::createWebApp(QString winType, std::shared_ptr<
 
 WebAppBase* WebAppFactoryManager::createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc, QString appType)
 {
-    WebAppFactoryInterface* interface = getPluggable(appType);  
+    WebAppFactoryInterface* interface = getInterfaceInstance(appType);
     if (interface)
         return interface->createWebApp(winType, page, desc);
 
@@ -122,15 +59,13 @@ WebPageBase* WebAppFactoryManager::createWebPage(QString winType, QUrl url, std:
 {
     WebPageBase *page = nullptr;
 
-    WebAppFactoryInterface* interface = getPluggable(appType);
+    WebAppFactoryInterface* interface = getInterfaceInstance(appType);
     if (interface) {
         page = interface->createWebPage(url, desc, launchParams);
     } else {
-        interface = m_interfaces.value("default");
-        if (interface) {
-            // use default factory if cannot find appType.
-            page = interface->createWebPage(url, desc, launchParams);
-        }
+        // use default factory if cannot find appType.
+        if (m_interfaces.find(kDefaultAppType) != m_interfaces.end())
+            page = m_interfaces.value(kDefaultAppType)->createWebPage(url, desc, launchParams);
     }
 
     if (page) page->init();
