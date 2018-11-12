@@ -73,9 +73,13 @@ luna_service {
 agl_service {
     SOURCES += \
             WebAppManagerServiceAGL.cpp \
+            WebAppFactoryAGL.cpp \
+            WebAppWaylandAGL.cpp \
             WebRuntimeAGL.cpp
     HEADERS += \
             WebAppManagerServiceAGL.h \
+            WebAppFactoryAGL.h \
+            WebAppWaylandAGL.h \
             WebRuntimeAGL.h
 }
 
