@@ -68,6 +68,16 @@ HEADERS += \
         WebRuntime.h \
         WindowTypes.h
 
+luna_service {
+    SOURCES += \
+        WebAppFactoryManagerQtPlugin.cpp
+}
+
+agl_service {
+    SOURCES += \
+        WebAppFactoryManagerAGL.cpp
+}
+
 pmlog {
     SOURCES += LogManagerPmLog.cpp
     HEADERS += LogManagerPmLog.h

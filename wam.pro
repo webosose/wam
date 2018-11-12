@@ -22,4 +22,8 @@ wamlib.file = wamlib.pri
 wamplugin.file = wamplugin.pri
 wam.file = wam.pri
 
-SUBDIRS += wamcorelib wamlib wamplugin wam
+SUBDIRS += wamcorelib wamlib
+luna_service {
+    SUBDIRS += wamplugin
+}
+SUBDIRS += wam
