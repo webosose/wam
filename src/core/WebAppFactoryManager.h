@@ -24,22 +24,24 @@
 
 #include "WebAppFactoryInterface.h"
 
+static const QString kDefaultAppType = QStringLiteral("default");
+
 class WebAppFactoryManager {
 public:
     static WebAppFactoryManager* instance();
+    virtual ~WebAppFactoryManager();
     WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "");
     WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "");
     WebPageBase* createWebPage(QString winType, QUrl url, std::shared_ptr<ApplicationDescription> desc, QString appType = "", QString launchParams = "");
-    WebAppFactoryInterface* getPluggable(QString appType);
-    WebAppFactoryInterface* loadPluggable(QString appType = "");
+    WebAppFactoryInterface* getInterfaceInstance(QString appType);
+
+protected:
+    WebAppFactoryManager() {}
+    virtual WebAppFactoryInterface* loadInterfaceInstance(QString appType) = 0;
+    QMap<QString, WebAppFactoryInterface*> m_interfaces;
 
 private:
     static WebAppFactoryManager* m_instance;
-    WebAppFactoryManager();
-    QMap<QString, WebAppFactoryInterface*> m_interfaces;
-    QString m_webAppFactoryPluginPath;
-    QStringList m_factoryEnv;
-    bool m_loadPluggableOnDemand;
 };
 
 #endif /* WEBAPPFACTORY_H */
