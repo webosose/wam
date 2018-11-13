@@ -14,10 +14,10 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include <cassert>
 #include <QtGlobal>
 #include <QString>
 
-#include <assert.h>
 #include <grp.h>
 #include <pwd.h>
 #include <unistd.h>
