@@ -1,6 +1,6 @@
 #include "WebRuntimeAGL.h"
 
-#include <assert.h>
+#include <cassert>
 #include <netinet/in.h>
 #include <regex>
 #include <sys/types.h>
