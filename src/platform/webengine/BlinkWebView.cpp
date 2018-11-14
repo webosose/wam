@@ -20,8 +20,8 @@
 #include "LogManager.h"
 #include <QStringList>
 
-BlinkWebView::BlinkWebView(bool doInitialize)
-    : WebViewBase::WebViewBase()
+BlinkWebView::BlinkWebView(int width, int height, bool doInitialize)
+    : WebViewBase::WebViewBase(width, height)
     , m_delegate(NULL)
     , m_progress(0)
     , m_userScriptExecuted(false)

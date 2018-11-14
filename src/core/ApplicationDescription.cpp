@@ -24,6 +24,32 @@
 #include "ApplicationDescription.h"
 #include "JsonHelper.h"
 #include "LogManager.h"
+#include "WebAppManagerConfig.h"
+#include "WebAppManager.h"
+
+static void getWindowSizeFromConfig(int& widthOutput, int& heightOutput) {
+    WebAppManagerConfig* webAppManagerConfig = WebAppManager::instance()->config();
+
+    if (!webAppManagerConfig) {
+        fprintf(stderr, "Failed to get webAppManagerConfig\r\n");
+        return;
+    }
+
+    std::string windowSize = webAppManagerConfig->getWindowSize();
+    if (windowSize.empty())
+        return;
+
+    std::size_t pos = windowSize.find(",");
+    if (pos == std::string::npos) {
+        fprintf(stderr, "Not matched with size format, 'w,h'.\r\n");
+        return;
+    }
+
+    std::string width = windowSize.substr(0, pos);
+    std::string height = windowSize.substr(pos+1);
+    widthOutput = std::stoi(width);
+    heightOutput = std::stoi(height);
+}
 
 bool ApplicationDescription::checkTrustLevel(std::string trustLevel)
 {
@@ -55,6 +81,7 @@ ApplicationDescription::ApplicationDescription()
     , m_networkStableTimeout(std::numeric_limits<double>::quiet_NaN())
     , m_disallowScrollingInMainFrame(true)
 {
+    getWindowSizeFromConfig(m_widthOverride, m_heightOverride);
 }
 
 const ApplicationDescription::WindowGroupInfo ApplicationDescription::getWindowGroupInfo()

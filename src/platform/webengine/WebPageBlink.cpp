@@ -101,7 +101,7 @@ WebPageBlink::~WebPageBlink()
 
 void WebPageBlink::init()
 {
-    d->pageView = createPageView();
+    d->pageView = createPageView(m_appDesc->widthOverride(), m_appDesc->heightOverride());
     d->pageView->setDelegate(this);
     d->pageView->Initialize(m_appDesc->id(),
                             m_appDesc->folderPath(),
@@ -778,9 +778,9 @@ void WebPageBlink::didFinishLaunchingSlot()
 }
 
 // functions from webappmanager2
-BlinkWebView * WebPageBlink::createPageView()
+BlinkWebView * WebPageBlink::createPageView(int width, int height)
 {
-    return new BlinkWebView();
+    return new BlinkWebView(width, height);
 }
 
 BlinkWebView* WebPageBlink::pageView() const
