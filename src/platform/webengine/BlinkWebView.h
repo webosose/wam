@@ -26,7 +26,7 @@ class WebPageBlinkDelegate;
 class BlinkWebView : public webos::WebViewBase {
 public:
     // TODO need to refactor both constructors (here & pluggables)
-    BlinkWebView(bool doInitialize = true);
+    BlinkWebView(int width = 1920, int height = 1080, bool doInitialize = true);
     BlinkWebView(const QString& group)
         : BlinkWebView()
     {
