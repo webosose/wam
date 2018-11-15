@@ -477,6 +477,8 @@ void WebAppManager::closeAppInternal(WebAppBase* app, bool ignoreCleanResource)
             app->dispatchUnload();
         }
     }
+
+    deleteWebViewProfile(app->appId().toStdString());
 }
 
 bool WebAppManager::closeAllApps(uint32_t pid)
@@ -1054,4 +1056,10 @@ void WebAppManager::buildWebViewProfile(const std::string& app_id, const std::st
 {
     if (m_webProcessManager)
         m_webProcessManager->buildWebViewProfile(app_id, proxy_host, proxy_port);
+}
+
+void WebAppManager::deleteWebViewProfile(const std::string& app_id)
+{
+    if (m_webProcessManager)
+        m_webProcessManager->deleteWebViewProfile(app_id);
 }
