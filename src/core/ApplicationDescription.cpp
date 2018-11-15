@@ -169,7 +169,6 @@ ApplicationDescription* ApplicationDescription::fromJsonString(const char* jsonS
 
     appDesc->m_surfaceId = jsonObj["surfaceId"].asInt();
     appDesc->m_transparency = jsonObj["transparent"].asBool();
-    appDesc->m_vendorExtension = jsonObj["vendorExtension"].toStyledString();
     appDesc->m_trustLevel = jsonObj["trustLevel"].asString();
     appDesc->m_subType = jsonObj["subType"].asString();
     appDesc->m_deeplinkingParams = jsonObj["deeplinkingParams"].asString();
@@ -183,7 +182,11 @@ ApplicationDescription* ApplicationDescription::fromJsonString(const char* jsonS
     appDesc->m_version = jsonObj["version"].asString();
     appDesc->m_customPlugin = jsonObj["customPlugin"].asBool();
     appDesc->m_backHistoryAPIDisabled = jsonObj["disableBackHistoryAPI"].asBool();
-    appDesc->m_groupWindowDesc = jsonObj["windowGroup"].toStyledString();
+
+    auto vendorExtension = jsonObj.get("vendorExtension", Json::Value(Json::objectValue));
+    auto groupWindowDesc = jsonObj.get("windowGroup", Json::Value(Json::objectValue));
+    dumpJsonToString(vendorExtension, appDesc->m_vendorExtension);
+    dumpJsonToString(groupWindowDesc, appDesc->m_groupWindowDesc);
 
     auto supportedVersions = jsonObj["supportedEnyoBundleVersions"];
     if (supportedVersions.isArray()) {
