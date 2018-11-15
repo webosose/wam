@@ -85,4 +85,13 @@ void BlinkWebViewProfileHelper::buildProfile(const std::string& app_id, const st
     webos::WebViewProfile* profile = new webos::WebViewProfile(app_id);
     profile->SetProxyServer(proxy_host, proxy_port, nullptr, nullptr);
     m_appProfileMap[app_id] = profile;
+    fprintf(stderr, "BlinkWebViewProfileHelper: added WebViewProfile for app %s\n", app_id.c_str());
+}
+
+void BlinkWebViewProfileHelper::deleteProfile(const std::string& app_id)
+{
+    assert(m_appProfileMap.count(app_id) == 1);
+    delete m_appProfileMap[app_id];
+    m_appProfileMap.erase(app_id);
+    fprintf(stderr, "BlinkWebViewProfileHelper: removed WebViewProfile for app %s\n", app_id.c_str());
 }
