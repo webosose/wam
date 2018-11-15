@@ -12,8 +12,8 @@
 
 [Unit]
 Description="WebAppMgr is responsible for running web apps and manage their lifecycle"
-Requires=weston.service
-After=weston.service
+After=afm-service-windowmanager-service-2017@0.1.service afm-appli-homescreen-2017@0.1.service
+Wants=afm-service-windowmanager-service-2017@0.1.service afm-appli-homescreen-2017@0.1.service
 
 [Service]
 Type=simple
@@ -24,4 +24,4 @@ Restart=on-failure
 RestartSec=50
 
 [Install]
-WantedBy=multi-user.target
+WantedBy=default.target
