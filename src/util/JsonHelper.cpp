@@ -16,6 +16,7 @@
 
 #include "JsonHelper.h"
 
+#include <iostream>
 #include <memory>
 #include <fstream>
 #include <sstream>
@@ -23,42 +24,53 @@
 #include <json/reader.h>
 #include <json/writer.h>
 
-#include "LogManager.h"
+using std::cerr;
+using std::endl;
 
-// TODO: Log error/warn messages when something wrong happens(?)
+#define LOGE cerr << __PRETTY_FUNCTION__ << ": "
+
 bool readJsonFromString(const std::string &in, Json::Value& out) {
+    out = Json::nullValue;
+    if (in.empty())
+        return true;
     Json::Value jsonObj;
     try {
         std::istringstream(in) >> jsonObj;
-    } catch (const Json::RuntimeError &) {
+        out = std::move(jsonObj);
+        return true;
+    } catch (const Json::RuntimeError &e) {
+        LOGE << " Failed to parse: " << e.what() << endl;
         return false;
     }
-    out = jsonObj;
-    return true;
 }
 
 bool readJsonFromFile(const std::string &path, Json::Value& out) {
+    out = Json::nullValue;
     std::ifstream in(path);
     if (!in.is_open()) {
+        LOGE << " Failed to open file " << path << endl;
         return false;
     }
     Json::Value jsonObj;
     try {
         in >> jsonObj;
-    } catch (const Json::RuntimeError &) {
+        out = std::move(jsonObj);
+        return true;
+    } catch (const Json::RuntimeError &e) {
+        LOGE << " Failed to parse: " << e.what() << endl;
         return false;
     }
-    out = jsonObj;
-    return true;
 }
 
 // FIXME: Using default writter settings for now (e.g: indentation
 // enable, etc).
 bool dumpJsonToString(const Json::Value &json, std::string &out) {
+    out = {};
     std::stringstream ss;
     try {
         ss << json;
-    } catch (const Json::RuntimeError &) {
+    } catch (const Json::RuntimeError &e) {
+        LOGE << " Failed to dump: " << e.what() << endl;
         return false;
     }
     out = ss.str();
