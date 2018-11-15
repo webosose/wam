@@ -49,6 +49,7 @@ public:
     static int maskForBrowsingDataType(const char* key);
     webos::WebViewProfile* getProfile(const std::string& app_id);
     void buildProfile(const std::string& app_id, const std::string& proxy_rules);
+    void deleteProfile(const std::string& app_id);
 
 private:
     BlinkWebViewProfileHelper() {}
