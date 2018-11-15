@@ -125,3 +125,8 @@ void BlinkWebProcessManager::buildWebViewProfile(const std::string& app_id, cons
 {
     BlinkWebViewProfileHelper::instance()->buildProfile(app_id, proxy_rules);
 }
+
+void BlinkWebProcessManager::deleteWebViewProfile(const std::string& app_id)
+{
+    BlinkWebViewProfileHelper::instance()->deleteProfile(app_id);
+}
