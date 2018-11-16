@@ -102,7 +102,7 @@ WebPageBlink::~WebPageBlink()
 
 void WebPageBlink::init()
 {
-    d->pageView = createPageView(m_appDesc->widthOverride(), m_appDesc->heightOverride());
+    d->pageView = createPageView();
     d->pageView->setDelegate(this);
     webos::WebViewProfile* profile = BlinkWebViewProfileHelper::instance()->getProfile(m_appDesc->id());
     if (profile)
@@ -782,9 +782,9 @@ void WebPageBlink::didFinishLaunchingSlot()
 }
 
 // functions from webappmanager2
-BlinkWebView * WebPageBlink::createPageView(int width, int height)
+BlinkWebView * WebPageBlink::createPageView()
 {
-    return new BlinkWebView(width, height);
+    return new BlinkWebView();
 }
 
 BlinkWebView* WebPageBlink::pageView() const
