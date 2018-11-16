@@ -33,10 +33,7 @@ class ApplicationDescription;
 class WebAppBasePrivate;
 class WebPageBase;
 
-class WebAppBase : public QObject,
-                   public WebPageObserver {
-
-    Q_OBJECT
+class WebAppBase : public WebPageObserver {
 
 public:
     enum PreloadState {
@@ -130,6 +127,15 @@ public:
 
     bool isClosing() const;
     bool isCheckLaunchTimeEnabled();
+    void closeWebApp();
+
+    // WebPageObserver
+    virtual void webPageLoadFinished();
+    virtual void webPageClosePageRequested();
+    virtual void closeCallbackExecuted();
+    virtual void timeoutExecuteCloseCallback();
+    virtual void closingAppProcessDidCrashed();
+    virtual void didDispatchUnload();
 
 protected:
     virtual void doAttach() = 0;
@@ -139,14 +145,6 @@ protected:
     void setActiveAppId(QString id);
     void forceCloseAppInternal();
     void closeAppInternal();
-
-protected Q_SLOTS:
-    virtual void webPageUrlChangedSlot();
-    virtual void webPageClosePageRequestedSlot();
-    virtual void showWindowSlot();
-    virtual void webPageLoadFinishedSlot();
-    virtual void webPageLoadFailedSlot(int errorCode) = 0;
-    virtual void closeWebAppSlot();
 
 protected:
     PreloadState m_preloadState;
