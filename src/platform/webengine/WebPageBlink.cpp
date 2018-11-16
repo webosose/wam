@@ -50,10 +50,7 @@ QString getHostname(const std::string& url)
   return QUrl(q_url).host();
 }
 
-class WebPageBlinkPrivate : public QObject
-{
-    Q_OBJECT
-
+class WebPageBlinkPrivate {
 public:
     WebPageBlinkPrivate(WebPageBlink * page)
         : q(page)
@@ -630,7 +627,7 @@ void WebPageBlink::cleanResources()
 
 void WebPageBlink::close()
 {
-    Q_EMIT webPageClosePageRequested();
+    FOR_EACH_OBSERVER(WebPageObserver, m_observers, webPageClosePageRequested());
 }
 
 void WebPageBlink::didFirstFrameFocused()
@@ -670,7 +667,7 @@ void WebPageBlink::loadFinished(const std::string& url)
             PMLOGKFV("PID", "%d", getWebProcessPID()),
             "cleaningResources():true; (should be about:blank) emit 'didDispatchUnload'");
         // TODO: Remove QSignal
-        Q_EMIT didDispatchUnload();
+        FOR_EACH_OBSERVER(WebPageObserver, m_observers, didDispatchUnload());
         return;
     }
     handleLoadFinished();
@@ -690,7 +687,7 @@ void WebPageBlink::loadStopped(const std::string& url)
 
 void WebPageBlink::loadFailed(const std::string& url, int errCode, const std::string& errDesc)
 {
-    Q_EMIT webPageLoadFailed(errCode);
+    FOR_EACH_OBSERVER(WebPageObserver, m_observers, webPageLoadFailed(errCode));
 
     // We follow through only if we have SSL error
     if (errDesc != "SSL_ERROR")
@@ -744,7 +741,7 @@ void WebPageBlink::recreateWebView()
     }
 
     init();
-    Q_EMIT webViewRecreated();
+    FOR_EACH_OBSERVER(WebPageObserver, m_observers, webViewRecreated());
 
     if (!m_isSuspended) {
         // Remove white screen while reloading contents due to the renderer crash
@@ -788,7 +785,7 @@ void WebPageBlink::renderProcessCrashed()
         if (m_closeCallbackTimer.isRunning())
             m_closeCallbackTimer.stop();
 
-        Q_EMIT closingAppProcessDidCrashed();
+        FOR_EACH_OBSERVER(WebPageObserver, m_observers, closingAppProcessDidCrashed());
         return;
     }
 
@@ -796,10 +793,6 @@ void WebPageBlink::renderProcessCrashed()
     recreateWebView();
     if (!processCrashed())
         handleForceDeleteWebPage();
-}
-
-void WebPageBlink::didFinishLaunchingSlot()
-{
 }
 
 // functions from webappmanager2
@@ -964,7 +957,7 @@ void WebPageBlink::didRunCloseCallback()
 {
     m_closeCallbackTimer.stop();
     LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "WebPageBlink::didRunCloseCallback(); onclose callback done");
-    Q_EMIT closeCallbackExecuted();
+    FOR_EACH_OBSERVER(WebPageObserver, m_observers, closeCallbackExecuted());
 }
 
 void WebPageBlink::setHasOnCloseCallback(bool hasCloseCallback)
@@ -986,7 +979,7 @@ void WebPageBlink::timeoutCloseCallback()
 {
     m_closeCallbackTimer.stop();
     LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "WebPageBlink::timeoutCloseCallback(); onclose callback Timeout");
-    Q_EMIT timeoutExecuteCloseCallback();
+    FOR_EACH_OBSERVER(WebPageObserver, m_observers, timeoutExecuteCloseCallback());
 }
 
 void WebPageBlink::setFileAccessBlocked(bool blocked)
@@ -1185,6 +1178,3 @@ bool WebPageBlink::allowMouseOnOffEvent() const {
 void WebPageBlink::setObserver(WebPageBlinkObserver* observer) {
     m_observer = observer;
 }
-
-#include "WebPageBlink.moc"
-
