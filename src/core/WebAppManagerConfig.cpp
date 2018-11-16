@@ -17,7 +17,6 @@
 #include "WebAppManagerConfig.h"
 
 #include <unistd.h>
-#include <cstdlib>
 
 WebAppManagerConfig::WebAppManagerConfig()
     : m_suspendDelayTime(0)
@@ -74,8 +73,6 @@ void WebAppManagerConfig::initConfiguration()
         m_userScriptPath = QLatin1String("webOSUserScripts/userScript.js");
 
     m_name = qgetenv("WAM_NAME").data();
-
-    m_windowSize = std::getenv("WAM_WINDOW_SIZE");
 }
 
 QVariant WebAppManagerConfig::getConfiguration(QString name)

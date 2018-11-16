@@ -42,7 +42,6 @@ public:
     virtual bool isUseSystemAppOptimization() const { return m_useSystemAppOptimization; }
     virtual QString getUserScriptPath() const { return m_userScriptPath; }
     virtual std::string getName() const { return m_name; }
-    virtual std::string getWindowSize() const { return m_windowSize; }
 
     virtual bool isLaunchOptimizationEnabled() const { return m_launchOptimizationEnabled; }
 
@@ -69,7 +68,6 @@ private:
     bool m_launchOptimizationEnabled;
     QString m_userScriptPath;
     std::string m_name;
-    std::string m_windowSize;
 
     QMap<QString, QVariant> m_configuration;
 };

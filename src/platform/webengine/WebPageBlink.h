@@ -154,7 +154,7 @@ protected:
     // WebPageBase
     virtual void loadDefaultUrl();
     virtual void loadErrorPage(int errorCode);
-    virtual BlinkWebView* createPageView(int width, int height);
+    virtual BlinkWebView* createPageView();
     virtual void setupStaticUserScripts();
     virtual void addUserScript(const QString& script);
     virtual void addUserScriptUrl(const QUrl& url);
