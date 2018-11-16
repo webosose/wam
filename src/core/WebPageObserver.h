@@ -24,6 +24,15 @@ public:
     virtual void titleChanged() {}
     virtual void firstFrameVisuallyCommitted() {}
     virtual void navigationHistoryChanged() {}
+    virtual void webPageLoadFinished() {}
+    virtual void webPageLoadFailed(int errorCode) {}
+    virtual void closeCallbackExecuted() {}
+    virtual void timeoutExecuteCloseCallback() {}
+    virtual void closingAppProcessDidCrashed() {}
+    virtual void didDispatchUnload() {}
+    virtual void webPageClosePageRequested() {}
+    virtual void webViewRecreated() {}
+    virtual void compositorFrameSwapped() {}
 
 protected:
     WebPageObserver(WebPageBase* page);

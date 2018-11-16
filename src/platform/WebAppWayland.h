@@ -52,8 +52,6 @@ public:
 };
 
 class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
-    Q_OBJECT
-
 public:
     WebAppWayland(QString type, int surface_id, int width = 0, int height = 0);
     WebAppWayland(QString type, WebAppWaylandWindow* window, int width = 0, int height = 0);
@@ -128,11 +126,10 @@ protected:
     void moveInputRegion(int height);
     void setForceActivateVtgIfRequired();
 
-protected Q_SLOTS:
-    virtual void showWindowSlot();
-    virtual void webPageLoadFinishedSlot();
-    virtual void webPageLoadFailedSlot(int errorCode);
-    virtual void webViewRecreatedSlot();
+	// WebPageObserver
+    virtual void webPageLoadFailed(int errorCode);
+    virtual void webViewRecreated();
+    virtual void webPageLoadFinished();
 
 private:
     WebAppWaylandWindow* m_appWindow;
