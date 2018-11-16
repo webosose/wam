@@ -152,11 +152,6 @@ Q_SIGNALS:
     void closingAppProcessDidCrashed();
     void didDispatchUnload();
 
-protected Q_SLOTS:
-    virtual void urlChangedSlot();
-    void doLoadSlot();
-    virtual void suspendWebPagePaintingAndJSExecution() = 0;
-
 protected:
     // WebPageBase
     virtual void cleanResourcesFinished();
@@ -170,6 +165,7 @@ protected:
     virtual void recreateWebView() = 0;
     virtual void setVisible(bool visible) {}
     virtual bool doDeeplinking(const QString& launchParams);
+    virtual void suspendWebPagePaintingAndJSExecution() = 0;
 
     void handleLoadStarted();
     void handleLoadFinished();
