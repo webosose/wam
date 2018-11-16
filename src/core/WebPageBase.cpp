@@ -240,11 +240,6 @@ void WebPageBase::sendRelaunchEvent()
         "}, 1);").arg(launchParams().isEmpty() ? "{}" : launchParams()));
 }
 
-void WebPageBase::urlChangedSlot()
-{
-    Q_EMIT webPageUrlChanged();
-}
-
 void WebPageBase::handleLoadStarted()
 {
     m_suspendAtLoad = true;
@@ -336,11 +331,6 @@ int WebPageBase::suspendDelay()
 QString WebPageBase::telluriumNubPath()
 {
     return getWebAppManagerConfig()->getTelluriumNubPath();
-}
-
-void WebPageBase::doLoadSlot()
-{
-    loadDefaultUrl();
 }
 
 bool WebPageBase::hasLoadErrorPolicy(bool isHttpResponseError, int errorCode)
