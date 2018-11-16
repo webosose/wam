@@ -37,9 +37,7 @@ class WebProcessManager;
  * Common base class for UI independent
  * web page functionality
  */
-class WebPageBase : public QObject {
-    Q_OBJECT
-
+class WebPageBase {
 public:
     // Originally, webview_base.h, WebPageVisibilityState.h, PageVisibilityState.h
     // we can use enum of webview_base.h directly but this is WebPageBase in core
@@ -142,15 +140,6 @@ public:
     void removeObserver(WebPageObserver* observer);
 
     static QString truncateURL(const QString& url);
-
-Q_SIGNALS:
-    void webPageUrlChanged();
-    void webPageLoadFinished();
-    void webPageLoadFailed(int errorCode);
-    void closeCallbackExecuted();
-    void timeoutExecuteCloseCallback();
-    void closingAppProcessDidCrashed();
-    void didDispatchUnload();
 
 protected:
     // WebPageBase

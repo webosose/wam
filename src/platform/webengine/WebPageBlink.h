@@ -31,7 +31,6 @@ class WebPageBlinkPrivate;
 class WebPageBlinkObserver;
 
 class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
-    Q_OBJECT
 public:
     enum FontRenderParams {
         HINTING_NONE = 0,
@@ -145,13 +144,6 @@ public:
     void resetStateToMarkNextPaintForContainer() override;
     void updateBackHistoryAPIDisabled();
 
-Q_SIGNALS:
-    void webPageClosePageRequested();
-    void webPageTitleChanged();
-    void webViewRecreated();
-    void moveInputRegion(qreal);
-    void compositorFrameSwapped();
-
 protected:
     BlinkWebView* pageView() const;
 
@@ -173,9 +165,6 @@ protected:
     void handleBrowserControlFunction(const QString& command, const QStringList& arguments, QString* result) override;
 
     QString handleBrowserControlMessage(const QString& message, const QStringList& params);
-
-protected Q_SLOTS:
-    virtual void didFinishLaunchingSlot();
     virtual void suspendWebPagePaintingAndJSExecution();
 
 private:
