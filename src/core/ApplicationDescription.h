@@ -18,9 +18,8 @@
 #define APPLICATIONDESCRIPTION_H
 
 #include <memory>
+#include <map>
 
-#include <QMap>
-#include <QPair>
 #include <QString>
 #include <QStringList>
 
@@ -148,7 +147,7 @@ public:
     bool allowAudioCapture() const { return m_allowAudioCapture; }
 
     //Key code is changed only for facebooklogin WebApp
-    const QMap<int, QPair<int, int>>& keyFilterTable() const
+    const std::map<int, std::pair<int, int>>& keyFilterTable() const
     {
         return m_keyFilterTable;
     }
@@ -164,7 +163,7 @@ public:
         }
 
         bool allowAnonymous;
-        QMap<QString, int> layers;
+        std::map<QString, int> layers;
     };
 
     struct WindowClientInfo {
@@ -217,7 +216,7 @@ private:
     bool m_backHistoryAPIDisabled;
     int m_widthOverride;
     int m_heightOverride;
-    QMap<int, QPair<int, int>> m_keyFilterTable;
+    std::map<int, std::pair<int, int>> m_keyFilterTable;
     std::string m_groupWindowDesc;
     bool m_doNotTrack;
     bool m_handleExitKey;

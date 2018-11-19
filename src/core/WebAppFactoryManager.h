@@ -18,8 +18,8 @@
 #define WEBAPPFACTORYMANAGER_H
 
 #include <memory>
+#include <map>
 
-#include <QMap>
 #include <QStringList>
 
 #include "WebAppFactoryInterface.h"
@@ -38,7 +38,7 @@ public:
 protected:
     WebAppFactoryManager() {}
     virtual WebAppFactoryInterface* loadInterfaceInstance(QString appType) = 0;
-    QMap<QString, WebAppFactoryInterface*> m_interfaces;
+    std::map<QString, WebAppFactoryInterface*> m_interfaces;
 
 private:
     static WebAppFactoryManager* m_instance;

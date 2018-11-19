@@ -79,8 +79,9 @@ QVariant WebAppManagerConfig::getConfiguration(QString name)
 {
     QVariant value(0);
 
-    if (m_configuration.contains(name)) {
-        value = m_configuration.value(name);
+    auto it = m_configuration.find(name);
+    if (it != m_configuration.end()) {
+        value = it->second;
     }
 
     return value;
@@ -88,7 +89,7 @@ QVariant WebAppManagerConfig::getConfiguration(QString name)
 
 void WebAppManagerConfig::setConfiguration(QString name, QVariant value)
 {
-    m_configuration.insert(name, value);
+    m_configuration.insert(std::make_pair(name, value));
 }
 
 void WebAppManagerConfig::postInitConfiguration()

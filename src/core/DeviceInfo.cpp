@@ -29,7 +29,7 @@ bool DeviceInfo::getDisplayWidth(int &value)
 
 void DeviceInfo::setDisplayWidth(int value)
 {
-    m_deviceInfo.insert("DisplayWidth", QString::number(value));
+    m_deviceInfo.insert(std::make_pair("DisplayWidth", QString::number(value)));
 }
 
 bool DeviceInfo::getDisplayHeight(int &value)
@@ -45,7 +45,7 @@ bool DeviceInfo::getDisplayHeight(int &value)
 
 void DeviceInfo::setDisplayHeight(int value)
 {
-    m_deviceInfo.insert("DisplayHeight", QString::number(value));
+    m_deviceInfo.insert(std::make_pair("DisplayHeight", QString::number(value)));
 }
 
 bool DeviceInfo::getSystemLanguage(QString &value)
@@ -55,13 +55,14 @@ bool DeviceInfo::getSystemLanguage(QString &value)
 
 void DeviceInfo::setSystemLanguage(QString value)
 {
-    m_deviceInfo.insert("SystemLanguage", value);
+    m_deviceInfo.insert(std::make_pair("SystemLanguage", value));
 }
 
 bool DeviceInfo::getDeviceInfo(QString name, QString &value)
 {
-    if (m_deviceInfo.contains(name)) {
-        value = m_deviceInfo.value(name);
+    auto v = m_deviceInfo.find(name);
+    if (v != m_deviceInfo.end()) {
+        value = v->second;
         return true;
     }
 
@@ -70,5 +71,5 @@ bool DeviceInfo::getDeviceInfo(QString name, QString &value)
 
 void DeviceInfo::setDeviceInfo(QString name, QString value)
 {
-    m_deviceInfo.insert(name, value);
+    m_deviceInfo.insert(std::make_pair(name, value));
 }

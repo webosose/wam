@@ -55,7 +55,7 @@ private:
     BlinkWebViewProfileHelper() {}
     virtual ~BlinkWebViewProfileHelper() = default;
 
-    std::map<const std::string, webos::WebViewProfile*> m_appProfileMap;
+    std::map<std::string, webos::WebViewProfile*> m_appProfileMap;
 };
 
 #endif // BLINK_WEB_VIEW_PROFILE_HELPER_H_

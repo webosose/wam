@@ -100,7 +100,7 @@ const ApplicationDescription::WindowOwnerInfo ApplicationDescription::getWindowO
                     auto zstr = layer["z"];
                     if (name.isString() && zstr.isString()) {
                         int z = stringTo<int>(zstr.asString());
-                        info.layers.insert(QString::fromStdString(name.asString()), z);
+                        info.layers.emplace(QString::fromStdString(name.asString()), z);
                     }
                 }
             }
@@ -235,7 +235,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
             int from = stringTo<int>(k["from"].asString());
             int to = stringTo<int>(k["to"].asString());
             int mod = stringTo<int>(k["mod"].asString());
-            appDesc->m_keyFilterTable[from] = qMakePair(to, mod);
+            appDesc->m_keyFilterTable[from] = std::make_pair(to, mod);
         }
     }
 
