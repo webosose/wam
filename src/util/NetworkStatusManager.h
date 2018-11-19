@@ -19,8 +19,8 @@
 
 #include "NetworkStatus.h"
 
-#include <QMap>
-#include <QPair>
+#include <map>
+
 #include <QString>
 
 class NetworkStatusManager {
@@ -32,7 +32,7 @@ public:
 
 private:
     NetworkStatus m_current;
-    QMap<QString, QPair<QString, QString>> m_logList;
+    std::map<QString, std::pair<QString, QString>> m_logList;
 };
 
 #endif //#ifndef NETWORKSTATUS_MANAGER_H

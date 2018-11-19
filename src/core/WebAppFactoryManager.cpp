@@ -30,9 +30,9 @@ WebAppFactoryManager::~WebAppFactoryManager()
 
 WebAppFactoryInterface* WebAppFactoryManager::getInterfaceInstance(QString appType)
 {
-    QMap<QString, WebAppFactoryInterface*>::iterator iter = m_interfaces.find(appType);
+    auto iter = m_interfaces.find(appType);
     if (iter != m_interfaces.end())
-        return iter.value();
+        return iter->second;
 
     return loadInterfaceInstance(appType);
 }
@@ -64,8 +64,9 @@ WebPageBase* WebAppFactoryManager::createWebPage(QString winType, QUrl url, std:
         page = interface->createWebPage(url, desc, launchParams);
     } else {
         // use default factory if cannot find appType.
-        if (m_interfaces.find(kDefaultAppType) != m_interfaces.end())
-            page = m_interfaces.value(kDefaultAppType)->createWebPage(url, desc, launchParams);
+        auto it = m_interfaces.find(kDefaultAppType);
+        if (it != m_interfaces.end())
+            page = it->second->createWebPage(url, desc, launchParams);
     }
 
     if (page) page->init();

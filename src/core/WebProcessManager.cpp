@@ -60,7 +60,7 @@ bool WebProcessManager::webProcessInfoMapReady()
 {
     uint32_t count = 0;
     for (const auto& it : m_webProcessInfoMap) {
-        if (it.proxyID != 0)
+        if (it.second.proxyID != 0)
             count++;
     }
 
@@ -74,19 +74,19 @@ uint32_t WebProcessManager::getWebProcessProxyID(const ApplicationDescription *d
 
     QString key = getProcessKey(desc);
 
-    QMap<QString, WebProcessInfo>::const_iterator it = m_webProcessInfoMap.find(key);
-    if (it == m_webProcessInfoMap.end() || !it.value().proxyID) {
+    auto it = m_webProcessInfoMap.find(key);
+    if (it == m_webProcessInfoMap.end() || !it->second.proxyID) {
         return getInitialWebViewProxyID();
     }
 
-    return it.value().proxyID;
+    return it->second.proxyID;
 }
 
 uint32_t WebProcessManager::getWebProcessProxyID(uint32_t pid) const
 {
-    for (QMap<QString, WebProcessInfo>::const_iterator it = m_webProcessInfoMap.begin(); it != m_webProcessInfoMap.end(); it++) {
-        if (it.value().webProcessPid == pid)
-            return it.value().proxyID;
+    for (const auto& it : m_webProcessInfoMap) {
+        if (it.second.webProcessPid == pid)
+            return it.second.proxyID;
     }
     return 0;
 }
@@ -135,13 +135,13 @@ void WebProcessManager::readWebProcessPolicy()
                 auto id = value["id"];
                 if (id.isString()) {
                     QString qid = QString::fromStdString(id.asString());
-                    m_webProcessGroupAppIDList.append(qid);
+                    m_webProcessGroupAppIDList.push_back(qid);
                     setWebProcessCacheProperty(value, qid);
                 }
                 auto trustLevel = value["trustLevel"];
                 if (trustLevel.isString()) {
                     QString qtl = QString::fromStdString(trustLevel.asString());
-                    m_webProcessGroupTrustLevelList.append(qtl);
+                    m_webProcessGroupTrustLevelList.push_back(qtl);
                     setWebProcessCacheProperty(value, qtl);
                 }
 
@@ -178,7 +178,7 @@ void WebProcessManager::setWebProcessCacheProperty(const Json::Value &object, QS
             info.codeCacheSize = codeCacheStr.toUInt();
     }
 
-    m_webProcessInfoMap.insert(key, info);
+    m_webProcessInfoMap.insert(std::make_pair(key, info));
 }
 
 QString WebProcessManager::getProcessKey(const ApplicationDescription* desc) const
@@ -197,7 +197,7 @@ QString WebProcessManager::getProcessKey(const ApplicationDescription* desc) con
             key = desc->id().c_str();
     }
     else {
-        for (int i = 0; i < m_webProcessGroupAppIDList.size(); i++) {
+        for (size_t i = 0; i < m_webProcessGroupAppIDList.size(); i++) {
             QString appId = m_webProcessGroupAppIDList.at(i);
             if (appId.contains("*")) {
                 appId.remove(QChar('*'));
@@ -217,7 +217,7 @@ QString WebProcessManager::getProcessKey(const ApplicationDescription* desc) con
         if (!key.isEmpty())
             return key;
 
-        for (int i = 0; i < m_webProcessGroupTrustLevelList.size(); i++) {
+        for (size_t i = 0; i < m_webProcessGroupTrustLevelList.size(); i++) {
             QString trustLevel = m_webProcessGroupTrustLevelList.at(i);
             trustLevelList.append(trustLevel.split(","));
             Q_FOREACH(QString trust, trustLevelList) {
@@ -233,9 +233,9 @@ QString WebProcessManager::getProcessKey(const ApplicationDescription* desc) con
 
 void WebProcessManager::killWebProcess(uint32_t pid)
 {
-    for(QMap<QString, WebProcessInfo>::iterator it = m_webProcessInfoMap.begin(); it != m_webProcessInfoMap.end(); it++) {
-        if (it.value().webProcessPid == pid) {
-            it.value().requestKill = false;
+    for(auto &it : m_webProcessInfoMap) {
+        if (it.second.webProcessPid == pid) {
+            it.second.requestKill = false;
             break;
         }
     }
@@ -248,10 +248,10 @@ void WebProcessManager::killWebProcess(uint32_t pid)
 
 void WebProcessManager::requestKillWebProcess(uint32_t pid)
 {
-    for (QMap<QString, WebProcessInfo>::iterator it = m_webProcessInfoMap.begin(); it != m_webProcessInfoMap.end(); it++) {
-        if (it.value().webProcessPid == pid) {
+    for(auto &it : m_webProcessInfoMap) {
+        if (it.second.webProcessPid == pid) {
             LOG_INFO(MSGID_KILL_WEBPROCESS_DELAYED, 1, PMLOGKFV("PID", "%u", pid), "");
-            it.value().requestKill = true;
+            it.second.requestKill = true;
             return;
         }
     }

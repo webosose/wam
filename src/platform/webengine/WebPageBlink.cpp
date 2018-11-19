@@ -20,7 +20,6 @@
 #include <cstdio>
 
 #include <QtCore/QDir>
-#include <QtCore/QMultiMap>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
 #include <QTextStream>
