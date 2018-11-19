@@ -18,9 +18,9 @@
 #define WEBPROCESSMANAGER_H
 
 #include <list>
+#include <unordered_map>
+#include <vector>
 
-#include <QList>
-#include <QMap>
 #include <QString>
 
 class ApplicationDescription;
@@ -87,11 +87,11 @@ protected:
         uint32_t codeCacheSize;
         bool requestKill;
     };
-    QMap<QString, WebProcessInfo> m_webProcessInfoMap;
+    std::unordered_map<QString, WebProcessInfo> m_webProcessInfoMap;
 
     uint32_t m_maximumNumberOfProcesses;
-    QList<QString> m_webProcessGroupAppIDList;
-    QList<QString> m_webProcessGroupTrustLevelList;
+    std::vector<QString> m_webProcessGroupAppIDList;
+    std::vector<QString> m_webProcessGroupTrustLevelList;
 };
 
 #endif /* WEBPROCESSMANAGER_H */

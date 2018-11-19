@@ -17,7 +17,8 @@
 #ifndef WEBAPPMANAGERCONFIG_H
 #define WEBAPPMANAGERCONFIG_H
 
-#include <QMap>
+#include <unordered_map>
+
 #include <QString>
 #include <QVariant>
 
@@ -69,7 +70,7 @@ private:
     QString m_userScriptPath;
     std::string m_name;
 
-    QMap<QString, QVariant> m_configuration;
+    std::unordered_map<QString, QVariant> m_configuration;
 };
 
 #endif /* WEBAPPMANAGERCONFIG_H */

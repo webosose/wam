@@ -17,7 +17,7 @@
 #ifndef BLINK_WEB_VIEW_PROFILE_HELPER_H_
 #define BLINK_WEB_VIEW_PROFILE_HELPER_H_
 
-#include <map>
+#include <unordered_map>
 #include <string>
 
 namespace webos {
@@ -55,7 +55,7 @@ private:
     BlinkWebViewProfileHelper() {}
     virtual ~BlinkWebViewProfileHelper() = default;
 
-    std::map<const std::string, webos::WebViewProfile*> m_appProfileMap;
+    std::unordered_map<std::string, webos::WebViewProfile*> m_appProfileMap;
 };
 
 #endif // BLINK_WEB_VIEW_PROFILE_HELPER_H_

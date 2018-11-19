@@ -1,7 +1,7 @@
 #ifndef WEBRUNTIME_AGL_H
 #define WEBRUNTIME_AGL_H
 
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <signal.h>
 #include <string>
@@ -98,7 +98,7 @@ private:
   LibHomeScreen *m_hs = nullptr;
   ILMControl *m_ic = nullptr;
 
-  std::map<int, int> m_surfaces;  // pair of <afm:rid, ivi:id>
+  std::unordered_map<int, int> m_surfaces;  // pair of <afm:rid, ivi:id>
 
   bool m_pending_create = false;
 };

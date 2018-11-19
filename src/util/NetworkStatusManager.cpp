@@ -52,18 +52,15 @@ void NetworkStatusManager::checkInformationChange(const NetworkStatus::Informati
 
 void NetworkStatusManager::appendLogList(const QString& key, const QString& previous, const QString& current)
 {
-    QPair<QString, QString> pair = qMakePair(previous, current);
-    m_logList[key] = pair;
+    m_logList.emplace(key, std::make_pair(previous, current));
 }
 
 void NetworkStatusManager::printLog()
 {
-    QMapIterator<QString, QPair<QString, QString> > itr(m_logList);
-    while (itr.hasNext()) {
-        itr.next();
-        LOG_INFO(MSGID_NETWORKSTATUS_INFO, 3, PMLOGKS("CHANGE", qPrintable(itr.key())),
-            PMLOGKS("Previous", qPrintable(itr.value().first)),
-            PMLOGKS("Current", qPrintable(itr.value().second)), "");
+    for (const auto &l : m_logList) {
+        LOG_INFO(MSGID_NETWORKSTATUS_INFO, 3, PMLOGKS("CHANGE", qPrintable(l.first)),
+            PMLOGKS("Previous", qPrintable(l.first)),
+            PMLOGKS("Current", qPrintable(l.second)), "");
     }
     m_logList.clear();
 }

@@ -17,7 +17,8 @@
 #ifndef DEVICEINFO_H
 #define DEVICEINFO_H
 
-#include <QMap>
+#include <unordered_map>
+
 #include <QString>
 
 class DeviceInfo {
@@ -37,7 +38,7 @@ public:
     virtual void setDeviceInfo(QString name, QString value);
 
 private:
-    QMap<QString, QString> m_deviceInfo;
+    std::unordered_map<QString, QString> m_deviceInfo;
 };
 
 #endif /* DEVICEINFO_H */

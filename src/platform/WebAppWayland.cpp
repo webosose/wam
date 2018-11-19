@@ -16,6 +16,7 @@
 
 #include "WebAppWayland.h"
 
+#include <unordered_map>
 #include <json/json.h>
 
 #include "ApplicationDescription.h"
@@ -274,10 +275,8 @@ void WebAppWayland::setupWindowGroup(ApplicationDescription* desc)
         ApplicationDescription::WindowOwnerInfo ownerInfo = desc->getWindowOwnerInfo();
         webos::WindowGroupConfiguration config(groupInfo.name.toStdString());
         config.SetIsAnonymous(ownerInfo.allowAnonymous);
-        QMap<QString, int>::iterator iter = ownerInfo.layers.begin();
-        while (iter != ownerInfo.layers.end()){
-          config.AddLayer(webos::WindowGroupLayerConfiguration(iter.key().toStdString(), iter.value()));
-          iter++;
+        for (const auto &l : ownerInfo.layers) {
+          config.AddLayer(webos::WindowGroupLayerConfiguration(l.first.toStdString(), l.second));
         }
         m_appWindow->CreateWindowGroup(config);
         LOG_INFO(MSGID_CREATE_SURFACEGROUP, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
@@ -345,42 +344,39 @@ void WebAppWayland::setCursor(const QString& cursorArg, int hotspot_x, int hotsp
     m_appWindow->setCursor(cursorArg, hotspot_x, hotspot_y);
 }
 
-static QMap<QString, webos::WebOSKeyMask>& getKeyMaskTable()
+static std::unordered_map<QString, webos::WebOSKeyMask>& getKeyMaskTable()
 {
-    static QMap<QString, webos::WebOSKeyMask> mapTable;
-
-    if (mapTable.isEmpty()) {
-        mapTable["KeyMaskNone"]      = static_cast<webos::WebOSKeyMask>(0);
-        mapTable["KeyMaskHome"]      = webos::WebOSKeyMask::KEY_MASK_HOME;
-        mapTable["KeyMaskBack"]      = webos::WebOSKeyMask::KEY_MASK_BACK;
-        mapTable["KeyMaskExit"]      = webos::WebOSKeyMask::KEY_MASK_EXIT;
-        mapTable["KeyMaskLeft"]      = webos::WebOSKeyMask::KEY_MASK_LEFT;
-        mapTable["KeyMaskRight"]     = webos::WebOSKeyMask::KEY_MASK_RIGHT;
-        mapTable["KeyMaskUp"]        = webos::WebOSKeyMask::KEY_MASK_UP;
-        mapTable["KeyMaskDown"]      = webos::WebOSKeyMask::KEY_MASK_DOWN;
-        mapTable["KeyMaskOk"]        = webos::WebOSKeyMask::KEY_MASK_OK;
-        mapTable["KeyMaskNumeric"]   = webos::WebOSKeyMask::KEY_MASK_NUMERIC;
-        mapTable["KeyMaskRed"]       = webos::WebOSKeyMask::KEY_MASK_REMOTECOLORRED;
-        mapTable["KeyMaskGreen"]     = webos::WebOSKeyMask::KEY_MASK_REMOTECOLORGREEN;
-        mapTable["KeyMaskYellow"]    = webos::WebOSKeyMask::KEY_MASK_REMOTECOLORYELLOW;
-        mapTable["KeyMaskBlue"]      = webos::WebOSKeyMask::KEY_MASK_REMOTECOLORBLUE;
-        mapTable["KeyMaskProgramme"] = webos::WebOSKeyMask::KEY_MASK_REMOTEPROGRAMMEGROUP;
-        mapTable["KeyMaskPlayback"]  = webos::WebOSKeyMask::KEY_MASK_REMOTEPLAYBACKGROUP;
-        mapTable["KeyMaskTeletext"]  = webos::WebOSKeyMask::KEY_MASK_REMOTETELETEXTGROUP;
-        mapTable["KeyMaskDefault"]   = webos::WebOSKeyMask::KEY_MASK_DEFAULT;
-    }
-
+    static std::unordered_map<QString, webos::WebOSKeyMask> mapTable {
+        { "KeyMaskNone", static_cast<webos::WebOSKeyMask>(0) },
+        { "KeyMaskHome", webos::WebOSKeyMask::KEY_MASK_HOME },
+        { "KeyMaskBack", webos::WebOSKeyMask::KEY_MASK_BACK },
+        { "KeyMaskExit", webos::WebOSKeyMask::KEY_MASK_EXIT },
+        { "KeyMaskLeft", webos::WebOSKeyMask::KEY_MASK_LEFT },
+        { "KeyMaskRight", webos::WebOSKeyMask::KEY_MASK_RIGHT },
+        { "KeyMaskUp", webos::WebOSKeyMask::KEY_MASK_UP },
+        { "KeyMaskDown", webos::WebOSKeyMask::KEY_MASK_DOWN },
+        { "KeyMaskOk", webos::WebOSKeyMask::KEY_MASK_OK },
+        { "KeyMaskNumeric", webos::WebOSKeyMask::KEY_MASK_NUMERIC },
+        { "KeyMaskRed", webos::WebOSKeyMask::KEY_MASK_REMOTECOLORRED },
+        { "KeyMaskGreen", webos::WebOSKeyMask::KEY_MASK_REMOTECOLORGREEN },
+        { "KeyMaskYellow", webos::WebOSKeyMask::KEY_MASK_REMOTECOLORYELLOW },
+        { "KeyMaskBlue", webos::WebOSKeyMask::KEY_MASK_REMOTECOLORBLUE },
+        { "KeyMaskProgramme", webos::WebOSKeyMask::KEY_MASK_REMOTEPROGRAMMEGROUP },
+        { "KeyMaskPlayback", webos::WebOSKeyMask::KEY_MASK_REMOTEPLAYBACKGROUP },
+        { "KeyMaskTeletext", webos::WebOSKeyMask::KEY_MASK_REMOTETELETEXTGROUP },
+        { "KeyMaskDefault", webos::WebOSKeyMask::KEY_MASK_DEFAULT }
+    };
     return mapTable;
 }
 
 void WebAppWayland::setKeyMask(const Json::Value& jsonDoc)
 {
-    static QMap<QString, webos::WebOSKeyMask>& mapTable = getKeyMaskTable();
+    static std::unordered_map<QString, webos::WebOSKeyMask>& mapTable = getKeyMaskTable();
     unsigned int keyMask = 0;
 
     if (jsonDoc.isArray()) {
         for (const Json::Value& child : jsonDoc)
-            keyMask |= mapTable.value(QString::fromStdString(child.asString()));
+            keyMask |= mapTable[QString::fromStdString(child.asString())];
     }
 #if defined(OS_WEBOS)
     webos::WebOSPlatform::GetInstance()->SetKeyMask(m_windowHandle, static_cast<webos::WebOSKeyMask>(keyMask));

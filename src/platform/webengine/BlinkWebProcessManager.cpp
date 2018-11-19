@@ -16,9 +16,11 @@
 
 #include "BlinkWebProcessManager.h"
 
+#include <unordered_map>
 #include <memory>
+#include <set>
+
 #include <json/value.h>
-#include <QtCore/QList>
 #include <QString>
 
 #include "WebPageBlink.h"
@@ -39,41 +41,38 @@ Json::Value BlinkWebProcessManager::getWebProcessProfiling()
     Json::Value reply(Json::objectValue);
     Json::Value processArray(Json::arrayValue);
     uint32_t pid;
-    QList<uint32_t> processIdList;
+    std::set<uint32_t> processIdList;
 
-    QMap<uint32_t, QString> runningAppList;
+    std::unordered_multimap<uint32_t, QString> runningAppsMap;
     std::list<const WebAppBase*> running = runningApps();
     for (auto it = running.begin(); it != running.end(); ++it) {
         WebAppBase* app = findAppById((*it)->appId());
         pid = getWebProcessPID(app);
-        if (!processIdList.contains(pid))
-            processIdList.append(pid);
+        processIdList.insert(pid);
 
-        runningAppList.insertMulti(pid, app->appId());
+        runningAppsMap.emplace(pid, app->appId());
     }
 
     WebAppBase* containerApp = getContainerApp();
     if (containerApp) {
         pid = getWebProcessPID(containerApp);
-        if (!processIdList.contains(pid))
-            processIdList.append(pid);
+        processIdList.insert(pid);
 
-        runningAppList.insertMulti(pid, containerApp->appId());
+        runningAppsMap.emplace(pid, containerApp->appId());
     }
 
-    for (int id = 0; id < processIdList.size(); id++) {
+    for (uint32_t pid : processIdList) {
         Json::Value processObject(Json::objectValue);
         Json::Value appArray(Json::arrayValue);
-        pid = processIdList.at(id);
 
         processObject["pid"] = QString::number(pid).toStdString();
         processObject["webProcessSize"] = getWebProcessMemSize(pid).toStdString();
         //starfish-surface is note used on Blink
         processObject["tileSize"] = 0;
-        QList<QString> processApp = runningAppList.values(pid);
-        for (int app = 0; app < processApp.size(); app++) {
+        auto processes = runningAppsMap.equal_range(pid);
+        for (auto p = processes.first; p != processes.second; ++p) {
             Json::Value appObject(Json::objectValue);
-            appObject["id"] = processApp.at(app).toStdString();
+            appObject["id"] = p->second.toStdString();
             appArray.append(appObject);
         }
         processObject["runningApps"] = appArray;
