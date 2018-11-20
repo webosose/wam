@@ -151,3 +151,11 @@ MOC_DIR = $$DESTDIR/.moc
 LIBS += -L$$DESTDIR
 
 LIBS += -lcbe
+
+# Link against boost_filesystem assuming it's on WAM's sysroot
+# This relies on a patch in meta-agl-lge adding boost as dependency
+# of WAM.
+# TODO: Once WAM build system  is ported to CMake, better configure-time checkings
+# will be used (e.g: find_package(Boost, 1.68 COMPONENTS filesystem REQUIRED).
+LIBS += -lboost_filesystem
+
