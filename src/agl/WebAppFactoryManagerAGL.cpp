@@ -45,7 +45,7 @@ WebAppFactoryManager* WebAppFactoryManager::instance()
 WebAppFactoryManagerAGL::WebAppFactoryManagerAGL()
     : m_defaultInterface(new WebAppFactoryAGL())
 {
-    m_interfaces.insert(kDefaultAppType, m_defaultInterface);
+    m_interfaces.emplace(kDefaultAppType, m_defaultInterface);
 }
 
 WebAppFactoryInterface* WebAppFactoryManagerAGL::loadInterfaceInstance(QString appType)
