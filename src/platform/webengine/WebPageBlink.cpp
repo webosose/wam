@@ -1083,9 +1083,9 @@ void WebPageBlink::updateDatabaseIdentifier()
     d->pageView->SetDatabaseIdentifier(m_appId.toStdString());
 }
 
-void WebPageBlink::deleteWebStorages(const QString& identifier)
+void WebPageBlink::deleteWebStorages(const std::string& identifier)
 {
-    d->pageView->DeleteWebStorages(identifier.toStdString());
+    d->pageView->DeleteWebStorages(identifier);
 }
 
 void WebPageBlink::setInspectorEnable()

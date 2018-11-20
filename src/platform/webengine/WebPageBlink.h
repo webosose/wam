@@ -87,7 +87,7 @@ public:
     void reloadExtensionData() override;
     void updateIsLoadErrorPageFinish() override;
     void updateDatabaseIdentifier() override;
-    void deleteWebStorages(const QString& identfier) override;
+    void deleteWebStorages(const std::string& identfier) override;
     void setInspectorEnable() override;
     void setKeepAliveWebApp(bool keepAlive) override;
 
