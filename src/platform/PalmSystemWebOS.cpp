@@ -136,7 +136,7 @@ void PalmSystemWebOS::setGroupClientEnvironment(GroupClientCallKey callKey, cons
     ApplicationDescription* appDesc = m_app ? m_app->getAppDescription() : 0;
     if (appDesc) {
         ApplicationDescription::WindowGroupInfo groupInfo = appDesc->getWindowGroupInfo();
-        if (!groupInfo.name.isEmpty() && !groupInfo.isOwner) {
+        if (!groupInfo.name.empty() && !groupInfo.isOwner) {
             Json::Value jsonDoc;
             readJsonFromString(params.toStdString(), jsonDoc);
             switch (callKey) {

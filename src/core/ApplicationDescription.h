@@ -18,9 +18,8 @@
 #define APPLICATIONDESCRIPTION_H
 
 #include <unordered_map>
-
-#include <QString>
-#include <QStringList>
+#include <set>
+#include <string>
 
 class ApplicationDescription {
 public:
@@ -94,7 +93,7 @@ public:
         return m_enyoBundleVersion;
     }
 
-    const QStringList& supportedEnyoBundleVersions() const
+    const std::set<std::string>& supportedEnyoBundleVersions() const
     {
         return m_supportedEnyoBundleVersions;
     }
@@ -161,12 +160,12 @@ public:
         }
 
         bool allowAnonymous;
-        std::unordered_map<QString, int> layers;
+        std::unordered_map<std::string, int> layers;
     };
 
     struct WindowClientInfo {
-        QString layer;
-        QString hint;
+        std::string layer;
+        std::string hint;
     };
 
     struct WindowGroupInfo {
@@ -175,7 +174,7 @@ public:
         {
         }
 
-        QString name;
+        std::string name;
         bool isOwner;
     };
 
@@ -204,7 +203,7 @@ private:
     std::string m_containerJS;
     std::string m_containerCSS;
     std::string m_enyoBundleVersion;
-    QStringList m_supportedEnyoBundleVersions;
+    std::set<std::string> m_supportedEnyoBundleVersions;
     std::string m_enyoVersion;
     std::string m_version;
     std::string m_v8SnapshotPath;

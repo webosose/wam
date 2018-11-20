@@ -17,7 +17,6 @@
 #ifndef WEBPAGEBASE_H
 #define WEBPAGEBASE_H
 
-#include <QObject>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 

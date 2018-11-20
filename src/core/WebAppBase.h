@@ -17,8 +17,8 @@
 #ifndef WEBAPPBASE_H
 #define WEBAPPBASE_H
 
-#include <QObject>
 #include <QString>
+#include <QVariant>
 
 #include "WebAppManager.h"
 #include "WebPageObserver.h"
