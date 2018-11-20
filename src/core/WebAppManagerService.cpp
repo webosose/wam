@@ -137,7 +137,7 @@ void WebAppManagerService::setForceCloseApp(const QString &appId)
     WebAppManager::instance()->setForceCloseApp(appId);
 }
 
-void WebAppManagerService::deleteStorageData(const QString &identifier)
+void WebAppManagerService::deleteStorageData(const std::string &identifier)
 {
     WebAppManager::instance()->deleteStorageData(identifier);
 }

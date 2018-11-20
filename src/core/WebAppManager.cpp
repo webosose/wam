@@ -563,6 +563,7 @@ void WebAppManager::removeWebAppFromWebProcessInfoMap(QString appId)
     // Deprecated (2016-04-01)
 }
 
+// FIXME: QString -> std::string
 WebAppBase* WebAppManager::findAppById(const QString& appId)
 {
     for (AppList::iterator it = m_appList.begin(); it != m_appList.end(); ++it) {
@@ -743,7 +744,7 @@ uint32_t WebAppManager::getContainerAppProxyID()
     return proxyID;
 }
 
-void WebAppManager::deleteStorageData(const QString& identifier)
+void WebAppManager::deleteStorageData(const std::string& identifier)
 {
     m_webProcessManager->deleteStorageData(identifier);
 }

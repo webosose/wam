@@ -132,7 +132,7 @@ public:
     bool shouldLaunchContainerAppOnDemand();
 
     int getSuspendDelay() { return m_suspendDelay; }
-    void deleteStorageData(const QString& identifier);
+    void deleteStorageData(const std::string& identifier);
     void killCustomPluginProcess(const QString& basePath);
     bool processCrashed(QString appId);
 
