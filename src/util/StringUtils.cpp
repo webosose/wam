@@ -17,9 +17,11 @@
 #include "StringUtils.h"
 
 #include <sstream>
+#include <stdexcept>
 
 // TODO: Initial simple implementation using standard
 // API. Maybe will be replaced by a boost version in the future.
+//
 StringList splitString(const std::string &str, char delimiter,
                        bool keepEmptyParts, bool ignoreCase)
 {
@@ -33,3 +35,26 @@ StringList splitString(const std::string &str, char delimiter,
     return tokens;
 }
 
+void replaceSubstrings(std::string& in, const std::string& toSearch,
+                       const std::string& replaceStr)
+{
+    size_t pos = in.find(toSearch);
+    while (pos != std::string::npos) {
+        in.replace(pos, toSearch.size(), replaceStr);
+        pos = in.find(toSearch, pos + toSearch.size());
+    }
+}
+
+bool stringToUInt(const std::string& in, unsigned int& out)
+{
+    try {
+        unsigned long lresult = std::stoul(in, nullptr, 10);
+        unsigned int result = lresult;
+        if (result != lresult)
+            return false;
+        out = result;
+        return true;
+    } catch (const std::invalid_argument&) {
+        return false;
+    }
+}

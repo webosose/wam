@@ -21,7 +21,6 @@
 #include <set>
 
 #include <json/value.h>
-#include <QString>
 
 #include "WebPageBlink.h"
 #include "WebAppBase.h"
@@ -43,14 +42,14 @@ Json::Value BlinkWebProcessManager::getWebProcessProfiling()
     uint32_t pid;
     std::set<uint32_t> processIdList;
 
-    std::unordered_multimap<uint32_t, QString> runningAppsMap;
+    std::unordered_multimap<uint32_t, std::string> runningAppsMap;
     std::list<const WebAppBase*> running = runningApps();
     for (auto it = running.begin(); it != running.end(); ++it) {
-        WebAppBase* app = findAppById((*it)->appId());
+        auto appid = (*it)->appId().toStdString(); //TODO port appId to std::string
+        WebAppBase* app = findAppById(appid);
         pid = getWebProcessPID(app);
         processIdList.insert(pid);
-
-        runningAppsMap.emplace(pid, app->appId());
+        runningAppsMap.emplace(pid, app->appId().toStdString());
     }
 
     WebAppBase* containerApp = getContainerApp();
@@ -58,21 +57,21 @@ Json::Value BlinkWebProcessManager::getWebProcessProfiling()
         pid = getWebProcessPID(containerApp);
         processIdList.insert(pid);
 
-        runningAppsMap.emplace(pid, containerApp->appId());
+        runningAppsMap.emplace(pid, containerApp->appId().toStdString());
     }
 
     for (uint32_t pid : processIdList) {
         Json::Value processObject(Json::objectValue);
         Json::Value appArray(Json::arrayValue);
 
-        processObject["pid"] = QString::number(pid).toStdString();
-        processObject["webProcessSize"] = getWebProcessMemSize(pid).toStdString();
+        processObject["pid"] = std::to_string(pid);
+        processObject["webProcessSize"] = getWebProcessMemSize(pid);
         //starfish-surface is note used on Blink
         processObject["tileSize"] = 0;
         auto processes = runningAppsMap.equal_range(pid);
         for (auto p = processes.first; p != processes.second; ++p) {
             Json::Value appObject(Json::objectValue);
-            appObject["id"] = p->second.toStdString();
+            appObject["id"] = p->second;
             appArray.append(appObject);
         }
         processObject["runningApps"] = appArray;
@@ -84,7 +83,7 @@ Json::Value BlinkWebProcessManager::getWebProcessProfiling()
     return std::move(reply);
 }
 
-void BlinkWebProcessManager::deleteStorageData(const QString& identifier)
+void BlinkWebProcessManager::deleteStorageData(const std::string& identifier)
 {
     std::list<const WebAppBase*> runningAppList = runningApps();
     if (!runningAppList.empty()) {
@@ -100,7 +99,7 @@ void BlinkWebProcessManager::deleteStorageData(const QString& identifier)
 
     BlinkWebView* webview = new BlinkWebView();
     if (webview) {
-        webview->DeleteWebStorages(identifier.toStdString());
+        webview->DeleteWebStorages(identifier);
         delete webview;
     }
 }

@@ -506,7 +506,7 @@ void WebAppManagerServiceLuna::getAppStatusCallback(QJsonObject reply)
         QJsonObject appObject = reply["app"].toObject();
         QString appId = appObject["id"].toString();
 
-        WebAppManagerService::deleteStorageData(appId);
+        WebAppManagerService::deleteStorageData(appId.toStdString());
     }
     if (reply["change"].toString() == "removed" ||
         reply["change"].toString() == "updated") {

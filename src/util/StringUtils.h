@@ -25,4 +25,9 @@ typedef std::vector<std::string> StringList;
 StringList splitString(const std::string &str, char delimiter,
                        bool keepEmpty = false, bool ignCase = false);
 
+void replaceSubstrings(std::string& in, const std::string& toSearch,
+                       const std::string& replaceStr = "");
+
+bool stringToUInt(const std::string& in, unsigned int& out);
+
 #endif // STRING_UTILS_H

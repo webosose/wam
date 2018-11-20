@@ -21,8 +21,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <QString>
-
 class ApplicationDescription;
 class WebPageBase;
 class WebAppBase;
@@ -38,17 +36,17 @@ public:
 
     uint32_t getWebProcessProxyID(const ApplicationDescription* desc) const;
     uint32_t getWebProcessProxyID(uint32_t pid) const;
-    QString getWebProcessMemSize(uint32_t pid) const; //change name from webProcessSize(uint32_t pid)
+    std::string getWebProcessMemSize(uint32_t pid) const; //change name from webProcessSize(uint32_t pid)
     void killWebProcess(uint32_t pid);
     void requestKillWebProcess(uint32_t pid);
     bool webProcessInfoMapReady();
-    void setWebProcessCacheProperty(const Json::Value &object, QString key); //change name from setWebProcessProperty()
+    void setWebProcessCacheProperty(const Json::Value &object, const std::string& key); //change name from setWebProcessProperty()
     void readWebProcessPolicy(); //chane name from setWebProcessEnvironment()
-    QString getProcessKey(const ApplicationDescription* desc) const; //change name from getKey()
+    std::string getProcessKey(const ApplicationDescription* desc) const; //change name from getKey()
 
     virtual Json::Value getWebProcessProfiling() = 0;
     virtual uint32_t getWebProcessPID(const WebAppBase* app) const = 0;
-    virtual void deleteStorageData(const QString& identifier) = 0;
+    virtual void deleteStorageData(const std::string& identifier) = 0;
     virtual uint32_t getInitialWebViewProxyID() const = 0;
     virtual void clearBrowsingData(const int removeBrowsingDataMask) = 0;
     virtual int maskForBrowsingDataType(const char* type) = 0;
@@ -58,7 +56,7 @@ public:
 protected:
     std::list<const WebAppBase*> runningApps();
     std::list<const WebAppBase*> runningApps(uint32_t pid);
-    WebAppBase* findAppById(const QString& appId);
+    WebAppBase* findAppById(const std::string& appId);
     WebAppBase* getContainerApp();
 
 protected:
@@ -87,11 +85,11 @@ protected:
         uint32_t codeCacheSize;
         bool requestKill;
     };
-    std::unordered_map<QString, WebProcessInfo> m_webProcessInfoMap;
+    std::unordered_map<std::string, WebProcessInfo> m_webProcessInfoMap;
 
     uint32_t m_maximumNumberOfProcesses;
-    std::vector<QString> m_webProcessGroupAppIDList;
-    std::vector<QString> m_webProcessGroupTrustLevelList;
+    std::vector<std::string> m_webProcessGroupAppIDList;
+    std::vector<std::string> m_webProcessGroupTrustLevelList;
 };
 
 #endif /* WEBPROCESSMANAGER_H */

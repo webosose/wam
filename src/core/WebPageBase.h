@@ -103,7 +103,7 @@ public:
     virtual bool isLoadErrorPageStart() { return m_isLoadErrorPageStart; }
     virtual void updateIsLoadErrorPageFinish();
     virtual void updateDatabaseIdentifier() {}
-    virtual void deleteWebStorages(const QString& identifier) {}
+    virtual void deleteWebStorages(const std::string& identifier) {}
     virtual void setInspectorEnable() {}
     virtual void setKeepAliveWebApp(bool keepAlive) {}
     virtual void setContentsScale() {}
