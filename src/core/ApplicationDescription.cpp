@@ -14,14 +14,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include "ApplicationDescription.h"
 
 #include <limits>
-
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
 
-#include "ApplicationDescription.h"
 #include "JsonHelper.h"
 #include "LogManager.h"
 #include "StringUtils.h"
@@ -70,7 +69,7 @@ const ApplicationDescription::WindowGroupInfo ApplicationDescription::getWindowG
         if (json.isObject()) {
             auto name = json["name"];
             if (name.isString())
-                info.name = QString::fromStdString(name.asString());
+                info.name = name.asString();
 
             auto isOwner = json["owner"];
             if (isOwner.isBool())
@@ -100,7 +99,7 @@ const ApplicationDescription::WindowOwnerInfo ApplicationDescription::getWindowO
                     auto zstr = layer["z"];
                     if (name.isString() && zstr.isString()) {
                         int z = stringTo<int>(zstr.asString());
-                        info.layers.emplace(QString::fromStdString(name.asString()), z);
+                        info.layers.emplace(name.asString(), z);
                     }
                 }
             }
@@ -121,11 +120,11 @@ const ApplicationDescription::WindowClientInfo ApplicationDescription::getWindow
         if (clientInfo.isObject()) {
             auto layer = clientInfo["layer"];
             if (layer.isString())
-                info.layer = QString::fromStdString(layer.asString());
+                info.layer = layer.asString();
 
             auto hint = clientInfo["hint"];
             if (hint.isString())
-                info.hint = QString::fromStdString(hint.asString());
+                info.hint = hint.asString();
         }
     }
     return info;
@@ -166,7 +165,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     auto supportedVersions = jsonObj["supportedEnyoBundleVersions"];
     if (supportedVersions.isArray()) {
         for (const Json::Value &version : supportedVersions)
-            appDesc->m_supportedEnyoBundleVersions.append(QString::fromStdString(version.asString()));
+            appDesc->m_supportedEnyoBundleVersions.insert(version.asString());
     }
 
     appDesc->m_id = jsonObj["id"].asString();
@@ -213,11 +212,11 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     // Handle resolution
     auto resolution = jsonObj["resolution"];
     if (resolution.isString()) {
-        QString overrideResolution = QString::fromStdString(jsonObj["resolution"].asString());
-        QStringList resList(overrideResolution.split("x", QString::KeepEmptyParts, Qt::CaseInsensitive));
+        std::string overrideResolution = jsonObj["resolution"].asString();
+        auto resList = splitString(overrideResolution, 'x', true, true);
         if(resList.size() == 2) {
-            appDesc->m_widthOverride = resList.at(0).toInt();
-            appDesc->m_heightOverride = resList.at(1).toInt();
+            appDesc->m_widthOverride = stringTo<int>(resList.at(0));
+            appDesc->m_heightOverride = stringTo<int>(resList.at(1));
         }
         if(appDesc->m_widthOverride < 0 || appDesc->m_heightOverride < 0) {
             appDesc->m_widthOverride = 0;

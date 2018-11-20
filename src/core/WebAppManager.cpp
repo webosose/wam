@@ -866,8 +866,9 @@ bool WebAppManager::isContainerBasedApp(ApplicationDescription* containerBasedAp
 
     // check the enyo bundle version
     if (!containerBasedAppDesc->enyoBundleVersion().empty()) {
-        QString enyoBundleVersion = QString::fromStdString(containerBasedAppDesc->enyoBundleVersion());
-        return containerAppDesc->supportedEnyoBundleVersions().contains(enyoBundleVersion);
+        std::string enyoBundleVersion = containerBasedAppDesc->enyoBundleVersion();
+        auto versions = containerAppDesc->supportedEnyoBundleVersions();
+        return versions.find(enyoBundleVersion) != versions.end();
     }
 
     // check the enyo version
