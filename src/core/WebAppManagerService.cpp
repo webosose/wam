@@ -132,7 +132,7 @@ QString WebAppManagerService::getSystemLanguage()
     return language;
 }
 
-void WebAppManagerService::setForceCloseApp(const QString &appId)
+void WebAppManagerService::setForceCloseApp(const std::string &appId)
 {
     WebAppManager::instance()->setForceCloseApp(appId);
 }
@@ -142,7 +142,7 @@ void WebAppManagerService::deleteStorageData(const std::string &identifier)
     WebAppManager::instance()->deleteStorageData(identifier);
 }
 
-void WebAppManagerService::killCustomPluginProcess(const QString &appBasePath)
+void WebAppManagerService::killCustomPluginProcess(const std::string& appBasePath)
 {
     WebAppManager::instance()->killCustomPluginProcess(appBasePath);
 }
@@ -172,9 +172,9 @@ std::vector<ApplicationInfo> WebAppManagerService::list(bool includeSystemApps)
     return WebAppManager::instance()->list(includeSystemApps);
 }
 
-Json::Value WebAppManagerService::closeByInstanceId(QString instanceId)
+Json::Value WebAppManagerService::closeByInstanceId(const std::string& instanceId)
 {
-    LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("INSTANCE_ID", qPrintable(instanceId)), PMLOGKS("API", "closeByInstanceId"), "");
+    LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("INSTANCE_ID", instanceId.c_str()), PMLOGKS("API", "closeByInstanceId"), "");
     WebAppBase* app = WebAppManager::instance()->findAppByInstanceId(instanceId);
     QString appId;
     if (app) {
@@ -185,11 +185,11 @@ Json::Value WebAppManagerService::closeByInstanceId(QString instanceId)
     Json::Value reply(Json::objectValue);
     if(!appId.isNull()) {
         reply["appId"] = appId.toStdString();
-        reply["processId"] = instanceId.toStdString();
+        reply["processId"] = instanceId;
         reply["returnValue"] = true;
     }
     else {
-        LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("INSTANCE_ID", qPrintable(instanceId)), PMLOGKS("API", "closeByInstanceId"), "No matched App; return false");
+        LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("INSTANCE_ID", instanceId.c_str()), PMLOGKS("API", "closeByInstanceId"), "No matched App; return false");
         std::string errMsg("Unknown Process");
         reply["returnValue"] = false;
         reply["errorText"] = errMsg;
@@ -202,7 +202,7 @@ void WebAppManagerService::setAccessibilityEnabled(bool enable)
     WebAppManager::instance()->setAccessibilityEnabled(enable);
 }
 
-uint32_t WebAppManagerService::getWebProcessId(const QString& appId)
+uint32_t WebAppManagerService::getWebProcessId(const std::string& appId)
 {
     return WebAppManager::instance()->getWebProcessId(appId);
 }
@@ -217,7 +217,7 @@ void WebAppManagerService::notifyMemoryPressure(webos::WebViewBase::MemoryPressu
     WebAppManager::instance()->notifyMemoryPressure(level);
 }
 
-bool WebAppManagerService::isEnyoApp(const QString& appId)
+bool WebAppManagerService::isEnyoApp(const std::string& appId)
 {
     return WebAppManager::instance()->isEnyoApp(appId);
 }

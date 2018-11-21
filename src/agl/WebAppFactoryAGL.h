@@ -23,9 +23,9 @@
 
 class WebAppFactoryAGL : public WebAppFactoryInterface {
 public:
-    virtual WebAppBase* createWebApp(QString winType, ApplicationDescription* desc = 0);
-    virtual WebAppBase* createWebApp(QString winType, WebPageBase* page, ApplicationDescription* desc = 0);
-    virtual WebPageBase* createWebPage(QUrl url, ApplicationDescription* desc, QString launchParams = "");
+    virtual WebAppBase* createWebApp(const std::string& winType, ApplicationDescription* desc = 0);
+    virtual WebAppBase* createWebApp(const std::string& winType, WebPageBase* page, ApplicationDescription* desc = 0);
+    virtual WebPageBase* createWebPage(QUrl url, ApplicationDescription* desc, const std::string& launchParams = "");
 };
 
 #endif /* WEBAPPFACTORYAGL_H */

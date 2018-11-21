@@ -73,7 +73,7 @@ public:
 };
 
 
-WebPageBlink::WebPageBlink(const QUrl& url, ApplicationDescription* desc, const QString& params)
+WebPageBlink::WebPageBlink(const QUrl& url, ApplicationDescription* desc, const std::string& params)
     : WebPageBase(url, desc, params)
     , d(new WebPageBlinkPrivate(this))
     , m_isPaused(false)
@@ -588,7 +588,7 @@ void WebPageBlink::updatePageSettings()
     d->pageView->UpdatePreferences();
 }
 
-void WebPageBlink::handleDeviceInfoChanged(const QString& deviceInfo)
+void WebPageBlink::handleDeviceInfoChanged(const std::string& deviceInfo)
 {
     if (!d->m_palmSystem)
         return;
@@ -602,9 +602,9 @@ void WebPageBlink::evaluateJavaScript(const QString& jsCode)
     d->pageView->RunJavaScript(jsCode.toStdString());
 }
 
-void WebPageBlink::evaluateJavaScriptInAllFrames(const QString &script, const char *method)
+void WebPageBlink::evaluateJavaScriptInAllFrames(const std::string& script, const char *method)
 {
-    d->pageView->RunJavaScriptInAllFrames(script.toStdString());
+    d->pageView->RunJavaScriptInAllFrames(script);
 }
 
 void WebPageBlink::cleanResources()

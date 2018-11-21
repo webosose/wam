@@ -23,7 +23,7 @@ class ApplicationDescription;
 
 class WebAppWaylandAGL : public WebAppWayland {
 public:
-    WebAppWaylandAGL(QString& winType, ApplicationDescription* desc = 0);
+    WebAppWaylandAGL(const std::string& winType, ApplicationDescription* desc = 0);
 };
 
 #endif /* WEBAPPWAYLANDAGL_H */

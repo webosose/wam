@@ -38,7 +38,7 @@ public:
         HINTING_FULL = 3
     };
 
-    WebPageBlink(const QUrl& url, ApplicationDescription* desc, const QString& launchParams);
+    WebPageBlink(const QUrl& url, ApplicationDescription* desc, const std::string& launchParams);
     ~WebPageBlink() override;
 
     // WebPageBase
@@ -65,9 +65,9 @@ public:
     bool isInputMethodActive() const override;
     void keyboardVisibilityChanged(bool visible) override;
     void updatePageSettings() override;
-    void handleDeviceInfoChanged(const QString& deviceInfo) override;
+    void handleDeviceInfoChanged(const std::string& deviceInfo) override;
     void evaluateJavaScript(const QString& jsCode) override;
-    void evaluateJavaScriptInAllFrames(const QString& jsCode, const char* method = "") override;
+    void evaluateJavaScriptInAllFrames(const std::string& jsCode, const char* method = "") override;
     void setForceActivateVtg(bool enabled) override;
     uint32_t getWebProcessProxyID() override;
     uint32_t getWebProcessPID() const override { return renderProcessPid(); }

@@ -16,7 +16,6 @@
 
 #include "WebAppFactoryManager.h"
 
-#include "LogManager.h"
 #include "WebAppBase.h"
 #include "WebAppManagerConfig.h"
 #include "WebAppManager.h"
@@ -28,7 +27,7 @@ WebAppFactoryManager::~WebAppFactoryManager()
 {
 }
 
-WebAppFactoryInterface* WebAppFactoryManager::getInterfaceInstance(QString appType)
+WebAppFactoryInterface* WebAppFactoryManager::getInterfaceInstance(const std::string& appType)
 {
     auto iter = m_interfaces.find(appType);
     if (iter != m_interfaces.end())
@@ -37,7 +36,8 @@ WebAppFactoryInterface* WebAppFactoryManager::getInterfaceInstance(QString appTy
     return loadInterfaceInstance(appType);
 }
 
-WebAppBase* WebAppFactoryManager::createWebApp(QString winType, ApplicationDescription* desc, QString appType)
+WebAppBase* WebAppFactoryManager::createWebApp(const std::string& winType, ApplicationDescription* desc,
+                                               const std::string& appType)
 {
     WebAppFactoryInterface* interface = getInterfaceInstance(appType);
     if (interface)
@@ -46,7 +46,8 @@ WebAppBase* WebAppFactoryManager::createWebApp(QString winType, ApplicationDescr
     return NULL;
 }
 
-WebAppBase* WebAppFactoryManager::createWebApp(QString winType, WebPageBase* page, ApplicationDescription* desc, QString appType)
+WebAppBase* WebAppFactoryManager::createWebApp(const std::string& winType, WebPageBase* page,
+                                               ApplicationDescription* desc, const std::string& appType)
 {
     WebAppFactoryInterface* interface = getInterfaceInstance(appType);
     if (interface)
@@ -55,7 +56,8 @@ WebAppBase* WebAppFactoryManager::createWebApp(QString winType, WebPageBase* pag
     return NULL;
 }
 
-WebPageBase* WebAppFactoryManager::createWebPage(QString winType, QUrl url, ApplicationDescription* desc, QString appType, QString launchParams)
+WebPageBase* WebAppFactoryManager::createWebPage(const std::string& winType, QUrl url, ApplicationDescription* desc,
+                                                 const std::string& appType, const std::string& launchParams)
 {
     WebPageBase *page = NULL;
 

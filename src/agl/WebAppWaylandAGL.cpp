@@ -17,7 +17,7 @@
 #include "WebAppWaylandAGL.h"
 #include "ApplicationDescription.h"
 
-WebAppWaylandAGL::WebAppWaylandAGL(QString& winType, ApplicationDescription* desc)
+WebAppWaylandAGL::WebAppWaylandAGL(const std::string& winType, ApplicationDescription* desc)
     : WebAppWayland(winType, desc->surfaceId(), desc->widthOverride(), desc->heightOverride())
 {
 }

@@ -25,9 +25,7 @@
 #include "WindowTypes.h"
 #include "LogManager.h"
 
-#include <QString>
-
-WebAppBase* WebAppFactoryAGL::createWebApp(QString winType, ApplicationDescription* desc)
+WebAppBase* WebAppFactoryAGL::createWebApp(const std::string& winType, ApplicationDescription* desc)
 {
     WebAppBase* app = 0;
 
@@ -46,12 +44,12 @@ WebAppBase* WebAppFactoryAGL::createWebApp(QString winType, ApplicationDescripti
     return app;
 }
 
-WebAppBase* WebAppFactoryAGL::createWebApp(QString winType, WebPageBase* page, ApplicationDescription* desc)
+WebAppBase* WebAppFactoryAGL::createWebApp(const std::string& winType, WebPageBase* page, ApplicationDescription* desc)
 {
     return createWebApp(winType, desc);
 }
 
-WebPageBase* WebAppFactoryAGL::createWebPage(QUrl url, ApplicationDescription* desc, QString launchParams)
+WebPageBase* WebAppFactoryAGL::createWebPage(QUrl url, ApplicationDescription* desc, const std::string& launchParams)
 {
     return new WebPageBlink(url, desc, launchParams);
 }

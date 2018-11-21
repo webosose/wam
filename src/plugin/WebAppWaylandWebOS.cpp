@@ -17,7 +17,7 @@
 #include "WebAppWaylandWebOS.h"
 #include "ApplicationDescription.h"
 
-WebAppWaylandWebOS::WebAppWaylandWebOS(QString& winType, ApplicationDescription* desc)
+WebAppWaylandWebOS::WebAppWaylandWebOS(const std::string& winType, ApplicationDescription* desc)
     : WebAppWayland(winType, desc->surfaceId(), desc->widthOverride(), desc->heightOverride())
 {
 }

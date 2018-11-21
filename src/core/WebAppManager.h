@@ -43,7 +43,7 @@ class Value;
 
 class ApplicationInfo {
 public:
-    ApplicationInfo(const QString& inInstanceId, const QString& inAppId, const uint32_t& inPid)
+    ApplicationInfo(const std::string& inInstanceId, const std::string& inAppId, const uint32_t& inPid)
         : instanceId(inInstanceId)
         , appId(inAppId)
         , pid(inPid)
@@ -51,8 +51,8 @@ public:
     }
     ~ApplicationInfo() {}
 
-    QString instanceId;
-    QString appId;
+    std::string instanceId;
+    std::string appId;
     uint32_t pid;
 };
 
@@ -66,7 +66,7 @@ public:
 
     bool getSystemLanguage(QString& value);
     bool getDeviceInfo(QString name, QString& value);
-    void broadcastWebAppMessage(WebAppMessageType type, const QString& message);
+    void broadcastWebAppMessage(WebAppMessageType type, const std::string& message);
 
     WebProcessManager* getWebProcessManager() { return m_webProcessManager; }
 
@@ -78,8 +78,8 @@ public:
 
     std::list<const WebAppBase*> runningApps();
     std::list<const WebAppBase*> runningApps(uint32_t pid);
-    WebAppBase* findAppById(const QString& appId);
-    WebAppBase* findAppByInstanceId(const QString& instanceId);
+    WebAppBase* findAppById(const std::string& appId);
+    WebAppBase* findAppByInstanceId(const std::string& instanceId);
 
     std::string launch(const std::string& appDescString,
         const std::string& params,
@@ -101,20 +101,20 @@ public:
     void reloadContainerApp();
     void setContainerAppReady(bool ready);
     void setContainerAppLaunched(bool launched);
-    QString& getContainerAppId();
+    std::string& getContainerAppId();
     WebAppBase* getContainerApp();
     int currentUiWidth();
     int currentUiHeight();
     void setUiSize(int width, int height);
 
-    void setActiveAppId(QString id) { m_activeAppId = id; }
-    const QString getActiveAppId() { return m_activeAppId; }
+    void setActiveAppId(std::string id) { m_activeAppId = id; }
+    const std::string getActiveAppId() { return m_activeAppId; }
 
     void onGlobalProperties(int key);
     bool purgeSurfacePool(uint32_t pid);
     bool onKillApp(const std::string& appId);
     bool isDiscardCodeCacheRequired();
-    bool setInspectorEnable(QString& appId);
+    bool setInspectorEnable(const std::string& appId);
     void discardCodeCache(uint32_t pid);
 
     void setSystemLanguage(QString value);
@@ -122,41 +122,41 @@ public:
     WebAppManagerConfig* config() { return m_webAppManagerConfig; }
 
     void requestActivity(WebAppBase* app);
-    const QString windowTypeFromString(const std::string& str);
+    const std::string windowTypeFromString(const std::string& str);
 
     bool closeAllApps(uint32_t pid = 0);
     bool closeContainerApp();
-    void setForceCloseApp(QString appId);
+    void setForceCloseApp(const std::string& appId);
     void requestKillWebProcess(uint32_t pid);
     bool shouldLaunchContainerAppOnDemand();
 
     int getSuspendDelay() { return m_suspendDelay; }
     void deleteStorageData(const std::string& identifier);
-    void killCustomPluginProcess(const QString& basePath);
-    bool processCrashed(QString appId);
+    void killCustomPluginProcess(const std::string& basePath);
+    bool processCrashed(const std::string& appId);
 
     void closeAppInternal(WebAppBase* app, bool ignoreCleanResource = false);
     void forceCloseAppInternal(WebAppBase* app);
 
     void webPageAdded(WebPageBase* page);
     void webPageRemoved(WebPageBase* page);
-    void removeWebAppFromWebProcessInfoMap(QString appId);
+    void removeWebAppFromWebProcessInfoMap(const std::string& appId);
 
     void appDeleted(WebAppBase* app);
     void postRunningAppList();
     std::string generateInstanceId();
-    void removeClosingAppList(const QString& appId);
+    void removeClosingAppList(const std::string& appId);
 
     bool isAccessibilityEnabled() { return m_isAccessibilityEnabled; }
     void setAccessibilityEnabled(bool enabled);
-    void postWebProcessCreated(const QString& appId, uint32_t pid);
-    uint32_t getWebProcessId(const QString& appId);
-    void sendEventToAllAppsAndAllFrames(const QString& jsscript);
-    void serviceCall(const QString& url, const QString& payload, const QString& appId);
+    void postWebProcessCreated(const std::string& appId, uint32_t pid);
+    uint32_t getWebProcessId(const std::string& appId);
+    void sendEventToAllAppsAndAllFrames(const std::string& jsscript);
+    void serviceCall(const std::string& url, const std::string& payload, const std::string& appId);
     void updateNetworkStatus(const Json::Value& object);
     void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level);
 
-    bool isEnyoApp(const QString& appId);
+    bool isEnyoApp(const std::string& appId);
 
     void closeApp(const std::string& appId);
 
@@ -169,11 +169,11 @@ protected:
 private:
     void loadEnvironmentVariable();
 
-    WebAppBase* onLaunchUrl(const std::string& url, QString winType,
+    WebAppBase* onLaunchUrl(const std::string& url, const std::string& winType,
         const ApplicationDescription* appDesc, const std::string& instanceId,
         const std::string& args, const std::string& launchingAppId,
         int& errCode, std::string& errMsg);
-    void onLaunchContainerBasedApp(const std::string& url, QString& winType,
+    void onLaunchContainerBasedApp(const std::string& url, const std::string& winType,
         const ApplicationDescription* appDesc, const std::string& args, const std::string& launchingAppId);
     std::string onLaunchContainerApp(const std::string& appDesc);
     void onRelaunchApp(const std::string& instanceId, const std::string& appId,
@@ -190,7 +190,7 @@ private:
     bool isContainerApp(const std::string& url);
     uint32_t getContainerAppProxyID();
 
-    std::unordered_map<QString, WebAppBase*> m_closingAppList;
+    std::unordered_map<std::string, WebAppBase*> m_closingAppList;
 
     // Mappings
     std::unordered_map<std::string, WebPageBase*> m_shellPageMap;
@@ -200,7 +200,7 @@ private:
     PageList m_pagesToDeleteList;
     bool m_deletingPages;
 
-    QString m_activeAppId;
+    std::string m_activeAppId;
 
     ServiceSender* m_serviceSender;
     ContainerAppManager* m_containerAppManager;
@@ -209,7 +209,7 @@ private:
     WebAppManagerConfig* m_webAppManagerConfig;
     NetworkStatusManager* m_networkStatusManager;
 
-    std::unordered_map<QString, int> m_lastCrashedAppIds;
+    std::unordered_map<std::string, int> m_lastCrashedAppIds;
 
     int m_suspendDelay;
 
