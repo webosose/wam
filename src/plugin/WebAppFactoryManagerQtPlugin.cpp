@@ -29,7 +29,7 @@
 
 class WebAppFactoryManagerQtPlugin : public WebAppFactoryManager {
 protected:
-    virtual WebAppFactoryInterface* loadInterfaceInstance(QString appType);
+    virtual WebAppFactoryInterface* loadInterfaceInstance(const std::string& appType);
 
 private:
     friend class WebAppFactoryManager;
@@ -66,8 +66,9 @@ WebAppFactoryManagerQtPlugin::WebAppFactoryManagerQtPlugin()
         loadInterfaceInstance({});
 }
 
-WebAppFactoryInterface* WebAppFactoryManagerQtPlugin::loadInterfaceInstance(QString appType)
+WebAppFactoryInterface* WebAppFactoryManagerQtPlugin::loadInterfaceInstance(const std::string& appType_)
 {
+    QString appType = QString::fromStdString(appType_);
     if (!appType.isEmpty() && !m_factoryEnv.contains(appType))
         return nullptr;
 
@@ -84,7 +85,7 @@ WebAppFactoryInterface* WebAppFactoryManagerQtPlugin::loadInterfaceInstance(QStr
             if (plugin) {
                 interface = qobject_cast<WebAppFactoryInterface*>(plugin);
                 if (interface)
-                    m_interfaces.insert(key, interface);
+                    m_interfaces.emplace(key.toStdString(), interface);
                 if (!appType.isEmpty())
                     return interface;
             } else {

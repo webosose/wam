@@ -25,7 +25,7 @@ class ApplicationDescription;
 
 class WebAppWaylandAGL : public WebAppWayland {
 public:
-    WebAppWaylandAGL(QString& winType, std::shared_ptr<ApplicationDescription> desc = 0);
+    WebAppWaylandAGL(const std::string& winType, std::shared_ptr<ApplicationDescription> desc = 0);
 };
 
 #endif /* WEBAPPWAYLANDAGL_H */

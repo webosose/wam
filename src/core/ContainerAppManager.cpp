@@ -26,7 +26,7 @@
 #include "WebPageBase.h"
 #include "WindowTypes.h"
 
-static QString s_containerAppId = "com.webos.app.container";
+static std::string s_containerAppId = "com.webos.app.container";
 static int kContainerAppLaunchDuration = 300;
 static int kContainerAppLaunchCpuThresh = 500; // 100 = 10%
 static int kContainerAppLaunchTryMax = 20;
@@ -65,7 +65,7 @@ void ContainerAppManager::loadContainerInfo()
         if(containerSettings.isObject()) {
             auto appId = containerSettings["appId"];
             if(appId.isString())
-                s_containerAppId = QString::fromStdString(appId.asString());
+                s_containerAppId = appId.asString();
 
             auto relaunchDelay = containerSettings["relaunchDelay"];
             if(relaunchDelay.isDouble())
@@ -77,7 +77,7 @@ void ContainerAppManager::loadContainerInfo()
         }
     }
 
-    LOG_DEBUG("Container settings: app_id=%s, delay=%d, thresh=%d", qPrintable(s_containerAppId), kContainerAppLaunchDuration, kContainerAppLaunchCpuThresh);
+    LOG_DEBUG("Container settings: app_id=%s, delay=%d, thresh=%d", s_containerAppId.c_str(), kContainerAppLaunchDuration, kContainerAppLaunchCpuThresh);
 }
 
 void ContainerAppManager::startContainerTimer()
@@ -93,7 +93,7 @@ void ContainerAppManager::stopContainerTimer()
     m_containerAppLaunchTimer.stop();
 }
 
-QString& ContainerAppManager::getContainerAppId()
+std::string& ContainerAppManager::getContainerAppId()
 {
     return s_containerAppId;
 }
@@ -145,7 +145,7 @@ WebAppBase* ContainerAppManager::launchContainerAppInternal(const std::string& i
     app->setAppDescription(desc);
     app->setHiddenWindow(true);
 
-    app->setInstanceId(QString::fromStdString(instanceId));
+    app->setInstanceId(instanceId);
     app->attach(page);
     page->load();
     WebAppManager::instance()->webPageAdded(page);

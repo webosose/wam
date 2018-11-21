@@ -60,7 +60,7 @@ public:
     virtual void onStageDeactivated() = 0;
     virtual void startLaunchTimer() {}
     virtual void setHiddenWindow(bool hidden);
-    virtual void configureWindow(QString& type) = 0;
+    virtual void configureWindow(const std::string& type) = 0;
     virtual void setKeepAlive(bool keepAlive);
     virtual bool isWindowed() const;
     virtual void relaunch(const QString& args, const QString& launchingAppId);
@@ -95,18 +95,18 @@ public:
     void setForceClose();
     bool forceClose();
     WebPageBase* page() const;
-    void handleWebAppMessage(WebAppManager::WebAppMessageType type, const QString& message);
+    void handleWebAppMessage(WebAppManager::WebAppMessageType type, const std::string& message);
     void setAppId(const QString& appId);
-    void setLaunchingAppId(const QString& appId);
+    void setLaunchingAppId(const std::string& appId);
     QString appId() const;
-    QString launchingAppId() const;
-    void setInstanceId(const QString& instanceId);
-    QString instanceId() const;
+    std::string launchingAppId() const;
+    void setInstanceId(const std::string& instanceId);
+    std::string instanceId() const;
     QString url() const;
 
     ApplicationDescription* getAppDescription() const;
 
-    void setAppProperties(QString properties);
+    void setAppProperties(const std::string& properties);
 
     void setNeedReload(bool status) { m_needReload = status; }
     bool needReload() { return m_needReload; }
@@ -119,9 +119,9 @@ public:
     void dispatchUnload();
 
     void setUseAccessibility(bool enabled);
-    void serviceCall(const QString& url, const QString& payload, const QString& appId);
+    void serviceCall(const std::string& url, const std::string& payload, const std::string& appId);
 
-    void setPreloadState(QString properties);
+    void setPreloadState(const std::string& properties);
     void clearPreloadState();
     PreloadState preloadState() { return m_preloadState; }
 
@@ -142,7 +142,7 @@ protected:
     virtual void showWindow();
 
     void setUiSize(int width, int height);
-    void setActiveAppId(QString id);
+    void setActiveAppId(const std::string& id);
     void forceCloseAppInternal();
     void closeAppInternal();
 

@@ -55,9 +55,9 @@ public:
     WebPageBase* m_page;
     bool m_keepAlive;
     bool m_forceClose;
-    QString m_launchingAppId;
+    std::string m_launchingAppId;
     QString m_appId;
-    QString m_instanceId;
+    std::string m_instanceId;
     QString m_url;
     std::shared_ptr<ApplicationDescription> m_appDesc;
 };
@@ -146,7 +146,7 @@ void WebAppBase::setAppId(const QString& appId)
     d->m_appId = appId;
 }
 
-void WebAppBase::setLaunchingAppId(const QString& appId)
+void WebAppBase::setLaunchingAppId(const std::string& appId)
 {
     d->m_launchingAppId = appId;
 }
@@ -156,12 +156,12 @@ QString WebAppBase::appId() const
     return d->m_appId;
 }
 
-void WebAppBase::setInstanceId(const QString& instanceId)
+void WebAppBase::setInstanceId(const std::string& instanceId)
 {
     d->m_instanceId = instanceId;
 }
 
-QString WebAppBase::instanceId() const
+std::string WebAppBase::instanceId() const
 {
     return d->m_instanceId;
 }
@@ -171,7 +171,7 @@ QString WebAppBase::url() const
     return d->m_url;
 }
 
-QString WebAppBase::launchingAppId() const
+std::string WebAppBase::launchingAppId() const
 {
     return d->m_launchingAppId;
 }
@@ -199,7 +199,7 @@ int WebAppBase::currentUiHeight()
     return WebAppManager::instance()->currentUiHeight();
 }
 
-void WebAppBase::setActiveAppId(QString id)
+void WebAppBase::setActiveAppId(const std::string& id)
 {
     WebAppManager::instance()->setActiveAppId(id);
 }
@@ -351,10 +351,10 @@ void WebAppBase::setAppDescription(std::shared_ptr<ApplicationDescription> appDe
    d->m_appId = QString::fromStdString(appDesc->id());
 }
 
-void WebAppBase::setAppProperties(QString properties)
+void WebAppBase::setAppProperties(const std::string& properties)
 {
     Json::Value obj;
-    readJsonFromString(properties.toStdString(), obj);
+    readJsonFromString(properties, obj);
 
     if (obj["keepAlive"].asBool())
         setKeepAlive(true);
@@ -365,10 +365,10 @@ void WebAppBase::setAppProperties(QString properties)
         setHiddenWindow(true);
 }
 
-void WebAppBase::setPreloadState(QString properties)
+void WebAppBase::setPreloadState(const std::string& properties)
 {
     Json::Value obj;
-    readJsonFromString(properties.toStdString(), obj);
+    readJsonFromString(properties, obj);
 
     std::string preload = obj["preload"].asString();
 
@@ -447,7 +447,7 @@ void WebAppBase::setPreferredLanguages(QString language)
     d->m_page->sendLocaleChangeEvent(language);
 }
 
-void WebAppBase::handleWebAppMessage(WebAppManager::WebAppMessageType type, const QString& message)
+void WebAppBase::handleWebAppMessage(WebAppManager::WebAppMessageType type, const std::string& message)
 {
     if (!d->m_page)
         return;
@@ -502,9 +502,10 @@ void WebAppBase::didDispatchUnload()
 void WebAppBase::closeWebApp()
 {
     LOG_INFO(MSGID_CLEANRESOURCE_COMPLETED, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "closeCallback/about:blank is DONE");
-    WebAppManager::instance()->removeClosingAppList(appId());
+    WebAppManager::instance()->removeClosingAppList(appId().toStdString()); // FIXME: WebApp: qstr2stdstr
 #ifdef PRELOADMANAGER_ENABLED
-    if (appId() == WebAppManager::instance()->getContainerAppId())
+    // FIXME: WebApp: qstr2stdstr
+    if (appId().toStdString() == WebAppManager::instance()->getContainerAppId())
         WebAppManager::instance()->closeContainerApp();
     else
 #endif
@@ -518,12 +519,12 @@ void WebAppBase::dispatchUnload()
 
 void WebAppBase::onCursorVisibilityChanged(const QString& jsscript)
 {
-    WebAppManager::instance()->sendEventToAllAppsAndAllFrames(jsscript);
+    WebAppManager::instance()->sendEventToAllAppsAndAllFrames(jsscript.toStdString()); // FIXME: WebApp: qstr2stdstr
 }
 
-void WebAppBase::serviceCall(const QString& url, const QString& payload, const QString& appId)
+void WebAppBase::serviceCall(const std::string& url, const std::string& payload, const std::string& appId)
 {
-    LOG_INFO(MSGID_SERVICE_CALL, 2, PMLOGKS("APP_ID", qPrintable(appId)), PMLOGKS("URL", qPrintable(url)), "");
+    LOG_INFO(MSGID_SERVICE_CALL, 2, PMLOGKS("APP_ID", appId.c_str()), PMLOGKS("URL", url.c_str()), "");
     WebAppManager::instance()->serviceCall(url, payload, appId);
 }
 

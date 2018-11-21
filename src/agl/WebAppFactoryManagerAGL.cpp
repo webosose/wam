@@ -25,7 +25,7 @@
 
 class WebAppFactoryManagerAGL : public WebAppFactoryManager {
 protected:
-    virtual WebAppFactoryInterface* loadInterfaceInstance(QString appType);
+    virtual WebAppFactoryInterface* loadInterfaceInstance(const std::string& appType);
 
 private:
     friend class WebAppFactoryManager;
@@ -48,9 +48,9 @@ WebAppFactoryManagerAGL::WebAppFactoryManagerAGL()
     m_interfaces.emplace(kDefaultAppType, m_defaultInterface);
 }
 
-WebAppFactoryInterface* WebAppFactoryManagerAGL::loadInterfaceInstance(QString appType)
+WebAppFactoryInterface* WebAppFactoryManagerAGL::loadInterfaceInstance(const std::string& appType)
 {
-    if (!appType.isEmpty())
+    if (!appType.empty())
         return nullptr;
 
     return m_defaultInterface;

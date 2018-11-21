@@ -28,9 +28,9 @@ class WebAppFactoryLuna : public QObject,
     Q_INTERFACES(WebAppFactoryInterface)
 
 public:
-    virtual WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr);
-    virtual WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr);
-    virtual WebPageBase* createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, QString launchParams = "");
+    virtual WebAppBase* createWebApp(const std::string& winType, std::shared_ptr<ApplicationDescription> desc = 0);
+    virtual WebAppBase* createWebApp(const std::string& winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = 0);
+    virtual WebPageBase* createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, const std::string& launchParams = "");
 };
 
 #endif /* WEBAPPFACTORYLUNA_H */

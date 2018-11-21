@@ -25,9 +25,7 @@
 #include "WindowTypes.h"
 #include "LogManager.h"
 
-#include <QString>
-
-WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc)
+WebAppBase* WebAppFactoryLuna::createWebApp(const std::string& winType, std::shared_ptr<ApplicationDescription> desc)
 {
     WebAppBase* app = nullptr;
 
@@ -46,12 +44,12 @@ WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, std::shared_ptr<App
     return app;
 }
 
-WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc)
+WebAppBase* WebAppFactoryLuna::createWebApp(const std::string& winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc)
 {
     return createWebApp(winType, desc);
 }
 
-WebPageBase* WebAppFactoryLuna::createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, QString launchParams)
+WebPageBase* WebAppFactoryLuna::createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, const std::string& launchParams)
 {
     return new WebPageBlink(url, desc, launchParams);
 }

@@ -23,11 +23,12 @@ class ServiceSenderLuna : public ServiceSender {
 public:
     void requestActivity(WebAppBase* app) override;
 #ifndef PRELOADMANAGER_ENABLED
-    void launchContainerApp(const QString& id) override;
+    void launchContainerApp(const std::string& id) override;
 #endif
     void postlistRunningApps(std::vector<ApplicationInfo>& apps) override;
-    void postWebProcessCreated(const QString& appId, uint32_t pid) override;
-    void serviceCall(const QString& url, const QString& payload, const QString& appId) override;
+    void postWebProcessCreated(const std::string& appId, uint32_t pid) override;
+    void serviceCall(const std::string& url, const std::string& payload,
+                     const std::string& appId) override;
     void closeApp(const std::string& id) override;
 };
 
