@@ -15,14 +15,18 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "PalmSystemBase.h"
-#include "WebAppManager.h"
+
+#include <sstream>
 
 #include <QByteArray>
 #include <QFile>
 
-QString PalmSystemBase::getDeviceInfo(QString name)
+#include "WebAppManager.h"
+
+
+std::string PalmSystemBase::getDeviceInfo(const std::string& name)
 {
-    QString value;
+    std::string value;
     WebAppManager::instance()->getDeviceInfo(name, value);
 
     return value;
@@ -41,22 +45,22 @@ QVariant PalmSystemBase::getResource(QVariant a, QVariant b)
 
 QString PalmSystemBase::country() const
 {
-    QString localcountry;
-    QString smartServiceCountry;
-    QString country;
+    std::string localcountry;
+    std::string smartServiceCountry;
 
     WebAppManager::instance()->getDeviceInfo("LocalCountry", localcountry);
     WebAppManager::instance()->getDeviceInfo("SmartServiceCountry", smartServiceCountry);
 
-    country = QString("{ \"country\": \"%1\", \"smartServiceCountry\": \"%2\" }");
-    country = country.arg(localcountry).arg(smartServiceCountry);
+    std::stringstream jss;
+    jss << "{ \"country\": \"" << localcountry
+        << "\", \"smartServiceCountry\": \"" << smartServiceCountry << "\" }";
 
-    return country;
+    return QString::fromStdString(jss.str()); // FIXME: PalmSystem: qstr2stdstr
 }
 
-QString PalmSystemBase::locale() const
+std::string PalmSystemBase::locale() const
 {
-    QString systemlocale;
+    std::string systemlocale;
     WebAppManager::instance()->getSystemLanguage(systemlocale);
     return systemlocale;
 }

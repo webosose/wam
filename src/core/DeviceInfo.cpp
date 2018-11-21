@@ -16,60 +16,61 @@
 
 #include "DeviceInfo.h"
 
+#include "StringUtils.h"
+
 bool DeviceInfo::getDisplayWidth(int &value)
 {
     bool ret = false;
-    QString valueStr;
+    std::string valueStr;
 
     ret = getDeviceInfo("DisplayWidth", valueStr);
-    value = valueStr.toInt();
+    value = stringTo<int>(valueStr);
 
     return ret;
 }
 
 void DeviceInfo::setDisplayWidth(int value)
 {
-    m_deviceInfo.insert(std::make_pair("DisplayWidth", QString::number(value)));
+    m_deviceInfo.emplace("DisplayWidth", std::to_string(value));
 }
 
 bool DeviceInfo::getDisplayHeight(int &value)
 {
     bool ret = false;
-    QString valueStr;
+    std::string valueStr;
 
     ret = getDeviceInfo("DisplayHeight", valueStr);
-    value = valueStr.toInt();
+    value = stringTo<int>(valueStr);
 
     return ret;
 }
 
 void DeviceInfo::setDisplayHeight(int value)
 {
-    m_deviceInfo.insert(std::make_pair("DisplayHeight", QString::number(value)));
+    m_deviceInfo.emplace("DisplayHeight", std::to_string(value));
 }
 
-bool DeviceInfo::getSystemLanguage(QString &value)
+bool DeviceInfo::getSystemLanguage(std::string &value)
 {
     return getDeviceInfo("SystemLanguage", value);
 }
 
-void DeviceInfo::setSystemLanguage(QString value)
+void DeviceInfo::setSystemLanguage(const std::string &value)
 {
-    m_deviceInfo.insert(std::make_pair("SystemLanguage", value));
+    m_deviceInfo.emplace("SystemLanguage", value);
 }
 
-bool DeviceInfo::getDeviceInfo(QString name, QString &value)
+bool DeviceInfo::getDeviceInfo(const std::string& name, std::string& value)
 {
     auto v = m_deviceInfo.find(name);
     if (v != m_deviceInfo.end()) {
         value = v->second;
         return true;
     }
-
     return false;
 }
 
-void DeviceInfo::setDeviceInfo(QString name, QString value)
+void DeviceInfo::setDeviceInfo(const std::string& name, const std::string& value)
 {
-    m_deviceInfo.insert(std::make_pair(name, value));
+    m_deviceInfo.emplace(name, value);
 }

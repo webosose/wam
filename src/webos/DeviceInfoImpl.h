@@ -22,8 +22,6 @@
 class DeviceInfoImpl : public DeviceInfo {
 public:
     DeviceInfoImpl();
-    virtual bool getDeviceInfo(QString name, QString& value);
-    virtual void setDeviceInfo(QString name, QString value);
 
 private:
     int m_screenWidth;
