@@ -84,7 +84,7 @@ public:
     virtual void updatePageSettings() = 0;
     virtual void handleDeviceInfoChanged(const std::string& deviceInfo) = 0;
     virtual bool relaunch(const QString& args, const QString& launchingAppId);
-    virtual void evaluateJavaScript(const QString& jsCode) = 0;
+    virtual void evaluateJavaScript(const std::string& jsCode) = 0;
     virtual void evaluateJavaScriptInAllFrames(const std::string& jsCode, const char* method = "") = 0;
     virtual void setForceActivateVtg(bool enabled) = 0;
     virtual uint32_t getWebProcessProxyID() = 0;
