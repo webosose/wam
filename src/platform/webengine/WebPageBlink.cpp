@@ -17,6 +17,7 @@
 #include "WebPageBlink.h"
 
 #include <cmath>
+#include <sstream>
 
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
@@ -541,25 +542,26 @@ QString WebPageBlink::escapeData(const QString& value)
 
 void WebPageBlink::reloadExtensionData()
 {
-    QString eventJS = QStringLiteral(
+    std::string eventJS =
        "if (typeof(PalmSystem) != 'undefined') {"
        "  PalmSystem.reloadInjectionData();"
-       "};"
-    );
+       "};";
     LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "Reload");
     evaluateJavaScript(eventJS);
 }
 
 void WebPageBlink::updateExtensionData(const QString& key, const QString& value)
 {
-    QString eventJS = QStringLiteral(
-       "if (typeof(PalmSystem) != 'undefined') {"
-       "  PalmSystem.updateInjectionData('%1', '%2');"
-       "};"
-    ).arg(escapeData(key)).arg(escapeData(value));
+    std::stringstream eventJS;
+    eventJS
+       << "if (typeof(PalmSystem) != 'undefined') {"
+       << "  PalmSystem.updateInjectionData('" << escapeData(key).toStdString() // FIXME: WebPage: qstr2stdstr
+       << "', '" << escapeData(value).toStdString() << "');" // FIXME: WebPage: qstr2stdstr
+       << "};";
+
     LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "Update; key:%s; value:%s",
         qPrintable(key), qPrintable(value));
-    evaluateJavaScript(eventJS);
+    evaluateJavaScript(eventJS.str());
 }
 
 void WebPageBlink::updatePageSettings()
@@ -597,9 +599,9 @@ void WebPageBlink::handleDeviceInfoChanged(const std::string& deviceInfo)
         d->m_palmSystem->setCountry();
 }
 
-void WebPageBlink::evaluateJavaScript(const QString& jsCode)
+void WebPageBlink::evaluateJavaScript(const std::string& jsCode)
 {
-    d->pageView->RunJavaScript(jsCode.toStdString());
+    d->pageView->RunJavaScript(jsCode);
 }
 
 void WebPageBlink::evaluateJavaScriptInAllFrames(const std::string& script, const char *method)
@@ -950,10 +952,12 @@ void WebPageBlink::setHasOnCloseCallback(bool hasCloseCallback)
 
 void WebPageBlink::executeCloseCallback(bool forced)
 {
-    QString script = QStringLiteral(
-       "window.PalmSystem._onCloseWithNotify_('%1');").arg(forced?"forced" : "normal");
-
-    evaluateJavaScript(script);
+    std::stringstream script;
+    script
+        << "window.PalmSystem._onCloseWithNotify_('"
+        << (forced ? "forced" : "normal")
+        << "');";
+    evaluateJavaScript(script.str());
 
     m_closeCallbackTimer.start(kExecuteCloseCallbackTimeOutMs, this, &WebPageBlink::timeoutCloseCallback);
 }
@@ -1105,13 +1109,14 @@ bool WebPageBlink::acceptsAudioCapture()
 
 void WebPageBlink::keyboardVisibilityChanged(bool visible)
 {
-    QString javascript = QStringLiteral(
-        "console.log('[WAM] fires keyboardStateChange event : %1');"
-        "    var keyboardStateEvent =new CustomEvent('keyboardStateChange', { detail: { 'visibility' : %2 } });"
-        "    keyboardStateEvent.visibility = %3;"
-        "    if(document) document.dispatchEvent(keyboardStateEvent);"
-    ).arg(visible ? "true" : "false").arg(visible ? "true" : "false").arg(visible ? "true" : "false");
-    evaluateJavaScript(javascript);
+    std::stringstream javascript;
+    std::string v = visible ? "true" : "false";
+    javascript
+        << "console.log('[WAM] fires keyboardStateChange event : " << v << "');"
+        << "var keyboardStateEvent =new CustomEvent('keyboardStateChange', { detail: { 'visibility' : " << v << " } });"
+        << "keyboardStateEvent.visibility = " << v << ";"
+        << "if(document) document.dispatchEvent(keyboardStateEvent);";
+    evaluateJavaScript(javascript.str());
 }
 
 void WebPageBlink::updateIsLoadErrorPageFinish()

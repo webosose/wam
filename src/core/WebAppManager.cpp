@@ -28,6 +28,7 @@
 #include "NetworkStatusManager.h"
 #include "PlatformModuleFactory.h"
 #include "ServiceSender.h"
+#include "StringUtils.h"
 #include "WebAppBase.h"
 #include "WebAppFactoryManager.h"
 #include "WebAppManagerConfig.h"
@@ -154,6 +155,47 @@ bool WebAppManager::getDeviceInfo(QString name, QString &value)
     return m_deviceInfo->getDeviceInfo(name, value);
 }
 
+static void buildAppJsTriggers(std::string &eventJS, std::string &versionJS,
+                               const ApplicationDescription *app,
+                               const std::string &launchDetail)
+{
+    using std::string;
+    using std::stringstream;
+
+    string detail = launchDetail.empty() ? "{}" : launchDetail;
+    string title = app->title();
+    string folderPath = app->folderPath();
+    string containerCSS = app->containerCSS();
+    string containerJS = app->containerJS();
+
+    replaceSubstrings(detail, "'", "\\'");
+    replaceSubstrings(title, "'", "\\'");
+    replaceSubstrings(folderPath, "'", "\\'");
+    replaceSubstrings(containerCSS, "'", "\\'");
+    replaceSubstrings(containerJS, "'", "\\'");
+
+    stringstream ejs;
+    ejs << "setTimeout(function () {"
+        << "    var launchEvent=new CustomEvent('webOSContainer', { detail: " << detail << " });"
+        << "    launchEvent.containerName='" << title << "';"
+        << "    launchEvent.containerDirectory='" << folderPath << "';"
+        << "    launchEvent.containerStyle='" << containerCSS << "';"
+        << "    launchEvent.containerScript='" << containerJS << "';"
+        << "    document.dispatchEvent(launchEvent);"
+        << "}, 1);";
+    eventJS = ejs.str();
+
+
+    string version = app->enyoBundleVersion();
+    if (!version.empty()) {
+        stringstream vjs;
+        vjs << "if (container.setVersion != null) {"
+            << "    container.setVersion('" << version << "');"
+            << "}";
+        versionJS = vjs.str();
+    }
+}
+
 void WebAppManager::onLaunchContainerBasedApp(const std::string& url, const std::string& winType,
                                               const ApplicationDescription* appDesc,
                                               const std::string& args, const std::string& launchingAppId)
@@ -202,7 +244,6 @@ void WebAppManager::onLaunchContainerBasedApp(const std::string& url, const std:
 
     app->setWasContainerApp(true);
 
-    QString launchDetail(args.c_str());
     app->configureWindow(winType);
     page->updatePageSettings();
     page->reloadExtensionData();
@@ -210,32 +251,10 @@ void WebAppManager::onLaunchContainerBasedApp(const std::string& url, const std:
     //repost web process status to QoSM
     postWebProcessCreated(appId.c_str(), getWebProcessId(appId));
 
-    QString eventJS = QStringLiteral(
-        "setTimeout(function () {"
-        "    var launchEvent=new CustomEvent('webOSContainer', { detail: %1 });"
-        "    launchEvent.containerName='%2';"
-        "    launchEvent.containerDirectory='%3';"
-        "    launchEvent.containerStyle='%4';"
-        "    launchEvent.containerScript='%5';"
-        "    document.dispatchEvent(launchEvent);"
-        "}, 1);"
-    );
-
-    page->evaluateJavaScript(eventJS
-        .arg(launchDetail.size() ? launchDetail.replace(QChar('\''), QString("\\'")) : "{}")
-        .arg(QString::fromStdString(appDesc->title()).replace(QChar('\''), QString("\\'")))
-        .arg(QString::fromStdString(appDesc->folderPath()).replace(QChar('\''), QString("\\'")))
-        .arg(QString::fromStdString(appDesc->containerCSS()).replace(QChar('\''), QString("\\'")))
-        .arg(QString::fromStdString(appDesc->containerJS()).replace(QChar('\''), QString("\\'")))
-    );
-
-    if (!appDesc->enyoBundleVersion().empty()) {
-        page->evaluateJavaScript(QStringLiteral(
-            "if (container.setVersion != null) {"
-            "    container.setVersion('%1');"
-            "}"
-        ).arg(QString::fromStdString(appDesc->enyoBundleVersion())));
-    }
+    std::string eventJS, versionJS;
+    buildAppJsTriggers(eventJS, versionJS, appDesc, args);
+    page->evaluateJavaScript(eventJS);
+    page->evaluateJavaScript(versionJS);
 
     webPageAdded(page);
 

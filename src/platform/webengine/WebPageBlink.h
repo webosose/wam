@@ -66,7 +66,7 @@ public:
     void keyboardVisibilityChanged(bool visible) override;
     void updatePageSettings() override;
     void handleDeviceInfoChanged(const std::string& deviceInfo) override;
-    void evaluateJavaScript(const QString& jsCode) override;
+    void evaluateJavaScript(const std::string& jsCode) override;
     void evaluateJavaScriptInAllFrames(const std::string& jsCode, const char* method = "") override;
     void setForceActivateVtg(bool enabled) override;
     uint32_t getWebProcessProxyID() override;

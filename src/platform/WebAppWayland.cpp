@@ -17,6 +17,7 @@
 #include "WebAppWayland.h"
 
 #include <unordered_map>
+#include <sstream>
 #include <json/json.h>
 
 #include "ApplicationDescription.h"
@@ -634,12 +635,13 @@ void WebAppWayland::sendWebOSMouseEvent(const QString& eventName)
 {
     if (eventName == "Enter" || eventName == "Leave") {
         // send webOSMouse event to app
-        QString javascript = QStringLiteral(
-            "console.log('[WAM] fires webOSMouse event : %1');"
-            "var mouseEvent =new CustomEvent('webOSMouse', { detail: { type : '%2' }});"
-            "document.dispatchEvent(mouseEvent);").arg(eventName).arg(eventName);
+        std::stringstream javascript;
+        javascript
+            << "console.log('[WAM] fires webOSMouse event : " << eventName.toStdString() << "');" // FIXME: WebApp: qstr2stdstr
+            << "var mouseEvent =new CustomEvent('webOSMouse', { detail: { type : '" << eventName.toStdString() << "' }});"
+            << "document.dispatchEvent(mouseEvent);";
         LOG_DEBUG("[%s] WebAppWayland::sendWebOSMouseEvent; dispatch webOSMouse; %s", qPrintable(appId()), qPrintable(eventName));
-        page()->evaluateJavaScript(javascript);
+        page()->evaluateJavaScript(javascript.str());
     }
 }
 
