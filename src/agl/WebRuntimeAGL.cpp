@@ -79,36 +79,32 @@ public:
     }
 };
 
-void Launcher::register_surfpid(pid_t surf_pid)
+void Launcher::register_surfpid(pid_t app_pid, pid_t surf_pid)
 {
-  if (surf_pid == m_rid) {
-    if (!std::count(m_pid_v.begin(), m_pid_v.end(), surf_pid)) {
-      fprintf(stderr, "surface creator(pid=%d) registered\r\n", surf_pid);
-      m_pid_v.push_back(surf_pid);
-      fprintf(stderr, "m_pid_v.count(%d) = %d\r\n", surf_pid,
-                (int)std::count(m_pid_v.begin(), m_pid_v.end(), surf_pid));
-    }
+  if (app_pid != m_rid)
+    return;
+  bool result = m_pid_map.insert({app_pid, surf_pid}).second;
+  if (!result) {
+    fprintf(stderr, "register_surfpid, (app_pid=%d) already registered surface_id with (surface_id=%d)\r\n",
+            (int)app_pid, (int)surf_pid);
   }
 }
 
-void Launcher::unregister_surfpid(pid_t surf_pid)
+void Launcher::unregister_surfpid(pid_t app_pid, pid_t surf_pid)
 {
-  auto itr = m_pid_v.begin();
-  while (itr != m_pid_v.end()) {
-    if (*itr == surf_pid) {
-      m_pid_v.erase(itr++);
-    } else {
-      ++itr;
-    }
+  size_t erased_count = m_pid_map.erase(app_pid);
+  if (erased_count == 0) {
+    fprintf(stderr, "unregister_surfpid, (app_pid=%d) doesn't have a registered surface\r\n",
+            (int)app_pid);
   }
 }
 
-pid_t Launcher::find_surfpid_by_rid(pid_t rid)
+pid_t Launcher::find_surfpid_by_rid(pid_t app_pid)
 {
-  fprintf(stderr, "find surfpid by rid(%d)\r\n", rid);
-  if (std::count(m_pid_v.begin(), m_pid_v.end(), rid)) {
-    fprintf(stderr, "found return(%d)\r\n", rid);
-    return rid;
+  auto surface_id = m_pid_map.find(app_pid);
+  if (surface_id != m_pid_map.end()) {
+    fprintf(stderr, "found return(%d, %d)\r\n", (int)app_pid, (int)surface_id->second);
+    return surface_id->second;
   }
   return -1;
 }
@@ -427,18 +423,18 @@ void WebAppLauncherRuntime::notify_ivi_control_cb (ilmObjectType object, t_ilm_u
     struct ilmSurfaceProperties surf_props;
 
     ilm_getPropertiesOfSurface(id, &surf_props);
-    pid_t surf_pid = id;//surf_props.creatorPid;
+    pid_t surf_pid = surf_props.creatorPid;
 
     if (!created) {
-      fprintf(stderr, "ivi surface (id=%d, pid=%d) destroyed.\r\n", id, surf_pid);
-      m_launcher->unregister_surfpid(surf_pid);
+      fprintf(stderr, "ivi surface (id=%d, surf_pid=%d) [m_rid:%d] destroyed.\r\n", id, surf_pid, m_launcher->m_rid);
+      m_launcher->unregister_surfpid(id, surf_pid);
       m_surfaces.erase(surf_pid);
       return;
     }
 
-    fprintf(stderr, "ivi surface (id=%d, pid=%d) is created.\r\n", id, surf_pid);
+    fprintf(stderr, "ivi surface (id=%d, surf_pid=%d) [m_rid:%d] is created.\r\n", id, surf_pid, m_launcher->m_rid);
 
-    m_launcher->register_surfpid(surf_pid);
+    m_launcher->register_surfpid(id, surf_pid);
     if (m_launcher->m_rid &&
         surf_pid == m_launcher->find_surfpid_by_rid(m_launcher->m_rid)) {
       setup_surface(id);
