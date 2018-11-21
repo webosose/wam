@@ -5,7 +5,7 @@
 #include <memory>
 #include <signal.h>
 #include <string>
-#include <vector>
+#include <unordered_map>
 
 #include <ilm/ilm_control.h>
 
@@ -31,14 +31,14 @@ class ILMControl
 
 class Launcher {
 public:
-  virtual void register_surfpid(pid_t surf_pid);
-  virtual void unregister_surfpid(pid_t surf_pid);
+  virtual void register_surfpid(pid_t app_pid, pid_t surf_pid);
+  virtual void unregister_surfpid(pid_t app_pid, pid_t surf_pid);
   virtual pid_t find_surfpid_by_rid(pid_t app_pid);
   virtual int launch(const std::string& id, const std::string& uri) = 0;
   virtual int loop(int argc, const char** argv, volatile sig_atomic_t& e_flag) = 0;
 
   int m_rid = 0;
-  std::vector<pid_t> m_pid_v;
+  std::unordered_map<pid_t, pid_t> m_pid_map; // pair of <app_pid, pid which creates a surface>
 };
 
 class TinyProxy {
