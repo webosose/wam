@@ -31,6 +31,7 @@
 #include "BlinkWebViewProfileHelper.h"
 #include "LogManager.h"
 #include "PalmSystemBlink.h"
+#include "StringUtils.h"
 #include "WebAppManagerConfig.h"
 #include "WebAppManagerTracer.h"
 #include "WebPageObserver.h"
@@ -168,7 +169,7 @@ void WebPageBlink::init()
 
     d->pageView->SetFontHinting(webos::WebViewBase::FontRenderParams::HINTING_SLIGHT);
 
-    QString language;
+    std::string language;
     getSystemLanguage(language);
     setPreferredLanguages(language);
     d->pageView->SetAppId(appId().toStdString());
@@ -258,7 +259,7 @@ uint32_t WebPageBlink::getWebProcessProxyID()
     return 0;
 }
 
-void WebPageBlink::setPreferredLanguages(const QString& language)
+void WebPageBlink::setPreferredLanguages(const std::string& language)
 {
     if (d->m_palmSystem)
         d->m_palmSystem->setLocale(language);
@@ -266,7 +267,7 @@ void WebPageBlink::setPreferredLanguages(const QString& language)
 #ifndef TARGET_DESKTOP
     // just set system language for accept-language for http header, navigator.language, navigator.languages
     // even window.languagechange event too
-    d->pageView->SetAcceptLanguages(language.toStdString());
+    d->pageView->SetAcceptLanguages(language);
     d->pageView->UpdatePreferences();
 #endif
 }
@@ -300,8 +301,10 @@ void WebPageBlink::loadErrorPage(int errorCode)
             return;
         }
 
-        QString language;
-        getSystemLanguage(language);
+        std::string lang;
+        getSystemLanguage(lang);
+
+        QString language = QString::fromStdString(lang); // FIXME: WebPage: qstr2stdstr
         QLocale locale(language);
 
         // Break the provided URL down into it's component pieces
@@ -1009,17 +1012,19 @@ void WebPageBlink::setAdditionalContentsScale(float scaleX, float scaleY)
 
 void WebPageBlink::updateHardwareResolution()
 {
-    QString hardwareWidth, hardwareHeight;
+    std::string hardwareWidth, hardwareHeight;
     getDeviceInfo("HardwareScreenWidth", hardwareWidth);
     getDeviceInfo("HardwareScreenHeight", hardwareHeight);
-    d->pageView->SetHardwareResolution(hardwareWidth.toInt(), hardwareHeight.toInt());
+    int w = stringTo<int>(hardwareWidth);
+    int h = stringTo<int>(hardwareHeight);
+    d->pageView->SetHardwareResolution(w, h);
 }
 
 void WebPageBlink::updateBoardType()
 {
-    QString boardType;
+    std::string boardType;
     getDeviceInfo("boardType", boardType);
-    d->pageView->SetBoardType(boardType.toStdString());
+    d->pageView->SetBoardType(boardType);
 }
 
 void WebPageBlink::updateMediaCodecCapability()
@@ -1045,12 +1050,12 @@ double WebPageBlink::devicePixelRatio()
     if(appWidth == 0) appWidth = static_cast<double>(currentUiWidth());
     if(appHeight == 0) appHeight = static_cast<double>(currentUiHeight());
 
-    QString hardwareWidth, hardwareHeight;
+    std::string hardwareWidth, hardwareHeight;
     getDeviceInfo("HardwareScreenWidth", hardwareWidth);
     getDeviceInfo("HardwareScreenHeight", hardwareHeight);
 
-    double deviceWidth = hardwareWidth.toDouble();
-    double deviceHeight = hardwareHeight.toDouble();
+    double deviceWidth = stringTo<double>(hardwareWidth);
+    double deviceHeight = stringTo<double>(hardwareHeight);
 
     double ratioX = deviceWidth/appWidth;
     double ratioY = deviceHeight/appHeight;
@@ -1076,9 +1081,10 @@ double WebPageBlink::devicePixelRatio()
 
 void WebPageBlink::setSupportDolbyHDRContents()
 {
-    QString supportDolbyHDRContents;
+    std::string supportDolbyHDRContents;
     getDeviceInfo("supportDolbyHDRContents", supportDolbyHDRContents);
-    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "supportDolbyHDRContents:%s", qPrintable(supportDolbyHDRContents));
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()),
+             "supportDolbyHDRContents:%s", supportDolbyHDRContents.c_str());
     d->pageView->SetSupportDolbyHDRContents(supportDolbyHDRContents == "true");
 }
 

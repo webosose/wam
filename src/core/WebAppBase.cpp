@@ -439,12 +439,12 @@ void WebAppBase::setUiSize(int width, int height) {
     WebAppManager::instance()->setUiSize(width, height);
 }
 
-void WebAppBase::setPreferredLanguages(QString language)
+void WebAppBase::setPreferredLanguages(const std::string& language)
 {
     if (!d->m_page)
         return;
     d->m_page->setPreferredLanguages(language);
-    d->m_page->sendLocaleChangeEvent(language);
+    d->m_page->sendLocaleChangeEvent(QString::fromStdString(language)); // FIXME: WebPage: qstr2stdstr
 }
 
 void WebAppBase::handleWebAppMessage(WebAppManager::WebAppMessageType type, const std::string& message)

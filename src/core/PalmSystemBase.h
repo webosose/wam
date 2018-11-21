@@ -17,6 +17,8 @@
 #ifndef PALMSYSTEMBASE_H_
 #define PALMSYSTEMBASE_H_
 
+#include <string>
+
 #include <QString>
 #include <QVariant>
 
@@ -26,10 +28,10 @@ public:
     virtual ~PalmSystemBase() {}
 
 protected:
-    virtual QString getDeviceInfo(QString name);
+    virtual std::string getDeviceInfo(const std::string& name);
     virtual QVariant getResource(QVariant a, QVariant b);
     virtual QString country() const;
-    virtual QString locale() const;
+    virtual std::string locale() const;
     virtual QString localeRegion() const;
     virtual QString phoneRegion() const;
     virtual void setContainerAppReady(const QString& appId);

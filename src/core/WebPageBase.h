@@ -69,7 +69,7 @@ public:
     virtual int progress() const = 0;
     virtual bool hasBeenShown() const = 0;
     virtual void setPageProperties() = 0;
-    virtual void setPreferredLanguages(const QString& language) = 0;
+    virtual void setPreferredLanguages(const std::string& language) = 0;
     virtual QString defaultFont();
     virtual void setDefaultFont(const QString& font) = 0;
     virtual void cleanResources();
@@ -159,8 +159,8 @@ protected:
     void handleLoadStarted();
     void handleLoadFinished();
     void handleLoadFailed(int errorCode);
-    bool getDeviceInfo(QString name, QString& value);
-    bool getSystemLanguage(QString& value);
+    bool getDeviceInfo(const std::string& name, std::string& value);
+    bool getSystemLanguage(std::string& value);
     int currentUiWidth();
     int currentUiHeight();
     WebProcessManager* getWebProcessManager();

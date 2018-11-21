@@ -74,7 +74,7 @@ public:
     virtual void unfocus() = 0;
     virtual void setOpacity(float opacity) = 0;
     virtual void setAppDescription(std::shared_ptr<ApplicationDescription>);
-    virtual void setPreferredLanguages(QString language);
+    virtual void setPreferredLanguages(const std::string& language);
     virtual void stagePreparing();
     virtual void stageReady();
     virtual void raise() = 0;

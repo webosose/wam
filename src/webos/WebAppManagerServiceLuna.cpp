@@ -384,10 +384,11 @@ void WebAppManagerServiceLuna::getSystemLocalePreferencesCallback(QJsonObject re
     if(language.isEmpty())
         return;
 
-    if(language == WebAppManagerService::getSystemLanguage())
+    QString sysLanguage = QString::fromStdString(WebAppManagerService::getSystemLanguage());
+    if(language == sysLanguage)
         return;
 
-    WebAppManagerService::setSystemLanguage(language);
+    WebAppManagerService::setSystemLanguage(language.toStdString());
 
     if(m_bootDone)
 #ifndef PRELOADMANAGER_ENABLED
