@@ -33,7 +33,7 @@ public:
     void setCountry() override;
     void setLaunchParams(const QString& params) override;
 
-    virtual void setLocale(const QString& params);
+    virtual void setLocale(const std::string& params);
     virtual double devicePixelRatio();
 
 protected:

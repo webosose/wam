@@ -52,7 +52,7 @@ public:
     int progress() const override;
     bool hasBeenShown() const override;
     void setPageProperties() override;
-    void setPreferredLanguages(const QString& language) override;
+    void setPreferredLanguages(const std::string& language) override;
     void setDefaultFont(const QString& font) override;
     void reloadDefaultPage() override;
     void reload() override;

@@ -295,12 +295,12 @@ void WebPageBase::handleForceDeleteWebPage()
     delete this;
 }
 
-bool WebPageBase::getSystemLanguage(QString &value)
+bool WebPageBase::getSystemLanguage(std::string &value)
 {
     return WebAppManager::instance()->getSystemLanguage(value);
 }
 
-bool WebPageBase::getDeviceInfo(QString name, QString &value)
+bool WebPageBase::getDeviceInfo(const std::string& name, std::string& value)
 {
     return WebAppManager::instance()->getDeviceInfo(name, value);
 }
@@ -413,9 +413,9 @@ void WebPageBase::setBackgroundColorOfBody(const QString& color_)
 QString WebPageBase::defaultFont()
 {
     QString defaultFont = "LG Display-Regular";
-    QString language;
-    QString country;
+    std::string language;
     getSystemLanguage(language);
+    std::string country;
     getDeviceInfo("LocalCountry", country);
 
     // for the model
@@ -427,7 +427,8 @@ QString WebPageBase::defaultFont()
     else if(language == "ur-IN")
         defaultFont = "LG Display_Urdu";
 
-    LOG_DEBUG("[%s] country : [%s], language : [%s], default font : [%s]", qPrintable(appId()), qPrintable(country), qPrintable(language), qPrintable(defaultFont));
+    LOG_DEBUG("[%s] country : [%s], language : [%s], default font : [%s]", qPrintable(appId()),
+              country.c_str(), language.c_str(), qPrintable(defaultFont));
     return defaultFont;
 }
 

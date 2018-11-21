@@ -92,10 +92,10 @@ protected:
     void startContainerTimer();
     void restartContainerApp();
 #endif
-    void setDeviceInfo(const QString& name, const QString& value);
+    void setDeviceInfo(const std::string& name, const std::string& value);
     void setUiSize(int width, int height);
-    void setSystemLanguage(const QString& language);
-    QString getSystemLanguage();
+    void setSystemLanguage(const std::string& language);
+    std::string getSystemLanguage();
     void setForceCloseApp(const std::string& appId);
     void deleteStorageData(const std::string& identifier);
     void killCustomPluginProcess(const std::string& appBasePath);

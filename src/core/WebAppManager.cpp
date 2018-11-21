@@ -20,6 +20,8 @@
 #include <sstream>
 #include <unistd.h>
 
+#include <QString>
+
 #include "ApplicationDescription.h"
 #include "ContainerAppManager.h"
 #include "DeviceInfo.h"
@@ -139,20 +141,6 @@ int WebAppManager::currentUiHeight()
     if (m_deviceInfo)
         m_deviceInfo->getDisplayHeight(height);
     return height;
-}
-
-//FIXME: WebAppManager: qstr2stdstr
-bool WebAppManager::getSystemLanguage(QString &value)
-{
-    if (!m_deviceInfo) return false;
-    return m_deviceInfo->getSystemLanguage(value);
-}
-
-//FIXME: WebAppManager: qstr2stdstr
-bool WebAppManager::getDeviceInfo(QString name, QString &value)
-{
-    if (!m_deviceInfo) return false;
-    return m_deviceInfo->getDeviceInfo(name, value);
 }
 
 static void buildAppJsTriggers(std::string &eventJS, std::string &versionJS,
@@ -620,8 +608,13 @@ void WebAppManager::appDeleted(WebAppBase* app)
         m_shellPageMap.erase(appId);
 }
 
-// FIXME: WebAppManager: qstr2stdstr
-void WebAppManager::setSystemLanguage(QString language)
+bool WebAppManager::getSystemLanguage(std::string &value)
+{
+    if (!m_deviceInfo) return false;
+    return m_deviceInfo->getSystemLanguage(value);
+}
+
+void WebAppManager::setSystemLanguage(const std::string& language)
 {
     if (!m_deviceInfo) return;
 
@@ -633,20 +626,26 @@ void WebAppManager::setSystemLanguage(QString language)
         app->setPreferredLanguages(language);
     }
 
-    LOG_DEBUG("New system language: %s", language.toStdString().c_str());
+    LOG_DEBUG("New system language: %s", language.c_str());
 }
 
-// FIXME: WebAppManager: qstr2stdstr
-void WebAppManager::setDeviceInfo(QString name, QString value)
+bool WebAppManager::getDeviceInfo(const std::string& name, std::string& value)
+{
+    if (!m_deviceInfo) return false;
+    return m_deviceInfo->getDeviceInfo(name, value);
+}
+
+void WebAppManager::setDeviceInfo(const std::string& name, const std::string& value)
 {
     if (!m_deviceInfo) return;
 
-    QString oldValue;
-    if (m_deviceInfo->getDeviceInfo(name, oldValue) && (oldValue == value)) return;
+    std::string oldValue;
+    if (m_deviceInfo->getDeviceInfo(name, oldValue) && (oldValue == value))
+        return;
 
     m_deviceInfo->setDeviceInfo(name, value);
-    broadcastWebAppMessage(WebAppMessageType::DeviceInfoChanged, name.toStdString());
-    LOG_DEBUG("SetDeviceInfo %s; %s to %s", name.toStdString().c_str(), oldValue.toStdString().c_str(), value.toStdString().c_str());
+    broadcastWebAppMessage(WebAppMessageType::DeviceInfoChanged, name);
+    LOG_DEBUG("SetDeviceInfo %s; %s to %s", name.c_str(), oldValue.c_str(), value.c_str());
 }
 
 void WebAppManager::broadcastWebAppMessage(WebAppMessageType type, const std::string& message)

@@ -53,8 +53,8 @@ Json::Value PalmSystemWebOS::initialize()
 
     data["launchParams"] = launchParams().toStdString();
     data["country"] = country().toStdString();
-    data["currentCountryGroup"] = getDeviceInfo("CountryGroup").toStdString();
-    data["locale"] = locale().toStdString();
+    data["currentCountryGroup"] = getDeviceInfo("CountryGroup");
+    data["locale"] = locale();
     data["localeRegion"] = localeRegion().toStdString();
     data["isMinimal"] = isMinimal();
     data["identifier"] = identifier().toStdString();

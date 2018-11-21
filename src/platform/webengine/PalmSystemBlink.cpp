@@ -37,7 +37,7 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
     } else if (message == "country") {
         return country();
     } else if (message == "locale") {
-        return locale();
+        return QString::fromStdString(locale()); // FIXME: PalmSystem: qstr2stdstr
     } else if (message == "localeRegion") {
         return localeRegion();
     } else if (message == "isMinimal") {
@@ -50,7 +50,7 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
     } else if (message == "screenOrientation") {
         return screenOrientation();
     } else if (message == "currentCountryGroup") {
-        return getDeviceInfo("CountryGroup");
+        return QString::fromStdString(getDeviceInfo("CountryGroup")); // FIXME: PalmSystem: qstr2stdstr
     } else if (message == "stageReady") {
         stageReady();
     } else if (message == "containerReady") {
@@ -164,10 +164,11 @@ void PalmSystemBlink::setLaunchParams(const QString& params)
     static_cast<WebPageBlink*>(m_app->page())->updateExtensionData(QStringLiteral("launchParams"), launchParams());
 }
 
-void PalmSystemBlink::setLocale(const QString& params)
+void PalmSystemBlink::setLocale(const std::string& params)
 {
+    QString l = QString::fromStdString(params); // FIXME: WebPage: qstr2stdstr
     if (m_initialized)
-        static_cast<WebPageBlink*>(m_app->page())->updateExtensionData(QStringLiteral("locale"), params);
+        static_cast<WebPageBlink*>(m_app->page())->updateExtensionData(QStringLiteral("locale"), l);
 }
 
 QString PalmSystemBlink::identifier() const

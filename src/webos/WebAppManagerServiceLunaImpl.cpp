@@ -65,24 +65,26 @@ void WebAppManagerServiceLunaImpl::getSystemOptionCallback(QJsonObject reply)
         return;
     }
     LOG_INFO(MSGID_SETTING_SERVICE, 0, "Notified from settingsservice/getSystemSettings");
-    QString country(settings.value("country").toString());
-    QString smartServiceCountry(settings.value("smartServiceCountryCode3").toString());
-    QString audioGuidance(settings.value("audioGuidance").toString());
-    QString screenRotation(settings.value("screenRotation").toString());
+    std::string country(settings.value("country").toString().toStdString());
+    std::string smartServiceCountry(settings.value("smartServiceCountryCode3").toString().toStdString());
+    std::string audioGuidance(settings.value("audioGuidance").toString().toStdString());
+    std::string screenRotation(settings.value("screenRotation").toString().toStdString());
+
     LOG_INFO(MSGID_SETTING_SERVICE, 1,
-        PMLOGKS("BroadcastCountry", country.isEmpty() ? "Empty" : qPrintable(country)), "");
+        PMLOGKS("BroadcastCountry", country.empty() ? "Empty" : country.c_str()), "");
     LOG_INFO(MSGID_SETTING_SERVICE, 1,
-            PMLOGKS("SmartServiceCountry", smartServiceCountry.isEmpty() ? "Empty" : qPrintable(smartServiceCountry)), "");
+            PMLOGKS("SmartServiceCountry", smartServiceCountry.empty() ? "Empty" : smartServiceCountry.c_str()), "");
     LOG_INFO(MSGID_SETTING_SERVICE, 1,
-            PMLOGKS("AudioGuidance", audioGuidance.isEmpty() ? "Empty" : qPrintable(audioGuidance)), "");
+            PMLOGKS("AudioGuidance", audioGuidance.empty() ? "Empty" : audioGuidance.c_str()), "");
     LOG_INFO(MSGID_SETTING_SERVICE, 1,
-            PMLOGKS("ScreenRotation", screenRotation.isEmpty() ? "Empty" : qPrintable(screenRotation)), "");
-    if (!country.isEmpty())
+            PMLOGKS("ScreenRotation", screenRotation.empty() ? "Empty" : screenRotation.c_str()), "");
+
+    if (!country.empty())
         WebAppManagerService::setDeviceInfo("LocalCountry", country);
-    if (!smartServiceCountry.isEmpty())
+    if (!smartServiceCountry.empty())
         WebAppManagerService::setDeviceInfo("SmartServiceCountry", smartServiceCountry);
-    if (!audioGuidance.isEmpty())
+    if (!audioGuidance.empty())
         WebAppManagerService::setAccessibilityEnabled(audioGuidance == "on");
-    if (!screenRotation.isEmpty())
+    if (!screenRotation.emtpy())
         WebAppManagerService::setDeviceInfo("ScreenRotation", screenRotation);
 }

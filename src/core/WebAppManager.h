@@ -22,8 +22,6 @@
 #include <string>
 #include <vector>
 
-#include <QString>
-
 #include "webos/webview_base.h"
 
 class ApplicationDescription;
@@ -64,8 +62,9 @@ public:
 
     static WebAppManager* instance();
 
-    bool getSystemLanguage(QString& value);
-    bool getDeviceInfo(QString name, QString& value);
+    bool getSystemLanguage(std::string& value);
+    bool getDeviceInfo(const std::string& name, std::string& value);
+    void setDeviceInfo(const std::string& name, const std::string& value);
     void broadcastWebAppMessage(WebAppMessageType type, const std::string& message);
 
     WebProcessManager* getWebProcessManager() { return m_webProcessManager; }
@@ -117,8 +116,7 @@ public:
     bool setInspectorEnable(const std::string& appId);
     void discardCodeCache(uint32_t pid);
 
-    void setSystemLanguage(QString value);
-    void setDeviceInfo(QString name, QString value);
+    void setSystemLanguage(const std::string& value);
     WebAppManagerConfig* config() { return m_webAppManagerConfig; }
 
     void requestActivity(WebAppBase* app);

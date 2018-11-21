@@ -602,8 +602,7 @@ void WebAppWayland::webViewRecreated()
 
 void WebAppWayland::setForceActivateVtgIfRequired()
 {
-    QString screenRotation;
-
+    std::string screenRotation;
     if (WebAppManager::instance() && page()) {
         if (WebAppManager::instance()->getDeviceInfo("ScreenRotation", screenRotation) && screenRotation != "off")
             page()->setForceActivateVtg(true);
