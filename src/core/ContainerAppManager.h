@@ -17,10 +17,9 @@
 #ifndef CONTAINERAPPMANAGER_H
 #define CONTAINERAPPMANAGER_H
 
-#include "Timer.h"
-
-#include <QString>
 #include <string>
+
+#include "Timer.h"
 
 class WebAppBase;
 
@@ -31,7 +30,7 @@ public:
 
     void startContainerTimer();
     void stopContainerTimer();
-    QString& getContainerAppId();
+    std::string& getContainerAppId();
     WebAppBase* launchContainerApp(const std::string& appDesc, const std::string& instanceId, int& errorCode);
     void closeContainerApp();
     void reloadContainerApp();

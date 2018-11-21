@@ -53,8 +53,8 @@ public:
 
 class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
 public:
-    WebAppWayland(QString type, int surface_id, int width = 0, int height = 0);
-    WebAppWayland(QString type, WebAppWaylandWindow* window, int width = 0, int height = 0);
+    WebAppWayland(const std::string& type, int surface_id, int width = 0, int height = 0);
+    WebAppWayland(const std::string& type, WebAppWaylandWindow* window, int width = 0, int height = 0);
 
     ~WebAppWayland() override;
 
@@ -71,7 +71,7 @@ public:
     bool isNormal() override;
     void onStageActivated() override;
     void onStageDeactivated() override;
-    void configureWindow(QString& type) override;
+    void configureWindow(const std::string& type) override;
     void setKeepAlive(bool keepAlive) override;
     bool isWindowed() const override { return true; }
     void setWindowProperty(const QString& name, const QVariant& value) override;
@@ -99,7 +99,7 @@ public:
     virtual void firstFrameVisuallyCommitted();
     virtual void navigationHistoryChanged();
 
-    QString getWindowType() const { return m_windowType; }
+    std::string getWindowType() const { return m_windowType; }
     bool cursorVisibility() { return InputManager::instance()->globalCursorVisibility(); }
     void startLaunchTimer();
     void sendWebOSMouseEvent(const QString& eventName);
@@ -133,7 +133,7 @@ protected:
 
 private:
     WebAppWaylandWindow* m_appWindow;
-    QString m_windowType;
+    std::string m_windowType;
     int m_lastSwappedTime;
 
     std::vector<gfx::Rect> m_inputRegion;

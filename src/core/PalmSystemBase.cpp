@@ -73,6 +73,7 @@ QString PalmSystemBase::phoneRegion() const
 
 void PalmSystemBase::setContainerAppReady(const QString& appId)
 {
-    if (appId == WebAppManager::instance()->getContainerAppId())
+    // FIXME: PalmSystem: qstr2stdstr
+    if (appId.toStdString() == WebAppManager::instance()->getContainerAppId())
         WebAppManager::instance()->setContainerAppReady(true);
 }

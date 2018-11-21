@@ -19,26 +19,29 @@
 
 #include <memory>
 #include <map>
-
-#include <QStringList>
+#include <string>
 
 #include "WebAppFactoryInterface.h"
 
-static const QString kDefaultAppType = QStringLiteral("default");
+#define kDefaultAppType "default"
 
 class WebAppFactoryManager {
 public:
     static WebAppFactoryManager* instance();
     virtual ~WebAppFactoryManager();
-    WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "");
-    WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "");
-    WebPageBase* createWebPage(QString winType, QUrl url, std::shared_ptr<ApplicationDescription> desc, QString appType = "", QString launchParams = "");
-    WebAppFactoryInterface* getInterfaceInstance(QString appType);
+
+    WebAppBase* createWebApp(const std::string& winType, std::shared_ptr<ApplicationDescription> desc = 0,
+                             const std::string& appType = "");
+    WebAppBase* createWebApp(const std::string& winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = 0,
+                             const std::string& appType = "");
+    WebPageBase* createWebPage(const std::string& winType, QUrl url, std::shared_ptr<ApplicationDescription> desc,
+                               const std::string& appType = "", const std::string& launchParams = "");
+    WebAppFactoryInterface* getInterfaceInstance(const std::string& appType);
 
 protected:
     WebAppFactoryManager() {}
-    virtual WebAppFactoryInterface* loadInterfaceInstance(QString appType) = 0;
-    std::map<QString, WebAppFactoryInterface*> m_interfaces;
+    virtual WebAppFactoryInterface* loadInterfaceInstance(const std::string& appType) = 0;
+    std::map<std::string, WebAppFactoryInterface*> m_interfaces;
 
 private:
     static WebAppFactoryManager* m_instance;

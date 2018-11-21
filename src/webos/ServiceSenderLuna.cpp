@@ -49,9 +49,9 @@ void ServiceSenderLuna::requestActivity(WebAppBase* app)
 }
 
 #ifndef PRELOADMANAGER_ENABLED
-void ServiceSenderLuna::launchContainerApp(const QString& id)
+void ServiceSenderLuna::launchContainerApp(const std::string& id)
 {
-    WebAppManagerServiceLuna::instance()->launchContainerApp(id);
+    WebAppManagerServiceLuna::instance()->launchContainerApp(QString::fromStdString(id));
 }
 #endif
 
@@ -61,8 +61,8 @@ void ServiceSenderLuna::postlistRunningApps(std::vector<ApplicationInfo> &apps)
     QJsonArray runningApps;
     for (auto it = apps.begin(); it != apps.end(); ++it) {
         QJsonObject app;
-        app["id"] = it->appId;
-        app["processid"] = it->instanceId;
+        app["id"] = QString::fromStdString(it->appId);
+        app["processid"] = QString::fromStdString(it->instanceId);
         app["webprocessid"] = QString::number(it->pid);
         runningApps.append(app);
     }
@@ -72,24 +72,25 @@ void ServiceSenderLuna::postlistRunningApps(std::vector<ApplicationInfo> &apps)
     WebAppManagerServiceLuna::instance()->postSubscription("listRunningApps", reply);
 }
 
-void ServiceSenderLuna::postWebProcessCreated(const QString& appId, uint32_t pid)
+void ServiceSenderLuna::postWebProcessCreated(const std::string& appId, uint32_t pid)
 {
     QJsonObject reply;
-    reply["id"] = appId;
+    reply["id"] = Qt::fromStdString(appId);
     reply["webprocessid"] = (int)pid;
     reply["returnValue"] = true;
 
     WebAppManagerServiceLuna::instance()->postSubscription("webProcessCreated", reply);
 }
 
-void ServiceSenderLuna::serviceCall(const QString& url, const QString& payload, const QString& appId)
+void ServiceSenderLuna::serviceCall(const std::string& url, const std::string& payload, const std::string& appId)
 {
     bool ret = WebAppManagerServiceLuna::instance()->call(
-        url.toLatin1().constData(),
-        QJsonDocument::fromJson(payload.toStdString().c_str()).object(),
-        appId.toLatin1().constData());
+        url.c_str(),
+        QJsonDocument::fromJson(payload.c_str()).object(),
+        appId.c_str());
     if (!ret) {
-        LOG_WARNING(MSGID_SERVICE_CALL_FAIL, 2, PMLOGKS("APP_ID", qPrintable(appId)), PMLOGKS("URL", qPrintable(url)), "ServiceSenderLuna::serviceCall; callPrivate() return false");
+        LOG_WARNING(MSGID_SERVICE_CALL_FAIL, 2, PMLOGKS("APP_ID", appId.c_str()), PMLOGKS("URL", url.c_str()),
+                    "ServiceSenderLuna::serviceCall; callPrivate() return false");
     }
 }
 

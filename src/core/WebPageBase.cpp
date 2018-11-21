@@ -43,7 +43,7 @@ WebPageBase::WebPageBase()
 {
 }
 
-WebPageBase::WebPageBase(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const QString& params)
+WebPageBase::WebPageBase(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const std::string& params)
     : m_appDesc(desc)
     , m_appId(QString::fromStdString(desc->id()))
     , m_suspendAtLoad(false)
@@ -52,7 +52,7 @@ WebPageBase::WebPageBase(const QUrl& url, std::shared_ptr<ApplicationDescription
     , m_isLoadErrorPageStart(false)
     , m_enableBackgroundRun(false)
     , m_defaultUrl(url)
-    , m_launchParams(params)
+    , m_launchParams(QString::fromStdString(params)) // FIXME: WebPage: qstr2stdstr
     , m_loadErrorPolicy(QStringLiteral("default"))
     , m_cleaningResources(false)
     , m_isPreload(false)
@@ -85,7 +85,8 @@ QString WebPageBase::getIdentifier() const
     // If appId is ContainerAppId then it should be ""? Why not just container appid?
     // I think there shouldn't be any chance to be returned container appid even for container base app
 
-    if(appId().isEmpty() || appId() == WebAppManager::instance()->getContainerAppId())
+    // FIXME: WebPage: qstr2stdstr
+    if(appId().isEmpty() || appId().toStdString() == WebAppManager::instance()->getContainerAppId())
         return QStringLiteral("");
     return m_appId;
 }
@@ -249,7 +250,8 @@ void WebPageBase::handleLoadStarted()
 void WebPageBase::handleLoadFinished()
 {
     LOG_INFO(MSGID_WEBPAGE_LOAD_FINISHED, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "m_suspendAtLoad : %s", m_suspendAtLoad ? "true; suspend in this time" : "false");
-    if (appId() == WebAppManager::instance()->getContainerAppId())
+    // FIXME: WebPage: qstr2stdstr
+    if (appId().toStdString() == WebAppManager::instance()->getContainerAppId())
         WebAppManager::instance()->setContainerAppLaunched(true);
 
     FOR_EACH_OBSERVER(WebPageObserver, m_observers, webPageLoadFinished());
@@ -279,7 +281,7 @@ void WebPageBase::cleanResourcesFinished()
 {
     WebAppManager::instance()->postRunningAppList();
     if (m_cleaningResources) {
-        WebAppManager::instance()->removeWebAppFromWebProcessInfoMap(appId());
+        WebAppManager::instance()->removeWebAppFromWebProcessInfoMap(appId().toStdString()); // FIXME: WebPage: qstr2stdstr
         delete this;
     }
 }
@@ -321,7 +323,8 @@ WebAppManagerConfig* WebPageBase::getWebAppManagerConfig()
 
 bool WebPageBase::processCrashed()
 {
-    return WebAppManager::instance()->processCrashed(appId());
+    //FIXME: WebAppBase: qstr2stdstr
+    return WebAppManager::instance()->processCrashed(appId().toStdString());
 }
 
 int WebPageBase::suspendDelay()
@@ -370,7 +373,7 @@ void WebPageBase::postRunningAppList()
 
 void WebPageBase::postWebProcessCreated(uint32_t pid)
 {
-    WebAppManager::instance()->postWebProcessCreated(m_appId, pid);
+    WebAppManager::instance()->postWebProcessCreated(m_appId.toStdString(), pid); // FIXME: WebPage: qstr2stdstr
 }
 
 void WebPageBase::setBackgroundColorOfBody(const QString& color)

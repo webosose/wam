@@ -19,7 +19,6 @@
 
 #include <memory>
 
-#include <QString>
 #include <QUrl>
 #include <QtPlugin>
 
@@ -30,9 +29,9 @@ class WebPageBase;
 
 class WebAppFactoryInterface {
 public:
-    virtual WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr) = 0;
-    virtual WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr) = 0;
-    virtual WebPageBase* createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, QString launchParams = "") = 0;
+    virtual WebAppBase* createWebApp(const std::string& winType, std::shared_ptr<ApplicationDescription> desc = 0) = 0;
+    virtual WebAppBase* createWebApp(const std::string& winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = 0) = 0;
+    virtual WebPageBase* createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, const std::string& launchParams = "") = 0;
 };
 
 #define WebAppFactoryInterface_iid "org.qt-project.Qt.WebAppFactoryInterface"

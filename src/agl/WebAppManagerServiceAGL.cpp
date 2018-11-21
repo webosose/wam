@@ -444,8 +444,7 @@ Json::Value WebAppManagerServiceAGL::webProcessCreated(const Json::Value &reques
 
 void WebAppManagerServiceAGL::onActivateEvent() {
   LOG_DEBUG("Activate app=%s", app_id_event_target_.c_str());
-  QString appIdToFind = QString::fromStdString(app_id_event_target_);
-  WebAppBase* web_app = WebAppManager::instance()->findAppById(appIdToFind);
+  WebAppBase* web_app = WebAppManager::instance()->findAppById(app_id_event_target_);
   if (web_app)
     web_app->onStageActivated();
   app_id_event_target_.clear();
@@ -453,8 +452,7 @@ void WebAppManagerServiceAGL::onActivateEvent() {
 
 void WebAppManagerServiceAGL::onDeactivateEvent() {
   LOG_DEBUG("Dectivate app=%s", app_id_event_target_.c_str());
-  QString appIdToFind = QString::fromStdString(app_id_event_target_);
-  WebAppBase* web_app = WebAppManager::instance()->findAppById(appIdToFind);
+  WebAppBase* web_app = WebAppManager::instance()->findAppById(app_id_event_target_);
   if (web_app)
     web_app->onStageDeactivated();
   app_id_event_target_.clear();

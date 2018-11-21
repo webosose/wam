@@ -53,7 +53,7 @@ std::list<const WebAppBase*> WebProcessManager::runningApps(uint32_t pid)
 
 WebAppBase* WebProcessManager::findAppById(const std::string& appId)
 {
-    return WebAppManager::instance()->findAppById(QString::fromStdString(appId));
+    return WebAppManager::instance()->findAppById(appId);
 }
 
 WebAppBase* WebProcessManager::getContainerApp()

@@ -239,8 +239,8 @@ QJsonObject WebAppManagerServiceLuna::listRunningApps(QJsonObject request, bool 
     QJsonArray runningApps;
     for (auto it = apps.begin(); it != apps.end(); ++it) {
         QJsonObject app;
-        app["id"] = it->appId;
-        app["processid"] = it->instanceId;
+        app["id"] = QString::fromStdString(it->appId);
+        app["processid"] = QString::fromStdString(it->instanceId);
         app["webprocessid"] = QString::number(it->pid);
         runningApps.append(app);
     }
@@ -443,7 +443,7 @@ void WebAppManagerServiceLuna::getCloseAppIdCallback(QJsonObject reply)
     QString appId = reply["id"].toString();
 
     if(!appId.isEmpty())
-        WebAppManagerService::setForceCloseApp(appId);
+        WebAppManagerService::setForceCloseApp(appId.toStdString());
 #ifndef PRELOADMANAGER_ENABLED
     else
         WebAppManagerService::reloadContainerApp();
@@ -518,7 +518,7 @@ void WebAppManagerServiceLuna::getAppStatusCallback(QJsonObject reply)
         bool isCustomPlugin = appObject["customPlugin"].toBool();
 
         if(isCustomPlugin) {
-            WebAppManagerService::killCustomPluginProcess(appBasePath);
+            WebAppManagerService::killCustomPluginProcess(appBasePath.toStdString());
         }
     }
 }
@@ -538,7 +538,7 @@ void WebAppManagerServiceLuna::getForegroundAppInfoCallback(QJsonObject reply)
         if(!reply.value("appId").isUndefined()) {
             QString appId = reply["appId"].toString();
             webos::Runtime::GetInstance()->SetIsForegroundAppEnyo(
-                WebAppManagerService::isEnyoApp(appId));
+                WebAppManagerService::isEnyoApp(appId.toStdString()));
         }
     }
 }
@@ -607,7 +607,8 @@ QJsonObject WebAppManagerServiceLuna::webProcessCreated(QJsonObject request, boo
 
      if (!appId.isEmpty())
      {
-        int pid = WebAppManagerService::getWebProcessId(request["appId"].toString());
+        auto appId = request["appId"].toString();
+        int pid = WebAppManagerService::getWebProcessId(appId.toStdString());
         reply["id"] = request["appId"].toString();
 
         if (pid) {
