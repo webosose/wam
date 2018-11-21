@@ -16,6 +16,8 @@
 
 #include <memory>
 
+#include <sstream>
+
 #include <QDir>
 #include <QFileInfo>
 
@@ -28,7 +30,7 @@
 #include "WebPageObserver.h"
 #include "WebProcessManager.h"
 
-#define CONSOLE_DEBUG(AAA) evaluateJavaScript(QStringLiteral("console.debug('") + QStringLiteral(AAA) + QStringLiteral("');"))
+#define CONSOLE_DEBUG(AAA) evaluateJavaScript("console.debug('" + AAA + "');")
 
 WebPageBase::WebPageBase()
     : m_appDesc(nullptr)
@@ -123,14 +125,14 @@ void WebPageBase::setupLaunchEvent()
     addUserScript(launchEventJS);
 }
 
-void WebPageBase::sendLocaleChangeEvent(const QString& language)
+void WebPageBase::sendLocaleChangeEvent(const QString&)
 {
-    evaluateJavaScript(QStringLiteral(
+    evaluateJavaScript(
         "setTimeout(function () {"
         "    var localeEvent=new CustomEvent('webOSLocaleChange');"
         "    document.dispatchEvent(localeEvent);"
         "}, 1);"
-    ));
+    );
 }
 
 void WebPageBase::cleanResources()
@@ -234,12 +236,15 @@ void WebPageBase::sendRelaunchEvent()
     // Send the relaunch event on the next tick after javascript is loaded
     // This is a workaround for a problem where WebKit can't free the page
     // if we don't use a timeout here.
-    evaluateJavaScript(QStringLiteral(
-        "setTimeout(function () {"
-        "    console.log('[WAM] fires webOSRelaunch event');"
-        "    var launchEvent=new CustomEvent('webOSRelaunch', { detail: %1 });"
-        "    document.dispatchEvent(launchEvent);"
-        "}, 1);").arg(launchParams().isEmpty() ? "{}" : launchParams()));
+
+    std::stringstream jss;
+    std::string detail = launchParams().isEmpty() ? "{}" : launchParams().toStdString();
+    jss << "setTimeout(function () {"
+        << "    console.log('[WAM] fires webOSRelaunch event');"
+        << "    var launchEvent=new CustomEvent('webOSRelaunch', { detail: " << detail << " });"
+        << "    document.dispatchEvent(launchEvent);"
+        << "}, 1);";
+    evaluateJavaScript(jss.str());
 }
 
 void WebPageBase::handleLoadStarted()
@@ -340,14 +345,17 @@ QString WebPageBase::telluriumNubPath()
 bool WebPageBase::hasLoadErrorPolicy(bool isHttpResponseError, int errorCode)
 {
     if (!m_loadErrorPolicy.compare("event")) {
-       evaluateJavaScript(QStringLiteral(
-           "{"
-           "    console.log('[WAM3] create webOSLoadError event');"
-           "    var launchEvent=new CustomEvent('webOSLoadError', { detail : { genericError : %1, errorCode : %2}});"
-           "    document.dispatchEvent(launchEvent);"
-           "}" ).arg(isHttpResponseError?"false":"true").arg(errorCode));
-       //App has load error policy, do not show platform load error page
-       return true;
+        std::stringstream jss;
+        std::string genError = isHttpResponseError ? "false" : "true";
+        jss <<"{"
+            << "    console.log('[WAM3] create webOSLoadError event');"
+            << "    var launchEvent=new CustomEvent('webOSLoadError', "
+            << "        { detail : { genericError : " << genError << ", errorCode : " << errorCode << "}});"
+            << "    document.dispatchEvent(launchEvent);"
+            << "}";
+        //App has load error policy, do not show platform load error page
+        evaluateJavaScript(jss.str());
+        return true;
     }
     return false;
 }
@@ -376,31 +384,31 @@ void WebPageBase::postWebProcessCreated(uint32_t pid)
     WebAppManager::instance()->postWebProcessCreated(m_appId.toStdString(), pid); // FIXME: WebPage: qstr2stdstr
 }
 
-void WebPageBase::setBackgroundColorOfBody(const QString& color)
+void WebPageBase::setBackgroundColorOfBody(const QString& color_)
 {
+    std::string color = color_.toStdString(); // FIXME: WebPage: qstr2stdstr
     // for error page only, set default background color to white by executing javascript
-    QString whiteBackground = QStringLiteral(
-        "(function() {"
-        "    if(document.readyState === 'complete' || document.readyState === 'interactive') { "
-        "       if(document.body.style.backgroundColor)"
-        "           console.log('[Server Error] Already set document.body.style.backgroundColor');"
-        "       else {"
-        "           console.log('[Server Error] set background Color of body to %1');"
-        "           document.body.style.backgroundColor = '%2';"
-        "       }"
-        "     } else {"
-        "        document.addEventListener('DOMContentLoaded', function() {"
-        "           if(document.body.style.backgroundColor)"
-        "               console.log('[Server Error] Already set document.body.style.backgroundColor');"
-        "           else {"
-        "               console.log('[Server Error] set background Color of body to %3');"
-        "               document.body.style.backgroundColor = '%4';"
-        "           }"
-        "        });"
-        "    }"
-        "})();"
-    ).arg(color).arg(color).arg(color).arg(color);
-    evaluateJavaScript(whiteBackground);
+    std::stringstream jss;
+    jss << "(function() {"
+        << "    if(document.readyState === 'complete' || document.readyState === 'interactive') { "
+        << "       if(document.body.style.backgroundColor)"
+        << "           console.log('[Server Error] Already set document.body.style.backgroundColor');"
+        << "       else {"
+        << "           console.log('[Server Error] set background Color of body to " << color << "');"
+        << "           document.body.style.backgroundColor = '" << color << "';"
+        << "       }"
+        << "     } else {"
+        << "        document.addEventListener('DOMContentLoaded', function() {"
+        << "           if(document.body.style.backgroundColor)"
+        << "               console.log('[Server Error] Already set document.body.style.backgroundColor');"
+        << "           else {"
+        << "               console.log('[Server Error] set background Color of body to " << color << "');"
+        << "               document.body.style.backgroundColor = '" << color << "';"
+        << "           }"
+        << "        });"
+        << "    }"
+        << "})();";
+    evaluateJavaScript(jss.str());
 }
 
 QString WebPageBase::defaultFont()
