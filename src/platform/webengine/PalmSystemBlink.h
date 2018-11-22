@@ -31,7 +31,7 @@ public:
 
     // PalmSystemWebOS
     void setCountry() override;
-    void setLaunchParams(const QString& params) override;
+    void setLaunchParams(const std::string& params) override;
 
     virtual void setLocale(const std::string& params);
     virtual double devicePixelRatio();
@@ -41,10 +41,10 @@ public:
 protected:
     // PalmSystemWebOS
     Json::Value initialize();
-    QString identifier() const override;
-    void setLoadErrorPolicy(const QString& params) override;
+    std::string identifier() const override;
+    void setLoadErrorPolicy(const std::string& params) override;
 
-    virtual QString trustLevel() const;
+    virtual std::string trustLevel() const;
     virtual void onCloseNotify(const QString& params);
 
 private:
