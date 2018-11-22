@@ -45,20 +45,20 @@ void NetworkStatus::fromJsonObject(const Json::Value& object)
 
     time_t raw_time;
     time(&raw_time);
-    m_savedDate = QString(ctime(&raw_time));
-    m_savedDate = m_savedDate.trimmed();
+    //TODO: Trim savedDate
+    m_savedDate = std::string(ctime(&raw_time));
 }
 
 void NetworkStatus::Information::fromJsonObject(const Json::Value& info)
 {
-    m_netmask = QString::fromStdString(info["netmask"].asString());
-    m_dns1 = QString::fromStdString(info["dns1"].asString());
+    m_netmask = info["netmask"].asString();
+    m_dns1 = info["dns1"].asString();
     if (info["dns2"].isString())
-        m_dns2 = QString::fromStdString(info["dns2"].asString());
-    m_ipAddress = QString::fromStdString(info["ipAddress"].asString());
-    m_method = QString::fromStdString(info["method"].asString());
-    m_state = QString::fromStdString(info["state"].asString());
-    m_gateway = QString::fromStdString(info["gateway"].asString());
-    m_interfaceName = QString::fromStdString(info["interfaceName"].asString());
-    m_onInternet = QString::fromStdString(info["onInternet"].asString());
+        m_dns2 = info["dns2"].asString();
+    m_ipAddress = info["ipAddress"].asString();
+    m_method = info["method"].asString();
+    m_state = info["state"].asString();
+    m_gateway = info["gateway"].asString();
+    m_interfaceName = info["interfaceName"].asString();
+    m_onInternet = info["onInternet"].asString();
 }
