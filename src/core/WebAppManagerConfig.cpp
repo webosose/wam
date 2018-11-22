@@ -18,6 +18,12 @@
 
 #include <unistd.h>
 
+static inline std::string getEnvVar(const char *name)
+{
+    const char *v = getenv("TELLURIUM_NUB_PATH");
+    return (v == NULL) ? std::string() : std::string(v);
+}
+
 WebAppManagerConfig::WebAppManagerConfig()
     : m_suspendDelayTime(0)
     , m_devModeEnabled(false)
@@ -100,6 +106,6 @@ void WebAppManagerConfig::postInitConfiguration()
 
     if (access("/var/luna/preferences/devmode_enabled", F_OK) == 0) {
         m_devModeEnabled = true;
-        m_telluriumNubPath = QLatin1String(qgetenv("TELLURIUM_NUB_PATH"));
+        m_telluriumNubPath = getEnvVar("TELLURIUM_NUB_PATH");
     }
 }

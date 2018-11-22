@@ -229,7 +229,7 @@ void WebAppWayland::onStageActivated()
 
     page()->setVisibilityState(WebPageBase::WebPageVisibilityState::WebPageVisibilityStateVisible);
 
-    setActiveAppId(page()->getIdentifier().toStdString()); // FIXME: WebPage: qstr2stdstr
+    setActiveAppId(page()->getIdentifier());
     focus();
 
     if (getHiddenWindow() || keepAlive())
@@ -581,7 +581,7 @@ void WebAppWayland::showWindow()
 
 void WebAppWayland::titleChanged()
 {
-    setWindowProperty("subtitle", page()->title().toStdString()); // FIXME: WebPage: qstr2stdstr
+    setWindowProperty("subtitle", page()->title());
 }
 
 void WebAppWayland::firstFrameVisuallyCommitted()

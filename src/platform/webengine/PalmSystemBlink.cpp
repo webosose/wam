@@ -46,8 +46,6 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
             return QString("true");
         else
             return QString("false");
-    } else if (message == "identifier") {
-        return identifier();
     } else if (message == "screenOrientation") {
         return screenOrientation();
     } else if (message == "currentCountryGroup") {
@@ -73,10 +71,10 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
         else
             return QString("false");
     } else if (message == "getIdentifier" || message == "identifier") {
-        return QString(identifier().toUtf8());
+        return QString::fromStdString(identifier());
     } else if (message == "launchParams") {
         LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", m_app->appId().c_str()), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.launchParams Updated by app; %s", qPrintable(params[0]));
-        updateLaunchParams(params[0]);
+        updateLaunchParams(params[0].toStdString());
     } else if (message == "screenOrientation") {
         QByteArray res;
         QDataStream out(res);
@@ -131,7 +129,7 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
     } else if (message == "setLoadErrorPolicy") {
         if (params.size() > 0) {
             LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", m_app->appId().c_str()), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.setLoadErrorPolicy(%s)", qPrintable(params[0]));
-            setLoadErrorPolicy(params[0]);
+            setLoadErrorPolicy(params[0].toStdString());
         }
     } else if (message == "onCloseNotify") {
         if (params.size() > 0) {
@@ -155,35 +153,33 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
 
 void PalmSystemBlink::setCountry()
 {
-    static_cast<WebPageBlink*>(m_app->page())->updateExtensionData(QStringLiteral("country"), country());
+    static_cast<WebPageBlink*>(m_app->page())->updateExtensionData("country", country().toStdString()); // FIXME: PalmSystem: qstr2stdstr
 }
 
-void PalmSystemBlink::setLaunchParams(const QString& params)
+void PalmSystemBlink::setLaunchParams(const std::string& params)
 {
     PalmSystemWebOS::setLaunchParams(params);
-    static_cast<WebPageBlink*>(m_app->page())->updateExtensionData(QStringLiteral("launchParams"), launchParams());
+    static_cast<WebPageBlink*>(m_app->page())->updateExtensionData("launchParams", launchParams());
 }
 
 void PalmSystemBlink::setLocale(const std::string& params)
 {
-    QString l = QString::fromStdString(params); // FIXME: WebPage: qstr2stdstr
-    static_cast<WebPageBlink*>(m_app->page())->updateExtensionData(QStringLiteral("locale"), l);
+    static_cast<WebPageBlink*>(m_app->page())->updateExtensionData("locale", params);
 }
 
-QString PalmSystemBlink::identifier() const
+std::string PalmSystemBlink::identifier() const
 {
     if (!m_app->page())
-        return QStringLiteral("");
-
+        return "";
     return static_cast<WebPageBlink*>(m_app->page())->getIdentifier();
 }
 
-void PalmSystemBlink::setLoadErrorPolicy(const QString& params)
+void PalmSystemBlink::setLoadErrorPolicy(const std::string& params)
 {
     static_cast<WebPageBlink*>(m_app->page())->setLoadErrorPolicy(params);
 }
 
-QString PalmSystemBlink::trustLevel() const
+std::string PalmSystemBlink::trustLevel() const
 {
     return static_cast<WebPageBlink*>(m_app->page())->trustLevel();
 }
@@ -210,19 +206,19 @@ Json::Value PalmSystemBlink::initialize()
     // Setup initial data set
     Json::Value data;
 
-    data["launchParams"] = launchParams().toStdString();
+    data["launchParams"] = launchParams();
     data["country"] = country().toStdString();
     data["currentCountryGroup"] = getDeviceInfo("CountryGroup");
     data["locale"] = locale();
     data["localeRegion"] = localeRegion().toStdString();
     data["isMinimal"] = isMinimal();
-    data["identifier"] = identifier().toStdString();
+    data["identifier"] = identifier();
     data["screenOrientation"] = screenOrientation().toStdString();
     data["activityId"] = (double)activityId();
     data["phoneRegion"] = phoneRegion().toStdString();
     data["folderPath"] = m_app->getAppDescription()->folderPath();
     data["devicePixelRatio"] = devicePixelRatio();
-    data["trustLevel"] = trustLevel().toStdString();
+    data["trustLevel"] = trustLevel();
     return std::move(data);
 }
 

@@ -36,7 +36,7 @@ public:
 
     virtual void setCountry() {}
     virtual void setFolderPath(const QString& params) {}
-    virtual void setLaunchParams(const QString& params);
+    virtual void setLaunchParams(const std::string& params);
 
 protected:
     enum GroupClientCallKey {
@@ -45,8 +45,8 @@ protected:
         FocusLayer
     };
 
-    virtual QString identifier() const = 0;
-    virtual QString launchParams() const { return m_launchParams; }
+    virtual std::string identifier() const = 0;
+    virtual std::string launchParams() const { return m_launchParams; }
     virtual QString version() const { return QString(); }
 
     virtual QString screenOrientation() const { return QString("up"); }
@@ -65,7 +65,7 @@ protected:
     virtual void hide();
 
     virtual void setKeepAlive(bool keep);
-    virtual void setLoadErrorPolicy(const QString& params) {}
+    virtual void setLoadErrorPolicy(const std::string& params) {}
     virtual void setInputRegion(const QByteArray& params);
     virtual void setGroupClientEnvironment(GroupClientCallKey callKey, const QByteArray& params);
 #ifdef HAS_PMLOG
@@ -73,11 +73,11 @@ protected:
     virtual void pmLogString(PmLogLevel level, const QVariant& msgid, const QVariant& kvpairs, const QVariant& message);
 #endif
     virtual bool cursorVisibility();
-    virtual void updateLaunchParams(const QString& launchParams);
+    virtual void updateLaunchParams(const std::string& launchParams);
 
 protected:
     WebAppWayland* m_app;
-    QString m_launchParams;
+    std::string m_launchParams;
 };
 
 #endif // PALMSYSTEMWEBOS_H_

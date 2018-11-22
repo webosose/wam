@@ -223,7 +223,7 @@ void WebAppManager::onLaunchContainerBasedApp(const std::string& url, const std:
 
     appId = appDesc->id();
     page->setApplicationDescription(appDesc);
-    page->setLaunchParams(args.c_str());
+    page->setLaunchParams(args);
 
     app->setWasContainerApp(true);
 

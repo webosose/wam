@@ -39,9 +39,9 @@ void ServiceSenderLuna::requestActivity(WebAppBase* app)
     payload["replace"]   = true;
 
     bool ret = WebAppManagerServiceLuna::instance()->call(
-        "luna://com.webos.service.activitymanager/create",
-        payload,
-        app->page()->getIdentifier().toLatin1().constData());
+                  "palm://com.palm.activitymanager/create",
+                  payload,
+                  app->page()->getIdentifier().c_str())
 
     if (!ret) {
         LOG_WARNING(MSGID_ACTIVITY_MANAGER_CREATE_FAIL, 0, "Failed to call activitymanager create");

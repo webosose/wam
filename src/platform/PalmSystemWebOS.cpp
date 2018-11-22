@@ -27,18 +27,18 @@
 
 PalmSystemWebOS::PalmSystemWebOS(WebAppBase* app)
     : m_app(static_cast<WebAppWayland*>(app))
-    , m_launchParams(QString())
+    , m_launchParams()
 {
 }
 
-void PalmSystemWebOS::setLaunchParams(const QString& params)
+void PalmSystemWebOS::setLaunchParams(const std::string& params)
 {
-    QString p = params;
+    std::string p = params;
     Json::Value jsonDoc;
-    readJsonFromString(params.toStdString(), jsonDoc);
+    readJsonFromString(params, jsonDoc);
 
     if (jsonDoc.isNull())
-        p = QString();
+        p = "";
 
     m_launchParams = p;
 }
@@ -162,7 +162,7 @@ bool PalmSystemWebOS::cursorVisibility()
     return m_app->cursorVisibility();
 }
 
-void PalmSystemWebOS::updateLaunchParams(const QString& launchParams)
+void PalmSystemWebOS::updateLaunchParams(const std::string& launchParams)
 {
     m_app->page()->setLaunchParams(launchParams);
 }
