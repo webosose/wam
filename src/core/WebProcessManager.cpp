@@ -118,7 +118,7 @@ std::string WebProcessManager::getWebProcessMemSize(uint32_t pid) const
 void WebProcessManager::readWebProcessPolicy()
 {
     Json::Value webProcessEnvironment;
-    std::string configPath = WebAppManager::instance()->config()->getWebProcessConfigPath().toStdString();
+    std::string configPath = WebAppManager::instance()->config()->getWebProcessConfigPath();
     bool configOk = readJsonFromFile(configPath, webProcessEnvironment);
 
     if (!configOk || webProcessEnvironment.isNull()) {
