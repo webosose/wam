@@ -14,10 +14,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include "WebAppWaylandWindow.h"
+
+#include <QString>
+
 #include "ApplicationDescription.h"
 #include "LogManager.h"
 #include "WebAppWayland.h"
-#include "WebAppWaylandWindow.h"
 
 WebAppWaylandWindow* WebAppWaylandWindow::s_instance = 0;
 

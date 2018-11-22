@@ -69,7 +69,7 @@ public:
     void configureWindow(const std::string& type) override;
     void setKeepAlive(bool keepAlive) override;
     bool isWindowed() const override { return true; }
-    void setWindowProperty(const std::string& name, const QVariant& value) override;
+    void setWindowProperty(const std::string& name, const std::string& value) override;
     void platformBack() override;
     void setCursor(const std::string& cursorArg, int hotspot_x = -1, int hotspot_y = -1) override;
     void setInputRegion(const Json::Value& jsonDoc) override;
