@@ -27,7 +27,7 @@ void ServiceSenderLuna::requestActivity(WebAppBase* app)
 {
     QJsonObject payload;
     QJsonObject activity;
-    activity["name"] = app->appId();
+    activity["name"] = QString::fromStdString(app->appId());
     activity["description"] = "";
     QJsonObject activityType;
     activityType["foreground"] = true;

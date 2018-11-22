@@ -45,11 +45,11 @@ Json::Value BlinkWebProcessManager::getWebProcessProfiling()
     std::multimap<uint32_t, std::string> runningAppsMap;
     std::list<const WebAppBase*> running = runningApps();
     for (auto it = running.begin(); it != running.end(); ++it) {
-        auto appid = (*it)->appId().toStdString(); //TODO port appId to std::string
+        std::string appid = (*it)->appId();
         WebAppBase* app = findAppById(appid);
         pid = getWebProcessPID(app);
         processIdList.insert(pid);
-        runningAppsMap.emplace(pid, app->appId().toStdString());
+        runningAppsMap.emplace(pid, app->appId());
     }
 
     WebAppBase* containerApp = getContainerApp();
@@ -57,7 +57,7 @@ Json::Value BlinkWebProcessManager::getWebProcessProfiling()
         pid = getWebProcessPID(containerApp);
         processIdList.insert(pid);
 
-        runningAppsMap.emplace(pid, containerApp->appId().toStdString());
+        runningAppsMap.emplace(pid, containerApp->appId());
     }
 
     for (uint32_t pid : processIdList) {
