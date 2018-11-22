@@ -22,8 +22,6 @@
 
 #include "WebPageBlinkObserver.h"
 
-#include <QtCore/QVariant>
-
 #include "webos/common/webos_constants.h"
 #include "webos/common/webos_event.h"
 #include "webos/webos_platform.h"
@@ -74,9 +72,9 @@ public:
     void configureWindow(const std::string& type) override;
     void setKeepAlive(bool keepAlive) override;
     bool isWindowed() const override { return true; }
-    void setWindowProperty(const QString& name, const QVariant& value) override;
+    void setWindowProperty(const std::string& name, const QVariant& value) override;
     void platformBack() override;
-    void setCursor(const QString& cursorArg, int hotspot_x = -1, int hotspot_y = -1) override;
+    void setCursor(const std::string& cursorArg, int hotspot_x = -1, int hotspot_y = -1) override;
     void setInputRegion(const Json::Value& jsonDoc) override;
     void setKeyMask(const Json::Value& jsonDoc) override;
     void setOpacity(float opacity) override;
@@ -102,7 +100,7 @@ public:
     std::string getWindowType() const { return m_windowType; }
     bool cursorVisibility() { return InputManager::instance()->globalCursorVisibility(); }
     void startLaunchTimer();
-    void sendWebOSMouseEvent(const QString& eventName);
+    void sendWebOSMouseEvent(const std::string& eventName);
 
     void postEvent(WebOSEvent* ev);
     void onDelegateWindowFrameSwapped();

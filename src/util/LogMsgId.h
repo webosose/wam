@@ -17,7 +17,7 @@
 #ifndef LOGMSGID_H
 #define LOGMSGID_H
 
-#include <qglobal.h>
+#include <QtGlobal>
 
 // clang-format off
 // Logging Message IDs
