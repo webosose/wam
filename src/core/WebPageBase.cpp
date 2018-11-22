@@ -38,7 +38,7 @@ WebPageBase::WebPageBase()
     , m_isLoadErrorPageFinish(false)
     , m_isLoadErrorPageStart(false)
     , m_enableBackgroundRun(false)
-    , m_loadErrorPolicy(QStringLiteral("default"))
+    , m_loadErrorPolicy("default")
     , m_cleaningResources(false)
     , m_isPreload(false)
 {
@@ -53,8 +53,8 @@ WebPageBase::WebPageBase(const QUrl& url, ApplicationDescription* desc, const st
     , m_isLoadErrorPageStart(false)
     , m_enableBackgroundRun(false)
     , m_defaultUrl(url)
-    , m_launchParams(QString::fromStdString(params)) // FIXME: WebPage: qstr2stdstr
-    , m_loadErrorPolicy(QStringLiteral("default"))
+    , m_launchParams(params)
+    , m_loadErrorPolicy("default")
     , m_cleaningResources(false)
     , m_isPreload(false)
 {
@@ -65,12 +65,12 @@ WebPageBase::~WebPageBase()
     LOG_INFO(MSGID_WEBPAGE_CLOSED, 1, PMLOGKS("APP_ID", appId().c_str()), "");
 }
 
-QString WebPageBase::launchParams() const
+std::string WebPageBase::launchParams() const
 {
     return m_launchParams;
 }
 
-void WebPageBase::setLaunchParams(const QString& params)
+void WebPageBase::setLaunchParams(const std::string& params)
 {
     m_launchParams = params;
 }
@@ -81,47 +81,50 @@ void WebPageBase::setApplicationDescription(ApplicationDescription* desc)
     setPageProperties();
 }
 
-QString WebPageBase::getIdentifier() const
+std::string WebPageBase::getIdentifier() const
 {
     // If appId is ContainerAppId then it should be ""? Why not just container appid?
     // I think there shouldn't be any chance to be returned container appid even for container base app
 
-    // FIXME: WebPage: qstr2stdstr
     if(appId().empty() || appId() == WebAppManager::instance()->getContainerAppId())
-        return QStringLiteral("");
-    return QString::fromStdString(m_appId);
+        return {};
+    return m_appId;
 }
 
 void WebPageBase::load()
 {
-    LOG_INFO(MSGID_WEBPAGE_LOAD, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "m_launchParams:%s", qPrintable(m_launchParams));
+    LOG_INFO(MSGID_WEBPAGE_LOAD, 2, PMLOGKS("APP_ID", appId().c_str()),
+             PMLOGKFV("PID", "%d", getWebProcessPID()),
+             "m_launchParams:%s", m_launchParams.c_str());
     /* this function is main load of WebPage : load default url */
     setupLaunchEvent();
     if (!doDeeplinking(m_launchParams)) {
-        LOG_INFO(MSGID_WEBPAGE_LOAD, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "loadDefaultUrl()");
+        LOG_INFO(MSGID_WEBPAGE_LOAD, 2, PMLOGKS("APP_ID", appId().c_str()),
+                 PMLOGKFV("PID", "%d", getWebProcessPID()), "loadDefaultUrl()");
         loadDefaultUrl();
     }
 }
 
 void WebPageBase::setupLaunchEvent()
 {
-    QString launchEventJS = QStringLiteral(
-            "(function() {"
-            "    var launchEvent = new CustomEvent('webOSLaunch', { detail: %1 });"
-            "    if(document.readyState === 'complete') {"
-            "        setTimeout(function() {"
-            "            document.dispatchEvent(launchEvent);"
-            "        }, 1);"
-            "    } else {"
-            "        document.addEventListener('DOMContentLoaded', function() {"
-            "            setTimeout(function() {"
-            "                document.dispatchEvent(launchEvent);"
-            "            }, 1);"
-            "        });"
-            "    }"
-            "})();"
-            ).arg(launchParams().isEmpty() ? "{}" : launchParams());
-    addUserScript(launchEventJS);
+    std::stringstream launchEventJS;
+    std::string params = launchParams().empty() ? "{}" : launchParams();
+    launchEventJS
+            << "(function() {"
+            << "    var launchEvent = new CustomEvent('webOSLaunch', { detail: " << params << " });"
+            << "    if(document.readyState === 'complete') {"
+            << "        setTimeout(function() {"
+            << "            document.dispatchEvent(launchEvent);"
+            << "        }, 1);"
+            << "    } else {"
+            << "        document.addEventListener('DOMContentLoaded', function() {"
+            << "            setTimeout(function() {"
+            << "                document.dispatchEvent(launchEvent);"
+            << "            }, 1);"
+            << "        });"
+            << "    }"
+            << "})();";
+    addUserScript(launchEventJS.str());
 }
 
 void WebPageBase::sendLocaleChangeEvent(const std::string&)
@@ -139,9 +142,8 @@ void WebPageBase::cleanResources()
     setCleaningResources(true);
 }
 
-bool WebPageBase::relaunch(const std::string& launchParams_, const std::string& launchingAppId)
+bool WebPageBase::relaunch(const std::string& launchParams, const std::string& launchingAppId)
 {
-    QString launchParams = QString::fromStdString(launchParams_); // FIXME: WebPage: qstr2stdstr
     resumeWebPagePaintingAndJSExecution();
 
     // for common webapp relaunch scenario
@@ -167,7 +169,7 @@ bool WebPageBase::relaunch(const std::string& launchParams_, const std::string& 
     return true;
 }
 
-bool WebPageBase::doHostedWebAppRelaunch(const QString& launchParams)
+bool WebPageBase::doHostedWebAppRelaunch(const std::string& launchParams)
 {
     /* hosted webapp deeplinking spec
     // legacy case
@@ -183,7 +185,7 @@ bool WebPageBase::doHostedWebAppRelaunch(const QString& launchParams)
     */
     // check deeplinking relaunch condition
     Json::Value obj;
-    readJsonFromString(launchParams.toStdString(), obj);
+    readJsonFromString(launchParams, obj);
     if (url().scheme() ==  "file"
         || m_defaultUrl.scheme() != "file"
         || !obj.isObject() /* no launchParams, { }, and this should be check with object().isEmpty()*/
@@ -200,10 +202,10 @@ bool WebPageBase::doHostedWebAppRelaunch(const QString& launchParams)
 }
 
 // TODO: Optimization: Consider use previously parsed Json::Object here instead of std::string
-bool WebPageBase::doDeeplinking(const QString& launchParams)
+bool WebPageBase::doDeeplinking(const std::string& launchParams)
 {
     Json::Value obj;
-    readJsonFromString(launchParams.toStdString(), obj);
+    readJsonFromString(launchParams, obj);
     if (!obj.isObject() || obj["contentTarget"].isNull())
         return false;
 
@@ -238,7 +240,7 @@ void WebPageBase::sendRelaunchEvent()
     // if we don't use a timeout here.
 
     std::stringstream jss;
-    std::string detail = launchParams().isEmpty() ? "{}" : launchParams().toStdString();
+    std::string detail = launchParams().empty() ? "{}" : launchParams();
     jss << "setTimeout(function () {"
         << "    console.log('[WAM] fires webOSRelaunch event');"
         << "    var launchEvent=new CustomEvent('webOSRelaunch', { detail: " << detail << " });"
@@ -336,14 +338,14 @@ int WebPageBase::suspendDelay()
     return WebAppManager::instance()->getSuspendDelay();
 }
 
-QString WebPageBase::telluriumNubPath()
+std::string WebPageBase::telluriumNubPath()
 {
     return getWebAppManagerConfig()->getTelluriumNubPath();
 }
 
 bool WebPageBase::hasLoadErrorPolicy(bool isHttpResponseError, int errorCode)
 {
-    if (!m_loadErrorPolicy.compare("event")) {
+    if (m_loadErrorPolicy == "event") {
         std::stringstream jss;
         std::string genError = isHttpResponseError ? "false" : "true";
         jss <<"{"
@@ -359,16 +361,17 @@ bool WebPageBase::hasLoadErrorPolicy(bool isHttpResponseError, int errorCode)
     return false;
 }
 
-void WebPageBase::applyPolicyForUrlResponse(bool isMainFrame, const QString& url, int status_code)
+// FIXME: WebPage: qurl-less
+void WebPageBase::applyPolicyForUrlResponse(bool isMainFrame, const std::string& url, int status_code)
 {
-    QUrl qUrl(url);
+    QUrl qUrl(QString::fromStdString(url));
     static const int s_httpErrorStatusCode = 400;
     if (qUrl.scheme() != "file" &&  status_code >= s_httpErrorStatusCode) {
         if(!hasLoadErrorPolicy(true, status_code) && isMainFrame) {
             // If app does not have policy for load error and
             // this error response is from main frame document
             // then before open server error page, reset the body's background color to white
-            setBackgroundColorOfBody(QStringLiteral("white"));
+            setBackgroundColorOfBody("white");
         }
     }
 }
@@ -383,9 +386,8 @@ void WebPageBase::postWebProcessCreated(uint32_t pid)
     WebAppManager::instance()->postWebProcessCreated(m_appId, pid);
 }
 
-void WebPageBase::setBackgroundColorOfBody(const QString& color_)
+void WebPageBase::setBackgroundColorOfBody(const std::string& color)
 {
-    std::string color = color_.toStdString(); // FIXME: WebPage: qstr2stdstr
     // for error page only, set default background color to white by executing javascript
     std::stringstream jss;
     jss << "(function() {"
@@ -410,9 +412,9 @@ void WebPageBase::setBackgroundColorOfBody(const QString& color_)
     evaluateJavaScript(jss.str());
 }
 
-QString WebPageBase::defaultFont()
+std::string WebPageBase::defaultFont()
 {
-    QString defaultFont = "LG Display-Regular";
+    std::string defaultFont = "LG Display-Regular";
     std::string language;
     getSystemLanguage(language);
     std::string country;
@@ -428,10 +430,11 @@ QString WebPageBase::defaultFont()
         defaultFont = "LG Display_Urdu";
 
     LOG_DEBUG("[%s] country : [%s], language : [%s], default font : [%s]", appId().c_str(),
-              country.c_str(), language.c_str(), qPrintable(defaultFont));
+              country.c_str(), language.c_str(), defaultFont.c_str());
     return defaultFont;
 }
 
+// FIXME: WebPage: qurl-less
 void WebPageBase::updateIsLoadErrorPageFinish()
 {
     // ex)
@@ -452,16 +455,7 @@ void WebPageBase::updateIsLoadErrorPageFinish()
     }
 }
 
-#define URL_SIZE_LIMIT 768
-QString WebPageBase::truncateURL(const QString& url)
-{
-    if(url.size() < URL_SIZE_LIMIT)
-        return url;
-    QString res = QString(url);
-    return res.replace(URL_SIZE_LIMIT / 2, url.size() - URL_SIZE_LIMIT, QStringLiteral(" ... "));
-}
-
-
+// FIXME: WebPage: qfile-less
 void WebPageBase::setCustomUserScript()
 {
     // 1. check app folder has userScripts

@@ -44,7 +44,7 @@ public:
     // WebPageBase
     void init() override;
     void* getWebContents() override;
-    void setLaunchParams(const QString& params) override;
+    void setLaunchParams(const std::string& params) override;
     void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level) override;
     QUrl url() const override;
     void replaceBaseUrl(QUrl newUrl) override;
@@ -53,12 +53,12 @@ public:
     bool hasBeenShown() const override;
     void setPageProperties() override;
     void setPreferredLanguages(const std::string& language) override;
-    void setDefaultFont(const QString& font) override;
+    void setDefaultFont(const std::string& font) override;
     void reloadDefaultPage() override;
     void reload() override;
     void setVisibilityState(WebPageVisibilityState visibilityState) override;
     void setFocus(bool focus) override;
-    QString title() override;
+    std::string title() override;
     bool canGoBack() override;
     void closeVkb() override;
     bool isKeyboardVisible() const override;
@@ -116,12 +116,12 @@ public:
     void titleChanged(const std::string& title) override;
     void navigationHistoryChanged() override;
 
-    void updateExtensionData(const QString& key, const QString& value);
-    void setLoadErrorPolicy(const QString& policy);
-    void setTrustLevel(const QString& trustLevel) { m_trustLevel = trustLevel; }
-    QString trustLevel() const { return m_trustLevel; }
-    QString defaultTrustLevel() const;
-    QString escapeData(const QString& value);
+    void updateExtensionData(const std::string& key, const std::string& value);
+    void setLoadErrorPolicy(const std::string& policy);
+    void setTrustLevel(const std::string& trustLevel) { m_trustLevel = trustLevel; }
+    std::string trustLevel() const { return m_trustLevel; }
+    std::string defaultTrustLevel() const;
+    std::string escapeData(const std::string& value);
     int renderProcessPid() const;
     static void setFileAccessBlocked(bool blocked);
     void updateBoardType();
@@ -149,7 +149,7 @@ protected:
     virtual void loadErrorPage(int errorCode);
     virtual BlinkWebView* createPageView();
     virtual void setupStaticUserScripts();
-    virtual void addUserScript(const QString& script);
+    virtual void addUserScript(const std::string& script);
     virtual void addUserScriptUrl(const QUrl& url);
     virtual void recreateWebView();
     virtual void setVisible(bool visible);
@@ -158,6 +158,7 @@ protected:
     bool inspectable();
 
     // WebPageDelegate
+    // FIXME: WebPage: qstring-less
     void handleBrowserControlCommand(const QString& command, const QStringList& arguments) override;
     void handleBrowserControlFunction(const QString& command, const QStringList& arguments, QString* result) override;
 
@@ -176,13 +177,13 @@ private:
     bool m_hasCustomPolicyForResponse;
     bool m_hasBeenShown;
     OneShotTimer<WebPageBlink> m_domSuspendTimer;
-    QString m_customPluginPath;
+    std::string m_customPluginPath;
     qreal m_vkbHeight;
     bool m_vkbWasOverlap;
     bool m_hasCloseCallback;
     OneShotTimer<WebPageBlink> m_closeCallbackTimer;
-    QString m_trustLevel;
-    QString m_loadFailedHostname;
+    std::string m_trustLevel;
+    std::string m_loadFailedHostname;
 };
 
 #endif /* WEBPAGEBLINK_H */

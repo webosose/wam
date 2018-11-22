@@ -18,6 +18,7 @@
 
 #include <cmath>
 #include <sstream>
+#include <unistd.h>
 
 #include <QtCore/QDir>
 #include <QtCore/QUrl>
@@ -30,6 +31,7 @@
 #include "BlinkWebViewProfileHelper.h"
 #include "LogManager.h"
 #include "PalmSystemBlink.h"
+#include "StringUtils.h"
 #include "WebAppManagerConfig.h"
 #include "WebAppManagerTracer.h"
 #include "WebPageObserver.h"
@@ -41,12 +43,17 @@
 
 static const int kExecuteCloseCallbackTimeOutMs = 10000;
 
-QString getHostname(const std::string& url)
+static std::string getHostname(const std::string& url)
 {
   // Convert given url to QURL and
   // return its hostname.
-  QString q_url = QString::fromStdString(url);
-  return QUrl(q_url).host();
+  return QUrl(QString::fromStdString(url)).host().toStdString();
+}
+
+static inline std::string getEnvVar(const char *name)
+{
+    const char *v = getenv("TELLURIUM_NUB_PATH");
+    return (v == NULL) ? std::string() : std::string(v);
 }
 
 class WebPageBlinkPrivate {
@@ -84,7 +91,7 @@ WebPageBlink::WebPageBlink(const QUrl& url, ApplicationDescription* desc, const 
     , m_vkbHeight(0)
     , m_vkbWasOverlap(false)
     , m_hasCloseCallback(false)
-    , m_trustLevel(QString::fromStdString(desc->trustLevel()))
+    , m_trustLevel(desc->trustLevel())
 {
 }
 
@@ -115,13 +122,12 @@ void WebPageBlink::init()
     d->pageView->SetVisible(false);
     d->pageView->SetUserAgent(d->pageView->DefaultUserAgent() + " " + getWebAppManagerConfig()->getName());
 
-    // TODO : need to replace qgetenv
-    if(qgetenv("ENABLE_INSPECTOR") == "1")
+    if(getEnvVar("ENABLE_INSPECTOR") == "1")
         d->pageView->SetInspectable(true);
 
-    if(!qgetenv("PRIVILEGED_PLUGIN_PATH").isEmpty()) {
-        QString privileged_plugin_path = QLatin1String(qgetenv("PRIVILEGED_PLUGIN_PATH"));
-        d->pageView->AddAvailablePluginDir(privileged_plugin_path.toStdString());
+    std::string pluginPath = getEnvVar("PRIVILEGED_PLUGIN_PATH");
+    if (!pluginPath.empty()) {
+        d->pageView->AddAvailablePluginDir(pluginPath);
     }
 
     d->pageView->SetAllowFakeBoldText(false);
@@ -147,8 +153,8 @@ void WebPageBlink::init()
     if (!std::isnan(m_appDesc->networkStableTimeout()) && (m_appDesc->networkStableTimeout() >= 0.0))
         d->pageView->SetNetworkStableTimeout(m_appDesc->networkStableTimeout());
 
-    if (QString::fromStdString(m_appDesc->trustLevel()) == "trusted") {
-        LOG_DEBUG("[%s] trustLevel : trusted; allow load local Resources", qPrintable(appId()));
+    if (m_appDesc->trustLevel() == "trusted") {
+        LOG_DEBUG("[%s] trustLevel : trusted; allow load local Resources", appId().c_str());
         d->pageView->SetAllowLocalResourceLoad(true);
     }
     d->pageView->AddUserStyleSheet("body { -webkit-user-select: none; } :focus { outline: none }");
@@ -207,9 +213,9 @@ bool WebPageBlink::canGoBack()
     return d->pageView->CanGoBack();
 }
 
-QString WebPageBlink::title()
+std::string WebPageBlink::title()
 {
-    return QString(d->pageView->DocumentTitle().c_str());
+    return d->pageView->DocumentTitle();
 }
 
 void WebPageBlink::setFocus(bool focus)
@@ -258,14 +264,14 @@ void WebPageBlink::setPreferredLanguages(const std::string& language)
         d->m_palmSystem->setLocale(language);
 }
 
-void WebPageBlink::setDefaultFont(const QString& font)
+void WebPageBlink::setDefaultFont(const std::string& font)
 {
-    d->pageView->SetStandardFontFamily(font.toStdString());
-    d->pageView->SetFixedFontFamily(font.toStdString());
-    d->pageView->SetSerifFontFamily(font.toStdString());
-    d->pageView->SetSansSerifFontFamily(font.toStdString());
-    d->pageView->SetCursiveFontFamily(font.toStdString());
-    d->pageView->SetFantasyFontFamily(font.toStdString());
+    d->pageView->SetStandardFontFamily(font);
+    d->pageView->SetFixedFontFamily(font);
+    d->pageView->SetSerifFontFamily(font);
+    d->pageView->SetSansSerifFontFamily(font);
+    d->pageView->SetCursiveFontFamily(font);
+    d->pageView->SetFantasyFontFamily(font);
 }
 
 void WebPageBlink::reloadDefaultPage()
@@ -277,13 +283,15 @@ void WebPageBlink::reloadDefaultPage()
     loadDefaultUrl();
 }
 
+// FIXME: WebPage: qurl-less
+// FIXME: WebPage: qfile/qdir-less
 void WebPageBlink::loadErrorPage(int errorCode)
 {
     QString errorpage = getWebAppManagerConfig()->getErrorPageUrl();
     if(!errorpage.isEmpty()) {
         if(hasLoadErrorPolicy(false, errorCode)) {
             // has loadErrorPolicy, do not show error page
-            LOG_DEBUG("[%s] has own policy for Error Page, do not load Error page; send webOSLoadError event; return", qPrintable(appId()));
+            LOG_DEBUG("[%s] has own policy for Error Page, do not load Error page; send webOSLoadError event; return", appId().c_str());
             return;
         }
 
@@ -350,9 +358,9 @@ void WebPageBlink::loadErrorPage(int errorCode)
             // set query items for error code and hostname to URL
             QUrlQuery query;
             query.addQueryItem(QStringLiteral("errorCode"), errCode);
-            query.addQueryItem(QStringLiteral("hostname"), m_loadFailedHostname);
+            query.addQueryItem(QStringLiteral("hostname"), QString::fromStdString(m_loadFailedHostname));
             errorUrl.setQuery(query);
-            LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "LoadErrorPage : %s", qPrintable(errorUrl.toString()));
+            LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "LoadErrorPage : %s", qPrintable(errorUrl.toString()));
             d->pageView->LoadUrl(errorUrl.toString().toStdString());
         } else
             LOG_ERROR(MSGID_ERROR_ERROR, 1, PMLOGKS("PATH", qPrintable(errorpage)), "Error loading error page");
@@ -369,7 +377,7 @@ void WebPageBlink::loadUrl(const std::string& url)
     d->pageView->LoadUrl(url);
 }
 
-void WebPageBlink::setLaunchParams(const QString& params)
+void WebPageBlink::setLaunchParams(const std::string& params)
 {
     WebPageBase::setLaunchParams(params);
     if (d->m_palmSystem)
@@ -403,13 +411,13 @@ void WebPageBlink::setForceActivateVtg(bool enabled)
 
 void WebPageBlink::suspendWebPageAll()
 {
-    LOG_INFO(MSGID_SUSPEND_WEBPAGE, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "%s", __func__);
+    LOG_INFO(MSGID_SUSPEND_WEBPAGE, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "%s", __func__);
 
     d->pageView->SetVisible(false);
     if (m_isSuspended || m_enableBackgroundRun)
         return;
 
-    if (!(qgetenv("WAM_KEEP_RTC_CONNECTIONS_ON_SUSPEND") == "1")) {
+    if (!(getEnvVar("WAM_KEEP_RTC_CONNECTIONS_ON_SUSPEND") == "1")) {
         // On sending applications to background, disconnect RTC
         d->pageView->DropAllPeerConnections(webos::DROP_PEER_CONNECTION_REASON_PAGE_HIDDEN);
     }
@@ -430,7 +438,7 @@ void WebPageBlink::suspendWebPageAll()
         // In app closing scenario, loading about:blank and executing onclose callback should be done
         // For that, WebPage should be resume
         // So, do not suspend here
-        LOG_INFO(MSGID_SUSPEND_WEBPAGE, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "InClosing; Don't start DOMSuspendTimer");
+        LOG_INFO(MSGID_SUSPEND_WEBPAGE, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "InClosing; Don't start DOMSuspendTimer");
         return;
     }
 
@@ -439,12 +447,12 @@ void WebPageBlink::suspendWebPageAll()
         m_domSuspendTimer.start(suspendDelay(), this,
                             &WebPageBlink::suspendWebPagePaintingAndJSExecution);
     }
-    LOG_INFO(MSGID_SUSPEND_WEBPAGE, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), PMLOGKFV("DELAY", "%dms", suspendDelay()), "DomSuspendTimer Started");
+    LOG_INFO(MSGID_SUSPEND_WEBPAGE, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), PMLOGKFV("DELAY", "%dms", suspendDelay()), "DomSuspendTimer Started");
 }
 
 void WebPageBlink::resumeWebPageAll()
 {
-    LOG_INFO(MSGID_RESUME_ALL, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "");
+    LOG_INFO(MSGID_RESUME_ALL, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "");
     // resume painting
     // Resume DOM and JS Excution
     // set visibility : visible (dispatch visibilitychange event)
@@ -459,21 +467,21 @@ void WebPageBlink::resumeWebPageAll()
 void WebPageBlink::suspendWebPageMedia()
 {
     if (m_isPaused || m_enableBackgroundRun) {
-        LOG_INFO(MSGID_SUSPEND_MEDIA, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "%s; Already paused; return", __func__);
+        LOG_INFO(MSGID_SUSPEND_MEDIA, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "%s; Already paused; return", __func__);
         return;
     }
 
     d->pageView->SuspendWebPageMedia();
     m_isPaused = true;
 
-    LOG_INFO(MSGID_SUSPEND_MEDIA, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "");
+    LOG_INFO(MSGID_SUSPEND_MEDIA, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "");
 
 }
 
 void WebPageBlink::resumeWebPageMedia()
 {
     if (!m_isPaused) {
-        LOG_INFO(MSGID_RESUME_MEDIA, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "%s; Not paused; return", __func__);
+        LOG_INFO(MSGID_RESUME_MEDIA, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "%s; Not paused; return", __func__);
         return;
     }
 
@@ -485,14 +493,14 @@ void WebPageBlink::resumeWebPageMedia()
     d->pageView->ResumeWebPageMedia();
     m_isPaused = false;
 
-    LOG_INFO(MSGID_RESUME_MEDIA, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "");
+    LOG_INFO(MSGID_RESUME_MEDIA, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "");
 }
 
 void WebPageBlink::suspendWebPagePaintingAndJSExecution()
 {
-    LOG_INFO(MSGID_SUSPEND_WEBPAGE, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "%s; m_isSuspended : %s", __func__, m_isSuspended ? "true" : "false; will be returned");
+    LOG_INFO(MSGID_SUSPEND_WEBPAGE, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "%s; m_isSuspended : %s", __func__, m_isSuspended ? "true" : "false; will be returned");
     if (m_domSuspendTimer.isRunning()) {
-        LOG_INFO(MSGID_SUSPEND_WEBPAGE_DELAYED, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "DomSuspendTimer Expired; suspend DOM");
+        LOG_INFO(MSGID_SUSPEND_WEBPAGE_DELAYED, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "DomSuspendTimer Expired; suspend DOM");
         m_domSuspendTimer.stop();
     }
 
@@ -505,40 +513,41 @@ void WebPageBlink::suspendWebPagePaintingAndJSExecution()
     // if we haven't finished loading the page yet, wait until it is loaded before suspending
     bool isLoading = !hasBeenShown() && progress() < 100;
     if (isLoading) {
-        LOG_INFO(MSGID_SUSPEND_WEBPAGE, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()),  PMLOGKS("URL", qPrintable(url().toString())), "Currently loading, Do not suspend, return");
+        LOG_INFO(MSGID_SUSPEND_WEBPAGE, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()),  PMLOGKS("URL", qPrintable(url().toString())), "Currently loading, Do not suspend, return");
         m_suspendAtLoad = true;
     } else {
         d->pageView->SuspendPaintingAndSetVisibilityHidden();
         d->pageView->SuspendWebPageDOM();
-        LOG_INFO(MSGID_SUSPEND_WEBPAGE, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "DONE");
+        LOG_INFO(MSGID_SUSPEND_WEBPAGE, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "DONE");
     }
 }
 
 void WebPageBlink::resumeWebPagePaintingAndJSExecution()
 {
-    LOG_INFO(MSGID_RESUME_WEBPAGE, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "%s; m_isSuspended : %s ", __func__, m_isSuspended ? "true" : "false; nothing to resume");
+    LOG_INFO(MSGID_RESUME_WEBPAGE, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "%s; m_isSuspended : %s ", __func__, m_isSuspended ? "true" : "false; nothing to resume");
     m_suspendAtLoad = false;
     if (m_isSuspended) {
         if (m_domSuspendTimer.isRunning()) {
-            LOG_INFO(MSGID_SUSPEND_WEBPAGE, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "DomSuspendTimer canceled by Resume");
+            LOG_INFO(MSGID_SUSPEND_WEBPAGE, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "DomSuspendTimer canceled by Resume");
             m_domSuspendTimer.stop();
             d->pageView->ResumePaintingAndSetVisibilityVisible();
         } else {
             d->pageView->ResumeWebPageDOM();
             d->pageView->ResumePaintingAndSetVisibilityVisible();
-            LOG_INFO(MSGID_RESUME_WEBPAGE, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "DONE");
+            LOG_INFO(MSGID_RESUME_WEBPAGE, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "DONE");
         }
         m_isSuspended = false;
     }
 }
 
-QString WebPageBlink::escapeData(const QString& value)
+// TODO: Refactor this
+std::string WebPageBlink::escapeData(const std::string& value)
 {
-    QString escapedValue(value);
-    escapedValue.replace("\\", "\\\\")
-                .replace("'", "\\'")
-                .replace("\n", "\\n")
-                .replace("\r", "\\r");
+    std::string escapedValue(value);
+    replaceSubstrings(escapedValue, "\\", "\\\\");
+    replaceSubstrings(escapedValue, "'", "\\'");
+    replaceSubstrings(escapedValue, "\n", "\\n");
+    replaceSubstrings(escapedValue, "\r", "\\r");
     return escapedValue;
 }
 
@@ -548,21 +557,22 @@ void WebPageBlink::reloadExtensionData()
        "if (typeof(PalmSystem) != 'undefined') {"
        "  PalmSystem.reloadInjectionData();"
        "};";
-    LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "Reload");
+    LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "Reload");
     evaluateJavaScript(eventJS);
 }
 
-void WebPageBlink::updateExtensionData(const QString& key, const QString& value)
+void WebPageBlink::updateExtensionData(const std::string& key, const std::string& value)
 {
     std::stringstream eventJS;
     eventJS
        << "if (typeof(PalmSystem) != 'undefined') {"
-       << "  PalmSystem.updateInjectionData('" << escapeData(key).toStdString() // FIXME: WebPage: qstr2stdstr
-       << "', '" << escapeData(value).toStdString() << "');" // FIXME: WebPage: qstr2stdstr
+       << "  PalmSystem.updateInjectionData('" << escapeData(key)
+       << "', '" << escapeData(value) << "');"
        << "};";
 
-    LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "Update; key:%s; value:%s",
-        qPrintable(key), qPrintable(value));
+    LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", appId().c_str()),
+             PMLOGKFV("PID", "%d", getWebProcessPID()),
+             "Update; key:%s; value:%s", key.c_str(), value.c_str());
     evaluateJavaScript(eventJS.str());
 }
 
@@ -574,12 +584,12 @@ void WebPageBlink::updatePageSettings()
     if(!m_appDesc)
         return;
 
-    if(QString::fromStdString(m_appDesc->trustLevel()) == "trusted") {
-        LOG_DEBUG("[%s] trustLevel : trusted; allow load local Resources", qPrintable(appId()));
+    if(m_appDesc->trustLevel() == "trusted") {
+        LOG_DEBUG("[%s] trustLevel : trusted; allow load local Resources", appId().c_str());
         d->pageView->SetAllowLocalResourceLoad(true);
     }
 
-    LOG_DEBUG("[%s] WebPageBlink::updatePageSettings(); update appId to chromium", qPrintable(appId()));
+    LOG_DEBUG("[%s] WebPageBlink::updatePageSettings(); update appId to chromium", appId().c_str());
     d->pageView->SetAppId(appId());
     d->pageView->SetTrustLevel(m_appDesc->trustLevel());
     d->pageView->SetAppPath(m_appDesc->folderPath());
@@ -614,7 +624,7 @@ void WebPageBlink::evaluateJavaScriptInAllFrames(const std::string& script, cons
 void WebPageBlink::cleanResources()
 {
     WebPageBase::cleanResources();
-    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "StopLoading and load about:blank");
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "StopLoading and load about:blank");
     d->pageView->StopLoading();
     d->pageView->LoadUrl(std::string("about:blank"));
 }
@@ -626,7 +636,7 @@ void WebPageBlink::close()
 
 void WebPageBlink::didFirstFrameFocused()
 {
-    LOG_DEBUG("[%s] render process frame focused for the first time", qPrintable(appId()));
+    LOG_DEBUG("[%s] render process frame focused for the first time", appId().c_str());
     //App load is finished, set use launching time optimization false.
     setUseLaunchOptimization(false);
 }
@@ -638,14 +648,14 @@ void WebPageBlink::didDropAllPeerConnections()
 void WebPageBlink::loadFinished(const std::string& url)
 {
     LOG_INFO(MSGID_WEBPAGE_LOAD_FINISHED, 2,
-        PMLOGKS("APP_ID", qPrintable(appId())),
+        PMLOGKS("APP_ID", appId().c_str()),
         PMLOGKFV("PID", "%d", getWebProcessPID()),
         "url from web engine : %s", url.c_str());
 
     if (cleaningResources()) {
         LOG_INFO(MSGID_WEBPAGE_LOAD_FINISHED,
             2,
-            PMLOGKS("APP_ID", qPrintable(appId())),
+            PMLOGKS("APP_ID", appId().c_str()),
             PMLOGKFV("PID", "%d", getWebProcessPID()),
             "cleaningResources():true; (should be about:blank) emit 'didDispatchUnload'");
         // TODO: Remove QSignal
@@ -657,14 +667,14 @@ void WebPageBlink::loadFinished(const std::string& url)
 
 void WebPageBlink::loadStarted()
 {
-    LOG_INFO(MSGID_PAGE_LOADING, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()),  PMLOGKS("LOADING", "STARTED"), "");
+    LOG_INFO(MSGID_PAGE_LOADING, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()),  PMLOGKS("LOADING", "STARTED"), "");
     m_hasCloseCallback = false;
     handleLoadStarted();
 }
 
 void WebPageBlink::loadStopped(const std::string& url)
 {
-    LOG_INFO(MSGID_PAGE_LOADING, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()),  PMLOGKS("LOADING", "STOPPED"), "");
+    LOG_INFO(MSGID_PAGE_LOADING, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()),  PMLOGKS("LOADING", "STOPPED"), "");
 }
 
 void WebPageBlink::loadFailed(const std::string& url, int errCode, const std::string& errDesc)
@@ -676,7 +686,7 @@ void WebPageBlink::loadFailed(const std::string& url, int errCode, const std::st
         return;
 
     LOG_WARNING(MSGID_PAGE_LOAD_FAILED, 4,
-                PMLOGKS("APP_ID", qPrintable(appId())),
+                PMLOGKS("APP_ID", appId().c_str()),
                 PMLOGKFV("ERROR_CODE", "%d", errCode),
                 PMLOGKS("ERROR_STR", errDesc.c_str()),
                 PMLOGKS("URL", url.c_str()),
@@ -714,9 +724,9 @@ void WebPageBlink::forwardEvent(void* event)
 
 void WebPageBlink::recreateWebView()
 {
-    LOG_INFO(MSGID_WEBPROC_CRASH, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "recreateWebView; initialize WebPage");
+    LOG_INFO(MSGID_WEBPROC_CRASH, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "recreateWebView; initialize WebPage");
     delete d->pageView;
-    if(!m_customPluginPath.isEmpty()) {
+    if(!m_customPluginPath.empty()) {
         // check setCustomPluginIfNeeded logic
         // not to set duplicated plugin path, it compares m_customPluginPath and new one
         m_customPluginPath = "";  // just make it init state
@@ -761,9 +771,9 @@ void WebPageBlink::notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel 
 
 void WebPageBlink::renderProcessCrashed()
 {
-    LOG_INFO(MSGID_WEBPROC_CRASH, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "m_isSuspended : %s", m_isSuspended?"true":"false");
+    LOG_INFO(MSGID_WEBPROC_CRASH, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "m_isSuspended : %s", m_isSuspended?"true":"false");
     if (isClosing()) {
-        LOG_INFO(MSGID_WEBPROC_CRASH, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "In Closing; return");
+        LOG_INFO(MSGID_WEBPROC_CRASH, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "In Closing; return");
         if (m_closeCallbackTimer.isRunning())
             m_closeCallbackTimer.stop();
 
@@ -814,11 +824,13 @@ bool WebPageBlink::inspectable()
 // then add any other userscripts that we might want via the C API, and then proceed.
 
 // IF any further userscripts are desired in the future, they should be added here.
-void WebPageBlink::addUserScript(const QString& script)
+void WebPageBlink::addUserScript(const std::string& script)
 {
-    d->pageView->addUserScript(script.toStdString());
+    d->pageView->addUserScript(script);
 }
 
+// FIXME: WebPage: qurl-less
+// FIXME: WebPage: qdir-less
 void WebPageBlink::addUserScriptUrl(const QUrl& url)
 {
     QString path;
@@ -849,10 +861,10 @@ void WebPageBlink::setupStaticUserScripts()
     d->pageView->clearUserScripts();
 
     // Load Tellurium test framework if available, as a UserScript
-    QString telluriumNubPath_ = telluriumNubPath();
-    if (!telluriumNubPath_.isEmpty()) {
-        LOG_DEBUG("Loading tellurium nub at %s", qPrintable(telluriumNubPath_));
-        addUserScriptUrl(QUrl::fromLocalFile(telluriumNubPath_));
+    std::string telluriumNubPath_ = telluriumNubPath();
+    if (!telluriumNubPath_.empty()) {
+        LOG_DEBUG("Loading tellurium nub at %s", telluriumNubPath_.c_str());
+        addUserScriptUrl(QUrl::fromLocalFile(QString::fromStdString(telluriumNubPath_))); // FIXME: WebPage: qurl-less
     }
 }
 
@@ -878,7 +890,7 @@ void WebPageBlink::setPageProperties()
 
     // set inspectable
     if (m_appDesc->isInspectable() || inspectable()) {
-        LOG_DEBUG("[%s] inspectable : true or 'debug_system_apps' mode; setInspectablePage(true)", qPrintable(appId()));
+        LOG_DEBUG("[%s] inspectable : true or 'debug_system_apps' mode; setInspectablePage(true)", appId().c_str());
         d->pageView->EnableInspectablePage();
     }
 
@@ -892,9 +904,9 @@ void WebPageBlink::createPalmSystem(WebAppBase* app)
     d->m_palmSystem->setLaunchParams(m_launchParams);
 }
 
-QString WebPageBlink::defaultTrustLevel() const
+std::string WebPageBlink::defaultTrustLevel() const
 {
-    return QString::fromStdString(m_appDesc->trustLevel());
+    return m_appDesc->trustLevel();
 }
 
 void WebPageBlink::loadExtension()
@@ -914,19 +926,19 @@ void WebPageBlink::setCustomPluginIfNeeded()
     if (!m_appDesc || !m_appDesc->useCustomPlugin())
         return;
 
-    QString customPluginPath = QString::fromStdString(m_appDesc->folderPath());
-    customPluginPath.append("/plugins");
+    std::string customPluginPath = m_appDesc->folderPath();
+    customPluginPath += "/plugins";
 
-    if (!QDir(customPluginPath).exists())
+    if (!QDir(QString::fromStdString(customPluginPath)).exists()) // FIXME: WebPage: qdir-less
         return;
     if (!m_customPluginPath.compare(customPluginPath))
         return;
 
     m_customPluginPath = customPluginPath;
-    LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), PMLOGKS("CUSTOM_PLUGIN_PATH", qPrintable(m_customPluginPath)), "%s", __func__);
+    LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), PMLOGKS("CUSTOM_PLUGIN_PATH", m_customPluginPath.c_str()), "%s", __func__);
 
-    d->pageView->AddCustomPluginDir(m_customPluginPath.toStdString());
-    d->pageView->AddAvailablePluginDir(m_customPluginPath.toStdString());
+    d->pageView->AddCustomPluginDir(m_customPluginPath);
+    d->pageView->AddAvailablePluginDir(m_customPluginPath);
 }
 
 void WebPageBlink::setDisallowScrolling(bool disallow)
@@ -943,7 +955,7 @@ int WebPageBlink::renderProcessPid() const
 void WebPageBlink::didRunCloseCallback()
 {
     m_closeCallbackTimer.stop();
-    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "WebPageBlink::didRunCloseCallback(); onclose callback done");
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "WebPageBlink::didRunCloseCallback(); onclose callback done");
     FOR_EACH_OBSERVER(WebPageObserver, m_observers, closeCallbackExecuted());
 }
 
@@ -967,7 +979,7 @@ void WebPageBlink::executeCloseCallback(bool forced)
 void WebPageBlink::timeoutCloseCallback()
 {
     m_closeCallbackTimer.stop();
-    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "WebPageBlink::timeoutCloseCallback(); onclose callback Timeout");
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "WebPageBlink::timeoutCloseCallback(); onclose callback Timeout");
     FOR_EACH_OBSERVER(WebPageObserver, m_observers, timeoutExecuteCloseCallback());
 }
 
@@ -1042,7 +1054,7 @@ double WebPageBlink::devicePixelRatio()
         devicePixelRatio = ratioX;
     }
     LOG_DEBUG("[%s] WebPageBlink::devicePixelRatio(); devicePixelRatio : %f; deviceWidth : %f, deviceHeight : %f, appWidth : %f, appHeight : %f",
-        qPrintable(appId()), devicePixelRatio, deviceWidth, deviceHeight, appWidth, appHeight);
+        appId().c_str(), devicePixelRatio, deviceWidth, deviceHeight, appWidth, appHeight);
     return devicePixelRatio;
 }
 
@@ -1050,7 +1062,7 @@ void WebPageBlink::setSupportDolbyHDRContents()
 {
     std::string supportDolbyHDRContents;
     getDeviceInfo("supportDolbyHDRContents", supportDolbyHDRContents);
-    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()),
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()),
              "supportDolbyHDRContents:%s", supportDolbyHDRContents.c_str());
     d->pageView->SetSupportDolbyHDRContents(supportDolbyHDRContents == "true");
 }
@@ -1067,23 +1079,23 @@ void WebPageBlink::deleteWebStorages(const std::string& identifier)
 
 void WebPageBlink::setInspectorEnable()
 {
-    LOG_DEBUG("[%s] Inspector enable", qPrintable(appId()));
+    LOG_DEBUG("[%s] Inspector enable", appId().c_str());
     d->pageView->EnableInspectablePage();
 }
 
 void WebPageBlink::setKeepAliveWebApp(bool keepAlive) {
-    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "setKeepAliveWebApp(%s)", keepAlive?"true":"false");
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "setKeepAliveWebApp(%s)", keepAlive?"true":"false");
     d->pageView->SetKeepAliveWebApp(keepAlive);
     d->pageView->UpdatePreferences();
 }
 
-void WebPageBlink::setLoadErrorPolicy(const QString& policy)
+void WebPageBlink::setLoadErrorPolicy(const std::string& policy)
 {
     m_loadErrorPolicy = policy;
-    if(!policy.compare("event")) {
+    if(policy == "event") {
         // policy : event
         m_hasCustomPolicyForResponse = true;
-    } else if (!policy.compare("default")) {
+    } else if (policy == "default") {
         // policy : default, WAM and blink handle all load errors
         m_hasCustomPolicyForResponse = false;
     }
@@ -1091,11 +1103,11 @@ void WebPageBlink::setLoadErrorPolicy(const QString& policy)
 
 bool WebPageBlink::decidePolicyForResponse(bool isMainFrame, int statusCode, const std::string& url, const std::string& statusText)
 {
-    LOG_INFO(MSGID_WAM_DEBUG, 7, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), PMLOGKFV("STATUS_CODE", "%d", statusCode),
+    LOG_INFO(MSGID_WAM_DEBUG, 7, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), PMLOGKFV("STATUS_CODE", "%d", statusCode),
         PMLOGKS("URL", url.c_str()), PMLOGKS("TEXT", statusText.c_str()), PMLOGKS("MAIN_FRAME", isMainFrame ? "true" : "false"), PMLOGKS("RESPONSE_POLICY", isMainFrame ? "event" : "default"), "");
 
     // how to WAM3 handle this response
-    applyPolicyForUrlResponse(isMainFrame, QString(url.c_str()), statusCode);
+    applyPolicyForUrlResponse(isMainFrame, url, statusCode);
 
     // how to blink handle this response
     // ACR requirement : even if received error response from subframe(iframe)ACR app should handle that as a error
@@ -1131,9 +1143,9 @@ void WebPageBlink::updateIsLoadErrorPageFinish()
     bool wasErrorPage = m_isLoadErrorPageFinish;
     WebPageBase::updateIsLoadErrorPageFinish();
 
-    if (trustLevel().compare("trusted") && wasErrorPage != m_isLoadErrorPageFinish) {
+    if (trustLevel() != "trusted" && wasErrorPage != m_isLoadErrorPageFinish) {
         if (m_isLoadErrorPageFinish) {
-            LOG_DEBUG("[%s] WebPageBlink::updateIsLoadErrorPageFinish(); m_isLoadErrorPageFinish : %s, set trustLevel : trusted to WAM and PalmSystem_injection", qPrintable(appId()), m_isLoadErrorPageFinish ? "true" : "false");
+            LOG_DEBUG("[%s] WebPageBlink::updateIsLoadErrorPageFinish(); m_isLoadErrorPageFinish : %s, set trustLevel : trusted to WAM and PalmSystem_injection", appId().c_str(), m_isLoadErrorPageFinish ? "true" : "false");
             setTrustLevel("trusted");
             updateExtensionData("trustLevel", "trusted");
         }

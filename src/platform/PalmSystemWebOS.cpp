@@ -28,18 +28,18 @@
 PalmSystemWebOS::PalmSystemWebOS(WebAppBase* app)
     : m_app(static_cast<WebAppWayland*>(app))
     , m_initialized(false)
-    , m_launchParams(QString())
+    , m_launchParams()
 {
 }
 
-void PalmSystemWebOS::setLaunchParams(const QString& params)
+void PalmSystemWebOS::setLaunchParams(const std::string& params)
 {
-    QString p = params;
+    std::string p = params;
     Json::Value jsonDoc;
-    readJsonFromString(params.toStdString(), jsonDoc);
+    readJsonFromString(params, jsonDoc);
 
     if (jsonDoc.isNull())
-        p = QString();
+        p = "";
 
     m_launchParams = p;
 }
@@ -51,13 +51,13 @@ Json::Value PalmSystemWebOS::initialize()
     // Setup initial data set
     Json::Value data;
 
-    data["launchParams"] = launchParams().toStdString();
+    data["launchParams"] = launchParams();
     data["country"] = country().toStdString();
     data["currentCountryGroup"] = getDeviceInfo("CountryGroup");
     data["locale"] = locale();
     data["localeRegion"] = localeRegion().toStdString();
     data["isMinimal"] = isMinimal();
-    data["identifier"] = identifier().toStdString();
+    data["identifier"] = identifier();
     data["screenOrientation"] = screenOrientation().toStdString();
     data["activityId"] = (double)activityId();
     data["phoneRegion"] = phoneRegion().toStdString();
@@ -186,7 +186,7 @@ bool PalmSystemWebOS::cursorVisibility()
     return m_app->cursorVisibility();
 }
 
-void PalmSystemWebOS::updateLaunchParams(const QString& launchParams)
+void PalmSystemWebOS::updateLaunchParams(const std::string& launchParams)
 {
     m_app->page()->setLaunchParams(launchParams);
 }

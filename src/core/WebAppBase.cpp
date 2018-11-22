@@ -277,7 +277,7 @@ void WebAppBase::relaunch(const std::string& args, const std::string& launchingA
     if(d->m_page) {
         WebPageBase* page = d->m_page;
         // try to do relaunch!!
-        if(!(page->relaunch(args, launchingAppId))) { // FIXME: WebPage: qstr2stdstr
+        if(!(page->relaunch(args, launchingAppId))) {
           LOG_INFO(MSGID_APP_RELAUNCH, 2,
                    PMLOGKS("APP_ID", appId().c_str()),
                    PMLOGKFV("PID", "%d", page->getWebProcessPID()),
@@ -516,7 +516,7 @@ void WebAppBase::didDispatchUnload()
 void WebAppBase::closeWebApp()
 {
     LOG_INFO(MSGID_CLEANRESOURCE_COMPLETED, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "closeCallback/about:blank is DONE");
-    WebAppManager::instance()->removeClosingAppList(appId()); // FIXME: WebApp: qstr2stdstr
+    WebAppManager::instance()->removeClosingAppList(appId());
 #ifdef PRELOADMANAGER_ENABLED
     if (appId() == WebAppManager::instance()->getContainerAppId())
         WebAppManager::instance()->closeContainerApp();

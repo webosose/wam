@@ -17,7 +17,6 @@
 #ifndef WEBPAGEBASE_H
 #define WEBPAGEBASE_H
 
-#include <QtCore/QString>
 #include <QtCore/QUrl>
 
 #include "ObserverList.h"
@@ -54,9 +53,9 @@ public:
     // WebPageBase
     virtual void init() = 0;
     virtual void* getWebContents() = 0;
-    virtual void setLaunchParams(const QString& params);
+    virtual void setLaunchParams(const std::string& params);
     virtual void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level) {}
-    virtual QString getIdentifier() const;
+    virtual std::string getIdentifier() const;
     virtual QUrl url() const = 0; /* return current url */
     virtual QUrl defaultUrl() const { return m_defaultUrl; } /* return default url */
     virtual void setDefaultUrl(QUrl url) { m_defaultUrl = url; } /* just set default url */
@@ -66,14 +65,14 @@ public:
     virtual bool hasBeenShown() const = 0;
     virtual void setPageProperties() = 0;
     virtual void setPreferredLanguages(const std::string& language) = 0;
-    virtual QString defaultFont();
-    virtual void setDefaultFont(const QString& font) = 0;
+    virtual std::string defaultFont();
+    virtual void setDefaultFont(const std::string& font) = 0;
     virtual void cleanResources();
     virtual void reloadDefaultPage() = 0;
     virtual void reload() = 0;
     virtual void setVisibilityState(WebPageVisibilityState visibilityState) = 0;
     virtual void setFocus(bool focus) = 0;
-    virtual QString title() = 0;
+    virtual std::string title() = 0;
     virtual bool canGoBack() = 0;
     virtual void closeVkb() = 0;
     virtual bool isKeyboardVisible() const { return false; }
@@ -113,14 +112,14 @@ public:
     virtual void resetStateToMarkNextPaintForContainer() {}
     virtual bool isInputMethodActive() const { return false; }
 
-    QString launchParams() const;
+    std::string launchParams() const;
     void setApplicationDescription(ApplicationDescription* desc);
     void load();
     void setEnableBackgroundRun(bool enable) { m_enableBackgroundRun = enable; }
     void sendLocaleChangeEvent(const std::string& language);
     void setCleaningResources(bool cleaningResources) { m_cleaningResources = cleaningResources; }
     bool cleaningResources() const { return m_cleaningResources; }
-    bool doHostedWebAppRelaunch(const QString& launchParams);
+    bool doHostedWebAppRelaunch(const std::string& launchParams);
     void sendRelaunchEvent();
     void setAppId(const std::string& appId) { m_appId = appId; }
     const std::string& appId() const { return m_appId; }
@@ -135,21 +134,19 @@ public:
     void addObserver(WebPageObserver* observer);
     void removeObserver(WebPageObserver* observer);
 
-    static QString truncateURL(const QString& url);
-
 protected:
     // WebPageBase
     virtual void cleanResourcesFinished();
     virtual void handleForceDeleteWebPage();
     virtual void loadDefaultUrl() = 0;
-    virtual void addUserScript(const QString& script) = 0;
+    virtual void addUserScript(const std::string& script) = 0;
     virtual void addUserScriptUrl(const QUrl& url) = 0;
     virtual int suspendDelay();
     virtual bool hasLoadErrorPolicy(bool isHttpResponseError, int errorCode);
     virtual void loadErrorPage(int errorCode) = 0;
     virtual void recreateWebView() = 0;
     virtual void setVisible(bool visible) {}
-    virtual bool doDeeplinking(const QString& launchParams);
+    virtual bool doDeeplinking(const std::string& launchParams);
     virtual void suspendWebPagePaintingAndJSExecution() = 0;
 
     void handleLoadStarted();
@@ -162,9 +159,9 @@ protected:
     WebProcessManager* getWebProcessManager();
     WebAppManagerConfig* getWebAppManagerConfig();
     bool processCrashed();
-    QString telluriumNubPath();
+    std::string telluriumNubPath();
 
-    void applyPolicyForUrlResponse(bool isMainFrame, const QString& url, int statusCode);
+    void applyPolicyForUrlResponse(bool isMainFrame, const std::string& url, int statusCode);
     void postRunningAppList();
     void postWebProcessCreated(uint32_t pid);
     bool isAccessibilityEnabled() const;
@@ -177,12 +174,12 @@ protected:
     bool m_isLoadErrorPageStart;
     bool m_enableBackgroundRun;
     QUrl m_defaultUrl;
-    QString m_launchParams;
-    QString m_loadErrorPolicy;
+    std::string m_launchParams;
+    std::string m_loadErrorPolicy;
     ObserverList<WebPageObserver> m_observers;
 
 private:
-    void setBackgroundColorOfBody(const QString& color);
+    void setBackgroundColorOfBody(const std::string& color);
     void setupLaunchEvent();
 
     bool m_cleaningResources;
