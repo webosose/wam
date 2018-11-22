@@ -300,7 +300,7 @@ void WebPageBlink::reloadDefaultPage()
 // FIXME: WebPage: qfile/qdir-less
 void WebPageBlink::loadErrorPage(int errorCode)
 {
-    QString errorpage = getWebAppManagerConfig()->getErrorPageUrl();
+    QString errorpage = QString::fromStdString(getWebAppManagerConfig()->getErrorPageUrl());
     if(!errorpage.isEmpty()) {
         if(hasLoadErrorPolicy(false, errorCode)) {
             // has loadErrorPolicy, do not show error page
