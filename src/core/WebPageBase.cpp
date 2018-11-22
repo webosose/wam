@@ -125,7 +125,7 @@ void WebPageBase::setupLaunchEvent()
     addUserScript(launchEventJS);
 }
 
-void WebPageBase::sendLocaleChangeEvent(const QString&)
+void WebPageBase::sendLocaleChangeEvent(const std::string&)
 {
     evaluateJavaScript(
         "setTimeout(function () {"
@@ -140,8 +140,9 @@ void WebPageBase::cleanResources()
     setCleaningResources(true);
 }
 
-bool WebPageBase::relaunch(const QString& launchParams, const QString& launchingAppId)
+bool WebPageBase::relaunch(const std::string& launchParams_, const std::string& launchingAppId)
 {
+    QString launchParams = QString::fromStdString(launchParams_); // FIXME: WebPage: qstr2stdstr
     resumeWebPagePaintingAndJSExecution();
 
     // for common webapp relaunch scenario
