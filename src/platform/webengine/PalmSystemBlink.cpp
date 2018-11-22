@@ -99,7 +99,7 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
         if (params.size() > 1) {
             LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", m_app->appId().c_str()), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()),
                 "webOSSystem.window.setProperty('%s', '%s')", qPrintable(params[0]), qPrintable(params[1]));
-            m_app->setWindowProperty(params[0].toStdString(), params[1]);
+            m_app->setWindowProperty(params[0].toStdString(), params[1].toStdString());
         }
     } else if (message == "platformBack") {
         LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", m_app->appId().c_str()), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.platformBack()");

@@ -19,9 +19,6 @@
 
 #include <memory>
 
-// FIXME: WebApp: qvariant-less
-#include <QVariant>
-
 #include "WebAppManager.h"
 #include "WebPageObserver.h"
 
@@ -64,7 +61,7 @@ public:
     virtual void setKeepAlive(bool keepAlive);
     virtual bool isWindowed() const;
     virtual void relaunch(const std::string& args, const std::string& launchingAppId);
-    virtual void setWindowProperty(const std::string& name, const QVariant& value) = 0;
+    virtual void setWindowProperty(const std::string& name, const std::string& value) = 0;
     virtual void platformBack() = 0;
     virtual void setCursor(const std::string& cursorArg, int hotspot_x, int hotspot_y) = 0;
     virtual void setInputRegion(const Json::Value& jsonDoc) = 0;
