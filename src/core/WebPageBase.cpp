@@ -448,8 +448,8 @@ void WebPageBase::updateIsLoadErrorPageFinish()
 
     QString urlString = url().toString();
     QString urlFileName = url().fileName();
-    QString errorPageFileName = QUrl(getWebAppManagerConfig()->getErrorPageUrl()).fileName();
-    QString errorPageDirPath = getWebAppManagerConfig()->getErrorPageUrl().remove(errorPageFileName);
+    QString errorPageFileName = QUrl(QString::fromStdString(getWebAppManagerConfig()->getErrorPageUrl())).fileName();
+    QString errorPageDirPath = QString::fromStdString(getWebAppManagerConfig()->getErrorPageUrl()).remove(errorPageFileName);
     if (urlString.startsWith(errorPageDirPath) && !urlFileName.compare(errorPageFileName)) {
         LOG_DEBUG("[%s] This is WAM ErrorPage; URL: %s ", appId().c_str(), qPrintable(urlString));
         m_isLoadErrorPageFinish = true;
@@ -461,7 +461,9 @@ void WebPageBase::setCustomUserScript()
 {
     // 1. check app folder has userScripts
     // 2. check userscript.js there is, appfolder/webOSUserScripts/*.js
-    QString userScriptFilePath = QDir(QString::fromStdString(m_appDesc->folderPath())).filePath(getWebAppManagerConfig()->getUserScriptPath());
+    QString userScriptFilePath = QDir(QString::fromStdString(m_appDesc->folderPath()))
+        .filePath(QString::fromStdString(getWebAppManagerConfig()->getUserScriptPath()));
+
     if(!QFileInfo(userScriptFilePath).isReadable())
         return;
 

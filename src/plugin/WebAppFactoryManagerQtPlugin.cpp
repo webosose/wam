@@ -53,11 +53,11 @@ WebAppFactoryManagerQtPlugin::WebAppFactoryManagerQtPlugin()
 {
     WebAppManagerConfig* webAppManagerConfig = WebAppManager::instance()->config();
 
-    QString factoryEnv = webAppManagerConfig->getWebAppFactoryPluginTypes();
+    QString factoryEnv = QString::fromStdString(webAppManagerConfig->getWebAppFactoryPluginTypes());
     m_factoryEnv = factoryEnv.split(QLatin1Char(':'));
     m_factoryEnv.append(kDefaultAppType);
 
-    m_webAppFactoryPluginPath = webAppManagerConfig->getWebAppFactoryPluginPath();
+    m_webAppFactoryPluginPath = QString::fromStdString(webAppManagerConfig->getWebAppFactoryPluginPath());
 
     if (webAppManagerConfig->isDynamicPluggableLoadEnabled())
         m_loadPluggableOnDemand = true;
