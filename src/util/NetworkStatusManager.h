@@ -17,22 +17,21 @@
 #ifndef NETWORKSTATUS_MANAGER_H
 #define NETWORKSTATUS_MANAGER_H
 
-#include "NetworkStatus.h"
-
 #include <map>
+#include <string>
 
-#include <QString>
+#include "NetworkStatus.h"
 
 class NetworkStatusManager {
 public:
     void updateNetworkStatus(const NetworkStatus& status);
     void checkInformationChange(const NetworkStatus::Information& information);
-    void appendLogList(const QString& key, const QString& previous, const QString& current);
+    void appendLogList(const std::string& key, const std::string& previous, const std::string& current);
     void printLog();
 
 private:
     NetworkStatus m_current;
-    std::map<QString, std::pair<QString, QString>> m_logList;
+    std::map<std::string, std::pair<std::string, std::string>> m_logList;
 };
 
 #endif //#ifndef NETWORKSTATUS_MANAGER_H
