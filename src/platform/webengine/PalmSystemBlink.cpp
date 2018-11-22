@@ -98,7 +98,7 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
         if (params.size() > 1) {
             LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", m_app->appId().c_str()), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()),
                 "PalmSystem.window.setProperty('%s', '%s')", qPrintable(params[0]), qPrintable(params[1]));
-            m_app->setWindowProperty(params[0], params[1]);
+            m_app->setWindowProperty(params[0].toStdString(), params[1]);
         }
     } else if (message == "platformBack") {
         LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", m_app->appId().c_str()), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "PalmSystem.platformBack()");
@@ -108,7 +108,7 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
         v1 = params.at(0);
         v2 = params.at(1);
         v3 = params.at(2);
-        m_app->setCursor(v1.toString(), v2.toInt(), v3.toInt());
+        m_app->setCursor(v1.toString().toStdString(), v2.toInt(), v3.toInt());
     } else if (message == "setInputRegion") {
         QByteArray data;
         for (int i = 0; i < params.count(); i++) {

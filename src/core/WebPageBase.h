@@ -80,7 +80,7 @@ public:
     virtual void keyboardVisibilityChanged(bool visible) {}
     virtual void updatePageSettings() = 0;
     virtual void handleDeviceInfoChanged(const std::string& deviceInfo) = 0;
-    virtual bool relaunch(const QString& args, const QString& launchingAppId);
+    virtual bool relaunch(const std::string& args, const std::string& launchingAppId);
     virtual void evaluateJavaScript(const std::string& jsCode) = 0;
     virtual void evaluateJavaScriptInAllFrames(const std::string& jsCode, const char* method = "") = 0;
     virtual void setForceActivateVtg(bool enabled) = 0;
@@ -117,7 +117,7 @@ public:
     void setApplicationDescription(ApplicationDescription* desc);
     void load();
     void setEnableBackgroundRun(bool enable) { m_enableBackgroundRun = enable; }
-    void sendLocaleChangeEvent(const QString& language);
+    void sendLocaleChangeEvent(const std::string& language);
     void setCleaningResources(bool cleaningResources) { m_cleaningResources = cleaningResources; }
     bool cleaningResources() const { return m_cleaningResources; }
     bool doHostedWebAppRelaunch(const QString& launchParams);

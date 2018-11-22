@@ -17,7 +17,7 @@
 #ifndef WEBAPPBASE_H
 #define WEBAPPBASE_H
 
-#include <QString>
+// FIXME: WebApp: qvariant-less
 #include <QVariant>
 
 #include "WebAppManager.h"
@@ -61,10 +61,10 @@ public:
     virtual void configureWindow(const std::string& type) = 0;
     virtual void setKeepAlive(bool keepAlive);
     virtual bool isWindowed() const;
-    virtual void relaunch(const QString& args, const QString& launchingAppId);
-    virtual void setWindowProperty(const QString& name, const QVariant& value) = 0;
+    virtual void relaunch(const std::string& args, const std::string& launchingAppId);
+    virtual void setWindowProperty(const std::string& name, const QVariant& value) = 0;
     virtual void platformBack() = 0;
-    virtual void setCursor(const QString& cursorArg, int hotspot_x, int hotspot_y) = 0;
+    virtual void setCursor(const std::string& cursorArg, int hotspot_x, int hotspot_y) = 0;
     virtual void setInputRegion(const Json::Value& jsonDoc) = 0;
     virtual void setKeyMask(const Json::Value& jsonDoc) = 0;
     virtual void hide(bool forcedHide = false) = 0;
@@ -82,7 +82,7 @@ public:
     virtual void keyboardVisibilityChanged(bool visible, int height);
     virtual void doClose() = 0;
 
-    static void onCursorVisibilityChanged(const QString& jsscript);
+    static void onCursorVisibilityChanged(const std::string& jsscript);
 
     bool getCrashState();
     void setCrashState(bool state);
@@ -100,7 +100,7 @@ public:
     std::string launchingAppId() const;
     void setInstanceId(const std::string& instanceId);
     std::string instanceId() const;
-    QString url() const;
+    std::string url() const;
 
     ApplicationDescription* getAppDescription() const;
 
@@ -147,8 +147,8 @@ protected:
 protected:
     PreloadState m_preloadState;
     bool m_addedToWindowMgr;
-    QString m_inProgressRelaunchParams;
-    QString m_inProgressRelaunchLaunchingAppId;
+    std::string m_inProgressRelaunchParams;
+    std::string m_inProgressRelaunchLaunchingAppId;
     float m_scaleFactor;
 
 private:

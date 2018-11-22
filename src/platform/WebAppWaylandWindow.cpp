@@ -95,21 +95,21 @@ void WebAppWaylandWindow::platformBack()
     LOG_INFO(MSGID_WAM_DEBUG, 1, PMLOGKS("APP_ID", m_webApp->appId().c_str()), "WebAppWaylandWindow::platformBack(); generate RECENT key");
 }
 
-void WebAppWaylandWindow::setCursor(const QString & cursorArg, int hotspot_x, int hotspot_y)
+void WebAppWaylandWindow::setCursor(const std::string& cursorArg, int hotspot_x, int hotspot_y)
 {
     webos::CustomCursorType type = webos::CUSTOM_CURSOR_NOT_USE;
-    if (cursorArg.isEmpty() || !cursorArg.compare("default"))
-        LOG_DEBUG("[%s] %s; arg: %s; Restore Cursor to webos::CUSTOM_CURSOR_NOT_USE", m_webApp->appId().c_str(), __PRETTY_FUNCTION__, cursorArg.toUtf8().data());
-    else if (!cursorArg.compare("blank")) {
-        LOG_DEBUG("[%s] %s; arg: %s; Set Cursor to webos::CUSTOM_CURSOR_BLANK", m_webApp->appId().c_str(), __PRETTY_FUNCTION__, cursorArg.toUtf8().data());
+    if (cursorArg.empty() || cursorArg == "default")
+        LOG_DEBUG("[%s] %s; arg: %s; Restore Cursor to webos::CUSTOM_CURSOR_NOT_USE", m_webApp->appId().c_str(), __PRETTY_FUNCTION__, cursorArg.c_str());
+    else if (cursorArg == "blank") {
+        LOG_DEBUG("[%s] %s; arg: %s; Set Cursor to webos::CUSTOM_CURSOR_BLANK", m_webApp->appId().c_str(), __PRETTY_FUNCTION__, cursorArg.c_str());
         type = webos::CUSTOM_CURSOR_BLANK;
     } else {
-        LOG_DEBUG("[%s] %s; Custom Cursor file path : %s, hotspot_x : %d, hotspot_y : %d", __PRETTY_FUNCTION__, m_webApp->appId().c_str(), cursorArg.toUtf8().data(), hotspot_x, hotspot_y);
+        LOG_DEBUG("[%s] %s; Custom Cursor file path : %s, hotspot_x : %d, hotspot_y : %d", __PRETTY_FUNCTION__, m_webApp->appId().c_str(), cursorArg.c_str(), hotspot_x, hotspot_y);
         type = webos::CUSTOM_CURSOR_PATH;
     }
 
 #if defined(OS_WEBOS)
-    SetCustomCursor(type, cursorArg.toUtf8().data(), hotspot_x, hotspot_y);
+    SetCustomCursor(type, cursorArg.c_str(), hotspot_x, hotspot_y);
 #endif
 
     if (type == webos::CUSTOM_CURSOR_BLANK)
