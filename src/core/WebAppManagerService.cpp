@@ -176,15 +176,15 @@ Json::Value WebAppManagerService::closeByInstanceId(const std::string& instanceI
 {
     LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("INSTANCE_ID", instanceId.c_str()), PMLOGKS("API", "closeByInstanceId"), "");
     WebAppBase* app = WebAppManager::instance()->findAppByInstanceId(instanceId);
-    QString appId;
+    std::string appId;
     if (app) {
         appId = app->appId();
         WebAppManager::instance()->forceCloseAppInternal(app);
     }
 
     Json::Value reply(Json::objectValue);
-    if(!appId.isNull()) {
-        reply["appId"] = appId.toStdString();
+    if(!appId.empty()) {
+        reply["appId"] = appId;
         reply["processId"] = instanceId;
         reply["returnValue"] = true;
     }

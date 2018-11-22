@@ -40,7 +40,7 @@ public:
         if(m_page)
             delete m_page;
 
-        LOG_DEBUG("Delete webapp base for App ID %s", qPrintable(m_appId));
+        LOG_DEBUG("Delete webapp base for App ID %s", m_appId.c_str());
     }
 
     void createActivity()
@@ -57,7 +57,7 @@ public:
     bool m_keepAlive;
     bool m_forceClose;
     std::string m_launchingAppId;
-    QString m_appId;
+    std::string m_appId;
     std::string m_instanceId;
     QString m_url;
     ApplicationDescription* m_appDesc;
@@ -77,7 +77,7 @@ WebAppBase::WebAppBase()
 
 WebAppBase::~WebAppBase()
 {
-    LOG_INFO(MSGID_WEBAPP_CLOSED, 2, PMLOGKS("APP_ID", appId().isEmpty() ? "unknown" : qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
+    LOG_INFO(MSGID_WEBAPP_CLOSED, 2, PMLOGKS("APP_ID", appId().empty() ? "unknown" : appId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
     cleanResources();
     delete d;
 }
@@ -142,7 +142,7 @@ bool WebAppBase::isWindowed() const
     return false;
 }
 
-void WebAppBase::setAppId(const QString& appId)
+void WebAppBase::setAppId(const std::string& appId)
 {
     d->m_appId = appId;
 }
@@ -152,7 +152,7 @@ void WebAppBase::setLaunchingAppId(const std::string& appId)
     d->m_launchingAppId = appId;
 }
 
-QString WebAppBase::appId() const
+std::string WebAppBase::appId() const
 {
     return d->m_appId;
 }
@@ -245,7 +245,7 @@ WebPageBase* WebAppBase::detach(void)
 void WebAppBase::relaunch(const QString& args, const QString& launchingAppId)
 {
     LOG_INFO(MSGID_APP_RELAUNCH, 3,
-             PMLOGKS("APP_ID", qPrintable(appId())),
+             PMLOGKS("APP_ID", appId().c_str()),
              PMLOGKFV("PID", "%d", page()->getWebProcessPID()),
              PMLOGKS("LAUNCHING_APP_ID", qPrintable(launchingAppId)), "");
     if (getHiddenWindow()) {
@@ -267,7 +267,7 @@ void WebAppBase::relaunch(const QString& args, const QString& launchingAppId)
 
     if (getCrashState()) {
         LOG_INFO(MSGID_APP_RELAUNCH, 2,
-                 PMLOGKS("APP_ID", qPrintable(appId())),
+                 PMLOGKS("APP_ID", appId().c_str()),
                  PMLOGKFV("PID", "%d", page()->getWebProcessPID()),
                  "Crashed in Background; Reluad Default page");
         page()->reloadDefaultPage();
@@ -279,7 +279,7 @@ void WebAppBase::relaunch(const QString& args, const QString& launchingAppId)
         // try to do relaunch!!
         if(!(page->relaunch(args, launchingAppId))) {
           LOG_INFO(MSGID_APP_RELAUNCH, 2,
-                   PMLOGKS("APP_ID", qPrintable(appId())),
+                   PMLOGKS("APP_ID", appId().c_str()),
                    PMLOGKFV("PID", "%d", page->getWebProcessPID()),
                    "Can't handle Relaunch now, backup the args and handle it after page loading finished");
             // if relaunch hasn't beeh executed, then set and wait till currnt page loading is finished
@@ -289,11 +289,11 @@ void WebAppBase::relaunch(const QString& args, const QString& launchingAppId)
         }
 
         if(d->m_appDesc && !(d->m_appDesc->handlesRelaunch())) {
-            LOG_DEBUG("[%s] m_appDesc->handlesRelaunch : false, call raise() to make it full screen", qPrintable(appId()));
+            LOG_DEBUG("[%s] m_appDesc->handlesRelaunch : false, call raise() to make it full screen", appId().c_str());
             raise();
         } else {
             LOG_INFO(MSGID_APP_RELAUNCH, 2,
-                     PMLOGKS("APP_ID", qPrintable(appId())),
+                     PMLOGKS("APP_ID", appId().c_str()),
                      PMLOGKFV("PID", "%d", page->getWebProcessPID()),
                      "handlesRelanch : true; Do not call raise()");
         }
@@ -309,7 +309,7 @@ void WebAppBase::doPendingRelaunch()
 {
     if(m_inProgressRelaunchLaunchingAppId.size() || m_inProgressRelaunchParams.size()) {
       LOG_INFO(MSGID_APP_RELAUNCH, 2,
-               PMLOGKS("APP_ID", qPrintable(appId())),
+               PMLOGKS("APP_ID", appId().c_str()),
                PMLOGKFV("PID", "%d", page()->getWebProcessPID()),
                "Page loading --> done; Do pending Relaunch");
         relaunch(m_inProgressRelaunchParams, m_inProgressRelaunchLaunchingAppId);
@@ -321,8 +321,8 @@ void WebAppBase::doPendingRelaunch()
 
 void WebAppBase::webPageClosePageRequested()
 {
-    LOG_INFO(MSGID_WINDOW_CLOSED_JS, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
-    WebAppManager::instance()->closeApp(appId().toStdString());
+    LOG_INFO(MSGID_WINDOW_CLOSED_JS, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
+    WebAppManager::instance()->closeApp(appId());
 }
 
 void WebAppBase::stagePreparing()
@@ -356,7 +356,7 @@ void WebAppBase::setAppDescription(ApplicationDescription* appDesc)
     d->m_appDesc = appDesc;
 
     // set appId here from appDesc
-   d->m_appId = QString::fromStdString(appDesc->id());
+   d->m_appId = appDesc->id();
 
    if (appDesc->widthOverride() && appDesc->heightOverride()) {
         float scaleX = static_cast<float>(currentUiWidth()) / appDesc->widthOverride();
@@ -490,7 +490,7 @@ void WebAppBase::setUseAccessibility(bool enabled)
 void WebAppBase::executeCloseCallback()
 {
     page()->executeCloseCallback(forceClose());
-    LOG_INFO(MSGID_EXECUTE_CLOSECALLBACK, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
+    LOG_INFO(MSGID_EXECUTE_CLOSECALLBACK, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
 }
 
 void WebAppBase::closeCallbackExecuted()
@@ -515,11 +515,10 @@ void WebAppBase::didDispatchUnload()
 
 void WebAppBase::closeWebApp()
 {
-    LOG_INFO(MSGID_CLEANRESOURCE_COMPLETED, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "closeCallback/about:blank is DONE");
-    WebAppManager::instance()->removeClosingAppList(appId().toStdString()); // FIXME: WebApp: qstr2stdstr
+    LOG_INFO(MSGID_CLEANRESOURCE_COMPLETED, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "closeCallback/about:blank is DONE");
+    WebAppManager::instance()->removeClosingAppList(appId()); // FIXME: WebApp: qstr2stdstr
 #ifdef PRELOADMANAGER_ENABLED
-    // FIXME: WebApp: qstr2stdstr
-    if (appId().toStdString() == WebAppManager::instance()->getContainerAppId())
+    if (appId() == WebAppManager::instance()->getContainerAppId())
         WebAppManager::instance()->closeContainerApp();
     else
 #endif

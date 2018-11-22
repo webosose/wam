@@ -161,7 +161,7 @@ void WebPageBlink::init()
     std::string language;
     getSystemLanguage(language);
     setPreferredLanguages(language);
-    d->pageView->SetAppId(appId().toStdString());
+    d->pageView->SetAppId(appId());
     updateHardwareResolution();
     updateBoardType();
     updateDatabaseIdentifier();
@@ -580,7 +580,7 @@ void WebPageBlink::updatePageSettings()
     }
 
     LOG_DEBUG("[%s] WebPageBlink::updatePageSettings(); update appId to chromium", qPrintable(appId()));
-    d->pageView->SetAppId(appId().toStdString());
+    d->pageView->SetAppId(appId());
     d->pageView->SetTrustLevel(m_appDesc->trustLevel());
     d->pageView->SetAppPath(m_appDesc->folderPath());
 
@@ -1057,7 +1057,7 @@ void WebPageBlink::setSupportDolbyHDRContents()
 
 void WebPageBlink::updateDatabaseIdentifier()
 {
-    d->pageView->SetDatabaseIdentifier(m_appId.toStdString());
+    d->pageView->SetDatabaseIdentifier(m_appId);
 }
 
 void WebPageBlink::deleteWebStorages(const std::string& identifier)

@@ -97,14 +97,14 @@ void PalmSystemWebOS::activate()
 
     // ask compositor to raise window. Compositor should raise us, then
     // give us focus, so we shouldn't have to specifically request focus.
-    LOG_DEBUG("[%s] called PalmSystem.activate() from the app, call raise() to make full screen", qPrintable(m_app->appId()));
+    LOG_DEBUG("[%s] called PalmSystem.activate() from the app, call raise() to make full screen", m_app->appId().c_str());
 
     m_app->raise();
 }
 
 void PalmSystemWebOS::deactivate()
 {
-    LOG_DEBUG("[%s] called PalmSystem.deactivate() from the app, call goBackground() to go background", qPrintable(m_app->appId()));
+    LOG_DEBUG("[%s] called PalmSystem.deactivate() from the app, call goBackground() to go background", m_app->appId().c_str());
     m_app->goBackground();
 }
 
@@ -166,7 +166,7 @@ void PalmSystemWebOS::setKeepAlive(bool keep)
 void PalmSystemWebOS::pmLogInfoWithClock(const QVariant& msgid, const QVariant& perfType, const QVariant& perfGroup)
 {
     PmLogContext context;
-    PmLogGetContext(qPrintable(m_app->page()->appId()), &context);
+    PmLogGetContext(m_app->page()->appId().c_str(), &context);
     PmLogInfoWithClock(context, msgid.toByteArray().size() ? msgid.toByteArray().data() : NULL, 2,
                        PMLOGKS("PerfType", perfType.toByteArray().size() ? perfType.toByteArray().data() : "empty"),
                        PMLOGKS("PerfGroup", perfGroup.toByteArray().size() ? perfGroup.toByteArray().data() : "empty"), "");
@@ -175,7 +175,7 @@ void PalmSystemWebOS::pmLogInfoWithClock(const QVariant& msgid, const QVariant& 
 void PalmSystemWebOS::pmLogString(PmLogLevel level, const QVariant& msgid, const QVariant& kvpairs, const QVariant& message)
 {
     PmLogContext context;
-    PmLogGetContext(qPrintable(m_app->page()->appId()), &context);
+    PmLogGetContext(m_app->page()->appId().c_str(), &context);
     PmLogString(context, level, msgid.toByteArray().size() ? msgid.toByteArray().data() : NULL,
             kvpairs.toByteArray().size() ? kvpairs.toByteArray().data() : NULL, message.toByteArray().data());
 }

@@ -94,9 +94,9 @@ public:
     bool forceClose();
     WebPageBase* page() const;
     void handleWebAppMessage(WebAppManager::WebAppMessageType type, const std::string& message);
-    void setAppId(const QString& appId);
+    void setAppId(const std::string& appId);
     void setLaunchingAppId(const std::string& appId);
-    QString appId() const;
+    std::string appId() const;
     std::string launchingAppId() const;
     void setInstanceId(const std::string& instanceId);
     std::string instanceId() const;
