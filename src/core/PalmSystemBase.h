@@ -19,7 +19,6 @@
 
 #include <string>
 
-#include <QString>
 #include <QVariant>
 
 class PalmSystemBase {
@@ -29,11 +28,11 @@ public:
 
 protected:
     virtual std::string getDeviceInfo(const std::string& name);
-    virtual QVariant getResource(QVariant a, QVariant b);
-    virtual QString country() const;
+    virtual QVariant getResource(QVariant a, QVariant b); // FIXME: PalmSystem: qvariant-less
+    virtual std::string country() const;
     virtual std::string locale() const;
-    virtual QString localeRegion() const;
-    virtual QString phoneRegion() const;
-    virtual void setContainerAppReady(const QString& appId);
+    virtual std::string localeRegion() const;
+    virtual std::string phoneRegion() const;
+    virtual void setContainerAppReady(const std::string& appId);
 };
 #endif
