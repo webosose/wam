@@ -16,11 +16,12 @@
 
 #include "WebAppManagerUtils.h"
 
+#include <cstdlib>
+#include <cstring>
+#include <fstream>
+
 #include <unistd.h>
 #include <fcntl.h>
-#include <stdlib.h>
-#include <string.h>
-#include <fstream>
 #include <grp.h>
 
 int WebAppManagerUtils::updateAndGetCpuIdle(bool updateOnly)
@@ -164,5 +165,11 @@ bool WebAppManagerUtils::setGroups() {
         return false;
     }
     return true;
+}
+
+std::string WebAppManagerUtils::getEnv(const char *name)
+{
+    const char *v = std::getenv(name);
+    return (v == NULL) ? std::string() : std::string(v);
 }
 

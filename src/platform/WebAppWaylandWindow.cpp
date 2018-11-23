@@ -16,11 +16,10 @@
 
 #include "WebAppWaylandWindow.h"
 
-#include <QString>
-
 #include "ApplicationDescription.h"
 #include "LogManager.h"
 #include "WebAppWayland.h"
+#include "WebAppManagerUtils.h"
 
 WebAppWaylandWindow* WebAppWaylandWindow::s_instance = 0;
 
@@ -76,7 +75,7 @@ WebAppWaylandWindow::WebAppWaylandWindow()
     , m_xinputActivated(false)
     , m_lastMouseEvent(WebOSMouseEvent(WebOSEvent::None, -1., -1.))
 {
-    m_cursorEnabled = (qgetenv("ENABLE_CURSOR_BY_DEFAULT") == "1") ? true : false;;
+    m_cursorEnabled = (WebAppManagerUtils::getEnv("ENABLE_CURSOR_BY_DEFAULT") == "1") ? true : false;;
 }
 
 void WebAppWaylandWindow::hide()

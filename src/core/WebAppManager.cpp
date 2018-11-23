@@ -20,8 +20,6 @@
 #include <sstream>
 #include <unistd.h>
 
-#include <QString>
-
 #include "ApplicationDescription.h"
 #include "ContainerAppManager.h"
 #include "DeviceInfo.h"

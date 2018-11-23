@@ -158,7 +158,7 @@ WebAppBase* ContainerAppManager::launchContainerAppInternal(const std::string& i
     WebAppManager::instance()->insertAppIntoList(m_containerApp);
 #endif
 
-    LOG_INFO(MSGID_CONTAINER_APP_RELAUNCHED, 2, PMLOGKS("APP_ID", qPrintable(QString::fromStdString(desc->id()))), PMLOGKFV("PID", "%d", page->getWebProcessPID()), "");
+    LOG_INFO(MSGID_CONTAINER_APP_RELAUNCHED, 2, PMLOGKS("APP_ID", desc->id().c_str()), PMLOGKFV("PID", "%d", page->getWebProcessPID()), "");
 
     return m_containerApp;
 }

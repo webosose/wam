@@ -285,7 +285,7 @@ protected:
                 callback_receiver, NULL, &lsError);
         }
         if (!err) {
-            qWarning("Failed to call in %s Service: %s", serviceName(), lsError.message);
+            LOG_WARNING(MSGID_LS2_CALL_FAIL, 2, "Failed to call in %s Service: %s", serviceName(), lsError.message);
             return false;
         }
         return true;
@@ -311,7 +311,7 @@ protected:
                 callback_receiver, NULL, &lsError);
         }
         if (!err) {
-            qWarning("Failed to call in %s Service: %s", serviceName(), lsError.message);
+            LOG_WARNING(MSGID_LS2_CALL_FAIL, 2,"Failed to call in %s Service: %s", serviceName(), lsError.message);
             return false;
         }
         return true;

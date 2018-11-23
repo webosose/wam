@@ -24,6 +24,7 @@
 #include "DeviceInfoImpl.h"
 #include "WebAppManagerConfig.h"
 #include "BlinkWebProcessManager.h"
+#include "WebAppManagerUtils.h"
 
 PlatformModuleFactoryImpl::PlatformModuleFactoryImpl()
 {
@@ -66,7 +67,7 @@ WebAppManagerConfig* PlatformModuleFactoryImpl::createWebAppManagerConfig()
 
 bool PlatformModuleFactoryImpl::useContainerApp()
 {
-    if (qgetenv("DISABLE_CONTAINER") == "1")
+    if (WebAppManagerUtils::getEnv("DISABLE_CONTAINER") == "1")
         return false;
 
     return true;
