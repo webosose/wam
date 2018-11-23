@@ -35,6 +35,7 @@
 #include "StringUtils.h"
 #include "WebAppManagerConfig.h"
 #include "WebAppManagerTracer.h"
+#include "WebAppManagerUtils.h"
 #include "WebPageObserver.h"
 #include "WebPageBlinkObserver.h"
 
@@ -58,12 +59,6 @@ static std::string getHostname(const std::string& url)
   // Convert given url to QURL and
   // return its hostname.
   return QUrl(QString::fromStdString(url)).host().toStdString();
-}
-
-static inline std::string getEnvVar(const char *name)
-{
-    const char *v = getenv("TELLURIUM_NUB_PATH");
-    return (v == NULL) ? std::string() : std::string(v);
 }
 
 class WebPageBlinkPrivate {
@@ -133,10 +128,10 @@ void WebPageBlink::init()
     d->pageView->SetVisible(false);
     d->pageView->SetUserAgent(d->pageView->DefaultUserAgent() + " " + getWebAppManagerConfig()->getName());
 
-    if(getEnvVar("ENABLE_INSPECTOR") == "1")
+    if(WebAppManagerUtils::getEnv("ENABLE_INSPECTOR") == "1")
         d->pageView->SetInspectable(true);
 
-    std::string pluginPath = getEnvVar("PRIVILEGED_PLUGIN_PATH");
+    std::string pluginPath = WebAppManagerUtils::getEnv("PRIVILEGED_PLUGIN_PATH");
     if (!pluginPath.empty()) {
         d->pageView->AddAvailablePluginDir(pluginPath);
     }
@@ -430,7 +425,7 @@ void WebPageBlink::suspendWebPageAll()
     if (m_isSuspended || m_enableBackgroundRun)
         return;
 
-    if (!(getEnvVar("WAM_KEEP_RTC_CONNECTIONS_ON_SUSPEND") == "1")) {
+    if (!(WebAppManagerUtils::getEnv("WAM_KEEP_RTC_CONNECTIONS_ON_SUSPEND") == "1")) {
         // On sending applications to background, disconnect RTC
         d->pageView->DropAllPeerConnections(webos::DROP_PEER_CONNECTION_REASON_PAGE_HIDDEN);
     }
@@ -690,7 +685,6 @@ void WebPageBlink::loadFinished(const std::string& url)
             PMLOGKS("APP_ID", appId().c_str()),
             PMLOGKFV("PID", "%d", getWebProcessPID()),
             "cleaningResources():true; (should be about:blank) emit 'didDispatchUnload'");
-        // TODO: Remove QSignal
         FOR_EACH_OBSERVER(WebPageObserver, m_observers, didDispatchUnload());
         return;
     }

@@ -19,12 +19,7 @@
 #include <unistd.h>
 
 #include "StringUtils.h"
-
-static inline std::string getEnvVar(const char *name)
-{
-    const char *v = getenv("TELLURIUM_NUB_PATH");
-    return (v == NULL) ? std::string() : std::string(v);
-}
+#include "WebAppManagerUtils.h"
 
 WebAppManagerConfig::WebAppManagerConfig()
     : m_suspendDelayTime(0)
@@ -42,45 +37,45 @@ WebAppManagerConfig::WebAppManagerConfig()
 
 void WebAppManagerConfig::initConfiguration()
 {
-    m_webAppFactoryPluginTypes = getEnvVar("WEBAPPFACTORY");
+    m_webAppFactoryPluginTypes = WebAppManagerUtils::getEnv("WEBAPPFACTORY");
 
-    m_webAppFactoryPluginPath = getEnvVar("WEBAPPFACTORY_PLUGIN_PATH");
+    m_webAppFactoryPluginPath = WebAppManagerUtils::getEnv("WEBAPPFACTORY_PLUGIN_PATH");
     if (m_webAppFactoryPluginPath.empty()) {
         m_webAppFactoryPluginPath = "/usr/lib/webappmanager/plugins";
     }
 
-    std::string suspendDelay = getEnvVar("WAM_SUSPEND_DELAY_IN_MS");
+    std::string suspendDelay = WebAppManagerUtils::getEnv("WAM_SUSPEND_DELAY_IN_MS");
     m_suspendDelayTime = std::max(stringTo<int>(suspendDelay), 1);
 
-    m_webProcessConfigPath = getEnvVar("WEBPROCESS_CONFIGURATION_PATH");
+    m_webProcessConfigPath = WebAppManagerUtils::getEnv("WEBPROCESS_CONFIGURATION_PATH");
     if (m_webProcessConfigPath.empty())
         m_webProcessConfigPath = "/etc/wam/com.webos.wam.json";
 
-    m_errorPageUrl = getEnvVar("WAM_ERROR_PAGE");
+    m_errorPageUrl = WebAppManagerUtils::getEnv("WAM_ERROR_PAGE");
 
-    if (getEnvVar("DISABLE_CONTAINER") == "1")
+    if (WebAppManagerUtils::getEnv("DISABLE_CONTAINER") == "1")
         m_containerAppEnabled = false;
 
-    if (getEnvVar("LOAD_DYNAMIC_PLUGGABLE") == "1")
+    if (WebAppManagerUtils::getEnv("LOAD_DYNAMIC_PLUGGABLE") == "1")
         m_dynamicPluggableLoadEnabled = true;
 
-    if (getEnvVar("POST_WEBPROCESS_CREATED_DISABLED") == "1")
+    if (WebAppManagerUtils::getEnv("POST_WEBPROCESS_CREATED_DISABLED") == "1")
         m_postWebProcessCreatedDisabled =  true;
 
-    if (getEnvVar("LAUNCH_TIME_CHECK") == "1")
+    if (WebAppManagerUtils::getEnv("LAUNCH_TIME_CHECK") == "1")
         m_checkLaunchTimeEnabled = true;
 
-    if (getEnvVar("USE_SYSTEM_APP_OPTIMIZATION") == "1")
+    if (WebAppManagerUtils::getEnv("USE_SYSTEM_APP_OPTIMIZATION") == "1")
         m_useSystemAppOptimization = true;
 
-    if (getEnvVar("ENABLE_LAUNCH_OPTIMIZATION") == "1")
+    if (WebAppManagerUtils::getEnv("ENABLE_LAUNCH_OPTIMIZATION") == "1")
         m_launchOptimizationEnabled = true;
 
-    m_userScriptPath = getEnvVar("USER_SCRIPT_PATH");
+    m_userScriptPath = WebAppManagerUtils::getEnv("USER_SCRIPT_PATH");
     if (m_userScriptPath.empty())
         m_userScriptPath = "webOSUserScripts/userScript.js";
 
-    m_name = getEnvVar("WAM_NAME");
+    m_name = WebAppManagerUtils::getEnv("WAM_NAME");
 }
 
 QVariant WebAppManagerConfig::getConfiguration(const std::string name)
@@ -108,6 +103,6 @@ void WebAppManagerConfig::postInitConfiguration()
 
     if (access("/var/luna/preferences/devmode_enabled", F_OK) == 0) {
         m_devModeEnabled = true;
-        m_telluriumNubPath = getEnvVar("TELLURIUM_NUB_PATH");
+        m_telluriumNubPath = WebAppManagerUtils::getEnv("TELLURIUM_NUB_PATH");
     }
 }

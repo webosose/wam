@@ -17,8 +17,6 @@
 #ifndef LOGMSGID_H
 #define LOGMSGID_H
 
-#include <QtGlobal>
-
 // clang-format off
 // Logging Message IDs
 
@@ -105,14 +103,6 @@
 
 #define MSGID_ERROR_ERROR               "ERROR_PAGE_ERROR" /** Error loop -- failed to load error page! */
 #define MSGID_CLOSE_CALL_FAIL           "CLOSE_CALL_FAIL" /** Failed to send closeByAppId call to sam */
-
-// Qt logging handler
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-#define MSGID_QINFO                     "QINFO" /** A message from qInfo() */
-#endif
-#define MSGID_QWARNING                  "QWARNING" /** A message from qWarning() */
-#define MSGID_QCRITICAL                 "QCRITICAL" /** A message from qCritical() */
-#define MSGID_QFATAL                    "QFATAL" /** a message from qFatal() */
 
 #define MSGID_LOCALEINFO_READ_FAIL      "LOCALEINFO_FILE_READ_FAIL" /** Fail to read locale info from /var/luna/preferences/localInfo */
 

@@ -23,6 +23,7 @@
 #include "ApplicationDescription.h"
 #include "LogManager.h"
 #include "WebAppWaylandWindow.h"
+#include "WebAppManagerUtils.h"
 #include "WebPageBase.h"
 #include "WindowTypes.h"
 
@@ -94,8 +95,10 @@ void WebAppWayland::init(int width, int height, int surface_id)
     setWindowProperty("_WEBOS_WINDOW_TYPE", m_windowType);
     LOG_DEBUG("App created window [%s]", m_windowType.c_str());
 
-    if (qgetenv("LAUNCH_FINISH_ASSURE_TIMEOUT").toInt() != 0)
-        kLaunchFinishAssureTimeoutMs = qgetenv("LAUNCH_FINISH_ASSURE_TIMEOUT").toInt();
+    try {
+        std::string launchTimeoutStr = WebAppManagerUtils::getEnv("LAUNCH_FINISH_ASSURE_TIMEOUT");
+        kLaunchFinishAssureTimeoutMs = std::stoi(launchTimeoutStr);
+    } catch(...) {}
 
     if (!webos::WebOSPlatform::GetInstance()->GetInputPointer()) {
         // Create InputManager instance.

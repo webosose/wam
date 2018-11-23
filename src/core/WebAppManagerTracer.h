@@ -56,7 +56,7 @@
 #define PMTRACE_FUNCTION_EXIT(label) \
     tracepoint(pmtrace_webappmanager3, function_exit, label)
 #define PMTRACE_FUNCTION \
-    PmTraceFunction traceFunction(const_cast<char*>(Q_FUNC_INFO))
+    PmTraceFunction traceFunction(const_cast<char*>(__PRETTY_FUNCTION__))
 
 class PmTraceScope {
 public:
