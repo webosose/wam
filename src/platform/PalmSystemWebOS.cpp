@@ -53,6 +53,7 @@ bool PalmSystemWebOS::isKeyboardVisible() const
     return m_app->isKeyboardVisible();
 }
 
+// FIXME: PalmSystem: qfile-less
 bool PalmSystemWebOS::isMinimal() const
 {
     return QFile::exists("/var/luna/preferences/ran-firstuse");
@@ -99,22 +100,22 @@ void PalmSystemWebOS::hide()
     m_app->hide();
 }
 
-void PalmSystemWebOS::setInputRegion(const QByteArray& params)
+void PalmSystemWebOS::setInputRegion(const std::string& params)
 {
     // this function is not related to windowGroup anymore
     Json::Value obj;
-    readJsonFromString(params.toStdString(), obj);
+    readJsonFromString(params, obj);
     m_app->setInputRegion(obj);
 }
 
-void PalmSystemWebOS::setGroupClientEnvironment(GroupClientCallKey callKey, const QByteArray& params)
+void PalmSystemWebOS::setGroupClientEnvironment(GroupClientCallKey callKey, const std::string& params)
 {
     ApplicationDescription* appDesc = m_app ? m_app->getAppDescription() : 0;
     if (appDesc) {
         ApplicationDescription::WindowGroupInfo groupInfo = appDesc->getWindowGroupInfo();
         if (!groupInfo.name.empty() && !groupInfo.isOwner) {
             Json::Value jsonDoc;
-            readJsonFromString(params.toStdString(), jsonDoc);
+            readJsonFromString(params, jsonDoc);
             switch (callKey) {
                 case KeyMask:
                     m_app->setKeyMask(jsonDoc);

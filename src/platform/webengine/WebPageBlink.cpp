@@ -200,22 +200,22 @@ void* WebPageBlink::getWebContents()
     return (void*)d->pageView->GetWebContents();
 }
 
-void WebPageBlink::handleBrowserControlCommand(const QString& command, const QStringList& arguments)
+void WebPageBlink::handleBrowserControlCommand(const std::string& command, const std::vector<std::string>& arguments)
 {
     handleBrowserControlMessage(command, arguments);
 }
 
-void WebPageBlink::handleBrowserControlFunction(const QString& command, const QStringList& arguments, QString* result)
+void WebPageBlink::handleBrowserControlFunction(const std::string& command, const std::vector<std::string>& arguments, std::string* result)
 {
     *result = handleBrowserControlMessage(command, arguments);
 }
 
-QString WebPageBlink::handleBrowserControlMessage(const QString& message, const QStringList& params)
+std::string WebPageBlink::handleBrowserControlMessage(const std::string& message, const std::vector<std::string>& params)
 {
     if (!d->m_palmSystem)
-        return QString();
+        return {};
 
-    QString res = d->m_palmSystem->handleBrowserControlMessage(message, params);
+    auto res = d->m_palmSystem->handleBrowserControlMessage(message, params);
     return res;
 }
 

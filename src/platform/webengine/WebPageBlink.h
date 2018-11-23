@@ -162,11 +162,10 @@ protected:
     bool inspectable();
 
     // WebPageDelegate
-    // FIXME: WebPage: qstring-less
-    void handleBrowserControlCommand(const QString& command, const QStringList& arguments) override;
-    void handleBrowserControlFunction(const QString& command, const QStringList& arguments, QString* result) override;
+    void handleBrowserControlCommand(const std::string& command, const std::vector<std::string>& arguments) override;
+    void handleBrowserControlFunction(const std::string& command, const std::vector<std::string>& arguments, std::string* result) override;
 
-    QString handleBrowserControlMessage(const QString& message, const QStringList& params);
+    std::string handleBrowserControlMessage(const std::string& message, const std::vector<std::string>& params);
     virtual void suspendWebPagePaintingAndJSExecution();
 
 private:
