@@ -32,6 +32,8 @@ std::string PalmSystemBase::getDeviceInfo(const std::string& name)
     return value;
 }
 
+// FIXME: PalmSystem: qvariant-less
+// FIXME: PalmSystem: qfile-less
 QVariant PalmSystemBase::getResource(QVariant a, QVariant b)
 {
     QFile f(a.toString());
@@ -43,7 +45,7 @@ QVariant PalmSystemBase::getResource(QVariant a, QVariant b)
     return QVariant(data.constData());
 }
 
-QString PalmSystemBase::country() const
+std::string PalmSystemBase::country() const
 {
     std::string localcountry;
     std::string smartServiceCountry;
@@ -55,7 +57,7 @@ QString PalmSystemBase::country() const
     jss << "{ \"country\": \"" << localcountry
         << "\", \"smartServiceCountry\": \"" << smartServiceCountry << "\" }";
 
-    return QString::fromStdString(jss.str()); // FIXME: PalmSystem: qstr2stdstr
+    return jss.str();
 }
 
 std::string PalmSystemBase::locale() const
@@ -65,19 +67,18 @@ std::string PalmSystemBase::locale() const
     return systemlocale;
 }
 
-QString PalmSystemBase::localeRegion() const
+std::string PalmSystemBase::localeRegion() const
 {
-    return QString("US");
+    return "US";
 }
 
-QString PalmSystemBase::phoneRegion() const
+std::string PalmSystemBase::phoneRegion() const
 {
-    return QString("");
+    return {};
 }
 
-void PalmSystemBase::setContainerAppReady(const QString& appId)
+void PalmSystemBase::setContainerAppReady(const std::string& appId)
 {
-    // FIXME: PalmSystem: qstr2stdstr
-    if (appId.toStdString() == WebAppManager::instance()->getContainerAppId())
+    if (appId == WebAppManager::instance()->getContainerAppId())
         WebAppManager::instance()->setContainerAppReady(true);
 }

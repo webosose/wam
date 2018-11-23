@@ -57,10 +57,10 @@ void BlinkWebView::setDelegate(WebPageBlinkDelegate* delegate)
 void BlinkWebView::HandleBrowserControlCommand(const std::string& command, const std::vector<std::string>& arguments)
 {
     if (m_delegate) {
-        QString message = QString::fromStdString(command);
-        QStringList params;
-        Q_FOREACH (const std::string& arg, arguments)
-             params << QString::fromStdString(arg);
+        std::string message = command;
+        std::vector<std::string> params;
+        for (const std::string& arg : arguments)
+             params.push_back(arg);
         m_delegate->handleBrowserControlCommand(message, params);
     }
 }
@@ -68,13 +68,13 @@ void BlinkWebView::HandleBrowserControlCommand(const std::string& command, const
 void BlinkWebView::HandleBrowserControlFunction(const std::string& command, const std::vector<std::string>& arguments, std::string* result)
 {
     if (m_delegate) {
-        QString message = QString::fromStdString(command);
-        QStringList params;
-        Q_FOREACH (const std::string& arg, arguments)
-            params << QString::fromStdString(arg);
-        QString ret;
+        std::string message = command;
+        std::vector<std::string> params;
+        for (const std::string& arg : arguments)
+            params.push_back(arg);
+        std::string ret;
         m_delegate->handleBrowserControlFunction(message, params, &ret);
-        *result = ret.toStdString();
+        *result = ret;
     }
 }
 

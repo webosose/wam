@@ -35,7 +35,7 @@ public:
     PalmSystemWebOS(WebAppBase* app);
 
     virtual void setCountry() {}
-    virtual void setFolderPath(const QString& params) {}
+    virtual void setFolderPath(const std::string& params) {}
     virtual void setLaunchParams(const std::string& params);
 
 protected:
@@ -47,10 +47,10 @@ protected:
 
     virtual std::string identifier() const = 0;
     virtual std::string launchParams() const { return m_launchParams; }
-    virtual QString version() const { return QString(); }
+    virtual std::string version() const { return {}; }
 
-    virtual QString screenOrientation() const { return QString("up"); }
-    virtual QString windowOrientation() const { return QString("free"); }
+    virtual std::string screenOrientation() const { return "up"; }
+    virtual std::string windowOrientation() const { return "free"; }
 
     virtual bool isActivated() const;
     virtual bool isKeyboardVisible() const;
@@ -66,8 +66,8 @@ protected:
 
     virtual void setKeepAlive(bool keep);
     virtual void setLoadErrorPolicy(const std::string& params) {}
-    virtual void setInputRegion(const QByteArray& params);
-    virtual void setGroupClientEnvironment(GroupClientCallKey callKey, const QByteArray& params);
+    virtual void setInputRegion(const std::string& params);
+    virtual void setGroupClientEnvironment(GroupClientCallKey callKey, const std::string& params);
 #ifdef HAS_PMLOG
     virtual void pmLogInfoWithClock(const QVariant& msgid, const QVariant& perfType, const QVariant& perfGroup);
     virtual void pmLogString(PmLogLevel level, const QVariant& msgid, const QVariant& kvpairs, const QVariant& message);
