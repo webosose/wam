@@ -24,6 +24,7 @@ class WebAppManagerUtils {
 public:
     static int updateAndGetCpuIdle(bool updateOnly = false);
     static bool setGroups();
+    static std::string getEnv(const char *name);
 
 private:
     static long percentages(int cnt, int* out, long* now, long* old, long* diffs);

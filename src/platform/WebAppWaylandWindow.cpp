@@ -16,11 +16,10 @@
 
 #include "WebAppWaylandWindow.h"
 
-#include <QString>
-
 #include "ApplicationDescription.h"
 #include "LogManager.h"
 #include "WebAppWayland.h"
+#include "WebAppManagerUtils.h"
 
 WebAppWaylandWindow* WebAppWaylandWindow::s_instance = nullptr;
 
@@ -78,7 +77,7 @@ WebAppWaylandWindow::WebAppWaylandWindow()
     , m_hasPageFrameBeenSwapped(false)
     , m_pendingShow(false)
 {
-    m_cursorEnabled = (qgetenv("ENABLE_CURSOR_BY_DEFAULT") == "1") ? true : false;;
+    m_cursorEnabled = (WebAppManagerUtils::getEnv("ENABLE_CURSOR_BY_DEFAULT") == "1") ? true : false;;
 }
 
 void WebAppWaylandWindow::hide()

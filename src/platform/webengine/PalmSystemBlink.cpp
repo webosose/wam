@@ -17,7 +17,6 @@
 #include "PalmSystemBlink.h"
 
 #include <sstream>
-#include <QString>
 
 #include "ApplicationDescription.h"
 #include "JsonHelper.h"
