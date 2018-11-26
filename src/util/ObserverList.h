@@ -17,6 +17,7 @@
 #ifndef ObserverList_H
 #define ObserverList_H
 
+#include <algorithm>
 #include <vector>
 
 template <class ObserverType>

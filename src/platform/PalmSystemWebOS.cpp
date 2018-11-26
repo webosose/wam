@@ -23,7 +23,7 @@
 #include "WebAppWayland.h"
 #include "WebPageBase.h"
 
-#include <QFile>
+#include <boost/filesystem.hpp>
 
 PalmSystemWebOS::PalmSystemWebOS(WebAppBase* app)
     : m_app(static_cast<WebAppWayland*>(app))
@@ -76,10 +76,10 @@ bool PalmSystemWebOS::isKeyboardVisible() const
     return m_app->page()->isKeyboardVisible();
 }
 
-// FIXME: PalmSystem: qfile-less
 bool PalmSystemWebOS::isMinimal() const
 {
-    return QFile::exists("/var/luna/preferences/ran-firstuse");
+    using boost::filesystem::exists;
+    return exists("/var/luna/preferences/ran-firstuse");
 }
 
 int PalmSystemWebOS::activityId() const

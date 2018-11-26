@@ -24,6 +24,7 @@
 #include "WebPageBlink.h"
 #include "WindowTypes.h"
 #include "LogManager.h"
+#include "Url.h"
 
 WebAppBase* WebAppFactoryAGL::createWebApp(const std::string& winType, ApplicationDescription* desc)
 {
@@ -49,7 +50,7 @@ WebAppBase* WebAppFactoryAGL::createWebApp(const std::string& winType, WebPageBa
     return createWebApp(winType, desc);
 }
 
-WebPageBase* WebAppFactoryAGL::createWebPage(QUrl url, ApplicationDescription* desc, const std::string& launchParams)
+WebPageBase* WebAppFactoryAGL::createWebPage(const Url& url, ApplicationDescription* desc, const std::string& launchParams)
 {
     return new WebPageBlink(url, desc, launchParams);
 }

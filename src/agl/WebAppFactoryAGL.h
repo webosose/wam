@@ -19,13 +19,11 @@
 
 #include "WebAppFactoryInterface.h"
 
-#include <QtCore/QUrl>
-
 class WebAppFactoryAGL : public WebAppFactoryInterface {
 public:
     virtual WebAppBase* createWebApp(const std::string& winType, ApplicationDescription* desc = 0);
     virtual WebAppBase* createWebApp(const std::string& winType, WebPageBase* page, ApplicationDescription* desc = 0);
-    virtual WebPageBase* createWebPage(QUrl url, ApplicationDescription* desc, const std::string& launchParams = "");
+    virtual WebPageBase* createWebPage(const Url& url, ApplicationDescription* desc, const std::string& launchParams = "");
 };
 
 #endif /* WEBAPPFACTORYAGL_H */

@@ -18,7 +18,6 @@
 #include "WebPageBlinkDelegate.h"
 
 #include "LogManager.h"
-#include <QStringList>
 
 BlinkWebView::BlinkWebView(bool doInitialize)
     : WebViewBase::WebViewBase()

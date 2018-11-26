@@ -138,7 +138,7 @@ WebAppBase* ContainerAppManager::launchContainerAppInternal(const std::string& i
     }
 
     std::string url = desc->entryPoint();
-    WebPageBase* page = WebAppFactoryManager::instance()->createWebPage(WT_CARD, QUrl(url.c_str()), desc, desc->subType().c_str());
+    WebPageBase* page = WebAppFactoryManager::instance()->createWebPage(WT_CARD, Url(url), desc, desc->subType().c_str());
 
     // Turning off inline caching on container app, too.
     if (m_useContainerAppOptimization)

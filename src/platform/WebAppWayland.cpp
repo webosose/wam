@@ -488,7 +488,7 @@ void WebAppWayland::webPageLoadFinished()
         return;
     }
 
-    std::string logUrl = truncateURL(page()->url().toString().toStdString()); // FIXME: WebPage: qstr2stdstr
+    std::string logUrl = truncateURL(page()->url().toString());
     LOG_INFO_WITH_CLOCK(MSGID_APP_LOADED, 5,
              PMLOGKS("PerfType", "AppLaunch"),
              PMLOGKS("PerfGroup", page()->appId().c_str()),

@@ -18,7 +18,6 @@
 #include "WebAppManagerServiceLuna.h"
 
 #include "LogManager.h"
-#include <QByteArray>
 #include <QJsonArray>
 #include <QStringList>
 #include "webos/public/runtime.h"

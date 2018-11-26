@@ -25,6 +25,7 @@ public:
     static int updateAndGetCpuIdle(bool updateOnly = false);
     static bool setGroups();
     static std::string getEnv(const char *name);
+    static void readFileContent(const std::string &path, std::string &out);
 
 private:
     static long percentages(int cnt, int* out, long* now, long* old, long* diffs);

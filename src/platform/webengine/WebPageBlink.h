@@ -17,9 +17,8 @@
 #ifndef WEBPAGEBLINK_H
 #define WEBPAGEBLINK_H
 
-#include <QtCore/QUrl>
-
 #include "Timer.h"
+#include "Url.h"
 #include "WebPageBase.h"
 #include "WebPageBlinkDelegate.h"
 
@@ -38,7 +37,7 @@ public:
         HINTING_FULL = 3
     };
 
-    WebPageBlink(const QUrl& url, ApplicationDescription* desc, const std::string& launchParams);
+    WebPageBlink(const Url& url, ApplicationDescription* desc, const std::string& launchParams);
     ~WebPageBlink() override;
 
     // WebPageBase
@@ -46,8 +45,8 @@ public:
     void* getWebContents() override;
     void setLaunchParams(const std::string& params) override;
     void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level) override;
-    QUrl url() const override;
-    void replaceBaseUrl(QUrl newUrl) override;
+    Url url() const override;
+    void replaceBaseUrl(const Url& newUrl) override;
     void loadUrl(const std::string& url) override;
     int progress() const override;
     bool hasBeenShown() const override;
@@ -150,7 +149,7 @@ protected:
     virtual BlinkWebView* createPageView();
     virtual void setupStaticUserScripts();
     virtual void addUserScript(const std::string& script);
-    virtual void addUserScriptUrl(const QUrl& url);
+    virtual void addUserScriptUrl(const Url& url);
     virtual void recreateWebView();
     virtual void setVisible(bool visible);
     virtual bool shouldStopJSOnSuspend() const { return true; }
@@ -177,7 +176,7 @@ private:
     bool m_hasBeenShown;
     OneShotTimer<WebPageBlink> m_domSuspendTimer;
     std::string m_customPluginPath;
-    qreal m_vkbHeight;
+    double m_vkbHeight;
     bool m_vkbWasOverlap;
     bool m_hasCloseCallback;
     OneShotTimer<WebPageBlink> m_closeCallbackTimer;

@@ -18,9 +18,7 @@
 
 #include <algorithm>
 #include <string>
-
 #include <signal.h>
-#include <QFile>
 
 #include "ApplicationDescription.h"
 #include "JsonHelper.h"
@@ -31,8 +29,6 @@
 #include "WebAppManagerUtils.h"
 #include "WebAppManager.h"
 #include "WebPageBase.h"
-
-#include <glib.h>
 
 WebProcessManager::WebProcessManager()
     : m_maximumNumberOfProcesses(1)
