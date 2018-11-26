@@ -34,7 +34,7 @@ public:
                              const std::string& appType = "");
     WebAppBase* createWebApp(const std::string& winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = 0,
                              const std::string& appType = "");
-    WebPageBase* createWebPage(const std::string& winType, QUrl url, std::shared_ptr<ApplicationDescription> desc,
+    WebPageBase* createWebPage(const std::string& winType, const Url& url, std::shared_ptr<ApplicationDescription> desc,
                                const std::string& appType = "", const std::string& launchParams = "");
     WebAppFactoryInterface* getInterfaceInstance(const std::string& appType);
 

@@ -19,8 +19,6 @@
 
 #include "WebAppFactoryInterface.h"
 
-#include <QtCore/QUrl>
-
 class WebAppFactoryLuna : public QObject,
                           public WebAppFactoryInterface {
     Q_OBJECT
@@ -30,7 +28,7 @@ class WebAppFactoryLuna : public QObject,
 public:
     virtual WebAppBase* createWebApp(const std::string& winType, std::shared_ptr<ApplicationDescription> desc = 0);
     virtual WebAppBase* createWebApp(const std::string& winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = 0);
-    virtual WebPageBase* createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, const std::string& launchParams = "");
+    virtual WebPageBase* createWebPage(const Url& url, std::shared_ptr<ApplicationDescription> desc, const std::string& launchParams = "");
 };
 
 #endif /* WEBAPPFACTORYLUNA_H */
