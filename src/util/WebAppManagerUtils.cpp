@@ -173,3 +173,16 @@ std::string WebAppManagerUtils::getEnv(const char *name)
     return (v == NULL) ? std::string() : std::string(v);
 }
 
+void WebAppManagerUtils::readFileContent(const std::string &path, std::string &out)
+{
+    std::ifstream t(path);
+    std::string str;
+
+    t.seekg(0, std::ios::end);
+    str.reserve(t.tellg());
+    t.seekg(0, std::ios::beg);
+
+    str.assign((std::istreambuf_iterator<char>(t)),
+               std::istreambuf_iterator<char>());
+    out = std::move(str);
+}

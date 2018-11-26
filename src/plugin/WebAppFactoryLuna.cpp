@@ -49,7 +49,7 @@ WebAppBase* WebAppFactoryLuna::createWebApp(const std::string& winType, WebPageB
     return createWebApp(winType, desc);
 }
 
-WebPageBase* WebAppFactoryLuna::createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, const std::string& launchParams)
+WebPageBase* WebAppFactoryLuna::createWebPage(const Url& url, std::shared_ptr<ApplicationDescription> desc, const std::string& launchParams)
 {
     return new WebPageBlink(url, desc, launchParams);
 }

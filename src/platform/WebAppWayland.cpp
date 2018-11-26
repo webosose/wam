@@ -22,6 +22,7 @@
 
 #include "ApplicationDescription.h"
 #include "LogManager.h"
+#include "StringUtils.h"
 #include "WebAppWaylandWindow.h"
 #include "WebAppManagerUtils.h"
 #include "WebPageBase.h"
@@ -97,7 +98,7 @@ void WebAppWayland::init(int width, int height, int surface_id)
 
     try {
         std::string launchTimeoutStr = WebAppManagerUtils::getEnv("LAUNCH_FINISH_ASSURE_TIMEOUT");
-        kLaunchFinishAssureTimeoutMs = std::stoi(launchTimeoutStr);
+        kLaunchFinishAssureTimeoutMs = stringTo<int>(launchTimeoutStr);
     } catch(...) {}
 
     if (!webos::WebOSPlatform::GetInstance()->GetInputPointer()) {
@@ -517,7 +518,7 @@ void WebAppWayland::webPageLoadFinished()
         return;
     }
 
-    std::string logUrl = truncateURL(page()->url().toString().toStdString()); // FIXME: WebPage: qstr2stdstr
+    std::string logUrl = truncateURL(page()->url().toString());
     LOG_INFO_WITH_CLOCK(MSGID_APP_LOADED, 5,
              PMLOGKS("PerfType", "AppLaunch"),
              PMLOGKS("PerfGroup", page()->appId().c_str()),

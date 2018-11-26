@@ -17,12 +17,11 @@
 #include "PalmSystemBase.h"
 
 #include <sstream>
+#include <boost/filesystem.hpp>
 
-#include <QByteArray>
-#include <QFile>
-
+#include "LogManager.h"
 #include "WebAppManager.h"
-
+#include "WebAppManagerUtils.h"
 
 std::string PalmSystemBase::getDeviceInfo(const std::string& name)
 {
@@ -32,17 +31,19 @@ std::string PalmSystemBase::getDeviceInfo(const std::string& name)
     return value;
 }
 
-// FIXME: PalmSystem: qvariant-less
-// FIXME: PalmSystem: qfile-less
-QVariant PalmSystemBase::getResource(QVariant a, QVariant b)
+QVariant PalmSystemBase::getResource(QVariant a, QVariant b) // FIXME: PalmSystem: qvariant-less
 {
-    QFile f(a.toString());
-    if (!f.open(QIODevice::ReadOnly))
-        return QVariant();
+    boost::filesystem::path p(a.toString().toStdString());
+    std::string data;
 
-    QByteArray data = f.readAll();
+    try {
+        WebAppManagerUtils::readFileContent(p.string(), data);
+    } catch (const std::exception &e) {
+        LOG_DEBUG("PalmSystemBase: Failed to read resource '%s' due to error '%s'.",
+                  p.string().c_str(), e.what());
+    }
 
-    return QVariant(data.constData());
+    return QVariant(data.c_str());
 }
 
 std::string PalmSystemBase::country() const

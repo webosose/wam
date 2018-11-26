@@ -21,10 +21,10 @@
 #include <sstream>
 #include <unistd.h>
 
-#include <QtCore/QDir>
-#include <QtCore/QUrl>
-#include <QtCore/QUrlQuery>
-#include <QTextStream>
+#include <boost/filesystem.hpp>
+
+//FIXME: WebPge: qlocale-less
+#include <QLocale>
 
 #include "ApplicationDescription.h"
 #include "BlinkWebProcessManager.h"
@@ -47,19 +47,14 @@
         fprintf(stderr, fmt, ##__VA_ARGS__);    \
     } while (0)
 
+namespace fs = boost::filesystem;
+
 /**
  * Hide dirty implementation details from
  * public API
  */
 
 static const int kExecuteCloseCallbackTimeOutMs = 10000;
-
-static std::string getHostname(const std::string& url)
-{
-  // Convert given url to QURL and
-  // return its hostname.
-  return QUrl(QString::fromStdString(url)).host().toStdString();
-}
 
 class WebPageBlinkPrivate {
 public:
@@ -84,7 +79,7 @@ public:
 };
 
 
-WebPageBlink::WebPageBlink(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const std::string& params)
+WebPageBlink::WebPageBlink(const Url& url, std::shared_ptr<ApplicationDescription> desc, const std::string& params)
     : WebPageBase(url, desc, params)
     , d(new WebPageBlinkPrivate(this))
     , m_isPaused(false)
@@ -231,7 +226,7 @@ void WebPageBlink::setFocus(bool focus)
 
 void WebPageBlink::loadDefaultUrl()
 {
-    d->pageView->LoadUrl(defaultUrl().toString().toStdString());
+    d->pageView->LoadUrl(defaultUrl().toString());
 }
 
 int WebPageBlink::progress() const
@@ -244,14 +239,14 @@ bool WebPageBlink::hasBeenShown() const
     return m_hasBeenShown;
 }
 
-void WebPageBlink::replaceBaseUrl(QUrl newUrl)
+void WebPageBlink::replaceBaseUrl(const Url& newUrl)
 {
-    d->pageView->ReplaceBaseURL(newUrl.toString().toStdString(), url().toString().toStdString());
+    d->pageView->ReplaceBaseURL(newUrl.toString(), url().toString());
 }
 
-QUrl WebPageBlink::url() const
+Url WebPageBlink::url() const
 {
-    return QUrl(d->pageView->GetUrl().c_str());
+    return Url(d->pageView->GetUrl());
 }
 
 uint32_t WebPageBlink::getWebProcessProxyID()
@@ -291,33 +286,29 @@ void WebPageBlink::reloadDefaultPage()
     loadDefaultUrl();
 }
 
-// FIXME: WebPage: qurl-less
-// FIXME: WebPage: qfile/qdir-less
 void WebPageBlink::loadErrorPage(int errorCode)
 {
-    QString errorpage = QString::fromStdString(getWebAppManagerConfig()->getErrorPageUrl());
-    if(!errorpage.isEmpty()) {
+    std::string errorpage = getWebAppManagerConfig()->getErrorPageUrl();
+    if(!errorpage.empty()) {
         if(hasLoadErrorPolicy(false, errorCode)) {
             // has loadErrorPolicy, do not show error page
-            LOG_DEBUG("[%s] has own policy for Error Page, do not load Error page; send webOSLoadError event; return", appId().c_str());
+            LOG_DEBUG("[%s] has own policy for Error Page, do not load Error page; send webOSLoadError event; return",
+                      appId().c_str());
             return;
         }
-
-        std::string lang;
-        getSystemLanguage(lang);
-
-        QString language = QString::fromStdString(lang); // FIXME: WebPage: qstr2stdstr
-        QLocale locale(language);
 
         // Break the provided URL down into it's component pieces
         // we always assume the error page will be a file:// url, because that's
         // the only thing that makes sense.
-        QUrl errorUrl(errorpage);
-        QFile file(errorUrl.toLocalFile());
-        QFileInfo fileinfo(file);
-        QString fileName = fileinfo.fileName();
-        QString searchPath = fileinfo.canonicalPath();
-        QString errCode = QString::number(errorCode);
+        Url errorUrl(errorpage);
+        fs::path errPagePath(errorUrl.toLocalFile());
+        fs::path fileName = errPagePath.filename();
+        fs::path searchPath = fs::canonical(errPagePath);
+        std::string errCode = std::to_string(errorCode);
+
+        std::string language;
+        getSystemLanguage(language);
+        QLocale locale(QString::fromStdString(language)); //TODO: WebPage: qlocale-less
 
         // search order:
         // searchPath/resources/<language>/<script>/<region>/html/fileName
@@ -333,45 +324,30 @@ void WebPageBlink::loadErrorPage(int errorCode)
         // es-ES has resources/es/ES/html but QLocale::bcp47Name() returns es not es-ES
         // fr-CA, pt-PT has its own localization folder and QLocale::bcp47Name() returns well
 
-        QString bcp47Name;
-        if(language.startsWith("zh", Qt::CaseSensitive) ||language.startsWith("es", Qt::CaseSensitive) )
-            bcp47Name = language.replace(QString("-"), QString("/"));
-        else
-            bcp47Name = locale.bcp47Name().replace(QString("-"), QString("/"));
+        bool except = language.find("zh") == 0 || language.find("es") == 0;
+        std::string bcp47Name(except ? language : locale.bcp47Name().toStdString());
+        replaceSubstrings(bcp47Name, "-", "/");
 
-        QStringList paths = bcp47Name.split("/");
-        bool bFound = false;
-        while(!paths.isEmpty() && !bFound) {
-            file.setFileName(searchPath + QStringLiteral("/resources/%1/html/%2").arg(paths.join("/")).arg(fileName));
-            if(!file.exists())
-                paths.removeLast();
-            else
-                bFound = true;
-        }
-
-        if(!bFound) {
-            file.setFileName(searchPath + QStringLiteral("/resources/html/%1").arg(fileName));
-            bFound = file.exists();
-        }
-        if(!bFound) {
-            file.setFileName(searchPath + QStringLiteral("/%1").arg(fileName));
-            bFound = file.exists();
-        }
+        bool found = false;
+        for (fs::path l(bcp47Name); !found && !l.empty(); l = l.parent_path())
+            found = fs::exists(searchPath / "resources" / l / "html" / fileName);
+        found = found || fs::exists(searchPath / "resources" / "html" / fileName);
+        found = found || fs::exists(searchPath / fileName);
 
         // finally found something!
-        if(bFound) {
+        if(found) {
             // re-create it as a proper URL, so WebKit can understand it
             m_isLoadErrorPageStart = true;
-            errorUrl = QUrl::fromLocalFile(file.fileName());
+            errorUrl = Url::fromLocalFile(errPagePath.string());
             // set query items for error code and hostname to URL
-            QUrlQuery query;
-            query.addQueryItem(QStringLiteral("errorCode"), errCode);
-            query.addQueryItem(QStringLiteral("hostname"), QString::fromStdString(m_loadFailedHostname));
+            std::map<std::string, std::string> query{{"errorCode", errCode}, {"hosname", m_loadFailedHostname}};
             errorUrl.setQuery(query);
-            LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "LoadErrorPage : %s", qPrintable(errorUrl.toString()));
-            d->pageView->LoadUrl(errorUrl.toString().toStdString());
-        } else
-            LOG_ERROR(MSGID_ERROR_ERROR, 1, PMLOGKS("PATH", qPrintable(errorpage)), "Error loading error page");
+            LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()),
+                     "LoadErrorPage : %s", errorUrl.toString().c_str());
+            d->pageView->LoadUrl(errorUrl.toString());
+        } else {
+            LOG_ERROR(MSGID_ERROR_ERROR, 1, PMLOGKS("PATH", errorpage.c_str()), "Error loading error page");
+        }
     }
 }
 
@@ -717,7 +693,7 @@ void WebPageBlink::loadFailed(const std::string& url, int errCode, const std::st
                 PMLOGKS("ERROR_STR", errDesc.c_str()),
                 PMLOGKS("URL", url.c_str()),
                 " ");
-    m_loadFailedHostname = getHostname(url);
+    m_loadFailedHostname = Url(url).host();
     handleLoadFailed(errCode);
 }
 
@@ -855,31 +831,29 @@ void WebPageBlink::addUserScript(const std::string& script)
     d->pageView->addUserScript(script);
 }
 
-// FIXME: WebPage: qurl-less
-// FIXME: WebPage: qdir-less
-void WebPageBlink::addUserScriptUrl(const QUrl& url)
+void WebPageBlink::addUserScriptUrl(const Url& url)
 {
-    QString path;
-    if (url.isLocalFile()) {
-        path = url.toLocalFile();
-    }
-    else {
-        LOG_DEBUG("WebPageBlink: Couldn't open '%s' as user script because only file:/// URLs are supported.", qPrintable(url.toString()));
+    if (!url.isLocalFile()) {
+        LOG_DEBUG("WebPageBlink: Couldn't open '%s' as user script because only file:/// URLs are supported.",
+                  url.toString().c_str());
         return;
     }
 
-    QFile file(path);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        LOG_DEBUG("WebPageBlink: Couldn't open '%s' as user script due to error '%s'.", qPrintable(url.toString()), qPrintable(file.errorString()));
+    std::string path(url.toLocalFile());
+    std::string script;
+    try {
+        WebAppManagerUtils::readFileContent(path, script);
+        if (script.empty()) {
+            LOG_DEBUG("WebPageBlink: Ignoring '%s' as user script because file is empty.", url.toString().c_str());
+            return;
+        }
+    } catch (const std::exception &e) {
+        LOG_DEBUG("WebPageBlink: Couldn't set '%s' as user script due to error '%s'.",
+                  url.toString().c_str(), e.what());
         return;
     }
 
-    QByteArray contents = file.readAll();
-    if (contents.isEmpty()) {
-        LOG_DEBUG("WebPageBlink: Ignoring '%s' as user script because file is empty.", qPrintable(url.toString()));
-        return;
-    }
-    d->pageView->addUserScript(contents.toStdString());
+    d->pageView->addUserScript(script);
 }
 
 void WebPageBlink::setupStaticUserScripts()
@@ -890,7 +864,7 @@ void WebPageBlink::setupStaticUserScripts()
     std::string telluriumNubPath_ = telluriumNubPath();
     if (!telluriumNubPath_.empty()) {
         LOG_DEBUG("Loading tellurium nub at %s", telluriumNubPath_.c_str());
-        addUserScriptUrl(QUrl::fromLocalFile(QString::fromStdString(telluriumNubPath_))); // FIXME: WebPage: qurl-less
+        addUserScriptUrl(Url::fromLocalFile(telluriumNubPath_));
     }
 }
 
@@ -947,16 +921,18 @@ void WebPageBlink::setCustomPluginIfNeeded()
     if (!m_appDesc || !m_appDesc->useCustomPlugin())
         return;
 
-    std::string customPluginPath = m_appDesc->folderPath();
-    customPluginPath += "/plugins";
+    auto customPluginPath = fs::path(m_appDesc->folderPath()) / "plugins";
 
-    if (!QDir(QString::fromStdString(customPluginPath)).exists()) // FIXME: WebPage: qdir-less
+    if (!fs::exists(customPluginPath) || !fs::is_directory(customPluginPath))
         return;
-    if (!m_customPluginPath.compare(customPluginPath))
+    if (!customPluginPath.compare(m_customPluginPath))
         return;
 
-    m_customPluginPath = customPluginPath;
-    LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), PMLOGKS("CUSTOM_PLUGIN_PATH", m_customPluginPath.c_str()), "%s", __func__);
+    m_customPluginPath = customPluginPath.string();
+    LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()),
+             PMLOGKFV("PID", "%d", getWebProcessPID()),
+             PMLOGKS("CUSTOM_PLUGIN_PATH", m_customPluginPath.c_str()),
+             "%s", __func__);
 
     d->pageView->AddCustomPluginDir(m_customPluginPath);
     d->pageView->AddAvailablePluginDir(m_customPluginPath);
@@ -976,7 +952,9 @@ int WebPageBlink::renderProcessPid() const
 void WebPageBlink::didRunCloseCallback()
 {
     m_closeCallbackTimer.stop();
-    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "WebPageBlink::didRunCloseCallback(); onclose callback done");
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", appId().c_str()),
+             PMLOGKFV("PID", "%d", getWebProcessPID()),
+             "WebPageBlink::didRunCloseCallback(); onclose callback done");
     FOR_EACH_OBSERVER(WebPageObserver, m_observers, closeCallbackExecuted());
 }
 
@@ -1034,18 +1012,20 @@ void WebPageBlink::updateBoardType()
 
 void WebPageBlink::updateMediaCodecCapability()
 {
-    QFile file("/etc/umediaserver/device_codec_capability_config.json");
-    if (!file.exists())
+    fs::path file("/etc/umediaserver/device_codec_capability_config.json");
+    if (!fs::exists(file) || !fs::is_regular_file(file))
         return;
 
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+    std::string capability;
+    try {
+        WebAppManagerUtils::readFileContent(file.string(), capability);
+    } catch (const std::exception &e) {
+        LOG_DEBUG("WebPageBlink: Couldn't load '%s' due to error '%s'.",
+                  file.string().c_str(), e.what());
         return;
+    }
 
-    QString capability;
-    QTextStream in(&file);
-    capability.append(in.readAll());
-
-    d->pageView->SetMediaCodecCapability(capability.toStdString());
+    d->pageView->SetMediaCodecCapability(capability);
 }
 
 double WebPageBlink::devicePixelRatio()

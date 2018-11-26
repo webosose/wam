@@ -56,7 +56,7 @@ WebAppBase* WebAppFactoryManager::createWebApp(const std::string& winType, WebPa
     return nullptr;
 }
 
-WebPageBase* WebAppFactoryManager::createWebPage(const std::string& winType, QUrl url, std::shared_ptr<ApplicationDescription> desc,
+WebPageBase* WebAppFactoryManager::createWebPage(const std::string& winType, const Url& url, std::shared_ptr<ApplicationDescription> desc,
                                                  const std::string& appType, const std::string& launchParams)
 {
     WebPageBase *page = nullptr;
