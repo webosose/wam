@@ -19,8 +19,6 @@
 
 #include <string>
 
-#include <QVariant>
-
 class PalmSystemBase {
 public:
     PalmSystemBase() {}
@@ -28,7 +26,6 @@ public:
 
 protected:
     virtual std::string getDeviceInfo(const std::string& name);
-    virtual QVariant getResource(QVariant a, QVariant b); // FIXME: PalmSystem: qvariant-less
     virtual std::string country() const;
     virtual std::string locale() const;
     virtual std::string localeRegion() const;

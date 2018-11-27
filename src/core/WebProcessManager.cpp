@@ -18,6 +18,8 @@
 
 #include <algorithm>
 #include <fstream>
+#include <climits>
+#include <cstdio>
 #include <string>
 #include <signal.h>
 
@@ -91,6 +93,7 @@ uint32_t WebProcessManager::getWebProcessProxyID(uint32_t pid) const
     return 0;
 }
 
+// TODO: Refactor to use C++ stream/string API
 std::string WebProcessManager::getWebProcessMemSize(uint32_t pid) const
 {
     std::string path = "/proc/" + std::to_string(pid) + "/status";
