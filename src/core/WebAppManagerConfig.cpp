@@ -77,23 +77,6 @@ void WebAppManagerConfig::initConfiguration()
     m_name = WebAppManagerUtils::getEnv("WAM_NAME");
 }
 
-QVariant WebAppManagerConfig::getConfiguration(const std::string name)
-{
-    QVariant value(0);
-
-    auto it = m_configuration.find(name);
-    if (it != m_configuration.end()) {
-        value = it->second;
-    }
-
-    return value;
-}
-
-void WebAppManagerConfig::setConfiguration(const std::string& name, QVariant value)
-{
-    m_configuration.emplace(name, value);
-}
-
 void WebAppManagerConfig::postInitConfiguration()
 {
     if (access("/var/luna/preferences/debug_system_apps", F_OK) == 0) {

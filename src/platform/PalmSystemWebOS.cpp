@@ -164,21 +164,21 @@ void PalmSystemWebOS::setKeepAlive(bool keep)
 }
 
 #ifdef HAS_PMLOG
-void PalmSystemWebOS::pmLogInfoWithClock(const QVariant& msgid, const QVariant& perfType, const QVariant& perfGroup)
+void PalmSystemWebOS::pmLogInfoWithClock(const std::string& msgid, const std::string& perfType, const std::string& perfGroup)
 {
     PmLogContext context;
     PmLogGetContext(m_app->page()->appId().c_str(), &context);
-    PmLogInfoWithClock(context, msgid.toByteArray().size() ? msgid.toByteArray().data() : NULL, 2,
-                       PMLOGKS("PerfType", perfType.toByteArray().size() ? perfType.toByteArray().data() : "empty"),
-                       PMLOGKS("PerfGroup", perfGroup.toByteArray().size() ? perfGroup.toByteArray().data() : "empty"), "");
+    PmLogInfoWithClock(context, msgid.size() ? msgid.c_str() : NULL, 2,
+                       PMLOGKS("PerfType", perfType.size() ? perfType.c_str() : "empty"),
+                       PMLOGKS("PerfGroup", perfGroup.size() ? perfGroup.c_str() : "empty"), "");
 }
 
-void PalmSystemWebOS::pmLogString(PmLogLevel level, const QVariant& msgid, const QVariant& kvpairs, const QVariant& message)
+void PalmSystemWebOS::pmLogString(PmLogLevel level, const std::string& msgid, const std::string& kvpairs, const std::string& message)
 {
     PmLogContext context;
     PmLogGetContext(m_app->page()->appId().c_str(), &context);
-    PmLogString(context, level, msgid.toByteArray().size() ? msgid.toByteArray().data() : NULL,
-            kvpairs.toByteArray().size() ? kvpairs.toByteArray().data() : NULL, message.toByteArray().data());
+    PmLogString(context, level, msgid.size() ? msgid.c_str() : NULL,
+                kvpairs.size() ? kvpairs.c_str() : NULL, message.c_str());
 }
 #endif
 

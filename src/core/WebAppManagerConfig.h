@@ -20,8 +20,6 @@
 #include <unordered_map>
 #include <string>
 
-#include <QVariant>
-
 class WebAppManagerConfig {
 public:
     WebAppManagerConfig();
@@ -46,10 +44,6 @@ public:
 
     virtual bool isLaunchOptimizationEnabled() const { return m_launchOptimizationEnabled; }
 
-protected:
-    virtual QVariant getConfiguration(std::string name);
-    virtual void setConfiguration(const std::string& name, QVariant value);
-
 private:
     void initConfiguration();
 
@@ -69,8 +63,6 @@ private:
     bool m_launchOptimizationEnabled;
     std::string m_userScriptPath;
     std::string m_name;
-
-    std::unordered_map<std::string, QVariant> m_configuration;
 };
 
 #endif /* WEBAPPMANAGERCONFIG_H */

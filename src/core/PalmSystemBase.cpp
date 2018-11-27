@@ -19,6 +19,7 @@
 #include <sstream>
 #include <boost/filesystem.hpp>
 
+#include "JsonHelper.h"
 #include "LogManager.h"
 #include "WebAppManager.h"
 #include "WebAppManagerUtils.h"
@@ -31,21 +32,6 @@ std::string PalmSystemBase::getDeviceInfo(const std::string& name)
     return value;
 }
 
-QVariant PalmSystemBase::getResource(QVariant a, QVariant b) // FIXME: PalmSystem: qvariant-less
-{
-    boost::filesystem::path p(a.toString().toStdString());
-    std::string data;
-
-    try {
-        WebAppManagerUtils::readFileContent(p.string(), data);
-    } catch (const std::exception &e) {
-        LOG_DEBUG("PalmSystemBase: Failed to read resource '%s' due to error '%s'.",
-                  p.string().c_str(), e.what());
-    }
-
-    return QVariant(data.c_str());
-}
-
 std::string PalmSystemBase::country() const
 {
     std::string localcountry;
@@ -54,11 +40,12 @@ std::string PalmSystemBase::country() const
     WebAppManager::instance()->getDeviceInfo("LocalCountry", localcountry);
     WebAppManager::instance()->getDeviceInfo("SmartServiceCountry", smartServiceCountry);
 
-    std::stringstream jss;
-    jss << "{ \"country\": \"" << localcountry
-        << "\", \"smartServiceCountry\": \"" << smartServiceCountry << "\" }";
-
-    return jss.str();
+    std::string json;
+    Json::Value obj(Json::objectValue);
+    obj["country"] = localcountry;
+    obj["smartServiceCountry"] = smartServiceCountry;
+    dumpJsonToString(obj, json);
+    return json;
 }
 
 std::string PalmSystemBase::locale() const

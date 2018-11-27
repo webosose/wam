@@ -73,8 +73,8 @@ protected:
     virtual void setInputRegion(const std::string& params);
     virtual void setGroupClientEnvironment(GroupClientCallKey callKey, const std::string& params);
 #ifdef HAS_PMLOG
-    virtual void pmLogInfoWithClock(const QVariant& msgid, const QVariant& perfType, const QVariant& perfGroup);
-    virtual void pmLogString(PmLogLevel level, const QVariant& msgid, const QVariant& kvpairs, const QVariant& message);
+    virtual void pmLogInfoWithClock(const std::string& msgid, const std::string& perfType, const std::string& perfGroup);
+    virtual void pmLogString(PmLogLevel level, const std::string& msgid, const std::string& kvpairs, const std::string& message);
 #endif
     virtual bool cursorVisibility();
     virtual void updateLaunchParams(const std::string& launchParams);
