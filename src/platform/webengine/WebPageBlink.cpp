@@ -16,15 +16,15 @@
 
 #include "WebPageBlink.h"
 
+#include <algorithm>
 #include <cmath>
 #include <cstdio>
+#include <locale>
 #include <sstream>
 #include <unistd.h>
 
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
-
-//FIXME: WebPge: qlocale-less
-#include <QLocale>
 
 #include "ApplicationDescription.h"
 #include "BlinkWebProcessManager.h"
@@ -286,6 +286,18 @@ void WebPageBlink::reloadDefaultPage()
     loadDefaultUrl();
 }
 
+static fs::path genPathForLang(const std::string &localeStr)
+{
+    auto encodingBegin = localeStr.find('.');
+    auto variantBegin = localeStr.find('@');
+    auto size = std::min(encodingBegin, variantBegin);
+    std::string lang(localeStr, 0, size);
+    std::vector<std::string> tokens;
+    boost::split(tokens, lang, boost::is_any_of("_"));
+    return boost::join(tokens, "/");
+}
+
+
 void WebPageBlink::loadErrorPage(int errorCode)
 {
     std::string errorpage = getWebAppManagerConfig()->getErrorPageUrl();
@@ -306,10 +318,6 @@ void WebPageBlink::loadErrorPage(int errorCode)
         fs::path searchPath = fs::canonical(errPagePath);
         std::string errCode = std::to_string(errorCode);
 
-        std::string language;
-        getSystemLanguage(language);
-        QLocale locale(QString::fromStdString(language)); //TODO: WebPage: qlocale-less
-
         // search order:
         // searchPath/resources/<language>/<script>/<region>/html/fileName
         // searchPath/resources/<language>/<region>/html/fileName
@@ -324,12 +332,10 @@ void WebPageBlink::loadErrorPage(int errorCode)
         // es-ES has resources/es/ES/html but QLocale::bcp47Name() returns es not es-ES
         // fr-CA, pt-PT has its own localization folder and QLocale::bcp47Name() returns well
 
-        bool except = language.find("zh") == 0 || language.find("es") == 0;
-        std::string bcp47Name(except ? language : locale.bcp47Name().toStdString());
-        replaceSubstrings(bcp47Name, "-", "/");
-
+        std::string language;
+        getSystemLanguage(language);
         bool found = false;
-        for (fs::path l(bcp47Name); !found && !l.empty(); l = l.parent_path())
+        for (auto l = genPathForLang(language); !found && !l.empty(); l = l.parent_path())
             found = fs::exists(searchPath / "resources" / l / "html" / fileName);
         found = found || fs::exists(searchPath / "resources" / "html" / fileName);
         found = found || fs::exists(searchPath / fileName);

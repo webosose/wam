@@ -18,6 +18,7 @@
 #define WEBPAGEBASE_H
 
 #include <memory>
+#include <string>
 
 #include "ObserverList.h"
 #include "Url.h"
