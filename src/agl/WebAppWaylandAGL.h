@@ -17,6 +17,8 @@
 #ifndef WEBAPPWAYLANDAGL_H
 #define WEBAPPWAYLANDAGL_H
 
+#include <string>
+
 #include "WebAppWayland.h"
 
 class ApplicationDescription;

@@ -17,6 +17,8 @@
 #ifndef WEBPAGEBASE_H
 #define WEBPAGEBASE_H
 
+#include <string>
+
 #include "ObserverList.h"
 #include "Url.h"
 

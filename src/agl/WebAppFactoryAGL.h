@@ -17,6 +17,8 @@
 #ifndef WEBAPPFACTORYAGL_H
 #define WEBAPPFACTORYAGL_H
 
+#include <string>
+
 #include "WebAppFactoryInterface.h"
 
 class WebAppFactoryAGL : public WebAppFactoryInterface {
