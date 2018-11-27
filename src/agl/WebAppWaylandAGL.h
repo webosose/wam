@@ -18,6 +18,7 @@
 #define WEBAPPWAYLANDAGL_H
 
 #include <memory>
+#include <string>
 
 #include "WebAppWayland.h"
 
