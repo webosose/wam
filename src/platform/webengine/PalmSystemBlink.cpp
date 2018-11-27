@@ -77,20 +77,14 @@ std::string PalmSystemBlink::handleBrowserControlMessage(const std::string& mess
     } else if (message == "PmLogInfoWithClock") {
 #ifdef HAS_PMLOG
         if (params.size() == 3) {
-            auto p0 = QString::fromStdString(params[0]);
-            auto p1 = QString::fromStdString(params[1]);
-            auto p2 = QString::fromStdString(params[2]);
-            pmLogInfoWithClock(p0, p1, p2); // FIXME: PmLog: qvariant-less
+            pmLogInfoWithClock(params[0], params[1], params[2]);
         }
 #endif
     } else if (message == "PmLogString") {
 #ifdef HAS_PMLOG
         if (params.size() > 3) {
             auto level = static_cast<PmLogLevel>(stringTo<int>(params[0]));
-            auto p1 = QString::fromStdString(params[1]);
-            auto p2 = QString::fromStdString(params[2]);
-            auto p3 = QString::fromStdString(params[3]);
-            pmLogString(level, p1, p2, p3); // FIXME: PmLog: qstr2stdstr
+            pmLogString(level, params[1], parasm[2], params[3]);
         }
 #endif
     } else if (message == "setWindowProperty") {
