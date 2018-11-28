@@ -39,7 +39,8 @@ SOURCES += \
         WebAppManagerUtils.cpp \
         WebPageBase.cpp \
         WebPageObserver.cpp \
-        WebProcessManager.cpp
+        WebProcessManager.cpp \
+        WindowTypes.cpp
 
 HEADERS += \
         ApplicationDescription.h \
