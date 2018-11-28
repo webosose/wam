@@ -14,16 +14,14 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef _WINDOWTYPES_H_
-#define _WINDOWTYPES_H_
+#include "WindowTypes.h"
 
-extern const char WT_CARD[];
-extern const char WT_POPUP[];
-extern const char WT_MINIMAL[];
-extern const char WT_OVERLAY[];
-extern const char WT_NONE[];
-extern const char WT_FLOATING[];
-extern const char WT_UNKNOWN[];
-extern const char WT_SYSTEM_UI[];
+const char WT_CARD[] = "_WEBOS_WINDOW_TYPE_CARD";
+const char WT_POPUP[] = "_WEBOS_WINDOW_TYPE_POPUP";
+const char WT_MINIMAL[] = "_WEBOS_WINDOW_TYPE_RESTRICTED";
+const char WT_OVERLAY[] = "_WEBOS_WINDOW_TYPE_OVERLAY";
+const char WT_NONE[] = "_WEBOS_WINDOW_TYPE_NONE";
+const char WT_FLOATING[] = "_WEBOS_WINDOW_TYPE_FLOATING";
+const char WT_UNKNOWN[] = "_WEBOS_WINDOW_TYPE_UNKNOWN";
+const char WT_SYSTEM_UI[] = "_WEBOS_WINDOW_TYPE_SYSTEM_UI";
 
-#endif // _WINDOWTYPES_H_
