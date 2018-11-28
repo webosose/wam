@@ -30,4 +30,6 @@ void replaceSubstrings(std::string& in, const std::string& toSearch,
 
 bool stringToUInt(const std::string& in, unsigned int& out);
 
+std::string trimString(const std::string& str);
+
 #endif // STRING_UTILS_H

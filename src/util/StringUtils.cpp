@@ -19,6 +19,8 @@
 #include <sstream>
 #include <stdexcept>
 
+#include <boost/algorithm/string.hpp>
+
 // TODO: Initial simple implementation using standard
 // API. Maybe will be replaced by a boost version in the future.
 //
@@ -57,4 +59,12 @@ bool stringToUInt(const std::string& in, unsigned int& out)
     } catch (const std::invalid_argument&) {
         return false;
     }
+}
+
+std::string trimString(const std::string& str)
+{
+    std::string trimmed(str);
+    boost::trim_right(trimmed);
+    boost::trim_left(trimmed);
+    return trimmed;
 }
