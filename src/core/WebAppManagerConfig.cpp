@@ -18,6 +18,7 @@
 
 #include <unistd.h>
 
+#include "StringUtils.h"
 #include "WebAppManagerUtils.h"
 
 WebAppManagerConfig::WebAppManagerConfig()
@@ -44,7 +45,7 @@ void WebAppManagerConfig::initConfiguration()
     }
 
     std::string suspendDelay = WebAppManagerUtils::getEnv("WAM_SUSPEND_DELAY_IN_MS");
-    m_suspendDelayTime = std::max(std::stoi(suspendDelay), 1);
+    m_suspendDelayTime = std::max(stringTo<int>(suspendDelay), 1);
 
     m_webProcessConfigPath = WebAppManagerUtils::getEnv("WEBPROCESS_CONFIGURATION_PATH");
     if (m_webProcessConfigPath.empty())

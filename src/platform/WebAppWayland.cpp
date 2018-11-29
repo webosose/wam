@@ -22,6 +22,7 @@
 
 #include "ApplicationDescription.h"
 #include "LogManager.h"
+#include "StringUtils.h"
 #include "WebAppWaylandWindow.h"
 #include "WebAppManagerUtils.h"
 #include "WebPageBase.h"
@@ -100,7 +101,7 @@ void WebAppWayland::init(int width, int height, int surface_id)
 
     try {
         std::string launchTimeoutStr = WebAppManagerUtils::getEnv("LAUNCH_FINISH_ASSURE_TIMEOUT");
-        kLaunchFinishAssureTimeoutMs = std::stoi(launchTimeoutStr);
+        kLaunchFinishAssureTimeoutMs = stringTo<int>(launchTimeoutStr);
     } catch(...) {}
 
     if (!webos::WebOSPlatform::GetInstance()->GetInputPointer()) {

@@ -16,6 +16,7 @@
 
 #include "LogManager.h"
 #include "PlatformModuleFactoryImpl.h"
+#include "StringUtils.h"
 #include "WebAppManager.h"
 #include "WebAppManagerServiceAGL.h"
 
@@ -208,7 +209,7 @@ bool WebAppLauncherRuntime::init() {
         std::string sport = authority.substr(n+1);
         m_role.append("-");
         m_role.append(sport);
-        m_port = std::stoi(sport);
+        m_port = stringTo<int>(sport);
       }
     }
 

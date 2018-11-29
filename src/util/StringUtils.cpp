@@ -16,10 +16,12 @@
 
 #include "StringUtils.h"
 
+#include <iostream>
 #include <sstream>
 #include <stdexcept>
 
 #include <boost/algorithm/string.hpp>
+#include <boost/lexical_cast.hpp>
 
 // TODO: Initial simple implementation using standard
 // API. Maybe will be replaced by a boost version in the future.
@@ -47,20 +49,6 @@ void replaceSubstrings(std::string& in, const std::string& toSearch,
     }
 }
 
-bool stringToUInt(const std::string& in, unsigned int& out)
-{
-    try {
-        unsigned long lresult = std::stoul(in, nullptr, 10);
-        unsigned int result = lresult;
-        if (result != lresult)
-            return false;
-        out = result;
-        return true;
-    } catch (const std::invalid_argument&) {
-        return false;
-    }
-}
-
 std::string trimString(const std::string& str)
 {
     std::string trimmed(str);
@@ -68,3 +56,25 @@ std::string trimString(const std::string& str)
     boost::trim_left(trimmed);
     return trimmed;
 }
+
+template<typename Target>
+Target stringTo(const std::string& str, bool *ok)
+{
+    try {
+        Target t = boost::lexical_cast<Target>(str);
+        if (ok != nullptr) *ok = true;
+        return t;
+    } catch (const std::exception &e) {
+        std::cerr << "Failed to convert: '" << str
+            << "' (err=" << e.what() << ")" << std::endl;
+        if (ok != nullptr) *ok = false;
+        return Target();
+    }
+}
+
+template int stringTo<int>(const std::string& str, bool *success = nullptr);
+
+template double stringTo<double>(const std::string& str, bool *success = nullptr);
+
+template unsigned int stringTo<unsigned int>(const std::string& str, bool *success = nullptr);
+

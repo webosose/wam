@@ -15,7 +15,6 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "DeviceInfoImpl.h"
-#include "LogManager.h"
 
 #ifdef HAS_LUNA_SERVICE
 #include <lunaprefs.h>
@@ -25,6 +24,9 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonObject>
+
+#include "StringUtils.h"
+#include "LogManager.h"
 
 DeviceInfoImpl::DeviceInfoImpl()
     : m_screenWidth(0)
@@ -90,8 +92,8 @@ void DeviceInfoImpl::initDisplayInfo()
     std::string hardwareScreenHeightStr;
     if (getDeviceInfo("HardwareScreenWidth", hardwareScreenWidthStr) &&
         getDeviceInfo("HardwareScreenHeight", hardwareScreenHeightStr)) {
-        hardwareScreenWidth = std::stoi(hardwareScreenWidthStr);
-        hardwareScreenHeight = std::stoi(hardwareScreenHeightStr);
+        hardwareScreenWidth = stringTo<int>(hardwareScreenWidthStr);
+        hardwareScreenHeight = stringTo<int>(hardwareScreenHeightStr);
     } else {
         getDisplayWidth(hardwareScreenWidth);
         getDisplayHeight(hardwareScreenHeight);

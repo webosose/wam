@@ -16,13 +16,15 @@
 
 #include "DeviceInfo.h"
 
+#include "StringUtils.h"
+
 bool DeviceInfo::getDisplayWidth(int &value)
 {
     bool ret = false;
     std::string valueStr;
 
     ret = getDeviceInfo("DisplayWidth", valueStr);
-    value = std::stoi(valueStr);
+    value = stringTo<int>(valueStr);
 
     return ret;
 }
@@ -38,7 +40,7 @@ bool DeviceInfo::getDisplayHeight(int &value)
     std::string valueStr;
 
     ret = getDeviceInfo("DisplayHeight", valueStr);
-    value = std::stoi(valueStr);
+    value = stringTo<int>(valueStr);
 
     return ret;
 }

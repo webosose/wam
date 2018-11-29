@@ -28,8 +28,9 @@ StringList splitString(const std::string &str, char delimiter,
 void replaceSubstrings(std::string& in, const std::string& toSearch,
                        const std::string& replaceStr = "");
 
-bool stringToUInt(const std::string& in, unsigned int& out);
-
 std::string trimString(const std::string& str);
+
+template<typename Target>
+Target stringTo(const std::string& str, bool *success = nullptr);
 
 #endif // STRING_UTILS_H

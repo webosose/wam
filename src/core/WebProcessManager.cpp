@@ -159,16 +159,13 @@ void WebProcessManager::readWebProcessPolicy()
 void WebProcessManager::setWebProcessCacheProperty(const Json::Value &object, const std::string &key)
 {
     WebProcessInfo info = WebProcessInfo(0, 0);
-    std::string memoryCacheStr, codeCacheStr;
     auto memoryCache = object["memoryCache"];
     if (memoryCache.isString()) {
-        memoryCacheStr = memoryCache.asString();
-        stringToUInt(memoryCacheStr, info.memoryCacheSize);
+        info.memoryCacheSize = stringTo<uint32_t>(memoryCache.asString());
     }
-    auto codeCahe = object["codeCahe"];
-    if (codeCahe.isString()) {
-        codeCacheStr = codeCahe.asString();
-        stringToUInt(codeCacheStr, info.codeCacheSize);
+    auto codeCache = object["codeCache"];
+    if (codeCache.isString()) {
+        info.codeCacheSize = stringTo<uint32_t>(codeCache.asString());
     }
 
     m_webProcessInfoMap.emplace(key, info);

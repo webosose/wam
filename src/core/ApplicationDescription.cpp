@@ -97,7 +97,7 @@ const ApplicationDescription::WindowOwnerInfo ApplicationDescription::getWindowO
                     auto name = layer["name"];
                     auto zstr = layer["z"];
                     if (name.isString() && zstr.isString()) {
-                        int z = std::stoi(zstr.asString());
+                        int z = stringTo<int>(zstr.asString());
                         info.layers.emplace(name.asString(), z);
                     }
                 }
@@ -214,8 +214,8 @@ ApplicationDescription* ApplicationDescription::fromJsonString(const char* jsonS
         std::string overrideResolution = jsonObj["resolution"].asString();
         auto resList = splitString(overrideResolution, 'x', true, true);
         if(resList.size() == 2) {
-            appDesc->m_widthOverride = std::stoi(resList.at(0));
-            appDesc->m_heightOverride = std::stoi(resList.at(1));
+            appDesc->m_widthOverride = stringTo<int>(resList.at(0));
+            appDesc->m_heightOverride = stringTo<int>(resList.at(1));
         }
         if(appDesc->m_widthOverride < 0 || appDesc->m_heightOverride < 0) {
             appDesc->m_widthOverride = 0;
@@ -230,9 +230,9 @@ ApplicationDescription* ApplicationDescription::fromJsonString(const char* jsonS
         for (const auto &k : keyFilterTable) {
             if (!k.isObject())
                 continue;
-            int from = std::stoi(k["from"].asString());
-            int to = std::stoi(k["to"].asString());
-            int mod = std::stoi(k["mod"].asString());
+            int from = stringTo<int>(k["from"].asString());
+            int to = stringTo<int>(k["to"].asString());
+            int mod = stringTo<int>(k["mod"].asString());
             appDesc->m_keyFilterTable[from] = std::make_pair(to, mod);
         }
     }

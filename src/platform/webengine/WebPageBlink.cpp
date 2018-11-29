@@ -972,8 +972,8 @@ void WebPageBlink::updateHardwareResolution()
     std::string hardwareWidth, hardwareHeight;
     getDeviceInfo("HardwareScreenWidth", hardwareWidth);
     getDeviceInfo("HardwareScreenHeight", hardwareHeight);
-    int w = std::stoi(hardwareWidth);
-    int h = std::stoi(hardwareHeight);
+    int w = stringTo<int>(hardwareWidth);
+    int h = stringTo<int>(hardwareHeight);
     d->pageView->SetHardwareResolution(w, h);
 }
 
@@ -1013,8 +1013,8 @@ double WebPageBlink::devicePixelRatio()
     getDeviceInfo("HardwareScreenWidth", hardwareWidth);
     getDeviceInfo("HardwareScreenHeight", hardwareHeight);
 
-    double deviceWidth = std::stod(hardwareWidth);
-    double deviceHeight = std::stod(hardwareHeight);
+    double deviceWidth = stringTo<double>(hardwareWidth);
+    double deviceHeight = stringTo<double>(hardwareHeight);
 
     double ratioX = deviceWidth/appWidth;
     double ratioY = deviceHeight/appHeight;
