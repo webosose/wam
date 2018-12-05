@@ -110,6 +110,8 @@ public:
     void setNeedReload(bool status) { m_needReload = status; }
     bool needReload() { return m_needReload; }
 
+    static int screenWidth();
+    static int screenHeight();
     static int currentUiWidth();
     static int currentUiHeight();
 

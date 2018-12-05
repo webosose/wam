@@ -768,6 +768,9 @@ void WebPageBlink::setViewportSize()
 {
     if (m_appDesc->widthOverride() && m_appDesc->heightOverride()) {
         d->pageView->SetViewportSize(m_appDesc->widthOverride(), m_appDesc->heightOverride());
+        double scale_x = static_cast<double>(screenWidth()) / static_cast<double>(m_appDesc->widthOverride());
+        double scale_y = static_cast<double>(screenHeight()) /  static_cast<double>(m_appDesc->heightOverride());
+        d->pageView->SetAdditionalContentsScale(scale_x, scale_y);
     }
 }
 

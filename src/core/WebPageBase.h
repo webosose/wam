@@ -176,6 +176,8 @@ protected:
     void handleLoadFailed(int errorCode);
     bool getDeviceInfo(QString name, QString& value);
     bool getSystemLanguage(QString& value);
+    int screenWidth();
+    int screenHeight();
     int currentUiWidth();
     int currentUiHeight();
     WebProcessManager* getWebProcessManager();

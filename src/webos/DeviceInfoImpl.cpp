@@ -64,6 +64,14 @@ DeviceInfoImpl::DeviceInfoImpl()
 
 bool DeviceInfoImpl::getDeviceInfo(QString name, QString &value)
 {
+    if (name == "ScreenWidth") {
+        value = QString::number(m_screenWidth);
+        return true;
+    } else if (name == "ScreenHeight") {
+        value = QString::number(m_screenHeight);
+        return true;
+    }
+
     return DeviceInfo::getDeviceInfo(name, value);
 }
 
@@ -89,7 +97,8 @@ bool DeviceInfoImpl::getInfoFromLunaPrefs(const char* key, std::string& value)
 void DeviceInfoImpl::initDisplayInfo()
 {
     // Display information --------------------------------------------------------
-    float m_screenDensity = 1.0f;
+    getDisplayWidth(m_screenWidth);
+    getDisplayHeight(m_screenHeight);
     int hardwareScreenWidth = 0;
     int hardwareScreenHeight = 0;
 
@@ -103,10 +112,6 @@ void DeviceInfoImpl::initDisplayInfo()
         getDisplayWidth(hardwareScreenWidth);
         getDisplayHeight(hardwareScreenHeight);
     }
-
-    m_screenWidth = (int) (hardwareScreenWidth / m_screenDensity);
-    m_screenHeight = (int) (hardwareScreenHeight / m_screenDensity);
-
 }
 
 void DeviceInfoImpl::initPlatformInfo()

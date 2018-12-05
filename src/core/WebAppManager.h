@@ -102,6 +102,8 @@ public:
     void setContainerAppLaunched(bool launched);
     QString& getContainerAppId();
     WebAppBase* getContainerApp();
+    int screenWidth();
+    int screenHeight();
     int currentUiWidth();
     int currentUiHeight();
     void setUiSize(int width, int height);

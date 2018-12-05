@@ -121,6 +121,26 @@ void WebAppManager::setUiSize(int width, int height)
     }
 }
 
+int WebAppManager::screenWidth()
+{
+    QString width;
+    if (m_deviceInfo && m_deviceInfo->getDeviceInfo("ScreenWidth", width)) {
+        return width.toInt();
+    } else {
+        return currentUiWidth();
+    }
+}
+
+int WebAppManager::screenHeight()
+{
+    QString height;
+    if (m_deviceInfo && m_deviceInfo->getDeviceInfo("ScreenHeight", height)) {
+        return height.toInt();
+    } else {
+        return currentUiHeight();
+    }
+}
+
 int WebAppManager::currentUiWidth()
 {
     int width = 0;
