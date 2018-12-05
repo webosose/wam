@@ -35,6 +35,8 @@
 #include "WebPageObserver.h"
 #include "WebPageBlinkObserver.h"
 
+#include "webos/webview_profile.h"
+
 /**
  * Hide dirty implementation details from
  * public API
@@ -103,7 +105,7 @@ void WebPageBlink::init()
     d->pageView->setDelegate(this);
     webos::WebViewProfile* profile = BlinkWebViewProfileHelper::instance()->getProfile(m_appDesc->id());
     if (profile)
-        d->pageView->SetProfile(profile);
+        d->pageView->SetProfile(profile->GetProfileDelegate());
     d->pageView->Initialize(m_appDesc->id(),
                             m_appDesc->folderPath(),
                             m_appDesc->trustLevel(),
