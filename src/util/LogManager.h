@@ -20,25 +20,23 @@
 #include "LogMsgId.h"
 
 #if defined(DISABLE_LOGMANAGER) || !defined(HAS_PMLOG)
+#include <cstdio>
+
+#define LOG_MSG(level, ...)                \
+    do {                                        \
+        fprintf(stderr, "## (%s)[%s] ", level, __PRETTY_FUNCTION__); \
+        fprintf(stderr, ##__VA_ARGS__);    \
+        fputc('\n', stderr);    \
+    } while (0)
 
 #define LOG_INFO_APPID(...) \
     do {                    \
     } while (0)
-#define LOG_INFO(...) \
-    do {              \
-    } while (0)
-#define LOG_DEBUG(...) \
-    do {               \
-    } while (0)
-#define LOG_WARNING(...) \
-    do {                 \
-    } while (0)
-#define LOG_ERROR(...) \
-    do {               \
-    } while (0)
-#define LOG_CRITICAL(...) \
-    do {                  \
-    } while (0)
+#define LOG_INFO(...) //LOG_MSG("INFO", ##__VA_ARGS__)
+#define LOG_DEBUG(...) LOG_MSG("DEBUG", ##__VA_ARGS__)
+#define LOG_WARNING(...) //LOG_MSG("WARN", ##__VA_ARGS__)
+#define LOG_ERROR(...) //LOG_MSG("ERROR", ##__VA_ARGS__)
+#define LOG_CRITICAL(...) //LOG_MSG("CRITICAL", ##__VA_ARGS__)
 
 #define PMLOGKFV(literal_key, literal_fmt, value) \
   literal_key, literal_fmt, value
@@ -46,10 +44,7 @@
 #define PMLOGKS(literal_key, string_value) \
   literal_key, "\"%s\"", string_value
 
-#define LOG_INFO_WITH_CLOCK(__msgid, ...) \
-    do {                                  \
-    } while (0)
-
+#define LOG_INFO_WITH_CLOCK(__msgid, ...)
 #else
 
 #include "LogManagerPmLog.h"
