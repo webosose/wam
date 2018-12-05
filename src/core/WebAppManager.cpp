@@ -750,7 +750,10 @@ void WebAppManager::killCustomPluginProcess(const QString &basePath)
 std::string WebAppManager::launch(const std::string& appDescString, const std::string& params,
         const std::string& launchingAppId, int& errCode, std::string& errMsg)
 {
+    LOG_DEBUG("Begin");
     std::shared_ptr<ApplicationDescription> desc(ApplicationDescription::fromJsonString(appDescString.c_str()));
+    LOG_DEBUG("parse app desc: Done");
+
     if (!desc)
         return std::string();
 
@@ -759,8 +762,11 @@ std::string WebAppManager::launch(const std::string& appDescString, const std::s
     QString winType = windowTypeFromString(desc->defaultWindowType());
     errMsg.erase();
 
+    LOG_DEBUG("windowType=[%s] Done", winType.toStdString().c_str());
+
     // Check if app is container itself, it shouldn't be relaunched like normal app
     if (isContainerApp(url)) {
+        LOG_DEBUG("isContainerApp=[%s]", url.c_str());
         if (!isRunningApp(desc->id(), instanceId))
             instanceId = onLaunchContainerApp(appDescString);
         else {
@@ -774,6 +780,7 @@ std::string WebAppManager::launch(const std::string& appDescString, const std::s
     }
     // Check if app is container-based
     else if (isContainerBasedApp(desc.get())) {
+        LOG_DEBUG("isContainerBasedApp=[%s]", url.c_str());
         if (desc->trustLevel() != "default" && desc->trustLevel() != "trusted") {
             errCode = ERR_CODE_LAUNCHAPP_INVALID_TRUSTLEVEL;
             errMsg = err_invalidTrustLevel;
@@ -788,11 +795,13 @@ std::string WebAppManager::launch(const std::string& appDescString, const std::s
     // Run as a normal app
     else {
         instanceId = generateInstanceId();
+        LOG_DEBUG("normal app url=[%s] instanceId=[%s]", url.c_str(), instanceId.c_str());
         if (!onLaunchUrl(url, winType, desc, instanceId, params, launchingAppId, errCode, errMsg)) {
             return std::string();
         }
     }
 
+    LOG_DEBUG("Done.");
     return instanceId;
 }
 

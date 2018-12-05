@@ -7,6 +7,7 @@
 #include <sys/socket.h>
 #include <unistd.h>
 
+#include <glib.h>
 #include <libxml/parser.h>
 
 #include <libhomescreen.hpp>
@@ -85,7 +86,7 @@ void Launcher::register_surfpid(pid_t app_pid, pid_t surf_pid)
     return;
   bool result = m_pid_map.insert({app_pid, surf_pid}).second;
   if (!result) {
-    fprintf(stderr, "register_surfpid, (app_pid=%d) already registered surface_id with (surface_id=%d)\r\n",
+    LOG_DEBUG("register_surfpid, (app_pid=%d) already registered surface_id with (surface_id=%d)",
             (int)app_pid, (int)surf_pid);
   }
 }
@@ -94,7 +95,7 @@ void Launcher::unregister_surfpid(pid_t app_pid, pid_t surf_pid)
 {
   size_t erased_count = m_pid_map.erase(app_pid);
   if (erased_count == 0) {
-    fprintf(stderr, "unregister_surfpid, (app_pid=%d) doesn't have a registered surface\r\n",
+    LOG_DEBUG("unregister_surfpid, (app_pid=%d) doesn't have a registered surface",
             (int)app_pid);
   }
 }
@@ -103,7 +104,7 @@ pid_t Launcher::find_surfpid_by_rid(pid_t app_pid)
 {
   auto surface_id = m_pid_map.find(app_pid);
   if (surface_id != m_pid_map.end()) {
-    fprintf(stderr, "found return(%d, %d)\r\n", (int)app_pid, (int)surface_id->second);
+    LOG_DEBUG("found return(%d, %d)", (int)app_pid, (int)surface_id->second);
     return surface_id->second;
   }
   return -1;
@@ -123,7 +124,7 @@ int SingleBrowserProcessWebAppLauncher::loop(int argc, const char** argv, volati
 
 int SharedBrowserProcessWebAppLauncher::launch(const std::string& id, const std::string& uri) {
   if (!WebAppManagerServiceAGL::instance()->initializeAsHostClient()) {
-    fprintf(stderr,"Failed to initialize as host client\r\n");
+    LOG_DEBUG("Failed to initialize as host client");
     return -1;
   }
 
@@ -157,10 +158,10 @@ int WebAppLauncherRuntime::run(int argc, const char** argv) {
   m_role = "WebApp";
 
   if(WebAppManagerServiceAGL::instance()->isHostServiceRunning()) {
-    fprintf(stderr, "WebAppLauncherRuntime::run - creating SharedBrowserProcessWebAppLauncher\r\n");
+    LOG_DEBUG("WebAppLauncherRuntime::run - creating SharedBrowserProcessWebAppLauncher");
     m_launcher = new SharedBrowserProcessWebAppLauncher();
   } else {
-    fprintf(stderr, "WebAppLauncherRuntime::run - creating SingleBrowserProcessWebAppLauncher\r\n");
+    LOG_DEBUG("WebAppLauncherRuntime::run - creating SingleBrowserProcessWebAppLauncher");
     m_launcher = new SingleBrowserProcessWebAppLauncher();
   }
 
@@ -175,11 +176,11 @@ int WebAppLauncherRuntime::run(int argc, const char** argv) {
   m_launcher->m_rid = m_launcher->launch(m_id, m_url);
 
   if (m_launcher->m_rid < 0) {
-    fprintf(stderr, "cannot launch WAM app (%s)\r\n", m_id.c_str());
+    LOG_DEBUG("cannot launch WAM app (%s)", m_id.c_str());
   }
 
   // take care 1st time launch
-  fprintf(stderr, "waiting for notification: surface created\r\n");
+  LOG_DEBUG("waiting for notification: surface created");
   m_pending_create = true;
 
   return m_launcher->loop(argc, argv, e_flag);
@@ -196,7 +197,7 @@ bool WebAppLauncherRuntime::init() {
   if (std::regex_match(m_url, url_match_result, url_regex)) {
     unsigned counter = 0;
     for (const auto& res : url_match_result) {
-      fprintf(stderr, "    %d: %s\r\n", counter++, res.str().c_str());
+      LOG_DEBUG("    %d: %s", counter++, res.str().c_str());
     }
 
     if (url_match_result.size() > 4) {
@@ -223,22 +224,22 @@ bool WebAppLauncherRuntime::init() {
 
     // Parse config file of runxdg
     if (parse_config(path.c_str())) {
-      fprintf(stderr, "Error in config\r\n");
+      LOG_DEBUG("Error in config");
       return false;
     }
 
-    fprintf(stderr, "id=[%s], name=[%s], role=[%s], url=[%s], port=%d, token=[%s]\r\n",
+    LOG_DEBUG("id=[%s], name=[%s], role=[%s], url=[%s], port=%d, token=[%s]",
             m_id.c_str(), m_name.c_str(), m_role.c_str(), m_url.c_str(),
             m_port, m_token.c_str());
 
     // Setup HomeScreen/WindowManager API
     if (!init_wm()) {
-      fprintf(stderr, "cannot setup wm API\r\n");
+      LOG_DEBUG("cannot setup wm API");
       return false;
     }
 
     if (!init_hs()) {
-      fprintf(stderr, "cannot setup hs API\r\n");
+      LOG_DEBUG("cannot setup hs API");
       return false;
     }
 
@@ -247,7 +248,7 @@ bool WebAppLauncherRuntime::init() {
 
     return true;
   } else {
-    fprintf(stderr, "Malformed url.\r\n");
+    LOG_DEBUG("Malformed url.");
     return false;
   }
 }
@@ -255,29 +256,29 @@ bool WebAppLauncherRuntime::init() {
 bool WebAppLauncherRuntime::init_wm() {
   m_wm = new LibWindowmanager();
   if (m_wm->init(m_port, m_token.c_str())) {
-    fprintf(stderr, "cannot initialize windowmanager\r\n");
+    LOG_DEBUG("cannot initialize windowmanager");
     return false;
   }
 
   std::function< void(json_object*) > h_active = [](json_object* object) {
-    fprintf(stderr, "Got Event_Active\r\n");
+    LOG_DEBUG("Got Event_Active");
   };
 
   std::function< void(json_object*) > h_inactive = [](json_object* object) {
-    fprintf(stderr, "Got Event_Inactive\r\n");
+    LOG_DEBUG("Got Event_Inactive");
   };
 
   std::function< void(json_object*) > h_visible = [](json_object* object) {
-    fprintf(stderr, "Got Event_Visible\r\n");
+    LOG_DEBUG("Got Event_Visible");
   };
 
   std::function< void(json_object*) > h_invisible = [](json_object* object) {
-    fprintf(stderr, "Got Event_Invisible\r\n");
+    LOG_DEBUG("Got Event_Invisible");
   };
 
   std::function< void(json_object*) > h_syncdraw =
       [this](json_object* object) {
-    fprintf(stderr, "Got Event_SyncDraw\r\n");
+    LOG_DEBUG("Got Event_SyncDraw");
     json_object* obj = json_object_new_object();
     json_object_object_add(obj, this->m_wm->kKeyDrawingName,
                            json_object_new_string(this->m_role.c_str()));
@@ -285,7 +286,7 @@ bool WebAppLauncherRuntime::init_wm() {
   };
 
   std::function< void(json_object*) > h_flushdraw= [](json_object* object) {
-    fprintf(stderr, "Got Event_FlushDraw\r\n");
+    LOG_DEBUG("Got Event_FlushDraw");
   };
 
   m_wm->set_event_handler(LibWindowmanager::Event_Active, h_active);
@@ -301,7 +302,7 @@ bool WebAppLauncherRuntime::init_wm() {
 bool WebAppLauncherRuntime::init_hs() {
   m_hs = new LibHomeScreen();
   if (m_hs->init(m_port, m_token.c_str())) {
-    fprintf(stderr, "cannot initialize homescreen\r\n");
+    LOG_DEBUG("cannot initialize homescreen");
     return false;
   }
 
@@ -311,11 +312,11 @@ bool WebAppLauncherRuntime::init_hs() {
     if (json_object_object_get_ex(object, "application_name", &val)) {
       const char *name = json_object_get_string(val);
 
-      fprintf(stderr, "Event_TapShortcut <%s>\r\n", name);
+      LOG_DEBUG("Event_TapShortcut <%s>", name);
 
       if (strcmp(name, this->m_name.c_str()) == 0) {
         // check app exist and re-launch if needed
-        fprintf(stderr, "Activesurface %s \r\n", this->m_role.c_str());
+        LOG_DEBUG("Activesurface %s ", this->m_role.c_str());
 
         json_object *obj = json_object_new_object();
         json_object_object_add(obj, this->m_wm->kKeyDrawingName,
@@ -331,7 +332,7 @@ bool WebAppLauncherRuntime::init_hs() {
 
   std::function< void(json_object*) > h_default= [](json_object* object) {
     const char *j_str = json_object_to_json_string(object);
-    fprintf(stderr, "Got event [%s]\r\n", j_str);
+    LOG_DEBUG("Got event [%s]", j_str);
   };
   m_hs->set_event_handler(LibHomeScreen::Event_OnScreenMessage, h_default);
 
@@ -366,13 +367,13 @@ int WebAppLauncherRuntime::parse_config (const char *path_to_config)
       author = xmlNodeListGetString(doc, node->xmlChildrenNode, 1);
   }
   fprintf(stdout, "...parse_config...\n");
-  fprintf(stderr, "id: %s\r\n", id);
-  fprintf(stderr, "version: %s\r\n", version);
-  fprintf(stderr, "name: %s\r\n", name);
-  fprintf(stderr, "content: %s\r\n", content);
-  fprintf(stderr, "description: %s\r\n", description);
-  fprintf(stderr, "author: %s\r\n", author);
-  fprintf(stderr, "icon: %s\r\n", icon);
+  LOG_DEBUG("id: %s", id);
+  LOG_DEBUG("version: %s", version);
+  LOG_DEBUG("name: %s", name);
+  LOG_DEBUG("content: %s", content);
+  LOG_DEBUG("description: %s", description);
+  LOG_DEBUG("author: %s", author);
+  LOG_DEBUG("icon: %s", icon);
 
   m_name = std::string((const char*)name);
 
@@ -399,7 +400,7 @@ void WebAppLauncherRuntime::setup_surface (int id)
   json_object_object_add(obj, m_wm->kKeyIviId,
                          json_object_new_string(sid.c_str()));
 
-  fprintf(stderr, "requestSurfaceXDG(%s,%s)\r\n", m_role.c_str(), sid.c_str());
+  LOG_DEBUG("requestSurfaceXDG(%s,%s)", m_role.c_str(), sid.c_str());
   m_wm->requestSurfaceXDG(obj);
 
   if (m_pending_create) {
@@ -426,13 +427,13 @@ void WebAppLauncherRuntime::notify_ivi_control_cb (ilmObjectType object, t_ilm_u
     pid_t surf_pid = surf_props.creatorPid;
 
     if (!created) {
-      fprintf(stderr, "ivi surface (id=%d, surf_pid=%d) [m_rid:%d] destroyed.\r\n", id, surf_pid, m_launcher->m_rid);
+      LOG_DEBUG("ivi surface (id=%d, surf_pid=%d) [m_rid:%d] destroyed.", id, surf_pid, m_launcher->m_rid);
       m_launcher->unregister_surfpid(id, surf_pid);
       m_surfaces.erase(surf_pid);
       return;
     }
 
-    fprintf(stderr, "ivi surface (id=%d, surf_pid=%d) [m_rid:%d] is created.\r\n", id, surf_pid, m_launcher->m_rid);
+    LOG_DEBUG("ivi surface (id=%d, surf_pid=%d) [m_rid:%d] is created.", id, surf_pid, m_launcher->m_rid);
 
     m_launcher->register_surfpid(id, surf_pid);
     if (m_launcher->m_rid &&
@@ -442,9 +443,9 @@ void WebAppLauncherRuntime::notify_ivi_control_cb (ilmObjectType object, t_ilm_u
     m_surfaces[surf_pid] = id;
   } else if (object == ILM_LAYER) {
     if (created)
-      fprintf(stderr, "ivi layer: %d created.\r\n", id);
+      LOG_DEBUG("ivi layer: %d created.", id);
     else
-      fprintf(stderr, "ivi layer: %d destroyed.\r\n", id);
+      LOG_DEBUG("ivi layer: %d destroyed.", id);
   }
 }
 
@@ -462,7 +463,7 @@ int SharedBrowserProcessRuntime::run(int argc, const char** argv) {
     webos::WebOSMain webOSMain(&delegate);
     return webOSMain.Run(argc, argv);
   } else {
-    fprintf(stderr, "Trying to start shared browser process but process is already running\r\n");
+    LOG_DEBUG("Trying to start shared browser process but process is already running");
     return -1;
   }
 }
@@ -474,18 +475,18 @@ int RenderProcessRuntime::run(int argc, const char** argv) {
 }
 
 int WebRuntimeAGL::run(int argc, const char** argv) {
-  fprintf(stderr, "WebRuntimeAGL::run\r\n");
+  LOG_DEBUG("WebRuntimeAGL::run");
   std::vector<std::string> args(argv + 1, argv + argc);
   if (isBrowserProcess(args)) {
     if (isSharedBrowserProcess(args)) {
-      fprintf(stderr, "WebRuntimeAGL - creating SharedBrowserProcessRuntime\r\n");
+      LOG_DEBUG("WebRuntimeAGL - creating SharedBrowserProcessRuntime");
       m_runtime = new SharedBrowserProcessRuntime();
     }  else {
-      fprintf(stderr, "WebRuntimeAGL - creating WebAppLauncherRuntime\r\n");
+      LOG_DEBUG("WebRuntimeAGL - creating WebAppLauncherRuntime");
       m_runtime = new WebAppLauncherRuntime();
     }
   } else {
-    fprintf(stderr, "WebRuntimeAGL - creating RenderProcessRuntime\r\n");
+    LOG_DEBUG("WebRuntimeAGL - creating RenderProcessRuntime");
     m_runtime = new RenderProcessRuntime();
   }
 
@@ -510,5 +511,5 @@ TinyProxy::TinyProxy() {
   std::string cmd = "tinyproxy -p " + std::to_string(port);
   int res = std::system(cmd.data());
   if (res == -1)
-    fprintf(stderr, "Error while running %s\r\n", cmd.data());
+    LOG_DEBUG("Error while running %s", cmd.data());
 }

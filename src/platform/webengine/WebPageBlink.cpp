@@ -17,6 +17,7 @@
 #include "WebPageBlink.h"
 
 #include <cmath>
+#include <cstdio>
 
 #include <QtCore/QDir>
 #include <QtCore/QMultiMap>
@@ -36,6 +37,12 @@
 #include "WebPageBlinkObserver.h"
 
 #include "webos/webview_profile.h"
+
+#define DBG(fmt, ...)                           \
+    do {                                        \
+        fprintf(stderr, "### [WebPageBlink] "); \
+        fprintf(stderr, fmt, ##__VA_ARGS__);    \
+    } while (0)
 
 /**
  * Hide dirty implementation details from
@@ -104,8 +111,10 @@ void WebPageBlink::init()
     d->pageView = createPageView();
     d->pageView->setDelegate(this);
     webos::WebViewProfile* profile = BlinkWebViewProfileHelper::instance()->getProfile(m_appDesc->id());
-    if (profile)
+    if (profile) {
+        DBG("### Setting profile for page %s\n", m_appDesc->id().c_str());
         d->pageView->SetProfile(profile->GetProfileDelegate());
+    }
     d->pageView->Initialize(m_appDesc->id(),
                             m_appDesc->folderPath(),
                             m_appDesc->trustLevel(),
