@@ -16,6 +16,7 @@
 #include <json/value.h>
 #include <libxml/parser.h>
 
+#include "LogManager.h"
 #include "JsonHelper.h"
 
 class WamSocketLockFile {
@@ -30,7 +31,7 @@ public:
   bool createAndLock() {
     lock_fd_ = openLockFile();
     if (!acquireLock(lock_fd_)) {
-      fprintf(stderr, "Failed to lock file %d\r\n", lock_fd_);
+      LOG_DEBUG("Failed to lock file %d", lock_fd_);
       return false;
     }
     return true;
@@ -56,18 +57,18 @@ private:
   int openLockFile() {
     int fd = open(lock_file_.c_str(), O_CREAT | O_TRUNC, S_IRWXU);
     if (fd == -1) {
-      fprintf(stderr, "Failed to open lock file descriptor\r\n");
+      LOG_DEBUG("Failed to open lock file descriptor");
       return fd;
     }
 
     int flags = fcntl(fd, F_GETFD);
     if (flags == -1)
-      fprintf(stderr, "Could not get flags for lock file %d\r\n", fd);
+      LOG_DEBUG("Could not get flags for lock file %d", fd);
 
      flags |= FD_CLOEXEC;
 
      if (fcntl(fd, F_SETFD, flags) == -1)
-       fprintf(stderr, "Could not set flags for lock file %d\r\n", fd);
+       LOG_DEBUG("Could not set flags for lock file %d", fd);
 
      return fd;
   }
@@ -97,7 +98,7 @@ public:
         // Create the socket file descriptor
     socket_fd_ = socket(AF_UNIX, SOCK_DGRAM, 0);
     if (socket_fd_ == -1) {
-      fprintf(stderr, "Failed to open socket file descriptor\r\n");
+      LOG_DEBUG("Failed to open socket file descriptor");
       return false;
     }
 
@@ -105,16 +106,16 @@ public:
     strncpy(sock_addr.sun_path, wam_socket_path_.c_str(), sizeof(sock_addr.sun_path));
 
     if (server) {
-      fprintf(stderr, "service binding\r\n");
+      LOG_DEBUG("service binding");
       unlink(wam_socket_path_.c_str());
       if (bind(socket_fd_, (struct sockaddr *) &sock_addr, sizeof(struct sockaddr_un)) != 0) {
-        fprintf(stderr, "Failed to bind to named socket");
+        LOG_DEBUG("Failed to bind to named socket");
         return false;
       }
     } else {
-      fprintf(stderr, "client connecting\r\n");
+      LOG_DEBUG("client connecting");
       if (connect(socket_fd_, (struct sockaddr *) &sock_addr, sizeof(struct sockaddr_un)) != 0) {
-        fprintf(stderr, "Failed to connect to named socket");
+        LOG_DEBUG("Failed to connect to named socket");
         return false;
       }
     }
@@ -128,22 +129,22 @@ public:
     // Remove the last appended space if any
     if (argc > 1)
       cmd.pop_back();
-    std::cout << "Sending message=[" << cmd << "]" << std::endl;
+    LOG_DEBUG("Sending message=[%s]", cmd.c_str());
     ssize_t bytes = write(socket_fd_, cmd.c_str(), cmd.length());
-    std::cout << "Wrote " << bytes << "bytes" << std::endl;
+    LOG_DEBUG("Wrote %zd bytes.", bytes);
   }
 
   int waitForMsg() {
     char buf[PATH_MAX] = {};
     ssize_t bytes;
 
-    std::cout << "Waiting for data..." << std::endl;
+    LOG_DEBUG("Waiting for data...");
     while (TEMP_FAILURE_RETRY((bytes = recv(socket_fd_, (void *)buf, sizeof(buf), 0)) != -1)) {
       int last = bytes - 1;
       // Remove the new line if there's one
       if (buf[last] == '\n')
         buf[last] = '\0';
-      std::cout << "Got " << bytes << " bytes=[" << buf << "]" << std::endl;
+      LOG_DEBUG("Got %zd bytes=[%s].", bytes, buf);
 
       std::string data(buf);
       std::istringstream iss(data);
@@ -197,6 +198,7 @@ bool WebAppManagerServiceAGL::isHostServiceRunning()
 
 void WebAppManagerServiceAGL::launchOnHost(int argc, const char **argv)
 {
+    LOG_DEBUG("Dispatching launchOnHost");
     socket_->sendMsg(argc, argv);
 }
 
@@ -223,7 +225,7 @@ bool WebAppManagerServiceAGL::startService()
       pthread_t thread_id;
       if( pthread_create( &thread_id , nullptr,  run_socket, socket_.get()) < 0) {
           perror("could not create thread");
-          fprintf(stderr, "Couldnt create thread...\r\n");
+          LOG_DEBUG("Couldnt create thread...");
           return false;
       }
     }
@@ -235,6 +237,7 @@ bool WebAppManagerServiceAGL::startService()
 
 void WebAppManagerServiceAGL::triggerStartupApp()
 {
+    LOG_DEBUG("Triggering app start: %s", startup_app_uri_.c_str());
     if (!startup_app_uri_.empty()) {
       if (startup_app_uri_.find("http://") == 0) {
         startup_app_timer_.start(1000, this,
@@ -278,13 +281,13 @@ void WebAppManagerServiceAGL::launchStartupAppFromConfig()
         author = xmlNodeListGetString(doc, node->xmlChildrenNode, 1);
     }
     fprintf(stdout, "...\n");
-    fprintf(stderr, "id: %s\r\n", id);
-    fprintf(stderr, "version: %s\r\n", version);
-    fprintf(stderr, "name: %s\r\n", name);
-    fprintf(stderr, "content: %s\r\n", content);
-    fprintf(stderr, "description: %s\r\n", description);
-    fprintf(stderr, "author: %s\r\n", author);
-    fprintf(stderr, "icon: %s\r\n", icon);
+    LOG_DEBUG("id: %s", id);
+    LOG_DEBUG("version: %s", version);
+    LOG_DEBUG("name: %s", name);
+    LOG_DEBUG("content: %s", content);
+    LOG_DEBUG("description: %s", description);
+    LOG_DEBUG("author: %s", author);
+    LOG_DEBUG("icon: %s", icon);
 
 
     Json::Value obj(Json::objectValue);
@@ -319,8 +322,8 @@ void WebAppManagerServiceAGL::launchStartupAppFromConfig()
 
 void WebAppManagerServiceAGL::launchStartupAppFromURL()
 {
-    fprintf(stderr, "WebAppManagerServiceAGL::launchStartupAppFromURL\r\n");
-    fprintf(stderr, "    url: %s\r\n", startup_app_uri_.c_str());
+    LOG_DEBUG("WebAppManagerServiceAGL::launchStartupAppFromURL");
+    LOG_DEBUG("    url: %s", startup_app_uri_.c_str());
     Json::Value obj(Json::objectValue);
     obj["id"] = startup_app_id_;
     obj["version"] = "1.0";
@@ -339,10 +342,15 @@ void WebAppManagerServiceAGL::launchStartupAppFromURL()
     int errCode = 0;
     std::string params, errMsg;
 
-    if (!startup_proxy_port_.empty())
+    LOG_DEBUG("Launching with appDesc=[%s]", appDesc.c_str());
+
+    if (!startup_proxy_port_.empty()) {
         WebAppManagerService::buildWebViewProfile(app_id, "localhost", startup_proxy_port_);
+        LOG_DEBUG("buildWebViewProfile: Done.");
+    }
 
     WebAppManagerService::onLaunch(appDesc, params, app_id, errCode, errMsg);
+    LOG_DEBUG("onLaunch: Done.");
 }
 
 Json::Value WebAppManagerServiceAGL::launchApp(const Json::Value &request)
