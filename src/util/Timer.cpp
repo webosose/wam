@@ -17,8 +17,11 @@
 #include "Timer.h"
 #include <glib.h>
 
+#include "LogManager.h"
+
 int timeout_cb(void* data)
 {
+    LOG_DEBUG("Timer tick: [this=%p]", data);
     Timer* timer = (Timer*) data;
     timer->handleCallback();
     return timer->isRepeating();
@@ -35,6 +38,7 @@ int timeout_cb_destroy(void* data)
 void Timer::start(int delayInMilliSeconds, bool willDestroy)
 {
     m_isRunning = true;
+    LOG_DEBUG("Starting timer: [this=%p] [destroy=%d]", this, willDestroy);
     if (!willDestroy)
         m_sourceId = g_timeout_add(delayInMilliSeconds, timeout_cb, this);
     else
