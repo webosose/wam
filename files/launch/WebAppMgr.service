@@ -19,7 +19,7 @@ Wants=afm-service-windowmanager-service-2017@0.1.service afm-appli-homescreen-20
 Type=simple
 OOMScoreAdjust=-1000
 EnvironmentFile=-/etc/default/WebAppMgr.env
-ExecStart=/usr/bin/WebAppMgr --no-sandbox --remote-debugging-port=9998 --user-data-dir="/home/0/wamdata" --webos-wam
+ExecStart=/usr/bin/WebAppMgr --no-sandbox --in-process-gpu --remote-debugging-port=9998 --user-data-dir="/home/0/wamdata" --webos-wam
 Restart=on-failure
 RestartSec=50
 
