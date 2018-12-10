@@ -131,7 +131,7 @@ public:
       cmd.pop_back();
     LOG_DEBUG("Sending message=[%s]", cmd.c_str());
     ssize_t bytes = write(socket_fd_, cmd.c_str(), cmd.length());
-    LOG_DEBUG("Wrote %ld bytes.", bytes);
+    LOG_DEBUG("Wrote %zd bytes.", bytes);
   }
 
   int waitForMsg() {
@@ -144,7 +144,7 @@ public:
       // Remove the new line if there's one
       if (buf[last] == '\n')
         buf[last] = '\0';
-      LOG_DEBUG("Got %ld bytes=[%s].",bytes, buf);
+      LOG_DEBUG("Got %zd bytes=[%s].", bytes, buf);
 
       std::string data(buf);
       std::istringstream iss(data);
