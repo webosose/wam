@@ -130,6 +130,7 @@ public:
     void updateBoardType();
     void updateMediaCodecCapability();
     double devicePixelRatio();
+    void setAdditionalContentsScale(float scaleX, float scaleY);
     void setFontHinting(FontRenderParams hinting);
     void setSupportDolbyHDRContents();
     void updateHardwareResolution();

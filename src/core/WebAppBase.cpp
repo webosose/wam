@@ -191,16 +191,6 @@ void WebAppBase::cleanResources()
     d->m_appDesc.reset();
 }
 
-int WebAppBase::screenWidth()
-{
-    return WebAppManager::instance()->currentUiWidth();
-}
-
-int WebAppBase::screenHeight()
-{
-    return WebAppManager::instance()->currentUiHeight();
-}
-
 int WebAppBase::currentUiWidth()
 {
     return WebAppManager::instance()->currentUiWidth();
@@ -370,12 +360,6 @@ void WebAppBase::setAppDescription(std::shared_ptr<ApplicationDescription> appDe
 
     // set appId here from appDesc
    d->m_appId = QString::fromStdString(appDesc->id());
-
-   if (appDesc->widthOverride() && appDesc->heightOverride()) {
-        float scaleX = static_cast<float>(screenWidth()) / appDesc->widthOverride();
-        float scaleY = static_cast<float>(screenHeight()) / appDesc->heightOverride();
-        m_scaleFactor = (scaleX < scaleY) ? scaleX : scaleY;
-   }
 }
 
 void WebAppBase::setAppProperties(QString properties)

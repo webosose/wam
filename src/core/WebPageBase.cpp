@@ -302,16 +302,6 @@ bool WebPageBase::getDeviceInfo(QString name, QString &value)
     return WebAppManager::instance()->getDeviceInfo(name, value);
 }
 
-int WebPageBase::screenWidth()
-{
-    return WebAppManager::instance()->screenWidth();
-}
-
-int WebPageBase::screenHeight()
-{
-    return WebAppManager::instance()->screenHeight();
-}
-
 int WebPageBase::currentUiWidth()
 {
     return WebAppManager::instance()->currentUiWidth();

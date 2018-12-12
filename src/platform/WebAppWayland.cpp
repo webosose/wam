@@ -158,6 +158,13 @@ void WebAppWayland::attach(WebPageBase *page)
     setKeyMask(webos::WebOSKeyMask::KEY_MASK_EXIT,
         getAppDescription()->handleExitKey());
 
+    if (getAppDescription()->widthOverride() && getAppDescription()->heightOverride()) {
+        float scaleX = static_cast<float>(m_appWindow->DisplayWidth()) / getAppDescription()->widthOverride();
+        float scaleY = static_cast<float>(m_appWindow->DisplayHeight()) / getAppDescription()->heightOverride();
+        m_scaleFactor = (scaleX < scaleY) ? scaleX : scaleY;
+        static_cast<WebPageBlink*>(page)->setAdditionalContentsScale(scaleX, scaleY);
+    }
+
     doAttach();
 
     static_cast<WebPageBlink*>(this->page())->setObserver(this);
