@@ -19,6 +19,9 @@
 #include "LogManager.h"
 #include "JsonHelper.h"
 
+#include "WebAppManager.h"
+#include "WebAppBase.h"
+
 class WamSocketLockFile {
 public:
   ~WamSocketLockFile() {
@@ -153,11 +156,17 @@ public:
           res.push_back(strdup(s.c_str()));
       }
 
-      WebAppManagerServiceAGL::instance()->setStartupApplication(
-        std::string(res[0]), std::string(res[1]), atoi(res[2]),
-        std::string(res[3]));
+      if (std::string(res[0]) == kStartApp) {
+        WebAppManagerServiceAGL::instance()->setStartupApplication(
+          std::string(res[1]), std::string(res[2]), atoi(res[3]),
+          std::string(res[4]));
 
-      WebAppManagerServiceAGL::instance()->triggerStartupApp();
+        WebAppManagerServiceAGL::instance()->triggerStartupApp();
+      } else {
+        WebAppManagerServiceAGL::instance()->setAppIdForEventTarget(std::string(res[1]));
+
+        WebAppManagerServiceAGL::instance()->triggetEventForApp(std::string(res[0]));
+      }
       return 1;
     }
     return 0;
@@ -202,6 +211,12 @@ void WebAppManagerServiceAGL::launchOnHost(int argc, const char **argv)
     socket_->sendMsg(argc, argv);
 }
 
+void WebAppManagerServiceAGL::sendEvent(int argc, const char **argv)
+{
+    LOG_DEBUG("Sending event");
+    socket_->sendMsg(argc, argv);
+}
+
 void WebAppManagerServiceAGL::setStartupApplication(
     const std::string& startup_app_id,
     const std::string& startup_app_uri, int startup_app_surface_id,
@@ -211,6 +226,12 @@ void WebAppManagerServiceAGL::setStartupApplication(
     startup_app_uri_ = startup_app_uri;
     startup_app_surface_id_ = startup_app_surface_id;
     startup_proxy_port_ = startup_proxy_port;
+}
+
+void WebAppManagerServiceAGL::setAppIdForEventTarget(const std::string& app_id) {
+  // This might be a subject to races. But it works ok as a temp solution.
+  if (app_id_event_target_.empty())
+    app_id_event_target_ = app_id;
 }
 
 void *run_socket(void *socket) {
@@ -247,6 +268,19 @@ void WebAppManagerServiceAGL::triggerStartupApp()
               &WebAppManagerServiceAGL::launchStartupAppFromConfig);
       }
     }
+}
+
+void WebAppManagerServiceAGL::triggetEventForApp(const std::string& action) {
+  if (app_id_event_target_.empty())
+    return;
+
+  if (action == kActivateEvent) {
+     startup_app_timer_.start(1000, this,
+           &WebAppManagerServiceAGL::onActivateEvent);
+  } else if (action == kDeactivateEvent) {
+     startup_app_timer_.start(1000, this,
+           &WebAppManagerServiceAGL::onDeactivateEvent);
+  }
 }
 
 void WebAppManagerServiceAGL::launchStartupAppFromConfig()
@@ -406,4 +440,22 @@ Json::Value WebAppManagerServiceAGL::clearBrowsingData(const Json::Value &reques
 Json::Value WebAppManagerServiceAGL::webProcessCreated(const Json::Value &request, bool subscribed)
 {
     return Json::Value(Json::objectValue);
+}
+
+void WebAppManagerServiceAGL::onActivateEvent() {
+  LOG_DEBUG("Activate app=%s", app_id_event_target_.c_str());
+  QString appIdToFind = QString::fromStdString(app_id_event_target_);
+  WebAppBase* web_app = WebAppManager::instance()->findAppById(appIdToFind);
+  if (web_app)
+    web_app->onStageActivated();
+  app_id_event_target_.clear();
+}
+
+void WebAppManagerServiceAGL::onDeactivateEvent() {
+  LOG_DEBUG("Dectivate app=%s", app_id_event_target_.c_str());
+  QString appIdToFind = QString::fromStdString(app_id_event_target_);
+  WebAppBase* web_app = WebAppManager::instance()->findAppById(appIdToFind);
+  if (web_app)
+    web_app->onStageDeactivated();
+  app_id_event_target_.clear();
 }

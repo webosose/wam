@@ -135,6 +135,7 @@ int SharedBrowserProcessWebAppLauncher::launch(const std::string& id, const std:
   m_rid = (int)getpid();
   std::string m_rid_s = std::to_string(m_rid);
   std::vector<const char*> data;
+  data.push_back(kStartApp);
   data.push_back(id.c_str());
   data.push_back(uri.c_str());
   data.push_back(m_rid_s.c_str());
@@ -260,12 +261,24 @@ bool WebAppLauncherRuntime::init_wm() {
     return false;
   }
 
-  std::function< void(json_object*) > h_active = [](json_object* object) {
+  std::function< void(json_object*) > h_active = [this](json_object* object) {
     LOG_DEBUG("Got Event_Active");
+
+    std::vector<const char*> data;
+    data.push_back(kActivateEvent);
+    data.push_back(this->m_id.c_str());
+
+    WebAppManagerServiceAGL::instance()->sendEvent(data.size(), data.data());
   };
 
-  std::function< void(json_object*) > h_inactive = [](json_object* object) {
+  std::function< void(json_object*) > h_inactive = [this](json_object* object) {
     LOG_DEBUG("Got Event_Inactive");
+
+    std::vector<const char*> data;
+    data.push_back(kDeactivateEvent);
+    data.push_back(this->m_id.c_str());
+
+    WebAppManagerServiceAGL::instance()->sendEvent(data.size(), data.data());
   };
 
   std::function< void(json_object*) > h_visible = [](json_object* object) {
