@@ -434,6 +434,17 @@ void WebAppLauncherRuntime::notify_ivi_control_cb (ilmObjectType object, t_ilm_u
                                     t_ilm_bool created)
 {
   if (object == ILM_SURFACE) {
+    // This call is broadcasted and all the launchers receive this call with the same id,
+    // but we cannot rely on surf_pid when calling find_surfpid_by_rid, because all the
+    // created surfaces are created by WebAppMgr, which has only one pid. This results
+    // in a wrong launcher requesting surfaces, which may lead to a sitatution, when app just
+    // creashes. Thus, let's temporarely use an assumption that each launcher has only one
+    // surface.
+    if (!m_launcher->m_pid_map.empty()) {
+      LOG_DEBUG("This launcher has already had a surface");
+      return;
+    }
+
     struct ilmSurfaceProperties surf_props;
 
     ilm_getPropertiesOfSurface(id, &surf_props);
