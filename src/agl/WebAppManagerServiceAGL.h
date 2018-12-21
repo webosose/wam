@@ -6,6 +6,10 @@
 #include "WebAppManagerService.h"
 #include "Timer.h"
 
+constexpr char kStartApp[] = "start-app";
+constexpr char kActivateEvent[] = "activate-event";
+constexpr char kDeactivateEvent[] = "deactivate-event";
+
 class WamSocket;
 class WamSocketLockFile;
 
@@ -21,8 +25,10 @@ public:
     void setStartupApplication(const std::string& startup_app_id,
         const std::string& startup_app_uri, int startup_app_surface_id,
         const std::string& startup_proxy_port =  std::string());
+    void setAppIdForEventTarget(const std::string& app_id);
 
     void launchOnHost(int argc, const char **argv);
+    void sendEvent(int argc, const char **argv);
 
     // WebAppManagerService
     bool startService() override;
@@ -39,6 +45,7 @@ public:
     Json::Value webProcessCreated(const Json::Value &request, bool subscribed) override;
 
     void triggerStartupApp();
+    void triggetEventForApp(const std::string& action);
 
 private:
 
@@ -46,6 +53,11 @@ private:
 
     void launchStartupAppFromConfig();
     void launchStartupAppFromURL();
+
+    void onActivateEvent();
+    void onDeactivateEvent();
+
+    std::string app_id_event_target_;
 
     std::string startup_app_id_;
     std::string startup_app_uri_;
