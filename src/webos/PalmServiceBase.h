@@ -208,8 +208,8 @@ public:
     virtual ~PalmServiceBase();
 
     bool startService();
-    void stopService();
-    /*
+    virtual bool stopService(LSErrorSafe* error = 0);
+/*
  *  Methods to issue calls to the LS2 bus, optional parameters are a callback context
  *  and applicationId
  **/

@@ -30,6 +30,7 @@ public:
     static WebAppManagerServiceLuna* instance();
 
     bool startService();
+    bool stopService(LSErrorSafe* error = 0) override;
 
     // WebAppManagerService
     QJsonObject launchApp(QJsonObject request) override;

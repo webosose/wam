@@ -58,6 +58,19 @@ WebAppManagerServiceLuna::WebAppManagerServiceLuna()
 
 WebAppManagerServiceLuna::~WebAppManagerServiceLuna()
 {
+    stopService();
+}
+
+bool WebAppManagerServiceLuna::stopService(LSErrorSafe* error)
+{
+    LSErrorSafe lsError;
+    if (!PalmServiceBase::stopService(&lsError) ) {
+        LOG_WARNING(MSGID_UNREG_LS2_FAIL, 2,
+            PMLOGKS("SERVICE", serviceName()),
+            PMLOGKS("ERROR", lsError.message), "");
+        return false;
+    }
+    return true;
 }
 
 bool WebAppManagerServiceLuna::startService()
