@@ -498,18 +498,18 @@ void WebAppManagerServiceLuna::thresholdChangedCallback(QJsonObject reply)
 void WebAppManagerServiceLuna::applicationManagerConnectCallback(QJsonObject reply)
 {
     if (reply["connected"] == true) {
-        QJsonObject subscribe;
-        subscribe["subscribe"] = true;
+        QJsonObject params;
+        params["subscribe"] = true;
 
         if (!call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::getAppStatusCallback>(
                 "luna://com.webos.applicationManager/listApps",
-                subscribe, this)) {
+                params, this)) {
             LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "Failed to get an application list");
         }
 
         if (!call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::getForegroundAppInfoCallback>(
                 "luna://com.webos.applicationManager/getForegroundAppInfo",
-                subscribe, this)) {
+                params, this)) {
             LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "Failed to get foreground application Information");
         }
     }
