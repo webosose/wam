@@ -625,12 +625,6 @@ void WebAppManager::broadcastWebAppMessage(WebAppMessageType type, const QString
 #endif
 }
 
-void WebAppManager::requestActivity(WebAppBase* app)
-{
-    if(m_serviceSender)
-        m_serviceSender->requestActivity(app);
-}
-
 bool WebAppManager::processCrashed(QString appId) {
     if (m_containerAppManager && (appId == m_containerAppManager->getContainerAppId())) {
         m_containerAppManager->setContainerAppReady(false);

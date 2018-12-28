@@ -23,31 +23,6 @@
 #include <QString>
 #include <QJsonArray>
 
-void ServiceSenderLuna::requestActivity(WebAppBase* app)
-{
-    QJsonObject payload;
-    QJsonObject activity;
-    activity["name"] = app->appId();
-    activity["description"] = "";
-    QJsonObject activityType;
-    activityType["foreground"] = true;
-    activity["type"] = activityType;
-
-    payload["activity"]  = activity;
-    payload["subscribe"] = true;
-    payload["start"]     = true;
-    payload["replace"]   = true;
-
-    bool ret = WebAppManagerServiceLuna::instance()->call(
-        "luna://com.webos.service.activitymanager/create",
-        payload,
-        app->page()->getIdentifier().toLatin1().constData());
-
-    if (!ret) {
-        LOG_WARNING(MSGID_ACTIVITY_MANAGER_CREATE_FAIL, 0, "Failed to call activitymanager create");
-    }
-}
-
 #ifndef PRELOADMANAGER_ENABLED
 void ServiceSenderLuna::launchContainerApp(const QString& id)
 {

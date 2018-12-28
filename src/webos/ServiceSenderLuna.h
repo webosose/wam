@@ -21,7 +21,6 @@
 
 class ServiceSenderLuna : public ServiceSender {
 public:
-    void requestActivity(WebAppBase* app) override;
 #ifndef PRELOADMANAGER_ENABLED
     void launchContainerApp(const QString& id) override;
 #endif

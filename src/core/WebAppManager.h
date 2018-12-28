@@ -120,7 +120,6 @@ public:
     void setDeviceInfo(QString name, QString value);
     WebAppManagerConfig* config() { return m_webAppManagerConfig.get(); }
 
-    void requestActivity(WebAppBase* app);
     const QString windowTypeFromString(const std::string& str);
 
     bool closeAllApps(uint32_t pid = 0);

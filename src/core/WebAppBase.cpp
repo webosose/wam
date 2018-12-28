@@ -43,15 +43,6 @@ public:
 
         LOG_DEBUG("Delete webapp base for App ID %s", qPrintable(m_appId));
     }
-
-    void createActivity()
-    {
-        if (m_page)
-            WebAppManager::instance()->requestActivity(q);
-    }
-
-    void destroyActivity() {}
-
 public:
     WebAppBase *q;
     WebPageBase* m_page;
@@ -185,9 +176,6 @@ ApplicationDescription* WebAppBase::getAppDescription() const
 
 void WebAppBase::cleanResources()
 {
-    // does nothing if m_page has already been deleted and set to 0 by ~WindowedWebApp
-    d->destroyActivity();
-
     d->m_appDesc.reset();
 }
 
@@ -230,7 +218,6 @@ void WebAppBase::attach(WebPageBase* page)
     connect(d->m_page, SIGNAL(webPageUrlChanged()), this, SLOT(webPageUrlChangedSlot()));
     connect(d->m_page, SIGNAL(webPageLoadFinished()), this, SLOT(webPageLoadFinishedSlot()));
     connect(d->m_page, SIGNAL(webPageLoadFailed(int)), this, SLOT(webPageLoadFailedSlot(int)));
-    d->createActivity();
 }
 
 WebPageBase* WebAppBase::detach(void)

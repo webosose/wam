@@ -23,7 +23,6 @@
 class ServiceSender {
 public:
     virtual ~ServiceSender() {}
-    virtual void requestActivity(WebAppBase* app) = 0;
 #ifndef PRELOADMANAGER_ENABLED
     virtual void launchContainerApp(const QString& id) = 0;
 #endif
