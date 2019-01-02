@@ -131,9 +131,8 @@ script
     # Enable more explicit logging of timing with regards to rendering
     # export WAM2_ENABLE_DEBUG_RENDER_TIMING=1
 
-    # enable Web Inspector and Tellurium if in developer mode
+    # Tellurium path for developer mode
     export TELLURIUM_NUB_PATH=WEBOS_PREFIX/tellurium/telluriumnub.js
-    export ENABLE_INSPECTOR=1
 
     # Enable cursor by default
     export ENABLE_CURSOR_BY_DEFAULT=1

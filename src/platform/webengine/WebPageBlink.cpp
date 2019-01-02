@@ -114,10 +114,6 @@ void WebPageBlink::init()
     d->pageView->SetVisible(false);
     d->pageView->SetUserAgent(d->pageView->DefaultUserAgent() + " " + getWebAppManagerConfig()->getName());
 
-    // TODO : need to replace qgetenv
-    if(qgetenv("ENABLE_INSPECTOR") == "1")
-        d->pageView->SetInspectable(true);
-
     if(!qgetenv("PRIVILEGED_PLUGIN_PATH").isEmpty()) {
         QString privileged_plugin_path = QLatin1String(qgetenv("PRIVILEGED_PLUGIN_PATH"));
         d->pageView->AddAvailablePluginDir(privileged_plugin_path.toStdString());
@@ -896,6 +892,7 @@ void WebPageBlink::setPageProperties()
     // set inspectable
     if (m_appDesc->isInspectable() || inspectable()) {
         LOG_DEBUG("[%s] inspectable : true or 'debug_system_apps' mode; setInspectablePage(true)", qPrintable(appId()));
+        d->pageView->SetInspectable(true);
         d->pageView->EnableInspectablePage();
     }
 
@@ -1086,6 +1083,7 @@ void WebPageBlink::deleteWebStorages(const QString& identifier)
 void WebPageBlink::setInspectorEnable()
 {
     LOG_DEBUG("[%s] Inspector enable", qPrintable(appId()));
+    d->pageView->SetInspectable(true);
     d->pageView->EnableInspectablePage();
 }
 
