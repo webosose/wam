@@ -111,7 +111,8 @@ public:
 
     void onGlobalProperties(int key);
     bool purgeSurfacePool(uint32_t pid);
-    bool onKillApp(const std::string& appId);
+    void onShutdownEvent();
+    bool onKillApp(const std::string& appId, bool force = false);
     bool isDiscardCodeCacheRequired();
     bool setInspectorEnable(QString& appId);
     void discardCodeCache(uint32_t pid);

@@ -149,7 +149,9 @@ QJsonObject WebAppManagerServiceLuna::killApp(QJsonObject request)
     LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("APP_ID", appId.c_str()), PMLOGKS("API", "killApp"), "reason : %s", reason.c_str());
 
     if (reason == "memoryReclaim")
-        setForceCloseApp(QString::fromStdString(appId));
+        instances = WebAppManagerService::onKillApp(request["appId"].toString().toStdString(), true);
+    else
+        instances = WebAppManagerService::onKillApp(request["appId"].toString().toStdString(), false);
 
     instances = WebAppManagerService::onKillApp(request["appId"].toString().toStdString());
 

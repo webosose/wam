@@ -318,7 +318,20 @@ void WebAppManager::discardCodeCache(uint32_t pid)
     // Deprecated (2016-04-01)
 }
 
-bool WebAppManager::onKillApp(const std::string& appId)
+void WebAppManager::onShutdownEvent()
+{
+#if defined(TARGET_DESKTOP)
+
+    for (AppList::const_iterator it = m_appList.begin(); it != m_appList.end(); ++it) {
+        delete (*it);
+    }
+
+//		Palm::WebGlobal::garbageCollectNow();
+#endif
+    return;
+}
+
+bool WebAppManager::onKillApp(const std::string& appId, bool force)
 {
     QString __appId = QString::fromStdString(appId);
     WebAppBase* app = findAppById(__appId);
@@ -327,7 +340,10 @@ bool WebAppManager::onKillApp(const std::string& appId)
         return false;
     }
 
-    closeAppInternal(app);
+    if (force)
+        forceCloseAppInternal(app);
+    else
+        closeAppInternal(app);
     return true;
 }
 

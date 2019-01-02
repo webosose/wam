@@ -71,7 +71,7 @@ protected:
         int& errCode,
         std::string& errMsg);
 
-    bool onKillApp(const std::string& appId);
+    bool onKillApp(const std::string& appId, bool force = false);
     QJsonObject onLogControl(const std::string& keys, const std::string& value);
     bool onCloseAllApps(uint32_t pid = 0);
     bool closeContainerApp();

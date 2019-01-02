@@ -30,9 +30,9 @@ std::string WebAppManagerService::onLaunch(const std::string& appDescString, con
     return WebAppManager::instance()->launch(appDescString, params, launchingAppId, errCode, errMsg);
 }
 
-bool WebAppManagerService::onKillApp(const std::string& appId)
+bool WebAppManagerService::onKillApp(const std::string& appId, bool force)
 {
-    return WebAppManager::instance()->onKillApp(appId);
+    return WebAppManager::instance()->onKillApp(appId, force);
 }
 
 QJsonObject WebAppManagerService::onLogControl(const std::string& keys, const std::string& value)
