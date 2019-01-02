@@ -64,6 +64,7 @@ WebAppBase::WebAppBase()
     , m_crashed(false)
     , m_hiddenWindow(false)
     , m_wasContainerApp(false)
+    , m_closePageRequested(false)
 {
 }
 
@@ -310,7 +311,11 @@ void WebAppBase::doPendingRelaunch()
 
 void WebAppBase::webPageClosePageRequestedSlot()
 {
-    LOG_INFO(MSGID_WINDOW_CLOSED_JS, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
+    LOG_INFO(MSGID_WINDOW_CLOSED_JS, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "%s", m_closePageRequested ? "duplicated window.close();" : "", isClosing() ? "app is closing; drop this window.close()": "");
+    if (isClosing() || m_closePageRequested)
+        return;
+
+    m_closePageRequested = true;
     WebAppManager::instance()->closeApp(appId().toStdString());
 }
 

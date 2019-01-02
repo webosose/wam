@@ -266,6 +266,11 @@ void WebAppManager::onRelaunchApp(const std::string& instanceId, const std::stri
     QJsonDocument doc = QJsonDocument::fromJson(args.c_str());
     QJsonObject obj = doc.object();
 
+    // if this app is keepAlive and window.close() was once and relaunch now no matter preloaded, fastswitching, launch by launch API
+    // need to clear the flag if it needs
+    if (app->keepAlive() && app->closePageRequested())
+        app->setClosePageRequested(false);
+
     if (app->instanceId() == QString::fromStdString(instanceId)
         && !obj["preload"].isString()
         && !obj["launchedHidden"].toBool()) {

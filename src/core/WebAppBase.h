@@ -127,6 +127,8 @@ public:
 
     bool isClosing() const;
     bool isCheckLaunchTimeEnabled();
+    void setClosePageRequested(bool requested) { m_closePageRequested = requested; }
+    bool closePageRequested() { return m_closePageRequested; }
 
 protected:
     virtual void doAttach() = 0;
@@ -158,5 +160,6 @@ private:
     bool m_crashed;
     bool m_hiddenWindow;
     bool m_wasContainerApp; // should be set to true if launched via container
+    bool m_closePageRequested; // window.close() is called once then have to drop further requests
 };
 #endif // WEBAPPBASE_H
