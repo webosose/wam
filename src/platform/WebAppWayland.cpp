@@ -610,6 +610,8 @@ void WebAppWayland::firstFrameVisuallyCommitted()
     // and therefore we have to do an explicit show
     if (!getHiddenWindow() && m_preloadState == NONE_PRELOAD) {
         LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "Not hidden window, preload, call showWindow");
+        if (getAppDescription()->usePrerendering())
+          m_appWindow->resetPageFrameSwapped();
         showWindow();
     }
 }
