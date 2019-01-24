@@ -18,10 +18,8 @@
 
 [Unit]
 Description=webos - "%n"
-Requires=ls-hubd.service
-Wants=surface-manager.service
+Requires=ls-hubd.service surface-manager.service
 After=ls-hubd.service surface-manager.service
-BindsTo=surface-manager.service
 
 [Service]
 Type=simple
