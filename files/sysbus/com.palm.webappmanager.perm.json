@@ -8,6 +8,9 @@
         "signals.register",
         "system"
     ],
+    "com.webos.media.client.*": [
+        "media"
+    ],
     "com.webos.rm.client.*": [
         "media"
     ]
