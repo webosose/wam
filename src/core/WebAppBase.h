@@ -82,7 +82,7 @@ public:
     virtual void deleteSurfaceGroup() = 0;
     virtual void keyboardVisibilityChanged(bool visible, int height);
     virtual void doClose() = 0;
-
+    virtual bool isKeyboardVisible() { return false; }
     static void onCursorVisibilityChanged(const QString& jsscript);
 
     bool getCrashState();

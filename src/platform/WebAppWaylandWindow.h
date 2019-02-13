@@ -48,6 +48,8 @@ public:
     bool event(WebOSEvent* event) override;
     unsigned int CheckKeyFilterTable(unsigned keycode, unsigned* modifier) override;
 
+    void resetPageFrameSwapped() { m_hasPageFrameBeenSwapped = false; }
+
 protected:
     bool cursorVisible() { return m_cursorVisible; }
     void setCursorVisible(bool visible) { m_cursorVisible = visible; }

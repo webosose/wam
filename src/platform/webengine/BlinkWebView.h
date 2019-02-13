@@ -58,9 +58,9 @@ public:
     void RenderProcessGone() override;
     void DidHistoryBackOnTopPage() {}
     void DidClearWindowObject() {}
-    void DidDropAllPeerConnections(webos::DropPeerConnectionReason reason) override;
+    virtual void DidDropAllPeerConnections(webos::DropPeerConnectionReason reason);
     void DidSwapCompositorFrame();
-    bool AllowMouseOnOffEvent() const override;
+    virtual bool AllowMouseOnOffEvent() const;
     void HandleBrowserControlCommand(const std::string& command, const std::vector<std::string>& arguments) override;
     void HandleBrowserControlFunction(const std::string& command, const std::vector<std::string>& arguments, std::string* result) override;
     void LoadVisuallyCommitted() override;

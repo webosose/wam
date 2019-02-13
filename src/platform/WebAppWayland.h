@@ -88,6 +88,7 @@ public:
     void doClose() override;
 
     // WebAppWayland
+    virtual bool isKeyboardVisible() override;
     virtual void setKeyMask(webos::WebOSKeyMask keyMask, bool value);
     virtual void setKeyMask(webos::WebOSKeyMask keyMask);
     virtual void focusOwner();
@@ -134,7 +135,6 @@ private:
     QString m_windowType;
     int m_lastSwappedTime;
 
-    unsigned m_windowHandle;
     std::vector<gfx::Rect> m_inputRegion;
     bool m_enableInputRegion;
 

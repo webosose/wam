@@ -139,7 +139,6 @@ void WebPageBlink::init()
     d->pageView->SetV8DateUseSystemLocaloffset(false);
     d->pageView->SetLocalStorageEnabled(true);
     d->pageView->SetShouldSuppressDialogs(true);
-    d->pageView->SetFixedPositionCreatesStackingContext(false);
     d->pageView->SetNotifyFMPDirectly(m_appDesc->usePrerendering());
     setDisallowScrolling(m_appDesc->disallowScrollingInMainFrame());
 
@@ -161,6 +160,7 @@ void WebPageBlink::init()
     getSystemLanguage(language);
     setPreferredLanguages(language);
     d->pageView->SetAppId(appId().toStdString());
+    d->pageView->SetSecurityOrigin(appId().toStdString());
     updateHardwareResolution();
     updateBoardType();
     updateDatabaseIdentifier();
@@ -248,13 +248,15 @@ uint32_t WebPageBlink::getWebProcessProxyID()
 
 void WebPageBlink::setPreferredLanguages(const QString& language)
 {
+    if (d->m_palmSystem)
+        d->m_palmSystem->setLocale(language);
+
+#ifndef TARGET_DESKTOP
     // just set system language for accept-language for http header, navigator.language, navigator.languages
     // even window.languagechange event too
     d->pageView->SetAcceptLanguages(language.toStdString());
     d->pageView->UpdatePreferences();
-
-    if (d->m_palmSystem)
-        d->m_palmSystem->setLocale(language);
+#endif
 }
 
 void WebPageBlink::setDefaultFont(const QString& font)
@@ -387,9 +389,9 @@ void WebPageBlink::setUseAccessibility(bool enabled)
     d->pageView->SetUseAccessibility(enabled);
 }
 
-void WebPageBlink::setBlockWriteDiskcache(bool blocked)
+void WebPageBlink::setAppPreloadHint(bool is_preload)
 {
-    d->pageView->SetBlockWriteDiskcache(blocked);
+    d->pageView->SetAppPreloadHint(is_preload);
 }
 
 void WebPageBlink::setForceActivateVtg(bool enabled)
@@ -542,8 +544,8 @@ QString WebPageBlink::escapeData(const QString& value)
 void WebPageBlink::reloadExtensionData()
 {
     QString eventJS = QStringLiteral(
-       "if (typeof(PalmSystem) != 'undefined') {"
-       "  PalmSystem.reloadInjectionData();"
+       "if (typeof(webOSSystem) != 'undefined') {"
+       "  webOSSystem.reloadInjectionData();"
        "};"
     );
     LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "Reload");
@@ -556,12 +558,12 @@ void WebPageBlink::updateExtensionData(const QString& key, const QString& value)
         LOG_WARNING(MSGID_PALMSYSTEM, 2,
             PMLOGKS("APP_ID", qPrintable(appId())),
             PMLOGKFV("PID", "%d", getWebProcessPID()),
-            "PalmSystem is not initialized. key:%s, value:%s", qPrintable(key), qPrintable(value));
+            "webOSSystem is not initialized. key:%s, value:%s", qPrintable(key), qPrintable(value));
         return;
     }
     QString eventJS = QStringLiteral(
-       "if (typeof(PalmSystem) != 'undefined') {"
-       "  PalmSystem.updateInjectionData('%1', '%2');"
+       "if (typeof(webOSSystem) != 'undefined') {"
+       "  webOSSystem.updateInjectionData('%1', '%2');"
        "};"
     ).arg(escapeData(key)).arg(escapeData(value));
     LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "Update; key:%s; value:%s",
@@ -879,11 +881,6 @@ void WebPageBlink::closeVkb()
 {
 }
 
-bool WebPageBlink::isKeyboardVisible() const
-{
-    return d->pageView->IsKeyboardVisible();
-}
-
 bool WebPageBlink::isInputMethodActive() const
 {
     return d->pageView->IsInputMethodActive();
@@ -918,8 +915,8 @@ QString WebPageBlink::defaultTrustLevel() const
 
 void WebPageBlink::loadExtension()
 {
-    LOG_DEBUG("WebPageBlink::loadExtension(); Extension : palmsystem");
-    d->pageView->LoadExtension("palmsystem");
+    LOG_DEBUG("WebPageBlink::loadExtension(); Extension : webossystem");
+    d->pageView->LoadExtension("webossystem");
 }
 
 void WebPageBlink::clearExtensions()
@@ -974,7 +971,7 @@ void WebPageBlink::setHasOnCloseCallback(bool hasCloseCallback)
 void WebPageBlink::executeCloseCallback(bool forced)
 {
     QString script = QStringLiteral(
-       "window.PalmSystem._onCloseWithNotify_('%1');").arg(forced?"forced" : "normal");
+       "window.webOSSystem._onCloseWithNotify_('%1');").arg(forced?"forced" : "normal");
 
     evaluateJavaScript(script);
 
@@ -992,6 +989,11 @@ void WebPageBlink::setFileAccessBlocked(bool blocked)
 {
     //TO_DO: Need to verify when shnapshot is ready.
     webos::WebViewBase::SetFileAccessBlocked(blocked);
+}
+
+void WebPageBlink::setAdditionalContentsScale(float scaleX, float scaleY)
+{
+    d->pageView->SetAdditionalContentsScale(scaleX, scaleY);
 }
 
 void WebPageBlink::updateHardwareResolution()
@@ -1146,7 +1148,7 @@ void WebPageBlink::updateIsLoadErrorPageFinish()
 
     if (trustLevel().compare("trusted") && wasErrorPage != m_isLoadErrorPageFinish) {
         if (m_isLoadErrorPageFinish) {
-            LOG_DEBUG("[%s] WebPageBlink::updateIsLoadErrorPageFinish(); m_isLoadErrorPageFinish : %s, set trustLevel : trusted to WAM and PalmSystem_injection", qPrintable(appId()), m_isLoadErrorPageFinish ? "true" : "false");
+            LOG_DEBUG("[%s] WebPageBlink::updateIsLoadErrorPageFinish(); m_isLoadErrorPageFinish : %s, set trustLevel : trusted to WAM and webOSSystem_injection", qPrintable(appId()), m_isLoadErrorPageFinish ? "true" : "false");
             setTrustLevel("trusted");
             updateExtensionData("trustLevel", "trusted");
         }

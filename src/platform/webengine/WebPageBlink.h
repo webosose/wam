@@ -65,7 +65,6 @@ public:
     QString title() override;
     bool canGoBack() override;
     void closeVkb() override;
-    bool isKeyboardVisible() const override;
     bool isInputMethodActive() const override;
     void keyboardVisibilityChanged(bool visible) override;
     void updatePageSettings() override;
@@ -79,7 +78,7 @@ public:
     void setUseLaunchOptimization(bool enabled, int delayMs = 0);
     void setUseSystemAppOptimization(bool enabled) override;
     void setUseAccessibility(bool enabled) override;
-    void setBlockWriteDiskcache(bool blocked) override;
+    void setAppPreloadHint(bool is_preload) override;
     void suspendWebPageAll() override;
     void resumeWebPageAll() override;
     void suspendWebPageMedia() override;
@@ -131,6 +130,7 @@ public:
     void updateBoardType();
     void updateMediaCodecCapability();
     double devicePixelRatio();
+    void setAdditionalContentsScale(float scaleX, float scaleY);
     void setFontHinting(FontRenderParams hinting);
     void setSupportDolbyHDRContents();
     void updateHardwareResolution();

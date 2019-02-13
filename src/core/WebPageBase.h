@@ -82,7 +82,6 @@ public:
     virtual QString title() = 0;
     virtual bool canGoBack() = 0;
     virtual void closeVkb() = 0;
-    virtual bool isKeyboardVisible() const { return false; }
     virtual void keyboardVisibilityChanged(bool visible) {}
     virtual void updatePageSettings() = 0;
     virtual void handleDeviceInfoChanged(const QString& deviceInfo) = 0;
@@ -96,7 +95,8 @@ public:
     virtual void setUseLaunchOptimization(bool enabled, int delayMs = 0) {}
     virtual void setUseSystemAppOptimization(bool enabled) {}
     virtual void setUseAccessibility(bool enabled) {}
-    virtual void setBlockWriteDiskcache(bool blocked) {}
+    virtual void setAppPreloadHint(bool is_preload) {}
+
     virtual void suspendWebPageAll() = 0;
     virtual void resumeWebPageAll() = 0;
     virtual void suspendWebPageMedia() = 0;

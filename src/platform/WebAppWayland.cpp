@@ -46,7 +46,6 @@ WebAppWayland::WebAppWayland(QString type, int width, int height)
     , m_appWindow(0)
     , m_windowType(type)
     , m_lastSwappedTime(0)
-    , m_windowHandle(0)
     , m_enableInputRegion(false)
     , m_isFocused(false)
     , m_vkbHeight(0)
@@ -87,7 +86,6 @@ void WebAppWayland::init(int width, int height)
     }
 
     m_appWindow->setWebApp(this);
-    m_windowHandle = m_appWindow->GetWindowHandle();
 
     // set compositor window type
     setWindowProperty(QStringLiteral("_WEBOS_WINDOW_TYPE"), m_windowType);
@@ -159,6 +157,13 @@ void WebAppWayland::attach(WebPageBase *page)
         getAppDescription()->backHistoryAPIDisabled());
     setKeyMask(webos::WebOSKeyMask::KEY_MASK_EXIT,
         getAppDescription()->handleExitKey());
+
+    if (getAppDescription()->widthOverride() && getAppDescription()->heightOverride()) {
+        float scaleX = static_cast<float>(m_appWindow->DisplayWidth()) / getAppDescription()->widthOverride();
+        float scaleY = static_cast<float>(m_appWindow->DisplayHeight()) / getAppDescription()->heightOverride();
+        m_scaleFactor = (scaleX < scaleY) ? scaleX : scaleY;
+        static_cast<WebPageBlink*>(page)->setAdditionalContentsScale(scaleX, scaleY);
+    }
 
     doAttach();
 
@@ -305,6 +310,11 @@ void WebAppWayland::setupWindowGroup(ApplicationDescription* desc)
     }
 }
 
+bool WebAppWayland::isKeyboardVisible()
+{
+    return m_appWindow->IsKeyboardVisible();
+}
+
 void WebAppWayland::setKeyMask(webos::WebOSKeyMask keyMask, bool value)
 {
     m_appWindow->SetKeyMask(keyMask, value);
@@ -314,7 +324,7 @@ void WebAppWayland::applyInputRegion()
 {
     if (!m_enableInputRegion && !m_inputRegion.empty()) {
         m_enableInputRegion = true;
-        webos::WebOSPlatform::GetInstance()->SetInputRegion(m_windowHandle, m_inputRegion);
+        m_appWindow->SetInputRegion(m_inputRegion);
     }
 }
 
@@ -335,7 +345,7 @@ void WebAppWayland::setInputRegion(const QJsonDocument& jsonDoc)
         }
     }
 
-    webos::WebOSPlatform::GetInstance()->SetInputRegion(m_windowHandle, m_inputRegion);
+    m_appWindow->SetInputRegion(m_inputRegion);
 }
 
 
@@ -402,12 +412,12 @@ void WebAppWayland::setKeyMask(const QJsonDocument& jsonDoc)
             keyMask |= mapTable.value(jsonArray[i].toString());
     }
 
-    webos::WebOSPlatform::GetInstance()->SetKeyMask(m_windowHandle, static_cast<webos::WebOSKeyMask>(keyMask));
+    m_appWindow->SetKeyMask(static_cast<webos::WebOSKeyMask>(keyMask));
 }
 
 void WebAppWayland::setKeyMask(webos::WebOSKeyMask keyMask)
 {
-    webos::WebOSPlatform::GetInstance()->SetKeyMask(m_windowHandle, keyMask);
+    m_appWindow->SetKeyMask(keyMask);
 }
 
 void WebAppWayland::focusOwner()
@@ -600,6 +610,8 @@ void WebAppWayland::firstFrameVisuallyCommitted()
     // and therefore we have to do an explicit show
     if (!getHiddenWindow() && m_preloadState == NONE_PRELOAD) {
         LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "Not hidden window, preload, call showWindow");
+        if (getAppDescription()->usePrerendering())
+          m_appWindow->resetPageFrameSwapped();
         showWindow();
     }
 }
@@ -711,7 +723,7 @@ void WebAppWayland::moveInputRegion(int height)
     }
     m_inputRegion.clear();
     m_inputRegion = newRegion;
-    webos::WebOSPlatform::GetInstance()->SetInputRegion(m_windowHandle, m_inputRegion);
+    m_appWindow->SetInputRegion(m_inputRegion);
 }
 
 void WebAppWayland::keyboardVisibilityChanged(bool visible, int height) {
