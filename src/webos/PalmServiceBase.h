@@ -18,14 +18,15 @@
 #define PalmServiceBase_H
 
 #include <glib.h>
-#include <luna-service2/lunaservice.h>
 
 #include <QJsonDocument>
 #include <QJsonObject>
 #include <QObject>
+#include <luna-service2/lunaservice.h>
 
 class LSHandle;
 class LSMessage;
+class LSPalmService;
 class PalmServiceBase;
 
 /*
@@ -126,7 +127,7 @@ private:
  * in a static function that is compatible with the LunaService callback signature.
  * usage:
  *
- * static LSMethod WebAppManagerService::s_methods[] = {
+ * static LSMethod WebAppManagerService::s_publicMethods[] = {
  *     {"launchUrl", bus_callback_qjson<WebAppManagerService, &WebAppManagerService::launchUrl>},
  *     { 0, 0 }
  * };
@@ -213,22 +214,41 @@ public:
  *  Methods to issue calls to the LS2 bus, optional parameters are a callback context
  *  and applicationId
  **/
-    inline bool call(const char* what,
+    inline bool callPrivate(const char* what,
         QJsonObject parameters,
         const char* applicationId = 0,
         LSCalloutContext* context = 0)
     {
-        return call(m_serviceHandle, what, parameters, applicationId, context);
+        return call(m_serviceHandlePrivate, what, parameters, applicationId, context);
+    };
+
+    inline bool callPublic(const char* what,
+        QJsonObject parameters,
+        const char* applicationId = 0,
+        LSCalloutContext* context = 0)
+    {
+        return call(m_serviceHandlePublic, what, parameters, applicationId, context);
     };
 
     /*
  * methods to post subscription updates TODO make subscriptions represented through objects
  **/
-    bool postSubscription(const char* subscription, QJsonObject reply)
+    bool postSubscriptionPrivate(const char* subscription, QJsonObject reply)
     {
         LSErrorSafe lsError;
         return LSSubscriptionPost(
-            m_serviceHandle,
+            m_serviceHandlePrivate,
+            category(),
+            subscription,
+            QJsonDocument(reply).toJson().data(),
+            &lsError);
+    }
+
+    bool postSubscriptionPublic(const char* subscription, QJsonObject reply)
+    {
+        LSErrorSafe lsError;
+        return LSSubscriptionPost(
+            m_serviceHandlePublic,
             category(),
             subscription,
             QJsonDocument(reply).toJson().data(),
@@ -246,19 +266,19 @@ protected:
      * for each HANDLER_CLASS::CALLBACK_METHOD to forward the call to.
      * */
     template <class HANDLER_CLASS, void (HANDLER_CLASS::*CALLBACK_METHOD)(QJsonObject)>
-    bool call(const char* what,
+    bool callPrivate(const char* what,
         QJsonObject parameters,
         HANDLER_CLASS* callback_receiver)
     {
         LSErrorSafe lsError;
         bool err = false;
         if (parameters.value("subscribe").toBool() || parameters.value("watch").toBool()) {
-            err = LSCall(m_serviceHandle, what,
+            err = LSCall(m_serviceHandlePrivate, what,
                 QJsonDocument(parameters).toJson().data(),
                 bus_callback_qjson<HANDLER_CLASS, CALLBACK_METHOD>,
                 callback_receiver, NULL, &lsError);
         } else {
-            err = LSCallOneReply(m_serviceHandle,
+            err = LSCallOneReply(m_serviceHandlePrivate,
                 what,
                 QJsonDocument(parameters).toJson().data(),
                 bus_callback_qjson<HANDLER_CLASS, CALLBACK_METHOD>,
@@ -271,11 +291,40 @@ protected:
         return true;
     };
 
-    virtual LSMethod* methods() const = 0;
+    template <class HANDLER_CLASS, void (HANDLER_CLASS::*CALLBACK_METHOD)(QJsonObject)>
+    bool callPublic(const char* what,
+        QJsonObject parameters,
+        HANDLER_CLASS* callback_receiver)
+    {
+        LSErrorSafe lsError;
+        bool err = false;
+        if (parameters.value("subscribe").toBool() || parameters.value("watch").toBool()) {
+            err = LSCall(m_serviceHandlePublic, what,
+                QJsonDocument(parameters).toJson().data(),
+                bus_callback_qjson<HANDLER_CLASS, CALLBACK_METHOD>,
+                callback_receiver, NULL, &lsError);
+        } else {
+            err = LSCallOneReply(m_serviceHandlePrivate,
+                what,
+                QJsonDocument(parameters).toJson().data(),
+                bus_callback_qjson<HANDLER_CLASS, CALLBACK_METHOD>,
+                callback_receiver, NULL, &lsError);
+        }
+        if (!err) {
+            qWarning("Failed to call in %s Service: %s", serviceName(), lsError.message);
+            return false;
+        }
+        return true;
+    };
+
+    virtual LSMethod* privateMethods() const = 0;
+    virtual LSMethod* publicMethods() const = 0;
     virtual const char* serviceName() const = 0;
     virtual const char* category() const { return "/"; };
     virtual GMainLoop* mainLoop() const;
-    LSHandle* m_serviceHandle;
+    LSPalmService* m_serviceHandle;
+    LSHandle* m_serviceHandlePublic;
+    LSHandle* m_serviceHandlePrivate;
 
 private:
     static bool serviceConnectCallback(LSHandle* sh, LSMessage* message, void* ctx);

@@ -1,0 +1,39 @@
+{
+    "role": {
+        "exeName":"/usr/bin/WebAppMgr",
+        "type": "privileged",
+        "allowedNames": ["", "com.palm.luna-*", "com.palm.appDataBackup", "com.palm.eventreporter.WebAppMgr", "com.palm.webappmanager", "com.webos.service.wampluggable*", "com.webos.media.client*", "com.webos.rm.client.*"]
+    },
+    "permissions": [
+        {
+            "service":"com.palm.appDataBackup",
+            "inbound":["*"],
+            "outbound":["*"]
+        },
+        {
+            "service":"com.palm.eventreporter.WebAppMgr",
+            "inbound":["*"],
+            "outbound":["*"]
+        },
+        {
+            "service":"com.palm.webappmanager",
+            "inbound":["*"],
+            "outbound":["*"]
+        },
+        {
+            "service":"com.webos.service.wampluggable*",
+            "inbound":["*"],
+            "outbound":["*"]
+        },
+        {
+            "service":"com.webos.media.client",
+            "inbound":["*"],
+            "outbound":["*"]
+        },
+        {
+            "service":"com.webos.rm.client.*",
+            "inbound":["com.webos.media"],
+            "outbound":["com.webos.media"]
+        }
+    ]
+}

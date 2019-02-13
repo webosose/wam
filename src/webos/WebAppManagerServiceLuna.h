@@ -77,11 +77,13 @@ public:
     void closeAppCallback(QJsonObject reply);
 
 protected:
-    //methods implementation of PalmServiceBase
-    virtual LSMethod* methods() const { return s_methods; }
-    virtual const char* serviceName() const { return "com.palm.webappmanager"; };
+    // PlamServiceBase
+    LSMethod* privateMethods() const override { return s_privateMethods; }
+    LSMethod* publicMethods() const override { return s_publicMethods; }
+    const char* serviceName() const override { return "com.palm.webappmanager"; }
 
-    static LSMethod s_methods[];
+    static LSMethod s_privateMethods[];
+    static LSMethod s_publicMethods[];
 
     bool m_clearedCache;
     bool m_bootDone;

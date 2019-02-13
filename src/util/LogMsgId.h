@@ -74,9 +74,6 @@
 #define MSGID_LAUNCH_URL_BAD_APP_DESC   "LAUNCH_URL_BAD_APP_DESC" /** Received a bad application description to launchUrl */
 #define MSGID_LOW_MEM_LAUNCH_FAIL       "LOW_MEM_LAUNCH_FAIL" /** Refused to launch an app because of low memory */
 #define MSGID_LOW_MEM_NEW_PAGE_FAIL     "LOW_MEM_NEW_PAGE_FAIL" /** Refused to open a new window because of low memory */
-#define MSGID_MEM_MGR_API_CALL_FAIL     "MEM_MGR_API_CALL_FAIL" /** Failed to call memory manager APIs */
-#define MSGID_SIGNAL_REGISTRATION_FAIL  "SINGAL_REGISTRATION_FAIL" /** Failed to register a client to receive signals*/
-#define MSGID_APP_MGR_API_CALL_FAIL     "APP_MGR_API_CALL_FAIL" /** Failed to call application manager APIs */
 #define MSGID_MEMWATCH_APP_CLOSE        "MEMWATCH_APP_CLOSE" /** MemWatcher decided to close an app */
 #define MSGID_PREPARE_FAIL              "PREPARE_FAIL" /** Failed to prepare window */
 #define MSGID_TAKE_FAIL                 "TAKE_FAIL" /** Failed to take window */

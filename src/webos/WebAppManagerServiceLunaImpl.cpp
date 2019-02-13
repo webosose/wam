@@ -23,7 +23,7 @@
 #include <QJsonObject>
 #include <QStringList>
 
-#define LS2_CALL(FUNC, SERVICE, PARAMS) call<WebAppManagerServiceLunaImpl, &WebAppManagerServiceLunaImpl::FUNC>(SERVICE, PARAMS, this)
+#define LS2_PRIVATE_CALL(FUNC, SERVICE, PARAMS) callPrivate<WebAppManagerServiceLunaImpl, &WebAppManagerServiceLunaImpl::FUNC>(SERVICE, PARAMS, this)
 
 WebAppManagerServiceLuna* WebAppManagerServiceLuna::instance()
 {
@@ -42,7 +42,7 @@ void WebAppManagerServiceLunaImpl::systemServiceConnectCallback(QJsonObject repl
         QStringList optionList;
         optionList << "country" << "smartServiceCountryCode3" << "audioGuidance" << "screenRotation";
         optionParams["keys"] = QJsonArray::fromStringList(optionList);
-        LS2_CALL(getSystemOptionCallback, "luna://com.webos.settingsservice/getSystemSettings", optionParams);
+        LS2_PRIVATE_CALL(getSystemOptionCallback, "luna://com.webos.settingsservice/getSystemSettings", optionParams);
     }
 }
 

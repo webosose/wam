@@ -1,0 +1,4 @@
+[D-BUS Service]
+Name=com.palm.lunastats;com.palm.appDataBackup;com.palm.webappmanager;com.webos.service.wampluggable
+Exec=/usr/bin/WebAppMgr
+Type=static
