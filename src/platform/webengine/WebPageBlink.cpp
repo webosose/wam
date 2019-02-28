@@ -171,6 +171,7 @@ void WebPageBlink::init()
     setCustomUserScript();
     d->pageView->SetAudioGuidanceOn(isAccessibilityEnabled());
     updateBackHistoryAPIDisabled();
+    d->pageView->SetUseUnlimitedMediaPolicy(m_appDesc->useUnlimitedMediaPolicy());
 
     d->pageView->UpdatePreferences();
 

@@ -157,6 +157,7 @@ public:
     double networkStableTimeout() const { return m_networkStableTimeout; }
     bool disallowScrollingInMainFrame() const { return m_disallowScrollingInMainFrame; }
     int delayMsForLaunchOptimization() const { return m_delayMsForLanchOptimization; }
+    bool useUnlimitedMediaPolicy() const { return m_useUnlimitedMediaPolicy; }
 
     struct WindowOwnerInfo {
         WindowOwnerInfo()
@@ -230,6 +231,7 @@ private:
     double m_networkStableTimeout;
     bool m_disallowScrollingInMainFrame;
     int m_delayMsForLanchOptimization;
+    bool m_useUnlimitedMediaPolicy;
 };
 
 #endif /* APPLICATIONDESCRIPTION_H */

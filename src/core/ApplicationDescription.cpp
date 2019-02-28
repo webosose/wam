@@ -61,6 +61,7 @@ ApplicationDescription::ApplicationDescription()
     , m_networkStableTimeout(std::numeric_limits<double>::quiet_NaN())
     , m_disallowScrollingInMainFrame(true)
     , m_delayMsForLanchOptimization(0)
+    , m_useUnlimitedMediaPolicy(false)
 {
 }
 
@@ -277,6 +278,8 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
         int delayMs = jsonObj["delayMsForLaunchOptimization"].toInt();
         appDesc->m_delayMsForLanchOptimization = (delayMs >= 0) ? delayMs : 0;
     }
+
+    appDesc->m_useUnlimitedMediaPolicy = jsonObj.contains("useUnlimitedMediaPolicy") && jsonObj["useUnlimitedMediaPolicy"].toBool();
 
     return appDesc;
 }
