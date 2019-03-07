@@ -162,6 +162,8 @@ public:
     void clearBrowsingData(const int removeBrowsingDataMask);
     int maskForBrowsingDataType(const char* type);
 
+    QString identifierForSecurityOrigin(const QString& identifier);
+
 protected:
 private:
     void loadEnvironmentVariable();

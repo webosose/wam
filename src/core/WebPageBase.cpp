@@ -485,3 +485,8 @@ bool WebPageBase::isAccessibilityEnabled() const
 {
      return WebAppManager::instance()->isAccessibilityEnabled();
 }
+
+QString WebPageBase::getIdentifierForSecurityOrigin() const
+{
+    return WebAppManager::instance()->identifierForSecurityOrigin(getIdentifier());
+}

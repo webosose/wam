@@ -142,6 +142,8 @@ public:
     void removeObserver(WebPageObserver* observer);
 
     static QString truncateURL(const QString& url);
+    virtual QString getIdentifierForSecurityOrigin() const;
+
 
 Q_SIGNALS:
     void webPageUrlChanged();

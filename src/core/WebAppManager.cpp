@@ -42,6 +42,7 @@
 #include "webos/public/runtime.h"
 
 static const int kContinuousReloadingLimit = 3;
+const char kSecurityOriginPostfix[] = "-webos";
 
 WebAppManager* WebAppManager::instance()
 {
@@ -726,7 +727,7 @@ uint32_t WebAppManager::getContainerAppProxyID()
 
 void WebAppManager::deleteStorageData(const QString& identifier)
 {
-    m_webProcessManager->deleteStorageData(identifier);
+    m_webProcessManager->deleteStorageData(identifierForSecurityOrigin(identifier));
 }
 
 void WebAppManager::killCustomPluginProcess(const QString &basePath)
@@ -1048,4 +1049,9 @@ void WebAppManager::clearBrowsingData(const int removeBrowsingDataMask)
 int WebAppManager::maskForBrowsingDataType(const char* type)
 {
     return m_webProcessManager->maskForBrowsingDataType(type);
+}
+
+QString WebAppManager::identifierForSecurityOrigin(const QString& identifier)
+{
+    return QString("%1%2").arg(identifier).arg(kSecurityOriginPostfix);
 }
