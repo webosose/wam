@@ -918,6 +918,7 @@ void WebPageBlink::loadExtension()
 {
     LOG_DEBUG("WebPageBlink::loadExtension(); Extension : webossystem");
     d->pageView->LoadExtension("webossystem");
+    d->pageView->LoadExtension("webosservicebridge");
 }
 
 void WebPageBlink::clearExtensions()
