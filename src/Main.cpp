@@ -34,7 +34,8 @@ namespace
                          const QString &msg)
     {
         const char* function = context.function;
-        char* userMessage = msg.toUtf8().data();
+        QByteArray utf8 = msg.toUtf8();
+        char* userMessage = utf8.data();
         switch (type) {
             case QtDebugMsg:
                 LOG_DEBUG("%s, %s", function, userMessage);
