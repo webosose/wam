@@ -42,7 +42,7 @@ export WAM_DATA_PATH=$(grep ${WAM_UID} /etc/passwd | cut -f6 -d":")
 mkdir -p ${WAM_DATA_PATH}
 
 # set directories permission
-chown ${WAM_UID}:${WAM_GID} ${WAM_DATA_PATH}
+chown -R ${WAM_UID}:${WAM_GID} ${WAM_DATA_PATH}
 
 # setup 50 Mb maximum for ApplicationCache
 export WAM_APPCACHE_MAXSIZE=52428800
