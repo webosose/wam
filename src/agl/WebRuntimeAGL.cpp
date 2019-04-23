@@ -320,7 +320,7 @@ bool WebAppLauncherRuntime::init_hs() {
     LOG_DEBUG("Activesurface %s ", this->m_role.c_str());
     this->m_wm->activateWindow(this->m_role.c_str(), "normal.full");
   };
-  m_hs->set_event_handler(LibHomeScreen::Event_TapShortcut, handler);
+  m_hs->set_event_handler(LibHomeScreen::Event_ShowWindow, handler);
 
   std::function< void(json_object*) > h_default= [](json_object* object) {
     const char *j_str = json_object_to_json_string(object);
