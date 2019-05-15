@@ -14,8 +14,6 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-CONFIG = qt
-
 BUILD_TYPE = release            # or debug
 ENV_BUILD_TYPE = $$(BUILD_TYPE)
 !isEmpty(ENV_BUILD_TYPE) {
@@ -32,7 +30,6 @@ isEmpty(PREFIX) {
 }
 
 CONFIG += link_pkgconfig
-QT = core
 
 ################################################################################
 # Decide MACHINE_NAME and PLATFORM
@@ -47,6 +44,8 @@ DEFINES += $$PLATFORM
 
 contains(PLATFORM, PLATFORM_WEBOS) {
     include(device.pri)
+    CONFIG = qt
+    QT = core
 } else {
     isEmpty(MACHINE_NAME) {
         error(MACHINE_NAME should not be empty. $$MACHINE_NAME)
@@ -140,7 +139,7 @@ QMAKE_CFLAGS += -Wno-psabi
 QMAKE_CXXFLAGS += -Wno-psabi
 QMAKE_LFLAGS += -Wl,--no-as-needed
 
-QMAKE_CXXFLAGS += -Werror \
+#QMAKE_CXXFLAGS += -Werror \
 
 ################################################################################
 # .o and .moc

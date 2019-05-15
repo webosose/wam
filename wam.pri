@@ -34,5 +34,7 @@ target.path = $${PREFIX}/bin
 INSTALLS += target
 
 contains(DEFINES, USE_ACCESSIBILITY) {
+  contains(PLATFORM, PLATFORM_WEBOS) {
     QT += core-private
+  }
 }
