@@ -42,7 +42,9 @@ private:
     std::string m_hardwareVersion;
     std::string m_firmwareVersion;
 
+#ifdef HAS_LUNA_SERVICE
     bool getInfoFromLunaPrefs(const char* key, std::string& value);
+#endif
     void initDisplayInfo();
     void initPlatformInfo();
     void gatherInfo();
