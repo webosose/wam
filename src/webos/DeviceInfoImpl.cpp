@@ -23,9 +23,12 @@
 #endif
 
 #include <glib.h>
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <utility>
+
+#include "JsonHelper.h"
+#include "LogManager.h"
+#include "StringUtils.h"
+#include "WebAppManagerUtils.h"
 
 DeviceInfoImpl::DeviceInfoImpl()
     : m_screenWidth(0)
@@ -40,45 +43,51 @@ DeviceInfoImpl::DeviceInfoImpl()
     , m_hardwareVersion("0x00000001")
     , m_firmwareVersion("00.00.01")
 {
-    QFile file("/var/luna/preferences/localeInfo");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    std::string jsonStr;
+    try {
+        WebAppManagerUtils::readFileContent("/var/luna/preferences/localeInfo", jsonStr);
+    } catch (const std::exception& e) {
         return;
     }
 
-    QString jsonStr = file.readAll();
-    file.close();
+    Json::Value localeObj;
+    if (!readJsonFromString(jsonStr, localeObj))
+        return;
 
-    QJsonDocument localeInfoDoc = QJsonDocument::fromJson(jsonStr.toUtf8());
-    if (localeInfoDoc.isNull()) {
-        LOG_ERROR(MSGID_LOCALEINFO_READ_FAIL, 1, PMLOGKS("CONTENT", jsonStr.toStdString().c_str()), "");
+    if (!localeObj.isObject()) {
+        LOG_ERROR(MSGID_LOCALEINFO_READ_FAIL, 1, PMLOGKS("CONTENT", jsonStr.c_str()), "");
         return;
     }
 
-    QJsonObject localeInfo = localeInfoDoc.object().value("localeInfo").toObject();
+    auto localeInfo = localeObj["localeInfo"];
+    std::string language;
+    if (localeInfo.isObject()) {
+        auto locales = localeInfo["locales"];
+        if (locales.isObject())
+            language = locales["UI"].asString();
+    }
+    std::string localcountry(localeObj["country"].asString());
+    std::string smartservicecountry(localeObj["smartServiceCountryCode3"].asString());
 
-    QString language(localeInfo.value("locales").toObject().value("UI").toString());
-    QString localcountry(localeInfoDoc.object().value("country").toString());
-    QString smartservicecountry(localeInfoDoc.object().value("smartServiceCountryCode3").toString());
-
-    setSystemLanguage(language.toStdString());
-    setDeviceInfo("LocalCountry", localcountry.toStdString());
-    setDeviceInfo("SmartServiceCountry", smartservicecountry.toStdString());
+    setSystemLanguage(std::move(language));
+    setDeviceInfo("LocalCountry", std::move(localcountry));
+    setDeviceInfo("SmartServiceCountry", std::move(smartservicecountry));
 }
 
+#ifdef HAS_LUNA_SERVICE
 bool DeviceInfoImpl::getInfoFromLunaPrefs(const char* key, std::string& value)
 {
     char* str = 0;
-#ifdef HAS_LUNA_SERVICE
     if (LP_ERR_NONE == LPSystemCopyStringValue(key, &str) && str) {
         value = str;
         g_free((gchar*) str);
         return true;
     }
-#endif
     g_free((gchar*) str);
     value = "Unknown";
     return false;
 }
+#endif
 
 void DeviceInfoImpl::initDisplayInfo()
 {
