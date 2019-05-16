@@ -59,6 +59,7 @@ static void changeUserIDGroupID()
 
 int main (int argc, const char** argv)
 {
+  LOG_DEBUG("### Starting %s", argv[0]);
   changeUserIDGroupID();
 
 #if defined(HAS_AGL_SERVICE)
