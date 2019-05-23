@@ -455,7 +455,7 @@ void WebAppManager::closeAppInternal(WebAppBase* app, bool ignoreCleanResource)
     webPageRemoved(app->page());
     removeWebAppFromWebProcessInfoMap(app->appId());
     postRunningAppList();
-    m_lastCrashedAppIds = std::map<std::string, int>();
+    m_lastCrashedAppIds = std::unordered_map<std::string, int>();
 
     // Set m_isClosing flag first, this flag will be checked in web page suspending
     page->setClosing(true);

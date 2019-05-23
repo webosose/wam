@@ -33,7 +33,7 @@ struct Url::Impl {
     std::string query() const;
 
     std::string original, scheme, host, path;
-    std::map<std::string, std::string> queryMap;
+    std::unordered_map<std::string, std::string> queryMap;
 };
 
 Url::Url(const Url &u)
@@ -127,9 +127,9 @@ std::string Url::toLocalFile() const
 // TODO: Current impl supports setting query params only through
 // this method. Url(std::string) constructor does not parse url
 // params correctly yet.
-bool Url::setQuery(const std::map<std::string, std::string> &query)
+bool Url::setQuery(const std::unordered_map<std::string, std::string> &query)
 {
-    std::map<std::string, std::string> escMap;
+    std::unordered_map<std::string, std::string> escMap;
     char *escapedKey = NULL;
     char *escapedVal = NULL;
     for (const auto &q : query) {

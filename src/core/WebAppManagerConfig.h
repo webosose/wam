@@ -17,7 +17,7 @@
 #ifndef WEBAPPMANAGERCONFIG_H
 #define WEBAPPMANAGERCONFIG_H
 
-#include <map>
+#include <unordered_map>
 #include <string>
 
 class WebAppManagerConfig {

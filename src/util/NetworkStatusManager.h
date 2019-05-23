@@ -17,7 +17,7 @@
 #ifndef NETWORKSTATUS_MANAGER_H
 #define NETWORKSTATUS_MANAGER_H
 
-#include <map>
+#include <unordered_map>
 #include <string>
 
 #include "NetworkStatus.h"
@@ -31,7 +31,7 @@ public:
 
 private:
     NetworkStatus m_current;
-    std::map<std::string, std::pair<std::string, std::string>> m_logList;
+    std::unordered_map<std::string, std::pair<std::string, std::string>> m_logList;
 };
 
 #endif //#ifndef NETWORKSTATUS_MANAGER_H

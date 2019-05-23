@@ -17,7 +17,7 @@
 #ifndef DEVICEINFO_H
 #define DEVICEINFO_H
 
-#include <map>
+#include <unordered_map>
 #include <string>
 
 class DeviceInfo {
@@ -37,7 +37,7 @@ public:
     virtual void setDeviceInfo(const std::string& name, const std::string& value);
 
 private:
-    std::map<std::string, std::string> m_deviceInfo;
+    std::unordered_map<std::string, std::string> m_deviceInfo;
 };
 
 #endif /* DEVICEINFO_H */

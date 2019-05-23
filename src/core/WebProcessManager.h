@@ -18,7 +18,7 @@
 #define WEBPROCESSMANAGER_H
 
 #include <list>
-#include <map>
+#include <unordered_map>
 #include <vector>
 
 class ApplicationDescription;
@@ -85,7 +85,7 @@ protected:
         uint32_t codeCacheSize;
         bool requestKill;
     };
-    std::map<std::string, WebProcessInfo> m_webProcessInfoMap;
+    std::unordered_map<std::string, WebProcessInfo> m_webProcessInfoMap;
 
     uint32_t m_maximumNumberOfProcesses;
     std::vector<std::string> m_webProcessGroupAppIDList;

@@ -18,7 +18,7 @@
 #define WEBAPPFACTORYMANAGER_H
 
 #include <memory>
-#include <map>
+#include <unordered_map>
 #include <string>
 
 #include "WebAppFactoryInterface.h"
@@ -41,7 +41,7 @@ public:
 protected:
     WebAppFactoryManager() {}
     virtual WebAppFactoryInterface* loadInterfaceInstance(const std::string& appType) = 0;
-    std::map<std::string, WebAppFactoryInterface*> m_interfaces;
+    std::unordered_map<std::string, WebAppFactoryInterface*> m_interfaces;
 
 private:
     static WebAppFactoryManager* m_instance;
