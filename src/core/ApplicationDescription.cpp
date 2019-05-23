@@ -24,6 +24,7 @@
 #include "ApplicationDescription.h"
 #include "JsonHelper.h"
 #include "LogManager.h"
+#include "StringUtils.h"
 
 bool ApplicationDescription::checkTrustLevel(std::string trustLevel)
 {
@@ -98,7 +99,7 @@ const ApplicationDescription::WindowOwnerInfo ApplicationDescription::getWindowO
                     auto name = layer["name"];
                     auto zstr = layer["z"];
                     if (name.isString() && zstr.isString()) {
-                        int z = std::stoi(zstr.asString());
+                        int z = stringTo<int>(zstr.asString());
                         info.layers.insert(QString::fromStdString(name.asString()), z);
                     }
                 }
@@ -231,9 +232,9 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
         for (const auto &k : keyFilterTable) {
             if (!k.isObject())
                 continue;
-            int from = std::stoi(k["from"].asString());
-            int to = std::stoi(k["to"].asString());
-            int mod = std::stoi(k["mod"].asString());
+            int from = stringTo<int>(k["from"].asString());
+            int to = stringTo<int>(k["to"].asString());
+            int mod = stringTo<int>(k["mod"].asString());
             appDesc->m_keyFilterTable[from] = qMakePair(to, mod);
         }
     }
