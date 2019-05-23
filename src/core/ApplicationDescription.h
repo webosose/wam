@@ -18,7 +18,7 @@
 #define APPLICATIONDESCRIPTION_H
 
 #include <memory>
-#include <map>
+#include <unordered_map>
 #include <set>
 #include <string>
 
@@ -146,7 +146,7 @@ public:
     bool allowAudioCapture() const { return m_allowAudioCapture; }
 
     //Key code is changed only for facebooklogin WebApp
-    const std::map<int, std::pair<int, int>>& keyFilterTable() const
+    const std::unordered_map<int, std::pair<int, int>>& keyFilterTable() const
     {
         return m_keyFilterTable;
     }
@@ -162,7 +162,7 @@ public:
         }
 
         bool allowAnonymous;
-        std::map<std::string, int> layers;
+        std::unordered_map<std::string, int> layers;
     };
 
     struct WindowClientInfo {
@@ -215,7 +215,7 @@ private:
     bool m_backHistoryAPIDisabled;
     int m_widthOverride;
     int m_heightOverride;
-    std::map<int, std::pair<int, int>> m_keyFilterTable;
+    std::unordered_map<int, std::pair<int, int>> m_keyFilterTable;
     std::string m_groupWindowDesc;
     bool m_doNotTrack;
     bool m_handleExitKey;

@@ -16,7 +16,7 @@
 
 #include "WebAppWayland.h"
 
-#include <map>
+#include <unordered_map>
 #include <sstream>
 #include <json/json.h>
 
@@ -368,9 +368,9 @@ void WebAppWayland::setCursor(const std::string& cursorArg, int hotspot_x, int h
     m_appWindow->setCursor(cursorArg, hotspot_x, hotspot_y);
 }
 
-static std::map<std::string, webos::WebOSKeyMask>& getKeyMaskTable()
+static std::unordered_map<std::string, webos::WebOSKeyMask>& getKeyMaskTable()
 {
-    static std::map<std::string, webos::WebOSKeyMask> mapTable {
+    static std::unordered_map<std::string, webos::WebOSKeyMask> mapTable {
         { "KeyMaskNone", static_cast<webos::WebOSKeyMask>(0) },
         { "KeyMaskHome", webos::WebOSKeyMask::KEY_MASK_HOME },
         { "KeyMaskBack", webos::WebOSKeyMask::KEY_MASK_BACK },
@@ -395,7 +395,7 @@ static std::map<std::string, webos::WebOSKeyMask>& getKeyMaskTable()
 
 void WebAppWayland::setKeyMask(const Json::Value& jsonDoc)
 {
-    static std::map<std::string, webos::WebOSKeyMask>& mapTable = getKeyMaskTable();
+    static std::unordered_map<std::string, webos::WebOSKeyMask>& mapTable = getKeyMaskTable();
     unsigned int keyMask = 0;
 
     if (jsonDoc.isArray()) {

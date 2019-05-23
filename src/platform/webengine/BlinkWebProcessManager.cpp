@@ -16,7 +16,7 @@
 
 #include "BlinkWebProcessManager.h"
 
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <set>
 
@@ -42,7 +42,7 @@ Json::Value BlinkWebProcessManager::getWebProcessProfiling()
     uint32_t pid;
     std::set<uint32_t> processIdList;
 
-    std::multimap<uint32_t, std::string> runningAppsMap;
+    std::unordered_multimap<uint32_t, std::string> runningAppsMap;
     std::list<const WebAppBase*> running = runningApps();
     for (auto it = running.begin(); it != running.end(); ++it) {
         std::string appid = (*it)->appId();

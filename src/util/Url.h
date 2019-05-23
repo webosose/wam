@@ -17,7 +17,7 @@
 #ifndef WAM_URL_H
 #define WAM_URL_H
 
-#include <map>
+#include <unordered_map>
 #include <memory>
 #include <string>
 
@@ -38,7 +38,7 @@ public:
     bool empty() const;
     bool isLocalFile() const;
 
-    bool setQuery(const std::map<std::string, std::string> &q);
+    bool setQuery(const std::unordered_map<std::string, std::string> &q);
     std::string toString() const;
     std::string toLocalFile() const;
 
