@@ -18,6 +18,7 @@
 
 [Unit]
 Description=webos - "%n"
+ConditionPathExists=/tmp/lsm-ready
 Requires=ls-hubd.service surface-manager.service
 After=ls-hubd.service surface-manager.service
 
