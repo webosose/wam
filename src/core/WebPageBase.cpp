@@ -31,12 +31,15 @@
 
 #define CONSOLE_DEBUG(AAA) evaluateJavaScript(QStringLiteral("console.debug('") + QStringLiteral(AAA) + QStringLiteral("');"))
 
+const char kIdentifierForNetErrorPage[] = "com.webos.settingsservice.client";
+
 WebPageBase::WebPageBase()
     : m_appDesc(nullptr)
     , m_suspendAtLoad(false)
     , m_isClosing(false)
     , m_isLoadErrorPageFinish(false)
     , m_isLoadErrorPageStart(false)
+    , m_didErrorPageLoadedFromNetErrorHelper(false)
     , m_enableBackgroundRun(false)
     , m_loadErrorPolicy(QStringLiteral("default"))
     , m_cleaningResources(false)
@@ -51,6 +54,7 @@ WebPageBase::WebPageBase(const QUrl& url, std::shared_ptr<ApplicationDescription
     , m_isClosing(false)
     , m_isLoadErrorPageFinish(false)
     , m_isLoadErrorPageStart(false)
+    , m_didErrorPageLoadedFromNetErrorHelper(false)
     , m_enableBackgroundRun(false)
     , m_defaultUrl(url)
     , m_launchParams(params)
@@ -85,6 +89,8 @@ QString WebPageBase::getIdentifier() const
 {
     if(appId().isEmpty())
         return QStringLiteral("");
+    if ((m_isLoadErrorPageFinish && m_isLoadErrorPageStart) || m_didErrorPageLoadedFromNetErrorHelper)
+        return QString(kIdentifierForNetErrorPage);
     return m_appId;
 }
 
@@ -244,6 +250,7 @@ void WebPageBase::urlChangedSlot()
 void WebPageBase::handleLoadStarted()
 {
     m_suspendAtLoad = true;
+    m_didErrorPageLoadedFromNetErrorHelper = false;
 }
 
 void WebPageBase::handleLoadFinished()

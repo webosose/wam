@@ -259,3 +259,10 @@ void BlinkWebView::DidResumeDOM()
     if (m_delegate)
         m_delegate->didResumeDOM();
 }
+
+void BlinkWebView::DidErrorPageLoadedFromNetErrorHelper()
+{
+    if (!m_delegate)
+        return;
+    return m_delegate->didErrorPageLoadedFromNetErrorHelper();
+}

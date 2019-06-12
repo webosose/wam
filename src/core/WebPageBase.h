@@ -197,6 +197,7 @@ protected:
     bool m_isClosing;
     bool m_isLoadErrorPageFinish;
     bool m_isLoadErrorPageStart;
+    bool m_didErrorPageLoadedFromNetErrorHelper;
     bool m_enableBackgroundRun;
     QUrl m_defaultUrl;
     QString m_launchParams;

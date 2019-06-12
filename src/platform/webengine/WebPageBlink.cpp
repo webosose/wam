@@ -728,6 +728,10 @@ void WebPageBlink::loadFailed(const std::string& url, int errCode, const std::st
     handleLoadFailed(errCode);
 }
 
+void WebPageBlink::didErrorPageLoadedFromNetErrorHelper() {
+   m_didErrorPageLoadedFromNetErrorHelper = true;
+}
+
 void WebPageBlink::loadVisuallyCommitted()
 {
     m_hasBeenShown = true;

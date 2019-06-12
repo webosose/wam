@@ -11,7 +11,7 @@
     "com.webos.rm.client.*": [
         "media"
     ],
-    "com.webos.settingsservice.client": [
+    "com.webos.settingsservice.client-*": [
         "applications.internal",
         "settings.read"
     ]

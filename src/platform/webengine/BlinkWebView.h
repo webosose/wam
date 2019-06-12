@@ -68,7 +68,7 @@ public:
     void HandleBrowserControlFunction(const std::string& command, const std::vector<std::string>& arguments, std::string* result) override;
     void LoadVisuallyCommitted() override;
     void DidResumeDOM() override;
-
+    void DidErrorPageLoadedFromNetErrorHelper() override;
 
 private:
     WebPageBlinkDelegate* m_delegate;

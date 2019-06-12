@@ -119,6 +119,7 @@ public:
     void renderProcessCrashed() override;
     void titleChanged(const std::string& title) override;
     void navigationHistoryChanged() override;
+    void didErrorPageLoadedFromNetErrorHelper() override;
 
     void updateExtensionData(const QString& key, const QString& value);
     void setLoadErrorPolicy(const QString& policy);
