@@ -307,6 +307,7 @@ set(WAM_EXE_LIBRARIES
     ${CHROMIUM_LDFLAGS}
     ${ILMCOMMON_LDFLAGS}
     Boost::filesystem
+    wamcorelib
     wamlib
 )
 set(WAM_EXE_LD_FLAGS -Wl,--no-as-needed)
