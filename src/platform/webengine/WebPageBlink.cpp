@@ -889,11 +889,14 @@ void WebPageBlink::setPageProperties()
         d->pageView->SetTransparentBackground(true);
     }
 
-    // set inspectable
+#if defined(OS_WEBOS) || defined(AGL_DEVEL)
+    // Set inspectable. For AGL this feature is only available if the
+    // 'agl-devel' distro feature is on.
     if (m_appDesc->isInspectable() || inspectable()) {
         LOG_DEBUG("[%s] inspectable : true or 'debug_system_apps' mode; setInspectablePage(true)", appId().c_str());
         d->pageView->EnableInspectablePage();
     }
+#endif
 
     setTrustLevel(defaultTrustLevel());
     d->pageView->UpdatePreferences();
@@ -1091,8 +1094,10 @@ void WebPageBlink::deleteWebStorages(const std::string& identifier)
 
 void WebPageBlink::setInspectorEnable()
 {
+#if defined(OS_WEBOS) || defined(AGL_DEVEL)
     LOG_DEBUG("[%s] Inspector enable", appId().c_str());
     d->pageView->EnableInspectablePage();
+#endif
 }
 
 void WebPageBlink::setKeepAliveWebApp(bool keepAlive) {
