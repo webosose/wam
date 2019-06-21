@@ -67,6 +67,7 @@ elseif(IS_AGL)
     pkg_search_module(LIBWM REQUIRED libwindowmanager)
     pkg_search_module(LIBHS REQUIRED libhomescreen)
     pkg_search_module(ILMCTRL REQUIRED ilmControl)
+    pkg_search_module(ILMCOMMON REQUIRED ilmCommon)
     list(APPEND WAM_COMMON_DEFINES HAS_AGL_SERVICE)
 endif()
 
@@ -304,6 +305,7 @@ set(WAM_EXE_INCLUDE_DIRS
 )
 set(WAM_EXE_LIBRARIES
     ${CHROMIUM_LDFLAGS}
+    ${ILMCOMMON_LDFLAGS}
     Boost::filesystem
     wamlib
 )
