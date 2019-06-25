@@ -80,11 +80,20 @@ void WebAppManagerConfig::initConfiguration()
 
 void WebAppManagerConfig::postInitConfiguration()
 {
-    if (access("/var/luna/preferences/debug_system_apps", F_OK) == 0) {
+    std::string dir;
+#if defined(HAS_AGL_SERVICE)
+    dir = "/var/agl-devel/preferences/";
+#else
+    dir = "/var/luna/preferences/";
+#endif
+
+    std::string debug_apps_setting = dir + "debug_system_apps";
+    if (access(debug_apps_setting.c_str(), F_OK) == 0) {
         m_inspectorEnabled = true;
     }
 
-    if (access("/var/luna/preferences/devmode_enabled", F_OK) == 0) {
+    std::string devmode_setting = dir + "devmode_enabled";
+    if (access(devmode_setting.c_str(), F_OK) == 0) {
         m_devModeEnabled = true;
         m_telluriumNubPath = WebAppManagerUtils::getEnv("TELLURIUM_NUB_PATH");
     }
