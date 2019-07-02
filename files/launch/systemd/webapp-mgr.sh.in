@@ -50,8 +50,15 @@ export WAM_APPCACHE_MAXSIZE=52428800
 # setup 10 Mb maximum for ApplicationCache per domain
 export WAM_APPCACHE_DOMAINLIMIT=10485760
 
+# setup maximum for DiskCache
+total_memory=$(vmstat -s | grep "total memory" | sed -e 's/^[ \t]*//' | cut -f1 -d" ")
+if [ $total_memory -lt 1048576 ]; then
+# setup 32 Mb maximum for DiskCache
+    export WAM_DISKCACHE_MAXSIZE=33554432
+else
 # setup 50 Mb maximum for DiskCache
-export WAM_DISKCACHE_MAXSIZE=52428800
+    export WAM_DISKCACHE_MAXSIZE=52428800
+fi
 
 # setup 256 Kb maximum for resource buffer allocation
 export WAM_RESOURCE_BUFFER_MAX_ALLOC_SIZE=262144
