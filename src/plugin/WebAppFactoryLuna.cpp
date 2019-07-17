@@ -33,7 +33,7 @@ WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, std::shared_ptr<App
     if (winType == WT_CARD || winType == WT_POPUP || winType == WT_MINIMAL || winType == WT_FLOATING || winType == WT_SYSTEM_UI) {
         app = new WebAppWaylandWebOS(winType, desc);
     } else if (winType == WT_OVERLAY || winType == WT_NONE) {
-        app = new WebAppWayland(winType);
+        app = new WebAppWayland(winType, 0, 0, desc->getDisplayAffinity());
     } else {
         LOG_WARNING(MSGID_BAD_WINDOW_TYPE, 1,
                     PMLOGKS("WINDOW_TYPE", qPrintable(winType)), "");

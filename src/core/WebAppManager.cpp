@@ -776,6 +776,12 @@ std::string WebAppManager::launch(const std::string& appDescString, const std::s
     QString winType = windowTypeFromString(desc->defaultWindowType());
     errMsg.erase();
 
+    // Set displayAffinity (multi display support)
+    QJsonDocument jsonDoc = QJsonDocument::fromJson(QByteArray(params.c_str()));
+    QJsonObject jsonObject = jsonDoc.object();
+    if (!jsonObject.value("displayAffinity").isUndefined())
+      desc->setDisplayAffinity(jsonObject.value("displayAffinity").toInt());
+
     // Check if app is container itself, it shouldn't be relaunched like normal app
     if (isContainerApp(url)) {
         if (!isRunningApp(desc->id(), instanceId))

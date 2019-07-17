@@ -17,6 +17,7 @@
 #ifndef WEBAPPWAYLAND_H
 #define WEBAPPWAYLAND_H
 
+#include "DisplayId.h"
 #include "Timer.h"
 #include "WebAppBase.h"
 
@@ -51,8 +52,8 @@ class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
     Q_OBJECT
 
 public:
-    WebAppWayland(QString type, int width = 0, int height = 0);
-    WebAppWayland(QString type, WebAppWaylandWindow* window, int width = 0, int height = 0);
+    WebAppWayland(QString type, int width = 0, int height = 0, int displayId = kUndefinedDisplayId);
+    WebAppWayland(QString type, WebAppWaylandWindow* window, int width = 0, int height = 0, int displayId = kUndefinedDisplayId);
 
     ~WebAppWayland() override;
 
@@ -146,6 +147,8 @@ private:
     OneShotTimer<WebAppWayland> m_launchTimeoutTimer;
 
     bool m_lostFocusBySetWindowProperty;
+
+    int m_displayId;
 };
 
 #endif /* WEBAPPWAYLAND_H */

@@ -32,7 +32,7 @@
 
 static int kLaunchFinishAssureTimeoutMs = 5000;
 
-WebAppWayland::WebAppWayland(QString type, int width, int height)
+WebAppWayland::WebAppWayland(QString type, int width, int height, int displayId)
     : WebAppBase()
     , m_appWindow(0)
     , m_windowType(type)
@@ -41,11 +41,12 @@ WebAppWayland::WebAppWayland(QString type, int width, int height)
     , m_isFocused(false)
     , m_vkbHeight(0)
     , m_lostFocusBySetWindowProperty(false)
+    , m_displayId(displayId)
 {
     init(width, height);
 }
 
-WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window, int width, int height)
+WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window, int width, int height, int displayId)
     : WebAppBase()
     , m_appWindow(window)
     , m_windowType(type)
@@ -54,6 +55,7 @@ WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window, int widt
     , m_isFocused(false)
     , m_vkbHeight(0)
     , m_lostFocusBySetWindowProperty(false)
+    , m_displayId(displayId)
 {
     init(width, height);
 }
@@ -81,6 +83,11 @@ void WebAppWayland::init(int width, int height)
     // set compositor window type
     setWindowProperty(QStringLiteral("_WEBOS_WINDOW_TYPE"), m_windowType);
     LOG_DEBUG("App created window [%s]", qPrintable(m_windowType));
+
+    if (m_displayId != kUndefinedDisplayId) {
+      setWindowProperty(QStringLiteral("displayAffinity"), m_displayId);
+      LOG_DEBUG("App window for display[%d]", m_displayId);
+    }
 
     if (qgetenv("LAUNCH_FINISH_ASSURE_TIMEOUT").toInt() != 0)
         kLaunchFinishAssureTimeoutMs = qgetenv("LAUNCH_FINISH_ASSURE_TIMEOUT").toInt();

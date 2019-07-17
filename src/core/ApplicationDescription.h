@@ -25,6 +25,8 @@
 #include <QString>
 #include <QStringList>
 
+#include "DisplayId.h"
+
 class ApplicationDescription {
 public:
     enum WindowClass {
@@ -189,6 +191,10 @@ public:
     const WindowOwnerInfo getWindowOwnerInfo();
     const WindowClientInfo getWindowClientInfo();
 
+    // To support multi display
+    DisplayId getDisplayAffinity() { return m_displayAffinity; }
+    void setDisplayAffinity(DisplayId display) { m_displayAffinity = display; }
+
 private:
     std::string m_id;
     std::string m_title;
@@ -234,6 +240,7 @@ private:
     int m_delayMsForLanchOptimization;
     bool m_useUnlimitedMediaPolicy;
     int m_memoryOptimizeLevel;
+    int m_displayAffinity;
 };
 
 #endif /* APPLICATIONDESCRIPTION_H */

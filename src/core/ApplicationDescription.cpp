@@ -64,6 +64,7 @@ ApplicationDescription::ApplicationDescription()
     , m_delayMsForLanchOptimization(0)
     , m_useUnlimitedMediaPolicy(false)
     , m_memoryOptimizeLevel(0)
+    , m_displayAffinity(kUndefinedDisplayId)
 {
 }
 
