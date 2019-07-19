@@ -158,7 +158,7 @@ void WebAppWayland::attach(WebPageBase *page)
     setKeyMask(webos::WebOSKeyMask::KEY_MASK_EXIT,
         getAppDescription()->handleExitKey());
 
-    if (getAppDescription()->widthOverride() && getAppDescription()->heightOverride()) {
+    if (getAppDescription()->widthOverride() && getAppDescription()->heightOverride() && !getAppDescription()->isTransparent()) {
         float scaleX = static_cast<float>(m_appWindow->DisplayWidth()) / getAppDescription()->widthOverride();
         float scaleY = static_cast<float>(m_appWindow->DisplayHeight()) / getAppDescription()->heightOverride();
         m_scaleFactor = (scaleX < scaleY) ? scaleX : scaleY;
