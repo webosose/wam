@@ -1053,5 +1053,9 @@ int WebAppManager::maskForBrowsingDataType(const char* type)
 
 QString WebAppManager::identifierForSecurityOrigin(const QString& identifier)
 {
-    return QString("%1%2").arg(identifier).arg(kSecurityOriginPostfix);
+    QString lowcase_identifier = identifier.toLower();
+    if (lowcase_identifier != identifier) {
+        LOG_WARNING(MSGID_APPID_HAS_UPPERCASE, 0, "Application id should not contain capital letters");
+    }
+    return QString("%1%2").arg(lowcase_identifier).arg(kSecurityOriginPostfix);
 }

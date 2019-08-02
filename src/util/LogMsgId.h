@@ -102,6 +102,7 @@
 #define MSGID_CONTAINER_APP_RELAUNCHED  "CONTAINER_APP_RELAUNCHED" /** Container app relaunched after container-based app is launched */
 #define MSGID_CONTAINER_APP_STATUS_CHANGED  "CONTAINER_APP_STATUS_CHANGED" /** containerApp status changed */
 #define MSGID_KILL_WEBPROCESS_DELAYED       "KILL_WEBPROCESS_DELAYED" /** Kill WebProcess when MM requests delayed until app is closed completely */
+#define MSGID_APPID_HAS_UPPERCASE       "APPID_HAS_UPPERCASE" /** the application id has uppercase letters */
 
 #define MSGID_ERROR_ERROR               "ERROR_PAGE_ERROR" /** Error loop -- failed to load error page! */
 #define MSGID_CLOSE_CALL_FAIL           "CLOSE_CALL_FAIL" /** Failed to send closeByAppId call to sam */
