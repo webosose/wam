@@ -24,6 +24,16 @@
 
 class WamSocketLockFile {
 public:
+  WamSocketLockFile() {
+    const char* runtime_dir;
+    if ((runtime_dir = getenv("XDG_RUNTIME_DIR")) == NULL) {
+      LOG_DEBUG("Failed to retrieve XDG_RUNTIME_DIR, falling back to /tmp");
+      runtime_dir = "/tmp";
+    }
+    lock_file_ = std::string(runtime_dir);
+    lock_file_.append("/wamsocket.lock");
+  }
+
   ~WamSocketLockFile() {
     if (lock_fd_ != -1)
       releaseLock(lock_fd_);
@@ -86,12 +96,22 @@ private:
     flock(fd, LOCK_UN);
   }
 
-  std::string lock_file_ = std::string("/tmp/wamsocket.lock");
+  std::string lock_file_;
   int lock_fd_ = -1;
 };
 
 class WamSocket {
 public:
+  WamSocket() {
+    const char* runtime_dir;
+    if ((runtime_dir = getenv("XDG_RUNTIME_DIR")) == NULL) {
+      LOG_DEBUG("Failed to retrieve XDG_RUNTIME_DIR, falling back to /tmp");
+      runtime_dir = "/tmp";
+    }
+    wam_socket_path_ = std::string(runtime_dir);
+    wam_socket_path_.append("/wamsocket");
+  }
+
   ~WamSocket() {
     if (socket_fd_ != -1)
       close(socket_fd_);
@@ -174,7 +194,7 @@ public:
 
 private:
 
-  const std::string wam_socket_path_ = std::string("/tmp/wamsocket");
+  std::string wam_socket_path_;
   int socket_fd_;
   struct sockaddr_un sock_addr;
 };
