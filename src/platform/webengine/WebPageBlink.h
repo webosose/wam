@@ -112,7 +112,10 @@ public:
     void loadFinished(const std::string& url) override;
     void loadFailed(const std::string& url, int errCode, const std::string& errDesc) override;
     void loadStopped(const std::string& url) override;
-    void loadStarted() override;
+    void loadAborted(const std::string& url) override;
+    void loadProgressChanged(double progress) override;
+    void didStartNavigation(const std::string& url, bool isInMainFrame) override;
+    void didFinishNavigation(const std::string& url, bool isInMainFrame) override;
     void loadVisuallyCommitted() override;
     void renderProcessCreated(int pid) override;
     void renderProcessCrashed() override;
@@ -198,6 +201,7 @@ private:
     OneShotTimer<WebPageBlink> m_closeCallbackTimer;
     QString m_trustLevel;
     QString m_loadFailedHostname;
+    std::string m_loadingUrl;
 
     WebPageBlinkObserver *m_observer;
 };

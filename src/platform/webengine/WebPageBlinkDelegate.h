@@ -35,7 +35,11 @@ public:
     virtual void loadFinished(const std::string& url) = 0;
     virtual void loadFailed(const std::string& url, int errCode, const std::string& errDesc) = 0;
     virtual void loadStopped(const std::string& url) = 0;
-    virtual void loadStarted() = 0;
+    virtual void loadAborted(const std::string& url) = 0;
+    virtual void loadStarted() {}
+    virtual void loadProgressChanged(double progress) = 0;
+    virtual void didStartNavigation(const std::string& url, bool isInMainFrame) {}
+    virtual void didFinishNavigation(const std::string& url, bool isInMainFrame) {}
     virtual void loadVisuallyCommitted() = 0;
     virtual void renderProcessCreated(int pid) = 0;
     virtual void renderProcessCrashed() = 0;

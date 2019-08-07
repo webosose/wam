@@ -53,6 +53,7 @@
 #define MSGID_WEBPROC_CRASH         "WEBPROC_CRASH" /* Web process crashed */
 #define MSGID_BACKKEY_HANDLE     "BACKKEY_HANDLE" /* About back key handling */
 #define MSGID_PAGE_LOADING          "PAGE_LOADING" /* About page loading */
+#define MSGID_LOAD          "LOAD" /* About page loading */
 #define MSGID_PALMSYSTEM        "PALMSYSTEM" /* About MSGID_PALMSYSTEM */
 #define MSGID_POST_RUNNING_APPS     "MSGID_POST_RUNNING_APPS" /* Post Running app Change */
 #define MSGID_WAM_DEBUG     "GENERAL" /* General */

@@ -49,11 +49,14 @@ public:
         const std::string& url, const std::string& statusText) override;
     bool AcceptsVideoCapture() override;
     bool AcceptsAudioCapture() override;
+    void LoadAborted(const std::string& url) override;
     void LoadStarted() override;
     void LoadFinished(const std::string& url) override;
     void LoadFailed(const std::string& url, int errCode, const std::string& errDesc) override;
     void LoadStopped(const std::string& url) override;
     void DocumentLoadFinished() override;
+    void DidStartNavigation(const std::string& url, bool isInMainFrame) override;
+    void DidFinishNavigation(const std::string& url, bool isInMainFrame) override;
     void RenderProcessCreated(int pid) override;
     void RenderProcessGone() override;
     void DidHistoryBackOnTopPage() {}

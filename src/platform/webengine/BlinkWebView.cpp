@@ -80,8 +80,11 @@ void BlinkWebView::HandleBrowserControlFunction(const std::string& command, cons
 
 void BlinkWebView::OnLoadProgressChanged(double progress)
 {
+    if (!m_delegate)
+        return;
+
     m_progress = (int)(progress * 100);
-    LOG_INFO(MSGID_PAGE_LOADING, 1, PMLOGKS("", ""), "PROGRESS: %d%%", m_progress);
+    m_delegate->loadProgressChanged(progress);
 }
 
 void BlinkWebView::Close()
@@ -169,12 +172,12 @@ void BlinkWebView::LoadFailed(const std::string& url, int errCode, const std::st
     m_delegate->loadFailed(url, errCode, errDesc);
 }
 
-void BlinkWebView::LoadStopped(const std::string& url)
+void BlinkWebView::LoadAborted(const std::string& url)
 {
     if (!m_delegate)
         return;
 
-    m_delegate->loadStopped(url);
+    m_delegate->loadAborted(url);
 }
 
 void BlinkWebView::LoadStarted()
@@ -185,6 +188,30 @@ void BlinkWebView::LoadStarted()
         return;
 
     m_delegate->loadStarted();
+}
+
+void BlinkWebView::LoadStopped(const std::string& url)
+{
+    if (!m_delegate)
+        return;
+
+    m_delegate->loadStopped(url);
+}
+
+void BlinkWebView::DidStartNavigation(const std::string& url, bool isInMainFrame)
+{
+    if (!m_delegate)
+        return;
+
+    m_delegate->didStartNavigation(url, isInMainFrame);
+}
+
+void BlinkWebView::DidFinishNavigation(const std::string& url, bool isInMainFrame)
+{
+    if (!m_delegate)
+        return;
+
+    m_delegate->didFinishNavigation(url, isInMainFrame);
 }
 
 void BlinkWebView::RenderProcessCreated(int pid)

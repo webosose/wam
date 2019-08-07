@@ -651,10 +651,10 @@ void WebPageBlink::didSwapCompositorFrame()
 
 void WebPageBlink::loadFinished(const std::string& url)
 {
-    LOG_INFO(MSGID_WEBPAGE_LOAD_FINISHED, 2,
+    LOG_INFO(MSGID_LOAD, 2,
         PMLOGKS("APP_ID", qPrintable(appId())),
         PMLOGKFV("PID", "%d", getWebProcessPID()),
-        "url from web engine : %s", url.c_str());
+        "[FINISH ]%s", url.c_str());
 
     if (cleaningResources()) {
         LOG_INFO(MSGID_WEBPAGE_LOAD_FINISHED,
@@ -669,32 +669,59 @@ void WebPageBlink::loadFinished(const std::string& url)
     handleLoadFinished();
 }
 
-void WebPageBlink::loadStarted()
-{
-    LOG_INFO(MSGID_PAGE_LOADING, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()),  PMLOGKS("LOADING", "STARTED"), "");
-    m_hasCloseCallback = false;
-    handleLoadStarted();
-}
-
 void WebPageBlink::loadStopped(const std::string& url)
 {
-    LOG_INFO(MSGID_PAGE_LOADING, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()),  PMLOGKS("LOADING", "STOPPED"), "");
+    m_loadingUrl = "";
+}
+
+void WebPageBlink::didStartNavigation(const std::string& url, bool isInMainFrame)
+{
+    m_loadingUrl = url;
+
+    // moved from loadStarted
+    m_hasCloseCallback = false;
+    handleLoadStarted();
+    LOG_INFO(MSGID_LOAD, 2,
+        PMLOGKS("APP_ID", qPrintable(appId())),
+        PMLOGKFV("PID", "%d", getWebProcessPID()),
+        "[START %s]%s", isInMainFrame?"m":"s", url.c_str());
+}
+
+void WebPageBlink::didFinishNavigation(const std::string& url, bool isInMainFrame)
+{
+    LOG_INFO(MSGID_LOAD, 2,
+        PMLOGKS("APP_ID", qPrintable(appId())),
+        PMLOGKFV("PID", "%d", getWebProcessPID()),
+        "[CONNECT]%s", url.c_str());
+}
+
+void WebPageBlink::loadProgressChanged(double progress)
+{
+    if (!(m_loadingUrl.empty() && progress == 0.1)) {
+        // m_loadingUrl is empty then net didStartNavigation yet, default(initial) progress : 0.1
+        // so m_loadingUrl shouldn't be empty and greater than 0.1
+        LOG_INFO(MSGID_LOAD, 2,
+            PMLOGKS("APP_ID", qPrintable(appId())),
+            PMLOGKFV("PID", "%d", getWebProcessPID()),
+            "[...%3d%%]%s", static_cast<int>(progress * 100.0), m_loadingUrl.c_str());
+    }
+}
+
+void WebPageBlink::loadAborted(const std::string& url)
+{
+    LOG_INFO(MSGID_LOAD, 2,
+        PMLOGKS("APP_ID", qPrintable(appId())),
+        PMLOGKFV("PID", "%d", getWebProcessPID()),
+        "[ABORTED]%s", url.c_str());
 }
 
 void WebPageBlink::loadFailed(const std::string& url, int errCode, const std::string& errDesc)
 {
-    Q_EMIT webPageLoadFailed(errCode);
+    LOG_INFO(MSGID_LOAD, 2,
+        PMLOGKS("APP_ID", qPrintable(appId())),
+        PMLOGKFV("PID", "%d",
+        getWebProcessPID()), "[FAILED ][%d/%s]%s", errCode, errDesc.c_str(),url.c_str());
 
-    // We follow through only if we have SSL error
-    if (errDesc != "SSL_ERROR")
-        return;
-
-    LOG_WARNING(MSGID_PAGE_LOAD_FAILED, 4,
-                PMLOGKS("APP_ID", qPrintable(appId())),
-                PMLOGKFV("ERROR_CODE", "%d", errCode),
-                PMLOGKS("ERROR_STR", errDesc.c_str()),
-                PMLOGKS("URL", url.c_str()),
-                " ");
     m_loadFailedHostname = getHostname(url);
     handleLoadFailed(errCode);
 }

@@ -268,8 +268,6 @@ void WebPageBase::handleLoadFinished()
 
 void WebPageBase::handleLoadFailed(int errorCode)
 {
-    LOG_INFO(MSGID_WEBPAGE_LOAD_FAILED, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "");
-
     // errorCode 204 specifically states that the web browser not relocate
     // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
     // we can't handle unknown protcol like mailto.
