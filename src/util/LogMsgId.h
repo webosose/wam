@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -59,6 +59,7 @@
 #define MSGID_WAM_DEBUG     "GENERAL" /* General */
 #define MSGID_LUNA_API      "LUNA_API" /* About luna api */
 #define MSGID_DEEPLINKING      "DEEPLINKING" /* handle deeplinking launch/relaunch */
+#define MSGID_VKB_EVENT     "VKB_EVENT" /* Received vkb event */
 
 // All other message IDs
 #define MSGID_APP_DESC_PARSE_FAIL       "APP_DESC_PARSE_FAIL" /** Failure to parse app description */

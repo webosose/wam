@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2018 LG Electronics, Inc.
+// Copyright (c) 2008-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -340,11 +340,23 @@ void WebAppWaylandWindow::logEventDebugging(WebOSEvent* event)
             }
             else {
                 // mouse button event
-                LOG_INFO(MSGID_MOUSE_BUTTON_EVENT, 3,
+                float scale = 1.0;
+                int height = m_webApp->getAppDescription()->heightOverride();
+                if (height)
+                    scale = (float)DisplayHeight() / m_webApp->getAppDescription()->heightOverride();
+                LOG_INFO(MSGID_MOUSE_BUTTON_EVENT, 5,
                     PMLOGKS("APP_ID", qPrintable(m_webApp->appId())),
                     PMLOGKFV("VALUE", "%d", (int)static_cast<WebOSMouseEvent*>(event)->GetButton()),
-                    PMLOGKS("STATUS", event->GetType() == WebOSEvent::MouseButtonPress ? "MouseButtonPress" : "MouseButtonRelease"), "");
+                    PMLOGKS("STATUS", event->GetType() == WebOSEvent::MouseButtonPress ? "MouseButtonPress" : "MouseButtonRelease"),
+                    PMLOGKFV("X", "%.f", static_cast<WebOSMouseEvent*>(event)->GetX() * scale),
+                    PMLOGKFV("Y", "%.f", static_cast<WebOSMouseEvent*>(event)->GetY() * scale), "");
             }
+        }
+        else if (event->GetType() == WebOSEvent::InputPanelVisible) {
+            LOG_INFO(MSGID_VKB_EVENT, 3,
+                PMLOGKS("APP_ID", qPrintable(m_webApp->appId())),
+                PMLOGKS("STATUS", "InputPanelVisible"),
+                PMLOGKS("Visible", static_cast<WebOSVirtualKeyboardEvent*>(event)->GetVisible() == true ? "true" : "false"), "");
         }
         else if (event->GetType() != WebOSEvent::MouseMove) {
             // log all window event except mouseMove
