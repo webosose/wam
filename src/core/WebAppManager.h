@@ -99,6 +99,7 @@ public:
     bool purgeSurfacePool(uint32_t pid);
     void onShutdownEvent();
     bool onKillApp(const std::string& appId, bool force = false);
+    bool onPauseApp(const std::string& appId);
     bool isDiscardCodeCacheRequired();
     bool setInspectorEnable(QString& appId);
     void discardCodeCache(uint32_t pid);

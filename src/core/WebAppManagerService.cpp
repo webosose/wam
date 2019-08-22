@@ -35,6 +35,11 @@ bool WebAppManagerService::onKillApp(const std::string& appId, bool force)
     return WebAppManager::instance()->onKillApp(appId, force);
 }
 
+bool WebAppManagerService::onPauseApp(const std::string& appId)
+{
+    return WebAppManager::instance()->onPauseApp(appId);
+}
+
 QJsonObject WebAppManagerService::onLogControl(const std::string& keys, const std::string& value)
 {
     LogManager::setLogControl(keys, value);

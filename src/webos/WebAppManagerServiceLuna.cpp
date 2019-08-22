@@ -37,6 +37,7 @@
 LSMethod WebAppManagerServiceLuna::s_methods[] = {
     LS2_METHOD_ENTRY(launchApp),
     LS2_METHOD_ENTRY(killApp),
+    LS2_METHOD_ENTRY(pauseApp),
     LS2_METHOD_ENTRY(closeAllApps),
     LS2_METHOD_ENTRY(setInspectorEnable),
     LS2_METHOD_ENTRY(logControl),
@@ -162,7 +163,28 @@ QJsonObject WebAppManagerServiceLuna::killApp(QJsonObject request)
     else
     {
         reply["returnValue"] = false;
-        reply["errorCode"] = ERR_CODE_KILLAPP_NO_APP;
+        reply["errorCode"] = ERR_CODE_NO_RUNNING_APP;
+        reply["errorText"] = QString::fromStdString(err_noRunningApp);
+    }
+    return reply;
+}
+
+QJsonObject WebAppManagerServiceLuna::pauseApp(QJsonObject request)
+{
+    std::string id{request["appId"].toString().toStdString()};
+
+    LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("APP_ID", id.c_str()), PMLOGKS("API", "pauseApp"), "");
+
+    QJsonObject reply;
+    if (WebAppManagerService::onPauseApp(id))
+    {
+        reply["returnValue"] = true;
+        reply["appId"] = request["appId"].toString();
+    }
+    else
+    {
+        reply["returnValue"] = false;
+        reply["errorCode"] = ERR_CODE_NO_RUNNING_APP;
         reply["errorText"] = QString::fromStdString(err_noRunningApp);
     }
     return reply;

@@ -9,6 +9,7 @@
     "com.palm.webappmanager/launchApp",
     "com.palm.webappmanager/listRunningApps",
     "com.palm.webappmanager/logControl",
+    "com.palm.webappmanager/pauseApp",
     "com.palm.webappmanager/setInspectorEnable",
     "com.palm.webappmanager/webProcessCreated"
   ]

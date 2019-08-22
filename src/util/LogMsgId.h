@@ -49,6 +49,7 @@
 #define MSGID_POST_BUNDLE_MSG                "POST_BUNDLE_MSG" /* Posting WAM bundle message */
 #define MSGID_HANDLE_BUNDLE_MSG              "HANDLE_BUNDLE_MSG" /* Handles WAM bundle message */
 #define MSGID_KILL_APP                       "KILL_APP" /* Killing App */
+#define MSGID_PAUSE_APP                      "PAUSE_APP" /* Pausing App */
 #define MSGID_FORCE_CLOSE_KEEP_ALIVE_APP     "FORCE_CLOSE_KEEP_ALIVE_APP" /* Keep Alive App is closed by force */
 #define MSGID_WEBPROC_CRASH         "WEBPROC_CRASH" /* Web process crashed */
 #define MSGID_BACKKEY_HANDLE     "BACKKEY_HANDLE" /* About back key handling */
