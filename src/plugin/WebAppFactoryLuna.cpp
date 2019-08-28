@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -30,9 +30,9 @@ WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, std::shared_ptr<App
 {
     WebAppBase* app = nullptr;
 
-    if (winType == WT_CARD || winType == WT_POPUP || winType == WT_MINIMAL || winType == WT_FLOATING) {
+    if (winType == WT_CARD || winType == WT_POPUP || winType == WT_MINIMAL || winType == WT_FLOATING || winType == WT_SYSTEM_UI) {
         app = new WebAppWaylandWebOS(winType, desc);
-    } else if (winType == WT_OVERLAY || winType == WT_SYSTEM_UI || winType == WT_NONE) {
+    } else if (winType == WT_OVERLAY || winType == WT_NONE) {
         app = new WebAppWayland(winType);
     } else {
         LOG_WARNING(MSGID_BAD_WINDOW_TYPE, 1,
