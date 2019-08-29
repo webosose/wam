@@ -158,6 +158,7 @@ public:
     bool disallowScrollingInMainFrame() const { return m_disallowScrollingInMainFrame; }
     int delayMsForLaunchOptimization() const { return m_delayMsForLanchOptimization; }
     bool useUnlimitedMediaPolicy() const { return m_useUnlimitedMediaPolicy; }
+    int memoryOptimizeLevel() const { return m_memoryOptimizeLevel; }
 
     struct WindowOwnerInfo {
         WindowOwnerInfo()
@@ -232,6 +233,7 @@ private:
     bool m_disallowScrollingInMainFrame;
     int m_delayMsForLanchOptimization;
     bool m_useUnlimitedMediaPolicy;
+    int m_memoryOptimizeLevel;
 };
 
 #endif /* APPLICATIONDESCRIPTION_H */

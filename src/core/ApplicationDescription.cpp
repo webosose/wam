@@ -62,6 +62,7 @@ ApplicationDescription::ApplicationDescription()
     , m_disallowScrollingInMainFrame(true)
     , m_delayMsForLanchOptimization(0)
     , m_useUnlimitedMediaPolicy(false)
+    , m_memoryOptimizeLevel(0)
 {
 }
 
@@ -280,6 +281,8 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     }
 
     appDesc->m_useUnlimitedMediaPolicy = jsonObj.contains("useUnlimitedMediaPolicy") && jsonObj["useUnlimitedMediaPolicy"].toBool();
+    appDesc->m_memoryOptimizeLevel = jsonObj.contains("memoryOptimizeLevel")
+        && jsonObj["memoryOptimizeLevel"].toInt();
 
     return appDesc;
 }

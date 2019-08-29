@@ -454,6 +454,10 @@ void WebPageBlink::resumeWebPageAll()
         resumeWebPagePaintingAndJSExecution();
     }
     resumeWebPageMedia();
+    if (m_appDesc->memoryOptimizeLevel() > 0)
+        d->pageView->SetGpuRasterizationAllowed(false);
+    else
+        d->pageView->SetGpuRasterizationAllowed(true);
     d->pageView->SetVisible(true);
 }
 
