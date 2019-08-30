@@ -90,6 +90,7 @@ void WebAppWaylandWindow::hide()
 void WebAppWaylandWindow::show()
 {
     if (!m_hasPageFrameBeenSwapped) {
+        LOG_INFO(MSGID_WAM_DEBUG, 1, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), "WebAppWaylandWindow::show(),  Not PageFrameSwapped; Pending Show()");
         m_pendingShow = true;
     } else {
         LOG_INFO(MSGID_WAM_DEBUG, 1, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), "WebAppWaylandWindow::show(); call onStageActivated");
@@ -133,6 +134,7 @@ void WebAppWaylandWindow::attachWebContents(void* webContents)
 void WebAppWaylandWindow::didSwapPageCompositorFrame()
 {
     if (!m_hasPageFrameBeenSwapped) {
+        LOG_INFO(MSGID_WAM_DEBUG, 1, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), "WebAppWaylandWindow::didSwapPageCompositorFrame(), PageFrameBeenSwapped; m_pendingShow : %s", m_pendingShow?"true":"false");
         m_hasPageFrameBeenSwapped = true;
         if (m_pendingShow) {
             show();
