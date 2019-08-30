@@ -1194,6 +1194,16 @@ void WebPageBlink::updateIsLoadErrorPageFinish()
     }
 }
 
+void WebPageBlink::activateRendererCompositor()
+{
+    d->pageView->ActivateRendererCompositor();
+}
+
+void WebPageBlink::deactivateRendererCompositor()
+{
+    d->pageView->DeactivateRendererCompositor();
+}
+
 void WebPageBlink::setAudioGuidanceOn(bool on)
 {
     d->pageView->SetAudioGuidanceOn(on);

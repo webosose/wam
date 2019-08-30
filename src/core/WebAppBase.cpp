@@ -251,7 +251,8 @@ void WebAppBase::relaunch(const QString& args, const QString& launchingAppId)
 
         // if we're already loaded, then show, else clear the hidden flag, and
         // show as normal when loaded and ready to render
-        if(m_addedToWindowMgr || page()->progress() == 100)
+        if(m_addedToWindowMgr ||
+            (page()->progress() == 100 && page()->hasBeenShown()))
             showWindow();
     }
 
@@ -378,6 +379,9 @@ void WebAppBase::setPreloadState(QString properties)
     if (preload == "full") {
         m_preloadState = FULL_PRELOAD;
     }
+    else if (preload == "semi-full") {
+        m_preloadState = SEMI_FULL_PRELOAD;
+    }
     else if (preload == "partial") {
         m_preloadState = PARTIAL_PRELOAD;
     }
@@ -399,9 +403,14 @@ void WebAppBase::setPreloadState(QString properties)
         case FULL_PRELOAD :
             // TODO : implement full preload when rule is set.
             break;
+        case SEMI_FULL_PRELOAD:
+            d->m_page->setAppPreloadHint(true);
+            d->m_page->suspendWebPageMedia();
+            break;
         case PARTIAL_PRELOAD :
             d->m_page->setAppPreloadHint(true);
             d->m_page->suspendWebPageMedia();
+            d->m_page->deactivateRendererCompositor();
             break;
         case MINIMAL_PRELOAD :
             // TODO : implement minimal preloaded when rule is set.
@@ -424,9 +433,14 @@ void WebAppBase::clearPreloadState()
         case FULL_PRELOAD :
             // TODO : implement full preload when rule is set.
             break;
+        case SEMI_FULL_PRELOAD:
+            d->m_page->setAppPreloadHint(false);
+            d->m_page->resumeWebPageMedia();
+            break;
         case PARTIAL_PRELOAD :
             d->m_page->setAppPreloadHint(false);
             d->m_page->resumeWebPageMedia();
+            d->m_page->activateRendererCompositor();
             break;
         case MINIMAL_PRELOAD :
             // TODO : implement minimal preloaded when rule is set.

@@ -144,6 +144,8 @@ public:
     static QString truncateURL(const QString& url);
     virtual QString getIdentifierForSecurityOrigin() const;
 
+    virtual void activateRendererCompositor() { }
+    virtual void deactivateRendererCompositor() { }
 
 Q_SIGNALS:
     void webPageUrlChanged();

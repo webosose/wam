@@ -141,6 +141,8 @@ public:
     void forwardEvent(void* event) override;
     bool allowMouseOnOffEvent() const override;
     void didSwapCompositorFrame();
+    void activateRendererCompositor() override;
+    void deactivateRendererCompositor() override;
 
     // Timer callback
     void timeoutCloseCallback();

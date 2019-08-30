@@ -38,8 +38,9 @@ public:
     enum PreloadState {
         NONE_PRELOAD = 0,
         FULL_PRELOAD = 1,
-        PARTIAL_PRELOAD = 2,
-        MINIMAL_PRELOAD = 3
+        SEMI_FULL_PRELOAD = 2,
+        PARTIAL_PRELOAD = 3,
+        MINIMAL_PRELOAD = 4
     };
 
     WebAppBase();
