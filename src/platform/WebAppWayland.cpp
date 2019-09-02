@@ -514,7 +514,6 @@ void WebAppWayland::doAttach()
     setForceActivateVtgIfRequired();
 
     connect(page(), SIGNAL(webPageClosePageRequested()), this, SLOT(webPageClosePageRequestedSlot()));
-    connect(page(), SIGNAL(webPageTitleChanged()), this, SLOT(webPageTitleChangedSlot()));
     connect(page(), SIGNAL(webViewRecreated()), this, SLOT(webViewRecreatedSlot()));
 }
 
