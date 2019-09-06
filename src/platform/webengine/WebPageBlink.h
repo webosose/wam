@@ -33,13 +33,6 @@ class WebPageBlinkObserver;
 class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
     Q_OBJECT
 public:
-    enum FontRenderParams {
-        HINTING_NONE = 0,
-        HINTING_SLIGHT = 1,
-        HINTING_MEDIUM = 2,
-        HINTING_FULL = 3
-    };
-
     WebPageBlink(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const QString& launchParams);
     ~WebPageBlink() override;
 
@@ -133,7 +126,6 @@ public:
     void updateMediaCodecCapability();
     double devicePixelRatio();
     void setAdditionalContentsScale(float scaleX, float scaleY);
-    void setFontHinting(FontRenderParams hinting);
     void setSupportDolbyHDRContents();
     void updateHardwareResolution();
 

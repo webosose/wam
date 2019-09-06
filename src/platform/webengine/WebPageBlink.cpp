@@ -161,8 +161,6 @@ void WebPageBlink::init()
 
     setDefaultFont(defaultFont());
 
-    d->pageView->SetFontHinting(webos::WebViewBase::FontRenderParams::HINTING_SLIGHT);
-
     QString language;
     getSystemLanguage(language);
     setPreferredLanguages(language);
