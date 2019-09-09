@@ -1069,12 +1069,18 @@ double WebPageBlink::devicePixelRatio()
     if(appWidth == 0) appWidth = static_cast<double>(currentUiWidth());
     if(appHeight == 0) appHeight = static_cast<double>(currentUiHeight());
 
-    QString hardwareWidth, hardwareHeight;
-    getDeviceInfo("HardwareScreenWidth", hardwareWidth);
-    getDeviceInfo("HardwareScreenHeight", hardwareHeight);
+    double deviceWidth = 0;
+    double deviceHeight = 0;
 
-    double deviceWidth = hardwareWidth.toDouble();
-    double deviceHeight = hardwareHeight.toDouble();
+    QString hardwareWidth, hardwareHeight;
+    if (getDeviceInfo("HardwareScreenWidth", hardwareWidth) &&
+        getDeviceInfo("HardwareScreenHeight", hardwareHeight)) {
+        deviceWidth = hardwareWidth.toDouble();
+        deviceHeight = hardwareHeight.toDouble();
+    } else {
+        deviceWidth = static_cast<double>(currentUiWidth());
+        deviceHeight = static_cast<double>(currentUiHeight());
+    }
 
     double ratioX = deviceWidth/appWidth;
     double ratioY = deviceHeight/appHeight;
