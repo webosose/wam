@@ -518,6 +518,7 @@ void WebAppManagerServiceLuna::applicationManagerConnectCallback(QJsonObject rep
             LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "Failed to get an application list");
         }
 
+        params["extraInfo"] = true;
         if (!call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::getForegroundAppInfoCallback>(
                 "luna://com.webos.applicationManager/getForegroundAppInfo",
                 params, this)) {
