@@ -161,6 +161,7 @@ public:
     int delayMsForLaunchOptimization() const { return m_delayMsForLanchOptimization; }
     bool useUnlimitedMediaPolicy() const { return m_useUnlimitedMediaPolicy; }
     int memoryOptimizeLevel() const { return m_memoryOptimizeLevel; }
+    const std::string& locationHint() const { return m_locationHint; }
 
     struct WindowOwnerInfo {
         WindowOwnerInfo()
@@ -241,6 +242,7 @@ private:
     bool m_useUnlimitedMediaPolicy;
     int m_memoryOptimizeLevel;
     int m_displayAffinity;
+    std::string m_locationHint;
 };
 
 #endif /* APPLICATIONDESCRIPTION_H */

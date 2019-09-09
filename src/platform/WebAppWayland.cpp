@@ -32,7 +32,10 @@
 
 static int kLaunchFinishAssureTimeoutMs = 5000;
 
-WebAppWayland::WebAppWayland(QString type, int width, int height, int displayId)
+WebAppWayland::WebAppWayland(QString type,
+                             int width, int height,
+                             int displayId,
+                             const std::string& location_hint)
     : WebAppBase()
     , m_appWindow(0)
     , m_windowType(type)
@@ -42,11 +45,15 @@ WebAppWayland::WebAppWayland(QString type, int width, int height, int displayId)
     , m_vkbHeight(0)
     , m_lostFocusBySetWindowProperty(false)
     , m_displayId(displayId)
+    , m_locationHint(location_hint)
 {
     init(width, height);
 }
 
-WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window, int width, int height, int displayId)
+WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window,
+                             int width, int height,
+                             int displayId,
+                             const std::string& location_hint)
     : WebAppBase()
     , m_appWindow(window)
     , m_windowType(type)
@@ -56,6 +63,7 @@ WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window, int widt
     , m_vkbHeight(0)
     , m_lostFocusBySetWindowProperty(false)
     , m_displayId(displayId)
+    , m_locationHint(location_hint)
 {
     init(width, height);
 }
@@ -63,6 +71,27 @@ WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window, int widt
 WebAppWayland::~WebAppWayland()
 {
     delete m_appWindow;
+}
+
+static webos::WebAppWindowBase::LocationHint getLocationHintFromString(const std::string& value)
+{
+    std::map<std::string, webos::WebAppWindowBase::LocationHint> hints = {
+        {"north", webos::WebAppWindowBase::LocationHint::kNorth},
+        {"west", webos::WebAppWindowBase::LocationHint::kWest},
+        {"south", webos::WebAppWindowBase::LocationHint::kSouth},
+        {"east", webos::WebAppWindowBase::LocationHint::kEast},
+        {"center", webos::WebAppWindowBase::LocationHint::kCenter},
+        {"northwest", webos::WebAppWindowBase::LocationHint::kNorthWest},
+        {"northeast", webos::WebAppWindowBase::LocationHint::kNorthEast},
+        {"southwest", webos::WebAppWindowBase::LocationHint::kSouthWest},
+        {"southeast", webos::WebAppWindowBase::LocationHint::kSouthEast}
+    };
+
+    webos::WebAppWindowBase::LocationHint hint = webos::WebAppWindowBase::LocationHint::kUnknown;
+    if (hints.find(value) != hints.end()) {
+        hint = hints[value];
+    }
+    return hint;
 }
 
 void WebAppWayland::init(int width, int height)
@@ -76,6 +105,11 @@ void WebAppWayland::init(int width, int height)
     else {
         setUiSize(width, height);
         m_appWindow->InitWindow(width, height);
+    }
+
+    webos::WebAppWindowBase::LocationHint locationHint = getLocationHintFromString(m_locationHint);
+    if (locationHint != webos::WebAppWindowBase::LocationHint::kUnknown) {
+        m_appWindow->SetLocationHint(locationHint);
     }
 
     m_appWindow->setWebApp(this);

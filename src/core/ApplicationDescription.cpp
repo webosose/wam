@@ -217,6 +217,9 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
         }
     }
 
+    if (!jsonObj.value("locationHint").isUndefined())
+        appDesc->m_locationHint = jsonObj["locationHint"].toString().toStdString();
+
     // Handle keyFilterTable
     //Key code is changed only for facebooklogin WebApp
     if (!jsonObj.value("keyFilterTable").isUndefined()) {

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2019 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -52,8 +52,14 @@ class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
     Q_OBJECT
 
 public:
-    WebAppWayland(QString type, int width = 0, int height = 0, int displayId = kUndefinedDisplayId);
-    WebAppWayland(QString type, WebAppWaylandWindow* window, int width = 0, int height = 0, int displayId = kUndefinedDisplayId);
+    WebAppWayland(QString type,
+                  int width = 0, int height = 0,
+                  int displayId = kUndefinedDisplayId,
+                  const std::string& location_hint = "");
+    WebAppWayland(QString type, WebAppWaylandWindow* window,
+                  int width = 0, int height = 0,
+                  int displayId = kUndefinedDisplayId,
+                  const std::string& location_hint = "");
 
     ~WebAppWayland() override;
 
@@ -149,6 +155,7 @@ private:
     bool m_lostFocusBySetWindowProperty;
 
     int m_displayId;
+    std::string m_locationHint;
 };
 
 #endif /* WEBAPPWAYLAND_H */
