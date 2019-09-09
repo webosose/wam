@@ -153,8 +153,6 @@ QJsonObject WebAppManagerServiceLuna::killApp(QJsonObject request)
     else
         instances = WebAppManagerService::onKillApp(request["appId"].toString().toStdString(), false);
 
-    instances = WebAppManagerService::onKillApp(request["appId"].toString().toStdString());
-
     QJsonObject reply;
     if(instances)
     {
