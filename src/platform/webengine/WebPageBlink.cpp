@@ -731,6 +731,12 @@ void WebPageBlink::loadFailed(const std::string& url, int errCode, const std::st
         PMLOGKFV("PID", "%d", getWebProcessPID()),
         "[FAILED ][%d/%s]%s", errCode, errDesc.c_str(), WebAppManagerUtils::truncateURL(url).c_str());
 
+    Q_EMIT webPageLoadFailed(errCode);
+
+    // We follow through only if we have SSL error
+    if (errDesc != "SSL_ERROR")
+        return;
+
     m_loadFailedHostname = getHostname(url);
     handleLoadFailed(errCode);
 }
