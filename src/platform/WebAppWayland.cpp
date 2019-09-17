@@ -226,7 +226,6 @@ void WebAppWayland::onStageActivated()
     page()->setVisibilityState(WebPageBase::WebPageVisibilityState::WebPageVisibilityStateVisible);
 
     setActiveAppId(page()->getIdentifier());
-    focus();
 
     if (getHiddenWindow() || keepAlive())
         m_appWindow->show();
