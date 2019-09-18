@@ -262,8 +262,16 @@ bool WebAppLauncherRuntime::init_wm() {
     return false;
   }
 
-  std::function< void(json_object*) > h_active = [this](json_object* object) {
+  std::function< void(json_object*) > h_active = [](json_object* object) {
     LOG_DEBUG("Got Event_Active");
+  };
+
+  std::function< void(json_object*) > h_inactive = [](json_object* object) {
+    LOG_DEBUG("Got Event_Inactive");
+  };
+
+  std::function< void(json_object*) > h_visible = [this](json_object* object) {
+    LOG_DEBUG("Got Event_Visible");
 
     std::vector<const char*> data;
     data.push_back(kActivateEvent);
@@ -272,22 +280,14 @@ bool WebAppLauncherRuntime::init_wm() {
     WebAppManagerServiceAGL::instance()->sendEvent(data.size(), data.data());
   };
 
-  std::function< void(json_object*) > h_inactive = [this](json_object* object) {
-    LOG_DEBUG("Got Event_Inactive");
+  std::function< void(json_object*) > h_invisible = [this](json_object* object) {
+    LOG_DEBUG("Got Event_Invisible");
 
     std::vector<const char*> data;
     data.push_back(kDeactivateEvent);
     data.push_back(this->m_id.c_str());
 
     WebAppManagerServiceAGL::instance()->sendEvent(data.size(), data.data());
-  };
-
-  std::function< void(json_object*) > h_visible = [](json_object* object) {
-    LOG_DEBUG("Got Event_Visible");
-  };
-
-  std::function< void(json_object*) > h_invisible = [](json_object* object) {
-    LOG_DEBUG("Got Event_Invisible");
   };
 
   std::function< void(json_object*) > h_syncdraw =
