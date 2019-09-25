@@ -17,14 +17,15 @@
 #include "Timer.h"
 #include <glib.h>
 
-int timeout_cb(void* data)
+static int timeout_cb(void* data)
 {
     Timer* timer = (Timer*) data;
+    bool isRepeating = timer->isRepeating();
     timer->handleCallback();
-    return timer->isRepeating();
+    return isRepeating;
 }
 
-int timeout_cb_destroy(void* data)
+static int timeout_cb_destroy(void* data)
 {
     Timer* timer = (Timer*) data;
     timer->handleCallback();

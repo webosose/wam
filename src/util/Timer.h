@@ -17,9 +17,6 @@
 #ifndef TIMER_H
 #define TIMER_H
 
-int timeout_cb(void* data);
-int timeout_cb_destroy(void* data);
-
 typedef struct _GTimer GTimer;
 
 class Timer {
