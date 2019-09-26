@@ -117,6 +117,7 @@ public:
     void applyInputRegion();
     void forwardWebOSEvent(WebOSEvent* event) const;
     void stateAboutToChange(webos::NativeWindowState willBe);
+    void setUseVirtualKeyboard(const bool enable) override;
 
     // from WebPageBlinkObserver
     void didSwapPageCompositorFrame();

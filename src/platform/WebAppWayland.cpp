@@ -761,3 +761,7 @@ void WebAppWayland::keyboardVisibilityChanged(bool visible, int height) {
     moveInputRegion(height);
 }
 
+void WebAppWayland::setUseVirtualKeyboard(const bool enable)
+{
+    m_appWindow->SetUseVirtualKeyboard(enable);
+}

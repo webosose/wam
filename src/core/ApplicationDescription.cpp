@@ -65,6 +65,7 @@ ApplicationDescription::ApplicationDescription()
     , m_useUnlimitedMediaPolicy(false)
     , m_memoryOptimizeLevel(0)
     , m_displayAffinity(kUndefinedDisplayId)
+    , m_useVirtualKeyboard(true)
 {
 }
 
@@ -178,6 +179,8 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     appDesc->m_enableBackgroundRun = jsonObj["enableBackgroundRun"].toBool();
     appDesc->m_allowVideoCapture = jsonObj["allowVideoCapture"].toBool();
     appDesc->m_allowAudioCapture = jsonObj["allowAudioCapture"].toBool();
+    appDesc->m_useVirtualKeyboard = jsonObj.contains("enableKeyboard") ? jsonObj["enableKeyboard"].toBool() : true;
+
     appDesc->m_usePrerendering = jsonObj.contains("usePrerendering") && jsonObj["usePrerendering"].toBool();
     appDesc->m_disallowScrollingInMainFrame = !jsonObj.contains("disallowScrollingInMainFrame") || jsonObj["disallowScrollingInMainFrame"].toBool();
 

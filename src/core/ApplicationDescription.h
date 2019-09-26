@@ -150,6 +150,7 @@ public:
     bool allowVideoCapture() const { return m_allowVideoCapture; }
     bool allowAudioCapture() const { return m_allowAudioCapture; }
 
+    virtual bool useVirtualKeyboard() const { return m_useVirtualKeyboard; }
     //Key code is changed only for facebooklogin WebApp
     const QMap<int, QPair<int, int>>& keyFilterTable() const
     {
@@ -243,6 +244,7 @@ private:
     int m_memoryOptimizeLevel;
     int m_displayAffinity;
     std::string m_locationHint;
+    bool m_useVirtualKeyboard;
 };
 
 #endif /* APPLICATIONDESCRIPTION_H */
