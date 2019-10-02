@@ -66,6 +66,15 @@ static bool isSharedBrowserProcess(const std::vector<std::string>& args) {
   return true;
 }
 
+static bool isWaitForHostService(const std::vector<std::string>& args) {
+  const char *value = getenv("WAIT_FOR_HOST_SERVICE");
+  if (value == nullptr || !value[0]) {
+    return false;
+  } else {
+    return (strcmp(value, "1") == 0);
+  }
+}
+
 class AGLMainDelegateWAM : public webos::WebOSMainDelegate {
 public:
     void AboutToCreateContentBrowserClient() override {
@@ -155,11 +164,19 @@ int SharedBrowserProcessWebAppLauncher::loop(int argc, const char** argv, volati
 
 int WebAppLauncherRuntime::run(int argc, const char** argv) {
   std::vector<std::string> args(argv + 1, argv + argc);
+  bool isWaitHostService = isWaitForHostService(args);
   m_id = getAppId(args);
   m_url = getAppUrl(args);
   m_role = "WebApp";
 
-  if(WebAppManagerServiceAGL::instance()->isHostServiceRunning()) {
+  if(isWaitHostService) {
+    while(!WebAppManagerServiceAGL::instance()->isHostServiceRunning()) {
+      LOG_DEBUG("WebAppLauncherRuntime::run - waiting for host service");
+      sleep(1);
+    }
+  }
+
+  if(isWaitHostService || WebAppManagerServiceAGL::instance()->isHostServiceRunning()) {
     LOG_DEBUG("WebAppLauncherRuntime::run - creating SharedBrowserProcessWebAppLauncher");
     m_launcher = new SharedBrowserProcessWebAppLauncher();
   } else {
