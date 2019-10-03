@@ -247,6 +247,16 @@ bool WebAppLauncherRuntime::init() {
       return false;
     }
 
+    // Special cases for windowmanager roles
+    if (m_id.rfind("webapps-html5-homescreen", 0) == 0)
+      m_role = "homescreen";
+    else if (m_id.rfind("webapps-homescreen", 0) == 0)
+      m_role = "homescreen";
+    else if (m_id.rfind("webapps-html5-launcher", 0) == 0)
+      m_role = "launcher";
+    else if (m_id.rfind("webapps-launcher", 0) == 0)
+      m_role = "launcher";
+
     LOG_DEBUG("id=[%s], name=[%s], role=[%s], url=[%s], port=%d, token=[%s]",
             m_id.c_str(), m_name.c_str(), m_role.c_str(), m_url.c_str(),
             m_port, m_token.c_str());
