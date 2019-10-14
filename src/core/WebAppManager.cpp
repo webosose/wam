@@ -176,7 +176,7 @@ void WebAppManager::onLaunchContainerBasedApp(const std::string& url, QString& w
     page->setAppId(QString::fromStdString(appDesc->id()));
     page->updateDatabaseIdentifier();
 
-    if (winType == WT_FLOATING)
+    if (winType == WT_FLOATING || winType == WT_CARD)
         page->setEnableBackgroundRun(appDesc->isEnableBackgroundRun());
     page->replaceBaseUrl(QUrl(url.c_str()));
     page->setDefaultUrl(QUrl(url.c_str()));
@@ -402,7 +402,7 @@ WebAppBase* WebAppManager::onLaunchUrl(const std::string& url, QString winType,
       page->setUseSystemAppOptimization(true);
     }
 
-    if (winType == WT_FLOATING)
+    if (winType == WT_FLOATING || winType == WT_CARD)
       page->setEnableBackgroundRun(appDesc->isEnableBackgroundRun());
 
     app->setAppDescription(appDesc);
