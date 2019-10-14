@@ -254,3 +254,8 @@ bool BlinkWebView::AllowMouseOnOffEvent() const
     return m_delegate->allowMouseOnOffEvent();
 }
 
+void BlinkWebView::DidResumeDOM()
+{
+    if (m_delegate)
+        m_delegate->didResumeDOM();
+}

@@ -657,6 +657,11 @@ void WebPageBlink::didSwapCompositorFrame()
         m_observer->didSwapPageCompositorFrame();
 }
 
+void WebPageBlink::didResumeDOM()
+{
+    if (m_observer)
+        m_observer->didResumeDOM();
+}
 
 void WebPageBlink::loadFinished(const std::string& url)
 {

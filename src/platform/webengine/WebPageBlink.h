@@ -144,6 +144,8 @@ public:
     void activateRendererCompositor() override;
     void deactivateRendererCompositor() override;
 
+    void didResumeDOM() override;
+
     // Timer callback
     void timeoutCloseCallback();
 

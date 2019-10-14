@@ -676,6 +676,11 @@ void WebAppWayland::didSwapPageCompositorFrame()
         m_appWindow->didSwapPageCompositorFrame();
 }
 
+void WebAppWayland::didResumeDOM()
+{
+    focus();
+}
+
 void WebAppWayland::setForceActivateVtgIfRequired()
 {
     QString screenRotation;

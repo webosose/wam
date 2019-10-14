@@ -20,6 +20,7 @@
 class WebPageBlinkObserver {
 public:
     virtual void didSwapPageCompositorFrame() = 0;
+    virtual void didResumeDOM() {}
 };
 
 #endif //WEBPAGE_BLINK_OBSERVER_H_

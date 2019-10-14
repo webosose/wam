@@ -50,6 +50,7 @@ public:
     virtual void didDropAllPeerConnections() {}
     virtual void didSwapCompositorFrame() {}
     virtual bool allowMouseOnOffEvent() const = 0;
+    virtual void didResumeDOM() {}
 };
 
 #endif //WEBPAGE_BLINK_DELEGATE_H_

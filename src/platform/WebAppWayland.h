@@ -121,6 +121,7 @@ public:
 
     // from WebPageBlinkObserver
     void didSwapPageCompositorFrame();
+    void didResumeDOM() override;
 
 protected:
     // WebAppBase
