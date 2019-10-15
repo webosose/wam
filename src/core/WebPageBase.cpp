@@ -334,6 +334,11 @@ int WebPageBase::suspendDelay()
     return WebAppManager::instance()->getSuspendDelay();
 }
 
+int WebPageBase::maxCustomSuspendDelay()
+{
+    return WebAppManager::instance()->getMaxCustomSuspendDelay();
+}
+
 QString WebPageBase::telluriumNubPath()
 {
     return getWebAppManagerConfig()->getTelluriumNubPath();

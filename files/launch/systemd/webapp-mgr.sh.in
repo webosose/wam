@@ -117,6 +117,9 @@ export ENABLE_LAUNCH_OPTIMIZATION=1
 # If set to a positive value, adjust a custom timeout for a network stable timer in FMPDetector
 export NETWORK_STABLE_TIMEOUT=3
 
+# Set maximum custom delay (in milliseconds) for suspending JS execution
+export MAX_CUSTOM_SUSPEND_DELAY_IN_MS=1000
+
 # setup limit on max gpu memory usage
 export MAX_GPU_MEM_LIMIT=60
 

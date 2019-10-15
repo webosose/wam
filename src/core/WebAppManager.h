@@ -130,6 +130,7 @@ public:
     bool shouldLaunchContainerAppOnDemand();
 
     int getSuspendDelay() { return m_suspendDelay; }
+    int getMaxCustomSuspendDelay() const { return m_maxCustomSuspendDelay; }
     void deleteStorageData(const QString& identifier);
     void killCustomPluginProcess(const QString& basePath);
     bool processCrashed(QString appId);
@@ -211,6 +212,7 @@ private:
     QMap<QString, int> m_lastCrashedAppIds;
 
     int m_suspendDelay;
+    int m_maxCustomSuspendDelay;
 
     std::map<std::string, std::string> m_appVersion;
 

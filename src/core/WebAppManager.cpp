@@ -56,6 +56,7 @@ WebAppManager::WebAppManager()
     , m_networkStatusManager(new NetworkStatusManager())
     , m_suspendDelay(0)
     , m_isAccessibilityEnabled(false)
+    , m_maxCustomSuspendDelay(0)
 {
 }
 
@@ -108,6 +109,7 @@ void WebAppManager::quit()
 void WebAppManager::loadEnvironmentVariable()
 {
     m_suspendDelay = m_webAppManagerConfig->getSuspendDelayTime();
+    m_maxCustomSuspendDelay = m_webAppManagerConfig->getMaxCustomSuspendDelayTime();
     m_webAppManagerConfig->postInitConfiguration();
 
     if (m_containerAppManager)

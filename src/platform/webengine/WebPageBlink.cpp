@@ -87,6 +87,7 @@ WebPageBlink::WebPageBlink(const QUrl& url, std::shared_ptr<ApplicationDescripti
     , m_vkbWasOverlap(false)
     , m_hasCloseCallback(false)
     , m_trustLevel(QString::fromStdString(desc->trustLevel()))
+    , m_customSuspendDOMTime(0)
     , m_observer(nullptr)
 {
 }
@@ -146,6 +147,15 @@ void WebPageBlink::init()
         LOG_DEBUG("[%s] trustLevel : trusted; allow load local Resources", qPrintable(appId()));
         d->pageView->SetAllowLocalResourceLoad(true);
     }
+
+    if (m_appDesc->customSuspendDOMTime() > suspendDelay()) {
+        if (m_appDesc->customSuspendDOMTime() > maxCustomSuspendDelay())
+            m_customSuspendDOMTime = maxCustomSuspendDelay();
+        else
+            m_customSuspendDOMTime = m_appDesc->customSuspendDOMTime();
+        LOG_DEBUG("[%s] set customSuspendDOMTime : %d ms", qPrintable(appId()), m_customSuspendDOMTime);
+    }
+
     d->pageView->AddUserStyleSheet("body { -webkit-user-select: none; } :focus { outline: none }");
     d->pageView->SetBackgroundColor(29, 29, 29, 0xFF);
 
@@ -433,14 +443,16 @@ void WebPageBlink::suspendWebPageAll()
 
     m_isSuspended = true;
     if (shouldStopJSOnSuspend()) {
-        m_domSuspendTimer.start(suspendDelay(), this,
-                            &WebPageBlink::suspendWebPagePaintingAndJSExecution);
+        m_domSuspendTimer.start(m_customSuspendDOMTime ? m_customSuspendDOMTime : suspendDelay(),
+                                this,
+                                &WebPageBlink::suspendWebPagePaintingAndJSExecution);
     }
-    LOG_INFO(MSGID_SUSPEND_WEBPAGE, 3,
-        PMLOGKS("APP_ID", qPrintable(appId())),
-        PMLOGKFV("PID", "%d", getWebProcessPID()),
-        PMLOGKFV("DELAY", "%dms", suspendDelay()),
-        "DomSuspendTimer Started");
+    LOG_INFO(MSGID_SUSPEND_WEBPAGE,
+             2,
+             PMLOGKS("APP_ID", qPrintable(appId())),
+             PMLOGKFV("PID", "%d", getWebProcessPID()),
+             "DomSuspendTimer(%dms) Started",
+             m_customSuspendDOMTime ? m_customSuspendDOMTime : suspendDelay());
 }
 
 void WebPageBlink::resumeWebPageAll()

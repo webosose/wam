@@ -185,6 +185,8 @@ protected:
     WebProcessManager* getWebProcessManager();
     WebAppManagerConfig* getWebAppManagerConfig();
     bool processCrashed();
+
+    virtual int maxCustomSuspendDelay();
     QString telluriumNubPath();
 
     void applyPolicyForUrlResponse(bool isMainFrame, const QString& url, int statusCode);

@@ -196,6 +196,7 @@ public:
     // To support multi display
     DisplayId getDisplayAffinity() { return m_displayAffinity; }
     void setDisplayAffinity(DisplayId display) { m_displayAffinity = display; }
+    int customSuspendDOMTime() const { return m_customSuspendDOMTime; }
 
 private:
     std::string m_id;
@@ -245,6 +246,7 @@ private:
     int m_displayAffinity;
     std::string m_locationHint;
     bool m_useVirtualKeyboard;
+    int m_customSuspendDOMTime;
 };
 
 #endif /* APPLICATIONDESCRIPTION_H */

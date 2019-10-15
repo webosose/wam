@@ -29,6 +29,7 @@ public:
     virtual QString getWebAppFactoryPluginTypes() const { return m_webAppFactoryPluginTypes; }
     virtual QString getWebAppFactoryPluginPath() const { return m_webAppFactoryPluginPath; }
     virtual int getSuspendDelayTime() const { return m_suspendDelayTime; }
+    virtual int getMaxCustomSuspendDelayTime() const { return m_maxCustomSuspendDelayTime; }
     virtual QString getWebProcessConfigPath() const { return m_webProcessConfigPath; }
     virtual bool isInspectorEnabled() const { return m_inspectorEnabled; }
     virtual bool isDevModeEnabled() const { return m_devModeEnabled; }
@@ -55,6 +56,7 @@ private:
     QString m_webAppFactoryPluginTypes;
     QString m_webAppFactoryPluginPath;
     int m_suspendDelayTime;
+    int m_maxCustomSuspendDelayTime;
     QString m_webProcessConfigPath;
     bool m_devModeEnabled;
     bool m_inspectorEnabled;

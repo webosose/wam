@@ -28,6 +28,7 @@ WebAppManagerConfig::WebAppManagerConfig()
     , m_checkLaunchTimeEnabled(false)
     , m_useSystemAppOptimization(false)
     , m_launchOptimizationEnabled(false)
+    , m_maxCustomSuspendDelayTime(0)
 {
     initConfiguration();
 }
@@ -43,6 +44,9 @@ void WebAppManagerConfig::initConfiguration()
 
     QString suspendDelay = QLatin1String(qgetenv("WAM_SUSPEND_DELAY_IN_MS"));
     m_suspendDelayTime = std::max(suspendDelay.toInt(), 1);
+
+    QString maxCustomSuspendDelay = QLatin1String(qgetenv("MAX_CUSTOM_SUSPEND_DELAY_IN_MS"));
+    m_maxCustomSuspendDelayTime = std::max(maxCustomSuspendDelay.toInt(), 0);
 
     m_webProcessConfigPath = QLatin1String(qgetenv("WEBPROCESS_CONFIGURATION_PATH"));
     if (m_webProcessConfigPath.isEmpty())

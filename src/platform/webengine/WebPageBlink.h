@@ -206,6 +206,7 @@ private:
     QString m_trustLevel;
     QString m_loadFailedHostname;
     std::string m_loadingUrl;
+    int m_customSuspendDOMTime;
 
     WebPageBlinkObserver *m_observer;
 };
