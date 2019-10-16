@@ -55,8 +55,8 @@ WebAppManager::WebAppManager()
     : m_deletingPages(false)
     , m_networkStatusManager(new NetworkStatusManager())
     , m_suspendDelay(0)
-    , m_isAccessibilityEnabled(false)
     , m_maxCustomSuspendDelay(0)
+    , m_isAccessibilityEnabled(false)
 {
 }
 

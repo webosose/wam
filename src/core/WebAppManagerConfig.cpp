@@ -20,6 +20,7 @@
 
 WebAppManagerConfig::WebAppManagerConfig()
     : m_suspendDelayTime(0)
+    , m_maxCustomSuspendDelayTime(0)
     , m_devModeEnabled(false)
     , m_inspectorEnabled(false)
     , m_containerAppEnabled(true)
@@ -28,7 +29,6 @@ WebAppManagerConfig::WebAppManagerConfig()
     , m_checkLaunchTimeEnabled(false)
     , m_useSystemAppOptimization(false)
     , m_launchOptimizationEnabled(false)
-    , m_maxCustomSuspendDelayTime(0)
 {
     initConfiguration();
 }
