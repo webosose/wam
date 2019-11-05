@@ -178,8 +178,7 @@ public:
 
       if (std::string(res[0]) == kStartApp) {
         WebAppManagerServiceAGL::instance()->setStartupApplication(
-          std::string(res[1]), std::string(res[2]), atoi(res[3]),
-          std::string(res[4]));
+          std::string(res[1]), std::string(res[2]), atoi(res[3]));
 
         WebAppManagerServiceAGL::instance()->triggerStartupApp();
       } else {
