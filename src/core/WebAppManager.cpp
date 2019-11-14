@@ -24,7 +24,6 @@
 #include <QtCore/QJsonDocument>
 
 #include "ApplicationDescription.h"
-#include "ContainerAppManager.h"
 #include "DeviceInfo.h"
 #include "LogManager.h"
 #include "NetworkStatusManager.h"
@@ -87,7 +86,6 @@ void WebAppManager::notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel
 void WebAppManager::setPlatformModules(std::unique_ptr<PlatformModuleFactory> factory)
 {
     m_webAppManagerConfig = factory->getWebAppManagerConfig();
-    m_containerAppManager = factory->getContainerAppManager();
     m_serviceSender = factory->getServiceSender();
     m_webProcessManager = factory->getWebProcessManager();
     m_deviceInfo = factory->getDeviceInfo();
@@ -111,9 +109,6 @@ void WebAppManager::loadEnvironmentVariable()
     m_suspendDelay = m_webAppManagerConfig->getSuspendDelayTime();
     m_maxCustomSuspendDelay = m_webAppManagerConfig->getMaxCustomSuspendDelayTime();
     m_webAppManagerConfig->postInitConfiguration();
-
-    if (m_containerAppManager)
-        m_containerAppManager->setUseContainerAppOptimization(m_webAppManagerConfig->isUseSystemAppOptimization());
 }
 
 void WebAppManager::setUiSize(int width, int height)
@@ -152,108 +147,6 @@ bool WebAppManager::getDeviceInfo(QString name, QString &value)
     return m_deviceInfo->getDeviceInfo(name, value);
 }
 
-void WebAppManager::onLaunchContainerBasedApp(const std::string& url, QString& winType,
-                                              std::shared_ptr<ApplicationDescription> appDesc,
-                                              const std::string& args, const std::string& launchingAppId)
-{
-    if (!m_containerAppManager)
-        return;
-
-    std::string appId;
-    WebAppBase *app = m_containerAppManager->getContainerApp();
-    WebPageBase *page = app->page();
-
-    LOG_DEBUG("[%s] WebAppManager::onLaunchContainerBasedApp(); ", qPrintable(QString::fromStdString(appDesc->id())));
-
-    app->setHiddenWindow(false);
-    page->resetStateToMarkNextPaintForContainer();
-
-    // set use launching time optimization true while app loading.
-    page->setUseLaunchOptimization(true);
-
-    // set using enyo system app specific optimization if flag is set
-    if (m_webAppManagerConfig->isUseSystemAppOptimization())
-        page->setUseSystemAppOptimization(true);
-
-    page->setAppId(QString::fromStdString(appDesc->id()));
-    page->updateDatabaseIdentifier();
-
-    if (winType == WT_FLOATING || winType == WT_CARD)
-        page->setEnableBackgroundRun(appDesc->isEnableBackgroundRun());
-    page->replaceBaseUrl(QUrl(url.c_str()));
-    page->setDefaultUrl(QUrl(url.c_str()));
-
-    app->setAppDescription(appDesc);
-    app->setAppProperties(QString::fromStdString(args));
-    app->setPreloadState(QString::fromStdString(args));
-
-    app->setLaunchingAppId(QString::fromStdString(launchingAppId));
-    if (m_webAppManagerConfig->isCheckLaunchTimeEnabled())
-        app->startLaunchTimer();
-
-    webPageRemoved(page);
-
-    appId = appDesc->id();
-    page->setApplicationDescription(appDesc);
-    page->setLaunchParams(args.c_str());
-
-    app->setWasContainerApp(true);
-
-    QString launchDetail(args.c_str());
-    app->configureWindow(winType);
-    page->updatePageSettings();
-    page->reloadExtensionData();
-
-    //repost web process status to QoSM
-    postWebProcessCreated(appId.c_str(), getWebProcessId(appId.c_str()));
-
-    QString eventJS = QStringLiteral(
-        "setTimeout(function () {"
-        "    var launchEvent=new CustomEvent('webOSContainer', { detail: %1 });"
-        "    launchEvent.containerName='%2';"
-        "    launchEvent.containerDirectory='%3';"
-        "    launchEvent.containerStyle='%4';"
-        "    launchEvent.containerScript='%5';"
-        "    document.dispatchEvent(launchEvent);"
-        "}, 1);"
-    );
-
-    page->evaluateJavaScript(eventJS
-        .arg(launchDetail.size() ? launchDetail.replace(QChar('\''), QString("\\'")) : "{}")
-        .arg(QString::fromStdString(appDesc->title()).replace(QChar('\''), QString("\\'")))
-        .arg(QString::fromStdString(appDesc->folderPath()).replace(QChar('\''), QString("\\'")))
-        .arg(QString::fromStdString(appDesc->containerCSS()).replace(QChar('\''), QString("\\'")))
-        .arg(QString::fromStdString(appDesc->containerJS()).replace(QChar('\''), QString("\\'")))
-    );
-
-    if (!appDesc->enyoBundleVersion().empty()) {
-        page->evaluateJavaScript(QStringLiteral(
-            "if (container.setVersion != null) {"
-            "    container.setVersion('%1');"
-            "}"
-        ).arg(QString::fromStdString(appDesc->enyoBundleVersion())));
-    }
-
-    webPageAdded(page);
-
-    PMTRACE("APP_ATTACHED_TO_CONTAINER");
-    LOG_INFO_WITH_CLOCK(MSGID_APP_ATTACHED_TO_CONTAINER, 4,
-            PMLOGKS("PerfType", "AppLaunch"), PMLOGKS("PerfGroup", qPrintable(page->appId())),
-            PMLOGKS("APP_ID", qPrintable(page->appId())), PMLOGKFV("PID", "%d", page->getWebProcessPID()), "");
-
-    m_containerAppManager->resetContainerAppManager();
-
-    if (m_appVersion.find(appId) != m_appVersion.end()) {
-        if (m_appVersion[appId] != appDesc->version()) {
-            app->setNeedReload(true);
-            m_appVersion[appId] = appDesc->version();
-        }
-    }
-    else {
-        m_appVersion[appId] = appDesc->version();
-    }
-}
-
 void WebAppManager::onRelaunchApp(const std::string& instanceId, const std::string& appId, const std::string& args, const std::string& launchingAppId)
 {
     WebAppBase* app = findAppById(QString::fromStdString(appId));
@@ -280,20 +173,6 @@ void WebAppManager::onRelaunchApp(const std::string& instanceId, const std::stri
     } else {
         LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(app->appId())), PMLOGKFV("PID", "%d", app->page()->getWebProcessPID()), "Relaunch with preload option, ignore");
     }
-}
-
-std::string WebAppManager::onLaunchContainerApp(const std::string& appDesc)
-{
-    int errorCode = 0;
-    std::string instanceId = generateInstanceId();
-
-    WebAppBase* containerApp = m_containerAppManager->launchContainerApp(appDesc, instanceId, errorCode);
-    if (containerApp) {
-        webPageAdded(containerApp->page());
-        return instanceId;
-    }
-
-    return "";
 }
 
 bool WebAppManager::purgeSurfacePool(uint32_t pid)
@@ -397,13 +276,6 @@ WebAppBase* WebAppManager::onLaunchUrl(const std::string& url, QString winType,
     //set use launching time optimization true while app loading.
     page->setUseLaunchOptimization(true);
 
-    // Set system app optimization - currently turning off inline caching
-    // this include the case that container based app is launched
-    // not by using container app.
-    if (m_webAppManagerConfig->isUseSystemAppOptimization() && isContainerUsedApp(appDesc.get())) {
-      page->setUseSystemAppOptimization(true);
-    }
-
     if (winType == WT_FLOATING || winType == WT_CARD)
       page->setEnableBackgroundRun(appDesc->isEnableBackgroundRun());
 
@@ -432,13 +304,6 @@ WebAppBase* WebAppManager::onLaunchUrl(const std::string& url, QString winType,
     }
 
     LOG_INFO(MSGID_START_LAUNCHURL, 2, PMLOGKS("APP_ID", qPrintable(app->appId())), PMLOGKFV("PID", "%d", app->page()->getWebProcessPID()), "");
-
-#ifndef PRELOADMANAGER_ENABLED
-    if (m_containerAppManager && m_containerAppManager->getLaunchContainerAppOnDemand() && getContainerAppProxyID() == m_webProcessManager->getWebProcessProxyID(appDesc.get())) {
-        m_containerAppManager->setLaunchContainerAppOnDemand(false);
-        m_containerAppManager->startContainerTimer();
-    }
-#endif
 
     return app;
 }
@@ -493,9 +358,7 @@ void WebAppManager::closeAppInternal(WebAppBase* app, bool ignoreCleanResource)
     else {
         m_closingAppList.insert(app->appId(), app);
 
-        if (app == getContainerApp())
-            m_containerAppManager->closeContainerApp();
-        else if (page->isRegisteredCloseCallback()) {
+        if (page->isRegisteredCloseCallback()) {
             LOG_INFO(MSGID_CLOSE_APP_INTERNAL, 2, PMLOGKS("APP_ID", qPrintable(app->appId())), PMLOGKFV("PID", "%d", app->page()->getWebProcessPID()), "CloseCallback; execute");
             app->executeCloseCallback();
         }
@@ -527,22 +390,7 @@ bool WebAppManager::closeAllApps(uint32_t pid)
         it = runningApps.erase(it);
     }
 
-    if (m_containerAppManager) {
-        WebAppBase *app = m_containerAppManager->getContainerApp();
-        if (!pid || (app && m_webProcessManager->getWebProcessPID(app) == pid))
-            m_containerAppManager->closeContainerApp();
-    }
-
     return runningApps.empty();
-}
-
-bool WebAppManager::closeContainerApp()
-{
-    if (!m_containerAppManager)
-        return false;
-    m_containerAppManager->closeContainerApp();
-    postRunningAppList();
-    return true;
 }
 
 void WebAppManager::webPageAdded(WebPageBase* page)
@@ -643,25 +491,9 @@ void WebAppManager::broadcastWebAppMessage(WebAppMessageType type, const QString
         WebAppBase* app = (*it);
         app->handleWebAppMessage(type, message);
     }
-#ifndef PRELOADMANAGER_ENABLED
-    if (m_containerAppManager && m_containerAppManager->getContainerApp()) {
-        WebAppBase* container = m_containerAppManager->getContainerApp();
-        container->handleWebAppMessage(type, message);
-    }
-#endif
 }
 
 bool WebAppManager::processCrashed(QString appId) {
-    if (m_containerAppManager && (appId == m_containerAppManager->getContainerAppId())) {
-        m_containerAppManager->setContainerAppReady(false);
-#ifndef PRELOADMANAGER_ENABLED
-        m_containerAppManager->startContainerTimer();
-#else
-        closeContainerApp();
-#endif
-        return true;
-    }
-
     WebAppBase* app = findAppById(appId);
     if (!app)
         return false;
@@ -727,24 +559,6 @@ void WebAppManager::requestKillWebProcess(uint32_t pid)
     // Deprecated (2016-0401)
 }
 
-bool WebAppManager::shouldLaunchContainerAppOnDemand()
-{
-    if (m_containerAppManager)
-        return  m_containerAppManager->getLaunchContainerAppOnDemand();
-
-    return false;
-}
-
-uint32_t WebAppManager::getContainerAppProxyID()
-{
-    if (!m_containerAppManager || m_containerAppManager->getContainerAppDescription().empty())
-        return 0;
-
-    auto containerDesc(ApplicationDescription::fromJsonString(m_containerAppManager->getContainerAppDescription().c_str()));
-    uint32_t proxyID = m_webProcessManager->getWebProcessProxyID(containerDesc.get());
-    return proxyID;
-}
-
 void WebAppManager::deleteStorageData(const QString& identifier)
 {
     m_webProcessManager->deleteStorageData(identifierForSecurityOrigin(identifier));
@@ -784,34 +598,11 @@ std::string WebAppManager::launch(const std::string& appDescString, const std::s
     if (!jsonObject.value("displayAffinity").isUndefined())
       desc->setDisplayAffinity(jsonObject.value("displayAffinity").toInt());
 
-    // Check if app is container itself, it shouldn't be relaunched like normal app
-    if (isContainerApp(url)) {
-        if (!isRunningApp(desc->id(), instanceId))
-            instanceId = onLaunchContainerApp(appDescString);
-        else {
-            LOG_INFO(MSGID_CONTAINER_APP_RELAUNCHED, 2, PMLOGKS("APP_ID", qPrintable(QString::fromStdString(desc->id()))),
-                  PMLOGKS("INSTANCE_ID", qPrintable(QString::fromStdString(instanceId))), "ContainerApp; Already Running");
-        }
-    }
     // Check if app is already running
-    else if (isRunningApp(desc->id(), instanceId)) {
+    if (isRunningApp(desc->id(), instanceId)) {
         onRelaunchApp(instanceId, desc->id().c_str(), params.c_str(), launchingAppId.c_str());
-    }
-    // Check if app is container-based
-    else if (isContainerBasedApp(desc.get())) {
-        if (desc->trustLevel() != "default" && desc->trustLevel() != "trusted") {
-            errCode = ERR_CODE_LAUNCHAPP_INVALID_TRUSTLEVEL;
-            errMsg = err_invalidTrustLevel;
-            return std::string();
-        }
-        instanceId = m_containerAppManager->getContainerApp()->instanceId().toStdString();
-        onLaunchContainerBasedApp(url.c_str(),
-            winType,
-            desc,
-            params.c_str(), launchingAppId.c_str());
-    }
-    // Run as a normal app
-    else {
+    } else {
+         // Run as a normal app
         instanceId = generateInstanceId();
         if (!onLaunchUrl(url, winType, desc, instanceId, params, launchingAppId, errCode, errMsg)) {
             return std::string();
@@ -819,17 +610,6 @@ std::string WebAppManager::launch(const std::string& appDescString, const std::s
     }
 
     return instanceId;
-}
-
-bool WebAppManager::isContainerApp(const std::string& url)
-{
-    if (!m_containerAppManager)
-        return false;
-
-    if (url.find((m_containerAppManager->getContainerAppId()).toStdString()) != std::string::npos)
-        return true;
-
-    return false;
 }
 
 bool WebAppManager::isRunningApp(const std::string& id, std::string& instanceId) {
@@ -842,40 +622,7 @@ bool WebAppManager::isRunningApp(const std::string& id, std::string& instanceId)
             return true;
         }
     }
-
-    if (m_containerAppManager) {
-        WebAppBase* container = m_containerAppManager->getContainerApp();
-        if (container && m_containerAppManager->getContainerAppId() == appIdToFind) {
-            instanceId = container->instanceId().toStdString();
-            return true;
-        }
-    }
-
     return false;
-}
-
-bool WebAppManager::isContainerBasedApp(ApplicationDescription* containerBasedAppDesc) {
-    if (!m_containerAppManager || !m_containerAppManager->isContainerAppReady())
-        return false;
-
-    if (containerBasedAppDesc->containerJS().size() == 0)
-        return false;
-
-    ApplicationDescription* containerAppDesc = m_containerAppManager->getContainerApp()->getAppDescription();
-
-    // check the enyo bundle version
-    if (!containerBasedAppDesc->enyoBundleVersion().empty()) {
-        QString enyoBundleVersion = QString::fromStdString(containerBasedAppDesc->enyoBundleVersion());
-        return containerAppDesc->supportedEnyoBundleVersions().contains(enyoBundleVersion);
-    }
-
-    // check the enyo version
-    return containerAppDesc->enyoVersion().compare(containerBasedAppDesc->enyoVersion()) == 0;
-}
-
-bool WebAppManager::isContainerUsedApp(const ApplicationDescription* containerUsedAppDesc) {
-    return containerUsedAppDesc->containerJS().size()? true : false;
-
 }
 
 std::vector<ApplicationInfo> WebAppManager::list( bool includeSystemApps )
@@ -899,81 +646,10 @@ QJsonObject WebAppManager::getWebProcessProfiling()
     return m_webProcessManager->getWebProcessProfiling();
 }
 
-#ifndef PRELOADMANAGER_ENABLED
-void WebAppManager::sendLaunchContainerApp()
-{
-    if (!m_containerAppManager)
-        return;
-
-    QString appId = getContainerAppId();
-
-    if (m_serviceSender)
-        m_serviceSender->launchContainerApp(appId);
-}
-
-void WebAppManager::startContainerTimer()
-{
-    if (m_containerAppManager)
-        m_containerAppManager->startContainerTimer();
-}
-
-void WebAppManager::restartContainerApp()
-{
-    if (m_containerAppManager)
-        m_containerAppManager->restartContainerApp();
-}
-#else
-void WebAppManager::insertAppIntoList(WebAppBase* app)
-{
-    m_appList.push_back(app);
-}
-
-void WebAppManager::deleteAppIntoList(WebAppBase* app)
-{
-    m_appList.remove(app);
-}
-#endif
-
 void WebAppManager::closeApp(const std::string& appId)
 {
     if (m_serviceSender)
         m_serviceSender->closeApp(appId);
-}
-
-void WebAppManager::reloadContainerApp()
-{
-    if (m_containerAppManager)
-        m_containerAppManager->reloadContainerApp();
-}
-
-QString& WebAppManager::getContainerAppId()
-{
-    static QString nullStr = "";
-
-    if (m_containerAppManager)
-        return m_containerAppManager->getContainerAppId();
-
-    return nullStr;
-}
-
-WebAppBase* WebAppManager::getContainerApp()
-{
-    if (m_containerAppManager)
-        return m_containerAppManager->getContainerApp();
-
-    return 0;
-}
-
-void WebAppManager::setContainerAppReady(bool ready)
-{
-    if (m_containerAppManager)
-        m_containerAppManager->setContainerAppReady(ready);
-}
-
-void WebAppManager::setContainerAppLaunched(bool launched)
-{
-    if (m_containerAppManager)
-        m_containerAppManager->setContainerAppLaunched(launched);
 }
 
 void WebAppManager::postRunningAppList()

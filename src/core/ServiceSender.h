@@ -23,9 +23,6 @@
 class ServiceSender {
 public:
     virtual ~ServiceSender() {}
-#ifndef PRELOADMANAGER_ENABLED
-    virtual void launchContainerApp(const QString& id) = 0;
-#endif
     virtual void postlistRunningApps(std::vector<ApplicationInfo>& apps) = 0;
     virtual void postWebProcessCreated(const QString& appId, uint32_t pid) = 0;
     virtual void serviceCall(const QString& url, const QString& payload, const QString& appId) = 0;

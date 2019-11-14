@@ -53,8 +53,6 @@ QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, con
         return getDeviceInfo("CountryGroup");
     } else if (message == "stageReady") {
         stageReady();
-    } else if (message == "containerReady") {
-        setContainerAppReady(m_app->appId());
     } else if (message == "activate") {
         LOG_INFO(MSGID_PALMSYSTEM, 2, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.activate()");
         activate();

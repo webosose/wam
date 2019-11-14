@@ -18,7 +18,6 @@
 
 #include "PlatformModuleFactoryImpl.h"
 #include "ServiceSenderLuna.h"
-#include "ContainerAppManager.h"
 #include "DeviceInfoImpl.h"
 #include "WebAppManagerConfig.h"
 #include "BlinkWebProcessManager.h"
@@ -38,16 +37,6 @@ std::unique_ptr<WebProcessManager> PlatformModuleFactoryImpl::createWebProcessMa
     return std::unique_ptr<BlinkWebProcessManager>(new BlinkWebProcessManager());
 }
 
-std::unique_ptr<ContainerAppManager> PlatformModuleFactoryImpl::createContainerAppManager()
-{
-    if(useContainerApp()) {
-        return std::unique_ptr<ContainerAppManager>(new ContainerAppManager());
-    }
-
-    return nullptr;
-
-}
-
 std::unique_ptr<DeviceInfo> PlatformModuleFactoryImpl::createDeviceInfo()
 {
     return std::unique_ptr<DeviceInfoImpl>(new DeviceInfoImpl());
@@ -56,14 +45,6 @@ std::unique_ptr<DeviceInfo> PlatformModuleFactoryImpl::createDeviceInfo()
 std::unique_ptr<WebAppManagerConfig> PlatformModuleFactoryImpl::createWebAppManagerConfig()
 {
     return std::unique_ptr<WebAppManagerConfig>(new WebAppManagerConfig());
-}
-
-bool PlatformModuleFactoryImpl::useContainerApp()
-{
-    if (qgetenv("DISABLE_CONTAINER") == "1")
-        return false;
-
-    return true;
 }
 
 void PlatformModuleFactoryImpl::prepareRenderingContext()

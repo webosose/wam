@@ -239,11 +239,6 @@ bool WebPageBlink::hasBeenShown() const
     return m_hasBeenShown;
 }
 
-void WebPageBlink::replaceBaseUrl(QUrl newUrl)
-{
-    d->pageView->ReplaceBaseURL(newUrl.toString().toStdString(), url().toString().toStdString());
-}
-
 QUrl WebPageBlink::url() const
 {
     return QUrl(d->pageView->GetUrl().c_str());
@@ -589,32 +584,6 @@ void WebPageBlink::updateExtensionData(const QString& key, const QString& value)
     evaluateJavaScript(eventJS);
 }
 
-void WebPageBlink::updatePageSettings()
-{
-    // When a container based app is launched
-    // if there any properties different from container app then should update
-    // ex, application description info
-    if(!m_appDesc)
-        return;
-
-    if(QString::fromStdString(m_appDesc->trustLevel()) == "trusted") {
-        LOG_DEBUG("[%s] trustLevel : trusted; allow load local Resources", qPrintable(appId()));
-        d->pageView->SetAllowLocalResourceLoad(true);
-    }
-
-    LOG_DEBUG("[%s] WebPageBlink::updatePageSettings(); update appId to chromium", qPrintable(appId()));
-    d->pageView->SetAppId(appId().toStdString());
-    d->pageView->SetTrustLevel(m_appDesc->trustLevel());
-    d->pageView->SetAppPath(m_appDesc->folderPath());
-
-    if (!std::isnan(m_appDesc->networkStableTimeout()) && (m_appDesc->networkStableTimeout() >= 0.0))
-        d->pageView->SetNetworkStableTimeout(m_appDesc->networkStableTimeout());
-
-    setCustomPluginIfNeeded();
-    updateBackHistoryAPIDisabled();
-    d->pageView->UpdatePreferences();
-}
-
 void WebPageBlink::handleDeviceInfoChanged(const QString& deviceInfo)
 {
     if (!d->m_palmSystem)
@@ -802,7 +771,7 @@ void WebPageBlink::recreateWebView()
         // Remove white screen while reloading contents due to the renderer crash
         // 1. Reset state to mark next paint for notification when FMP done.
         //    It will be used to make webview visible later.
-        d->pageView->ResetStateToMarkNextPaintForContainer();
+        d->pageView->ResetStateToMarkNextPaint();
         // 2. While rendering ready, set webview hidden.
         d->pageView->SetVisible(false);
         // 3. Set VisibilityState as Launching
@@ -1237,11 +1206,6 @@ void WebPageBlink::setAudioGuidanceOn(bool on)
 {
     d->pageView->SetAudioGuidanceOn(on);
     d->pageView->UpdatePreferences();
-}
-
-void WebPageBlink::resetStateToMarkNextPaintForContainer()
-{
-    d->pageView->ResetStateToMarkNextPaintForContainer();
 }
 
 void WebPageBlink::updateBackHistoryAPIDisabled()

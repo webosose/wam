@@ -20,7 +20,6 @@ include(common.pri)
 
 SOURCES += \
         ApplicationDescription.cpp \
-        ContainerAppManager.cpp \
         DeviceInfo.cpp \
         LogManager.cpp \
         LogManagerPmLog.cpp \
@@ -41,7 +40,6 @@ SOURCES += \
 
 HEADERS += \
         ApplicationDescription.h \
-        ContainerAppManager.h \
         DeviceInfo.h \
         LogManager.h \
         LogManagerPmLog.h \

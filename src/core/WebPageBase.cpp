@@ -83,10 +83,7 @@ void WebPageBase::setApplicationDescription(std::shared_ptr<ApplicationDescripti
 
 QString WebPageBase::getIdentifier() const
 {
-    // If appId is ContainerAppId then it should be ""? Why not just container appid?
-    // I think there shouldn't be any chance to be returned container appid even for container base app
-
-    if(appId().isEmpty() || appId() == WebAppManager::instance()->getContainerAppId())
+    if(appId().isEmpty())
         return QStringLiteral("");
     return m_appId;
 }
@@ -256,8 +253,6 @@ void WebPageBase::handleLoadFinished()
         PMLOGKFV("PID", "%d", getWebProcessPID()),
         "WebPageBase::handleLoadFinished; m_suspendAtLoad : %s",
             m_suspendAtLoad ? "true; suspend in this time" : "false");
-    if (appId() == WebAppManager::instance()->getContainerAppId())
-        WebAppManager::instance()->setContainerAppLaunched(true);
 
     Q_EMIT webPageLoadFinished();
 

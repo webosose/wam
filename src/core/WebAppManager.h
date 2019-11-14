@@ -30,7 +30,6 @@
 #include "webos/webview_base.h"
 
 class ApplicationDescription;
-class ContainerAppManager;
 class DeviceInfo;
 class NetworkStatusManager;
 class PlatformModuleFactory;
@@ -89,19 +88,6 @@ public:
     std::vector<ApplicationInfo> list(bool includeSystemApps = false);
 
     QJsonObject getWebProcessProfiling();
-#ifndef PRELOADMANAGER_ENABLED
-    void sendLaunchContainerApp();
-    void startContainerTimer();
-    void restartContainerApp();
-#else
-    void insertAppIntoList(WebAppBase* app);
-    void deleteAppIntoList(WebAppBase* app);
-#endif
-    void reloadContainerApp();
-    void setContainerAppReady(bool ready);
-    void setContainerAppLaunched(bool launched);
-    QString& getContainerAppId();
-    WebAppBase* getContainerApp();
     int currentUiWidth();
     int currentUiHeight();
     void setUiSize(int width, int height);
@@ -124,10 +110,8 @@ public:
     const QString windowTypeFromString(const std::string& str);
 
     bool closeAllApps(uint32_t pid = 0);
-    bool closeContainerApp();
     void setForceCloseApp(QString appId);
     void requestKillWebProcess(uint32_t pid);
-    bool shouldLaunchContainerAppOnDemand();
 
     int getSuspendDelay() { return m_suspendDelay; }
     int getMaxCustomSuspendDelay() const { return m_maxCustomSuspendDelay; }
@@ -173,9 +157,6 @@ private:
         std::shared_ptr<ApplicationDescription> appDesc, const std::string& instanceId,
         const std::string& args, const std::string& launchingAppId,
         int& errCode, std::string& errMsg);
-    void onLaunchContainerBasedApp(const std::string& url, QString& winType,
-        std::shared_ptr<ApplicationDescription> appDesc, const std::string& args, const std::string& launchingAppId);
-    std::string onLaunchContainerApp(const std::string& appDesc);
     void onRelaunchApp(const std::string& instanceId, const std::string& appId,
         const std::string& args, const std::string& launchingAppId);
 
@@ -184,11 +165,7 @@ private:
     typedef std::list<WebAppBase*> AppList;
     typedef std::list<WebPageBase*> PageList;
 
-    bool isContainerBasedApp(ApplicationDescription* containerBasedAppDesc);
-    bool isContainerUsedApp(const ApplicationDescription* containerUsedAppDesc);
     bool isRunningApp(const std::string& id, std::string& instanceId);
-    bool isContainerApp(const std::string& url);
-    uint32_t getContainerAppProxyID();
 
     QMap<QString, WebAppBase*> m_closingAppList;
 
@@ -203,7 +180,6 @@ private:
     QString m_activeAppId;
 
     std::unique_ptr<ServiceSender> m_serviceSender;
-    std::unique_ptr<ContainerAppManager> m_containerAppManager;
     std::unique_ptr<WebProcessManager> m_webProcessManager;
     std::unique_ptr<DeviceInfo> m_deviceInfo;
     std::unique_ptr<WebAppManagerConfig> m_webAppManagerConfig;

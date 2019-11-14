@@ -63,7 +63,6 @@ WebAppBase::WebAppBase()
     , m_needReload(false)
     , m_crashed(false)
     , m_hiddenWindow(false)
-    , m_wasContainerApp(false)
     , m_closePageRequested(false)
 {
 }
@@ -93,16 +92,6 @@ void WebAppBase::setHiddenWindow(bool hidden)
 bool WebAppBase::getHiddenWindow()
 {
     return m_hiddenWindow;
-}
-
-void WebAppBase::setWasContainerApp(bool contained)
-{
-    m_wasContainerApp = contained;
-}
-
-bool WebAppBase::wasContainerApp() const
-{
-    return m_wasContainerApp;
 }
 
 void WebAppBase::setKeepAlive(bool keepAlive)
@@ -332,11 +321,6 @@ void WebAppBase::stageReady()
 
 void WebAppBase::showWindow()
 {
-#ifndef PRELOADMANAGER_ENABLED
-    if (m_wasContainerApp)
-        WebAppManager::instance()->startContainerTimer();
-#endif
-
     // Set the accessibility after the application launched
     // because the chromium can generate huge amount of AXEvent during app loading.
     setUseAccessibility(WebAppManager::instance()->isAccessibilityEnabled());
@@ -508,12 +492,7 @@ void WebAppBase::closeWebAppSlot()
 {
     LOG_INFO(MSGID_CLEANRESOURCE_COMPLETED, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "closeCallback/about:blank is DONE");
     WebAppManager::instance()->removeClosingAppList(appId());
-#ifdef PRELOADMANAGER_ENABLED
-    if (appId() == WebAppManager::instance()->getContainerAppId())
-        WebAppManager::instance()->closeContainerApp();
-    else
-#endif
-        delete this;
+    delete this;
 }
 
 void WebAppBase::dispatchUnload()

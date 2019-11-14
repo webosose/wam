@@ -52,15 +52,6 @@ QJsonObject BlinkWebProcessManager::getWebProcessProfiling()
         runningAppList.insertMulti(pid, app->appId());
     }
 
-    WebAppBase* containerApp = getContainerApp();
-    if (containerApp) {
-        pid = getWebProcessPID(containerApp);
-        if (!processIdList.contains(pid))
-            processIdList.append(pid);
-
-        runningAppList.insertMulti(pid, containerApp->appId());
-    }
-
     for (int id = 0; id < processIdList.size(); id++) {
         QJsonObject appObject;
         QJsonArray appArray;
@@ -89,12 +80,6 @@ void BlinkWebProcessManager::deleteStorageData(const QString& identifier)
     std::list<const WebAppBase*> runningAppList = runningApps();
     if (!runningAppList.empty()) {
         runningAppList.front()->page()->deleteWebStorages(identifier);
-        return;
-    }
-
-    WebAppBase* containerApp = getContainerApp();
-    if (containerApp) {
-        containerApp->page()->deleteWebStorages(identifier);
         return;
     }
 

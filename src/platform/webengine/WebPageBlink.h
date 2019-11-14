@@ -51,7 +51,6 @@ public:
     void setLaunchParams(const QString& params) override;
     void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level) override;
     QUrl url() const override;
-    void replaceBaseUrl(QUrl newUrl) override;
     void loadUrl(const std::string& url) override;
     int progress() const override;
     bool hasBeenShown() const override;
@@ -67,7 +66,6 @@ public:
     void closeVkb() override;
     bool isInputMethodActive() const override;
     void keyboardVisibilityChanged(bool visible) override;
-    void updatePageSettings() override;
     void handleDeviceInfoChanged(const QString& deviceInfo) override;
     void evaluateJavaScript(const QString& jsCode) override;
     void evaluateJavaScriptInAllFrames(const QString& jsCode, const char* method = "") override;
@@ -150,7 +148,6 @@ public:
     void timeoutCloseCallback();
 
     void setAudioGuidanceOn(bool on) override;
-    void resetStateToMarkNextPaintForContainer() override;
     void updateBackHistoryAPIDisabled();
 
 Q_SIGNALS:

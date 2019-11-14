@@ -52,11 +52,6 @@ WebAppBase* WebProcessManager::findAppById(const QString& appId)
     return WebAppManager::instance()->findAppById(appId);
 }
 
-WebAppBase* WebProcessManager::getContainerApp()
-{
-    return WebAppManager::instance()->getContainerApp();
-}
-
 bool WebProcessManager::webProcessInfoMapReady()
 {
     uint32_t count = 0;

@@ -154,8 +154,6 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     appDesc->m_handlesRelaunch = jsonObj["handlesRelaunch"].toBool();
     appDesc->m_defaultWindowType = jsonObj["defaultWindowType"].toString().toStdString();
     appDesc->m_inspectable = jsonObj["inspectable"].toBool();
-    appDesc->m_containerJS = jsonObj["containerJS"].toString().toStdString();
-    appDesc->m_containerCSS = jsonObj["containerCSS"].toString().toStdString();
     appDesc->m_enyoBundleVersion = jsonObj["enyoBundleVersion"].toString().toStdString();
     appDesc->m_enyoVersion = jsonObj["enyoVersion"].toString().toStdString();
     appDesc->m_version = jsonObj["version"].toString().toStdString();

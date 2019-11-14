@@ -32,6 +32,5 @@ protected:
     virtual QString locale() const;
     virtual QString localeRegion() const;
     virtual QString phoneRegion() const;
-    virtual void setContainerAppReady(const QString& appId);
 };
 #endif

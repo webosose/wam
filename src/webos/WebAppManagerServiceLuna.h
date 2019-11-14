@@ -48,12 +48,6 @@ public:
     // PlamServiceBase
     void didConnect() override;
 
-#ifndef PRELOADMANAGER_ENABLED
-    //callback methods that return from the bus
-    void launchContainerApp(const QString& id);
-    void launchContainerAppCallback(QJsonObject reply);
-#endif
-
     // WebAppManagerServiceLuna
     virtual void systemServiceConnectCallback(QJsonObject reply);
 
@@ -61,7 +55,6 @@ public:
 
     void memoryManagerConnectCallback(QJsonObject reply);
     void getCloseAppIdCallback(QJsonObject reply);
-    void clearContainersCallback(QJsonObject reply);
     void thresholdChangedCallback(QJsonObject reply);
 
     void applicationManagerConnectCallback(QJsonObject reply);

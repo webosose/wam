@@ -21,7 +21,6 @@
 
 class ServiceSender;
 class WebProcessManager;
-class ContainerAppManager;
 class DeviceInfo;
 class WebAppManagerConfig;
 
@@ -32,12 +31,10 @@ public:
 protected:
     virtual std::unique_ptr<ServiceSender> createServiceSender();
     virtual std::unique_ptr<WebProcessManager> createWebProcessManager();
-    virtual std::unique_ptr<ContainerAppManager> createContainerAppManager();
     virtual std::unique_ptr<DeviceInfo> createDeviceInfo();
     virtual std::unique_ptr<WebAppManagerConfig> createWebAppManagerConfig();
 
 private:
-    bool useContainerApp();
     void prepareRenderingContext();
 };
 

@@ -21,7 +21,6 @@
 
 #include "ServiceSender.h"
 #include "WebProcessManager.h"
-#include "ContainerAppManager.h"
 #include "DeviceInfo.h"
 #include "WebAppManagerConfig.h"
 
@@ -29,14 +28,12 @@ class PlatformModuleFactory {
 public:
     std::unique_ptr<ServiceSender> getServiceSender() { return createServiceSender(); }
     std::unique_ptr<WebProcessManager> getWebProcessManager() { return createWebProcessManager(); }
-    std::unique_ptr<ContainerAppManager> getContainerAppManager() { return createContainerAppManager(); }
     std::unique_ptr<DeviceInfo> getDeviceInfo() { return createDeviceInfo(); }
     std::unique_ptr<WebAppManagerConfig> getWebAppManagerConfig() { return createWebAppManagerConfig(); }
 
 protected:
     virtual std::unique_ptr<ServiceSender> createServiceSender() = 0;
     virtual std::unique_ptr<WebProcessManager> createWebProcessManager() = 0;
-    virtual std::unique_ptr<ContainerAppManager> createContainerAppManager() = 0;
     virtual std::unique_ptr<DeviceInfo> createDeviceInfo() = 0;
     virtual std::unique_ptr<WebAppManagerConfig> createWebAppManagerConfig() = 0;
 };

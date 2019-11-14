@@ -66,7 +66,6 @@ public:
     virtual QUrl url() const = 0; /* return current url */
     virtual QUrl defaultUrl() const { return m_defaultUrl; } /* return default url */
     virtual void setDefaultUrl(QUrl url) { m_defaultUrl = url; } /* just set default url */
-    virtual void replaceBaseUrl(QUrl newUrl) = 0;
     virtual void loadUrl(const std::string& url) = 0;
     virtual int progress() const = 0;
     virtual bool hasBeenShown() const = 0;
@@ -83,7 +82,6 @@ public:
     virtual bool canGoBack() = 0;
     virtual void closeVkb() = 0;
     virtual void keyboardVisibilityChanged(bool visible) {}
-    virtual void updatePageSettings() = 0;
     virtual void handleDeviceInfoChanged(const QString& deviceInfo) = 0;
     virtual bool relaunch(const QString& args, const QString& launchingAppId);
     virtual void evaluateJavaScript(const QString& jsCode) = 0;
@@ -116,7 +114,6 @@ public:
     virtual void setCustomUserScript();
     virtual void forwardEvent(void* event) = 0;
     virtual void setAudioGuidanceOn(bool on) {}
-    virtual void resetStateToMarkNextPaintForContainer() {}
     virtual bool isInputMethodActive() const { return false; }
 
     QString launchParams() const;

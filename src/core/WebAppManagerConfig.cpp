@@ -23,7 +23,6 @@ WebAppManagerConfig::WebAppManagerConfig()
     , m_maxCustomSuspendDelayTime(0)
     , m_devModeEnabled(false)
     , m_inspectorEnabled(false)
-    , m_containerAppEnabled(true)
     , m_dynamicPluggableLoadEnabled(false)
     , m_postWebProcessCreatedDisabled(false)
     , m_checkLaunchTimeEnabled(false)
@@ -53,9 +52,6 @@ void WebAppManagerConfig::initConfiguration()
         m_webProcessConfigPath = QLatin1String("/etc/wam/com.webos.wam.json");
 
     m_errorPageUrl = QLatin1String(qgetenv("WAM_ERROR_PAGE"));
-
-    if (qgetenv("DISABLE_CONTAINER") == "1")
-        m_containerAppEnabled = false;
 
     if (qgetenv("LOAD_DYNAMIC_PLUGGABLE") == "1")
         m_dynamicPluggableLoadEnabled = true;

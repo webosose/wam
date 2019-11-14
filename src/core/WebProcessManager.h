@@ -54,7 +54,6 @@ protected:
     std::list<const WebAppBase*> runningApps();
     std::list<const WebAppBase*> runningApps(uint32_t pid);
     WebAppBase* findAppById(const QString& appId);
-    WebAppBase* getContainerApp();
 
 protected:
     class WebProcessInfo {

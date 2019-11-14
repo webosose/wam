@@ -84,16 +84,6 @@ public:
         return m_defaultWindowType;
     }
 
-    const std::string& containerJS() const
-    {
-        return m_containerJS;
-    }
-
-    const std::string& containerCSS() const
-    {
-        return m_containerCSS;
-    }
-
     const std::string& enyoBundleVersion() const
     {
         return m_enyoBundleVersion;
@@ -214,8 +204,6 @@ private:
     bool m_handlesRelaunch;
     std::string m_folderPath;
     std::string m_defaultWindowType;
-    std::string m_containerJS;
-    std::string m_containerCSS;
     std::string m_enyoBundleVersion;
     QStringList m_supportedEnyoBundleVersions;
     std::string m_enyoVersion;

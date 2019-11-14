@@ -95,14 +95,9 @@
 #define MSGID_NETWORK_CONNECT_FAIL      "NETWORK_CONNECT_FAIL" /* Failed to connect to connection manager */
 #define MSGID_INVALID_EVENT             "INVALID_EVENT" /* Received QEvents for a window with no app */
 #define MSGID_BOOTD_SUBSCRIBE_FAIL      "BOOTD_SUBSCRIBE_FAIL" /* Failed to subscribe to bootd */
-#define MSGID_CONTAINER_LAUNCH_FAIL     "CONTAINER_LAUNCH_FAIL" /* Failed to call applicationManager to launch container */
 #define MSGID_ACTIVITY_MANAGER_CREATE_FAIL "ACTIVITY_MANAGER_CREATE_FAIL" /* Failed to call activitymanager create */
 #define MSGID_WAM_INVALID_USER_PERMISSION  "WAM_INVALID_USER_PERMISSION" /* Failed to set valid User Privileges for webappmanager */
 
-#define MSGID_APP_ATTACHED_TO_CONTAINER "APP_ATTACHED_TO_CONTAINER" /** Container-based app attached to container app */
-#define MSGID_CONTAINER_APP_LAUNCHED    "CONTAINER_APP_LAUNCHED" /** Container app launched at boot time */
-#define MSGID_CONTAINER_APP_RELAUNCHED  "CONTAINER_APP_RELAUNCHED" /** Container app relaunched after container-based app is launched */
-#define MSGID_CONTAINER_APP_STATUS_CHANGED  "CONTAINER_APP_STATUS_CHANGED" /** containerApp status changed */
 #define MSGID_KILL_WEBPROCESS_DELAYED       "KILL_WEBPROCESS_DELAYED" /** Kill WebProcess when MM requests delayed until app is closed completely */
 #define MSGID_APPID_HAS_UPPERCASE       "APPID_HAS_UPPERCASE" /** the application id has uppercase letters */
 

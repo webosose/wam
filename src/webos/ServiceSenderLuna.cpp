@@ -23,13 +23,6 @@
 #include <QString>
 #include <QJsonArray>
 
-#ifndef PRELOADMANAGER_ENABLED
-void ServiceSenderLuna::launchContainerApp(const QString& id)
-{
-    WebAppManagerServiceLuna::instance()->launchContainerApp(id);
-}
-#endif
-
 void ServiceSenderLuna::postlistRunningApps(std::vector<ApplicationInfo> &apps)
 {
     QJsonObject reply;
