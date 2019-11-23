@@ -27,7 +27,7 @@ enum ErrorCode {
     ERR_CODE_LAUNCHAPP_MISS_PARAM = 1000,
     ERR_CODE_LAUNCHAPP_UNSUPPORTED_TYPE = 1001,
     ERR_CODE_LAUNCHAPP_INVALID_TRUSTLEVEL = 1002,
-    ERR_CODE_NO_RUNNING_APP = 2000,
+    ERR_CODE_KILLAPP_NO_APP = 2000,
     ERR_CODE_CLEAR_DATA_BRAWSING_EMPTY_ARRAY = 3000,
     ERR_CODE_CLEAR_DATA_BRAWSING_INVALID_VALUE = 3001,
     ERR_CODE_CLEAR_DATA_BRAWSING_UNKNOWN_DATA = 3002
@@ -54,7 +54,6 @@ public:
     // methods published to the bus
     virtual QJsonObject launchApp(QJsonObject request) = 0;
     virtual QJsonObject killApp(QJsonObject request) = 0;
-    virtual QJsonObject pauseApp(QJsonObject request) = 0;
     virtual QJsonObject logControl(QJsonObject request) = 0;
     virtual QJsonObject setInspectorEnable(QJsonObject request) = 0;
     virtual QJsonObject closeAllApps(QJsonObject request) = 0;
@@ -73,7 +72,6 @@ protected:
         std::string& errMsg);
 
     bool onKillApp(const std::string& appId, bool force = false);
-    bool onPauseApp(const std::string& appId);
     QJsonObject onLogControl(const std::string& keys, const std::string& value);
     bool onCloseAllApps(uint32_t pid = 0);
     bool closeContainerApp();

@@ -42,7 +42,6 @@ public:
     QJsonObject listRunningApps(QJsonObject request, bool subscribed) override;
     QJsonObject closeByProcessId(QJsonObject request) override;
     QJsonObject getWebProcessSize(QJsonObject request) override;
-    QJsonObject pauseApp(QJsonObject request) override;
     QJsonObject clearBrowsingData(QJsonObject request) override;
     QJsonObject webProcessCreated(QJsonObject request, bool subscribed) override;
 

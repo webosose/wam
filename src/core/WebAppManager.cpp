@@ -354,21 +354,6 @@ bool WebAppManager::onKillApp(const std::string& appId, bool force)
     return true;
 }
 
-bool WebAppManager::onPauseApp(const std::string& appId)
-{
-    QString id{QString::fromStdString(appId)};
-    if (WebAppBase* app = findAppById(id)) {
-        // although, name of the handler-function as well as the code it
-        // contains are not consistent, according to the "pauseApp" Luna API
-        // design, a "paused" application shall be just hidden by WAM
-        app->hideWindow();
-        return true;
-    }
-
-    LOG_INFO(MSGID_PAUSE_APP, 1, PMLOGKS("APP_ID", qPrintable(id)), "Application not found.");
-    return false;
-}
-
 std::list<const WebAppBase*> WebAppManager::runningApps()
 {
     std::list<const WebAppBase*> apps;
@@ -481,6 +466,9 @@ void WebAppManager::closeAppInternal(WebAppBase* app, bool ignoreCleanResource)
         LOG_INFO(MSGID_CLOSE_APP_INTERNAL, 2, PMLOGKS("APP_ID", qPrintable(app->appId())), PMLOGKFV("PID", "%d", app->page()->getWebProcessPID()), "In Closing; return");
         return;
     }
+
+    if (app->keepAlive() && app->hideWindow())
+        return;
 
     LOG_INFO(MSGID_CLOSE_APP_INTERNAL, 2, PMLOGKS("APP_ID", qPrintable(app->appId())), PMLOGKFV("PID", "%d", app->page()->getWebProcessPID()), "");
 
