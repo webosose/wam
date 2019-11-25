@@ -664,7 +664,7 @@ void WebPageBlink::loadFinished(const std::string& url)
     handleLoadFinished();
 }
 
-void WebPageBlink::loadStopped(const std::string& url)
+void WebPageBlink::loadStopped()
 {
     m_loadingUrl = "";
 }

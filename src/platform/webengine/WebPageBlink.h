@@ -109,7 +109,7 @@ public:
     void didDropAllPeerConnections() override;
     void loadFinished(const std::string& url) override;
     void loadFailed(const std::string& url, int errCode, const std::string& errDesc) override;
-    void loadStopped(const std::string& url) override;
+    void loadStopped() override;
     void loadAborted(const std::string& url) override;
     void loadProgressChanged(double progress) override;
     void didStartNavigation(const std::string& url, bool isInMainFrame) override;

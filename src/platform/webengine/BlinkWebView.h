@@ -53,7 +53,7 @@ public:
     void LoadStarted() override;
     void LoadFinished(const std::string& url) override;
     void LoadFailed(const std::string& url, int errCode, const std::string& errDesc) override;
-    void LoadStopped(const std::string& url) override;
+    void LoadStopped() override;
     void DocumentLoadFinished() override;
     void DidStartNavigation(const std::string& url, bool isInMainFrame) override;
     void DidFinishNavigation(const std::string& url, bool isInMainFrame) override;

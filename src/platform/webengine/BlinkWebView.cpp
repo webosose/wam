@@ -190,12 +190,12 @@ void BlinkWebView::LoadStarted()
     m_delegate->loadStarted();
 }
 
-void BlinkWebView::LoadStopped(const std::string& url)
+void BlinkWebView::LoadStopped()
 {
     if (!m_delegate)
         return;
 
-    m_delegate->loadStopped(url);
+    m_delegate->loadStopped();
 }
 
 void BlinkWebView::DidStartNavigation(const std::string& url, bool isInMainFrame)

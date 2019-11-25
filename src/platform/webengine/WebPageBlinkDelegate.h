@@ -34,7 +34,7 @@ public:
     virtual void handleBrowserControlFunction(const QString& command, const QStringList& arguments, QString* result) = 0;
     virtual void loadFinished(const std::string& url) = 0;
     virtual void loadFailed(const std::string& url, int errCode, const std::string& errDesc) = 0;
-    virtual void loadStopped(const std::string& url) = 0;
+    virtual void loadStopped() = 0;
     virtual void loadAborted(const std::string& url) = 0;
     virtual void loadStarted() {}
     virtual void loadProgressChanged(double progress) = 0;
