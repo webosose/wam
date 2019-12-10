@@ -230,11 +230,22 @@ bool WebAppLauncherRuntime::init() {
       }
     }
 
+    bool url_misses_token = true;
     if (url_match_result.size() > 7) {
       std::string query = url_match_result[7].str();
       std::size_t n = query.find('=');
       if (n != std::string::npos) {
         m_token = query.substr(n+1);
+        url_misses_token = false;
+      }
+    }
+    if (url_misses_token) {
+      char *tokenv = getenv("CYNAGOAUTH_TOKEN");
+      if (tokenv) {
+        m_token = tokenv;
+        m_url.push_back((url_match_result.size() > 7) ? '&' : '?');
+        m_url.append("token=");
+        m_url.append(m_token);
       }
     }
 
