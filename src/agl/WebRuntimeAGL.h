@@ -2,7 +2,6 @@
 #define WEBRUNTIME_AGL_H
 
 #include <unordered_map>
-#include <memory>
 #include <signal.h>
 #include <string>
 #include <unordered_map>
@@ -41,22 +40,10 @@ public:
   std::unordered_map<pid_t, pid_t> m_pid_map; // pair of <app_pid, pid which creates a surface>
 };
 
-class TinyProxy {
- public:
-  int port() { return port_; }
-  void setPort(int port) { port_ = port; }
-
-  TinyProxy();
-private:
-  int port_;
-};
-
 class SharedBrowserProcessWebAppLauncher : public Launcher {
 public:
   int launch(const std::string& id, const std::string& uri) override;
   int loop(int argc, const char** argv, volatile sig_atomic_t& e_flag) override;
-private:
-  std::unique_ptr<TinyProxy> tiny_proxy_;
 };
 
 class SingleBrowserProcessWebAppLauncher : public Launcher {

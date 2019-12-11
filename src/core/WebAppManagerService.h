@@ -84,7 +84,6 @@ protected:
     Json::Value closeByInstanceId(const std::string& instanceId);
     int maskForBrowsingDataType(const char* type);
     void onClearBrowsingData(const int removeBrowsingDataMask);
-    void buildWebViewProfile(const std::string& app_id, const std::string& proxy_host, const std::string& proxy_port);
 
     WebAppBase* getContainerApp();
 #ifndef PRELOADMANAGER_ENABLED
