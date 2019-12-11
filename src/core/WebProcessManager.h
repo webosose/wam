@@ -50,8 +50,6 @@ public:
     virtual uint32_t getInitialWebViewProxyID() const = 0;
     virtual void clearBrowsingData(const int removeBrowsingDataMask) = 0;
     virtual int maskForBrowsingDataType(const char* type) = 0;
-    virtual void buildWebViewProfile(const std::string& app_id, const std::string& proxy_host, const std::string& proxy_port) = 0;
-    virtual void deleteWebViewProfile(const std::string& app_id) = 0;
 
 protected:
     std::list<const WebAppBase*> runningApps();

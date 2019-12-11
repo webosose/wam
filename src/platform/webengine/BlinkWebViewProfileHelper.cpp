@@ -22,11 +22,6 @@
 #include <cassert>
 #include <cstring>
 
-BlinkWebViewProfileHelper* BlinkWebViewProfileHelper::instance() {
-    static BlinkWebViewProfileHelper* sInstance = new BlinkWebViewProfileHelper();
-    return sInstance;
-}
-
 void BlinkWebViewProfileHelper::clearBrowsingData(const int removeBrowsingDataMask,
         webos::WebViewProfile *profile)
 {
@@ -71,27 +66,4 @@ int BlinkWebViewProfileHelper::maskForBrowsingDataType(const char* type) {
         return webos::WebViewProfile::REMOVE_WEBSQL;
 
     return 0;
-}
-
-webos::WebViewProfile* BlinkWebViewProfileHelper::getProfile(const std::string& app_id) {
-    if (m_appProfileMap.find(app_id) == m_appProfileMap.end())
-       return nullptr;
-    return m_appProfileMap[app_id];
-}
-
-void BlinkWebViewProfileHelper::buildProfile(const std::string& app_id, const std::string& proxy_host, const std::string& proxy_port)
-{
-    assert(m_appProfileMap.count(app_id) == 0);
-    webos::WebViewProfile* profile = new webos::WebViewProfile(app_id);
-    profile->SetProxyServer(proxy_host, proxy_port, {}, {});
-    m_appProfileMap[app_id] = profile;
-    fprintf(stderr, "BlinkWebViewProfileHelper: added WebViewProfile for app %s\n", app_id.c_str());
-}
-
-void BlinkWebViewProfileHelper::deleteProfile(const std::string& app_id)
-{
-    assert(m_appProfileMap.count(app_id) == 1);
-    delete m_appProfileMap[app_id];
-    m_appProfileMap.erase(app_id);
-    fprintf(stderr, "BlinkWebViewProfileHelper: removed WebViewProfile for app %s\n", app_id.c_str());
 }

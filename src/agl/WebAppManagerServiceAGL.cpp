@@ -238,13 +238,11 @@ void WebAppManagerServiceAGL::sendEvent(int argc, const char **argv)
 
 void WebAppManagerServiceAGL::setStartupApplication(
     const std::string& startup_app_id,
-    const std::string& startup_app_uri, int startup_app_surface_id,
-    const std::string& startup_proxy_port)
+    const std::string& startup_app_uri, int startup_app_surface_id)
 {
     startup_app_id_ = startup_app_id;
     startup_app_uri_ = startup_app_uri;
     startup_app_surface_id_ = startup_app_surface_id;
-    startup_proxy_port_ = startup_proxy_port;
 }
 
 void WebAppManagerServiceAGL::setAppIdForEventTarget(const std::string& app_id) {
@@ -396,11 +394,6 @@ void WebAppManagerServiceAGL::launchStartupAppFromURL()
     std::string params, errMsg;
 
     LOG_DEBUG("Launching with appDesc=[%s]", appDesc.c_str());
-
-    if (!startup_proxy_port_.empty()) {
-        WebAppManagerService::buildWebViewProfile(app_id, "localhost", startup_proxy_port_);
-        LOG_DEBUG("buildWebViewProfile: Done.");
-    }
 
     WebAppManagerService::onLaunch(appDesc, params, app_id, errCode, errMsg);
     LOG_DEBUG("onLaunch: Done.");

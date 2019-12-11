@@ -1,10 +1,7 @@
 #include "WebRuntimeAGL.h"
 
 #include <cassert>
-#include <netinet/in.h>
 #include <regex>
-#include <sys/types.h>
-#include <sys/socket.h>
 #include <unistd.h>
 
 #include <glib.h>
@@ -521,23 +518,3 @@ int WebRuntimeAGL::run(int argc, const char** argv) {
   return m_runtime->run(argc, argv);
 }
 
-TinyProxy::TinyProxy() {
-  // Get a free port to listen
-  int test_socket = socket(AF_INET, SOCK_STREAM, 0);
-  struct sockaddr_in test_socket_addr;
-  memset(&test_socket_addr, 0, sizeof(test_socket_addr));
-  test_socket_addr.sin_port = htons(0);
-  test_socket_addr.sin_family = AF_INET;
-  bind(test_socket, (struct sockaddr*) &test_socket_addr, sizeof(struct sockaddr_in));
-  socklen_t len = sizeof(test_socket_addr);
-  getsockname(test_socket, (struct sockaddr*) &test_socket_addr, &len);
-  int port = ntohs(test_socket_addr.sin_port);
-  close(test_socket);
-
-  setPort(port);
-
-  std::string cmd = "tinyproxy -p " + std::to_string(port);
-  int res = std::system(cmd.data());
-  if (res == -1)
-    LOG_DEBUG("Error while running %s", cmd.data());
-}
