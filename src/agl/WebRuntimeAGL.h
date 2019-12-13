@@ -88,6 +88,7 @@ private:
   std::string m_role;
   std::string m_url;
   std::string m_name;
+  std::string m_host;
 
   int m_port;
   std::string m_token;
