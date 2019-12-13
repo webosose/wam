@@ -224,9 +224,16 @@ bool WebAppLauncherRuntime::init() {
       std::size_t n = authority.find(':');
       if (n != std::string::npos) {
         std::string sport = authority.substr(n+1);
-        m_role.append("-");
+        m_host = authority.substr(0, n);
+        m_role.push_back('-');
+        m_role.append(m_host);
+        m_role.push_back('-');
         m_role.append(sport);
         m_port = stringTo<int>(sport);
+      } else {
+        m_host = authority;
+        m_role.push_back('-');
+        m_role.append(m_host);
       }
     }
 
@@ -264,9 +271,9 @@ bool WebAppLauncherRuntime::init() {
     else if (m_id.rfind("webapps-homescreen", 0) == 0)
       m_role = "homescreen";
 
-    LOG_DEBUG("id=[%s], name=[%s], role=[%s], url=[%s], port=%d, token=[%s]",
+    LOG_DEBUG("id=[%s], name=[%s], role=[%s], url=[%s], host=[%s], port=%d, token=[%s]",
             m_id.c_str(), m_name.c_str(), m_role.c_str(), m_url.c_str(),
-            m_port, m_token.c_str());
+            m_host.c_str(), m_port, m_token.c_str());
 
     // Setup HomeScreen/WindowManager API
     if (!init_wm()) {
@@ -291,7 +298,7 @@ bool WebAppLauncherRuntime::init() {
 
 bool WebAppLauncherRuntime::init_wm() {
   m_wm = new LibWindowmanager();
-  if (m_wm->init(m_port, m_token.c_str())) {
+  if (m_wm->init(m_host.c_str(), m_port, m_token.c_str())) {
     LOG_DEBUG("cannot initialize windowmanager");
     return false;
   }
@@ -346,7 +353,7 @@ bool WebAppLauncherRuntime::init_wm() {
 
 bool WebAppLauncherRuntime::init_hs() {
   m_hs = new LibHomeScreen();
-  if (m_hs->init(m_port, m_token.c_str())) {
+  if (m_hs->init(m_host.c_str(), m_port, m_token.c_str())) {
     LOG_DEBUG("cannot initialize homescreen");
     return false;
   }
