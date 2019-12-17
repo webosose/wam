@@ -219,7 +219,7 @@ bool WebAppLauncherRuntime::init() {
       LOG_DEBUG("    %d: %s", counter++, res.str().c_str());
     }
 
-    if (url_match_result.size() > 4) {
+    if (url_match_result[4].length()) {
       std::string authority = url_match_result[4].str();
       std::size_t n = authority.find(':');
       if (n != std::string::npos) {
@@ -238,7 +238,7 @@ bool WebAppLauncherRuntime::init() {
     }
 
     bool url_misses_token = true;
-    if (url_match_result.size() > 7) {
+    if (url_match_result[7].length()) {
       std::string query = url_match_result[7].str();
       std::size_t n = query.find('=');
       if (n != std::string::npos) {
@@ -250,7 +250,7 @@ bool WebAppLauncherRuntime::init() {
       char *tokenv = getenv("CYNAGOAUTH_TOKEN");
       if (tokenv) {
         m_token = tokenv;
-        m_url.push_back((url_match_result.size() > 7) ? '&' : '?');
+        m_url.push_back(url_match_result[7].length() ? '&' : '?');
         m_url.append("token=");
         m_url.append(m_token);
       }
