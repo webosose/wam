@@ -64,7 +64,6 @@ public:
     ~WebAppWayland() override;
 
     // WebAppBase
-    void init(int width, int height) override;
     void attach(WebPageBase*) override;
     WebPageBase* detach() override;
     void suspendAppRendering() override;
@@ -141,6 +140,9 @@ protected Q_SLOTS:
     virtual void webViewRecreatedSlot();
 
 private:
+
+    void init(int width, int height);
+
     WebAppWaylandWindow* m_appWindow;
     QString m_windowType;
     int m_lastSwappedTime;

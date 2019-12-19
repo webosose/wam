@@ -46,7 +46,6 @@ public:
     WebAppBase();
     ~WebAppBase() override;
 
-    virtual void init(int width, int height) = 0;
     virtual void attach(WebPageBase*);
     virtual WebPageBase* detach();
     virtual void suspendAppRendering() = 0;
