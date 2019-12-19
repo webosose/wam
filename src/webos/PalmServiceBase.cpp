@@ -29,6 +29,8 @@ PalmServiceBase::~PalmServiceBase()
 
 bool PalmServiceBase::startService()
 {
+    m_serviceName = serviceName();
+
     LSErrorSafe lsError;
 
     if (!LSRegister(serviceName(), &m_serviceHandle, &lsError)) {
@@ -72,16 +74,21 @@ bool PalmServiceBase::startService()
     return true;
 }
 
-bool  PalmServiceBase::stopService(LSErrorSafe* error)
+bool PalmServiceBase::stopService()
 {
     if (!m_serviceHandle)
         return true;
 
     LSErrorSafe lsError;
-    if (!LSUnregister(m_serviceHandle, error ? error : &lsError)) {
+    if (!LSUnregister(m_serviceHandle, &lsError)) {
         m_serviceHandle = 0;
         return true;
     }
+
+    LOG_WARNING(MSGID_UNREG_LS2_FAIL, 2,
+            PMLOGKS("SERVICE", m_serviceName.c_str()),
+            PMLOGKS("ERROR", lsError.message), "");
+
     return false;
 }
 
