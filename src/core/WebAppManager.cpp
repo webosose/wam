@@ -61,6 +61,8 @@ WebAppManager::WebAppManager()
 
 WebAppManager::~WebAppManager()
 {
+    if (m_deviceInfo)
+        m_deviceInfo->terminate();
 }
 
 void WebAppManager::notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level)
@@ -89,6 +91,7 @@ void WebAppManager::setPlatformModules(std::unique_ptr<PlatformModuleFactory> fa
     m_serviceSender = factory->getServiceSender();
     m_webProcessManager = factory->getWebProcessManager();
     m_deviceInfo = factory->getDeviceInfo();
+    m_deviceInfo->initialize();
 
     WebAppFactoryManager::instance();
     loadEnvironmentVariable();

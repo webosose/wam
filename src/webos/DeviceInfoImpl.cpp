@@ -35,7 +35,9 @@ DeviceInfoImpl::DeviceInfoImpl()
     , m_platformVersionDot(0)
     , m_3DSupport(false)
     , m_hardwareVersion("0x00000001")
-    , m_firmwareVersion("00.00.01")
+    , m_firmwareVersion("00.00.01") {}
+
+void DeviceInfoImpl::initialize()
 {
     QFile file("/var/luna/preferences/localeInfo");
     if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
@@ -60,16 +62,6 @@ DeviceInfoImpl::DeviceInfoImpl()
     setSystemLanguage(language);
     setDeviceInfo("LocalCountry", localcountry);
     setDeviceInfo("SmartServiceCountry", smartservicecountry);
-}
-
-bool DeviceInfoImpl::getDeviceInfo(QString name, QString &value)
-{
-    return DeviceInfo::getDeviceInfo(name, value);
-}
-
-void DeviceInfoImpl::setDeviceInfo(QString name, QString value)
-{
-    DeviceInfo::setDeviceInfo(name, value);
 }
 
 bool DeviceInfoImpl::getInfoFromLunaPrefs(const char* key, std::string& value)
@@ -120,7 +112,7 @@ void DeviceInfoImpl::initPlatformInfo()
        "platformVersionMinor": 00,
     */
 
-    QString value;     
+    QString value;
      if (getDeviceInfo("ModelName", value))
          m_modelName = value.toStdString();
      if (getDeviceInfo("FirmwareVersion", value))
