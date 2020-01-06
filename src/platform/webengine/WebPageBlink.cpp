@@ -692,7 +692,8 @@ void WebPageBlink::didFinishNavigation(const std::string& url, bool isInMainFram
 
 void WebPageBlink::loadProgressChanged(double progress)
 {
-    if (!(m_loadingUrl.empty() && progress == 0.1)) {
+    bool processTenPercent = std::abs(progress - 0.1f) < std::numeric_limits<float>::epsilon();
+    if (!(m_loadingUrl.empty() && processTenPercent)) {
         // m_loadingUrl is empty then net didStartNavigation yet, default(initial) progress : 0.1
         // so m_loadingUrl shouldn't be empty and greater than 0.1
         LOG_INFO(MSGID_LOAD, 2,
@@ -1056,28 +1057,29 @@ void WebPageBlink::updateMediaCodecCapability()
 
 double WebPageBlink::devicePixelRatio()
 {
-    double appWidth = static_cast<double>(m_appDesc->widthOverride());
-    double appHeight =  static_cast<double>(m_appDesc->heightOverride());
-    if(appWidth == 0) appWidth = static_cast<double>(currentUiWidth());
-    if(appHeight == 0) appHeight = static_cast<double>(currentUiHeight());
+    int appWidth = m_appDesc->widthOverride();
+    int appHeight =  m_appDesc->heightOverride();
+    if(appWidth == 0) appWidth = currentUiWidth();
+    if(appHeight == 0) appHeight = currentUiHeight();
 
-    double deviceWidth = 0;
-    double deviceHeight = 0;
+    int deviceWidth = 0;
+    int deviceHeight = 0;
 
     QString hardwareWidth, hardwareHeight;
     if (getDeviceInfo("HardwareScreenWidth", hardwareWidth) &&
         getDeviceInfo("HardwareScreenHeight", hardwareHeight)) {
-        deviceWidth = hardwareWidth.toDouble();
-        deviceHeight = hardwareHeight.toDouble();
+        deviceWidth = hardwareWidth.toInt();
+        deviceHeight = hardwareHeight.toInt();
     } else {
-        deviceWidth = static_cast<double>(currentUiWidth());
-        deviceHeight = static_cast<double>(currentUiHeight());
+        deviceWidth = currentUiWidth();
+        deviceHeight = currentUiHeight();
     }
 
-    double ratioX = deviceWidth/appWidth;
-    double ratioY = deviceHeight/appHeight;
-    double devicePixelRatio = 1.0;
-    if(ratioX != ratioY) {
+    float ratioX = static_cast<float>(deviceWidth)/appWidth;
+    float ratioY = static_cast<float>(deviceHeight)/appHeight;
+    float devicePixelRatio = 1.0;
+    bool ratiosAreEqual = std::abs(ratioX - ratioY) < std::numeric_limits<float>::epsilon();
+    if(!ratiosAreEqual) {
         // device resolution : 5120x2160 (UHD 21:9 - D9)
         // - app resolution : 1280x720 ==> 4:3 (have to take 3)
         // - app resolution : 1920x1080 ==> 2.6:2 (have to take 2)
@@ -1091,7 +1093,7 @@ double WebPageBlink::devicePixelRatio()
         // - app resolution : 1920x1080 ==> 2:2
         devicePixelRatio = ratioX;
     }
-    LOG_DEBUG("[%s] WebPageBlink::devicePixelRatio(); devicePixelRatio : %f; deviceWidth : %f, deviceHeight : %f, appWidth : %f, appHeight : %f",
+    LOG_DEBUG("[%s] WebPageBlink::devicePixelRatio(); devicePixelRatio : %f; deviceWidth : %d, deviceHeight : %d, appWidth : %d, appHeight : %d",
         qPrintable(appId()), devicePixelRatio, deviceWidth, deviceHeight, appWidth, appHeight);
     return devicePixelRatio;
 }
