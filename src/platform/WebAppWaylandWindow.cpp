@@ -38,12 +38,6 @@ WebAppWaylandWindow* WebAppWaylandWindow::take()
     return window;
 }
 
-void WebAppWaylandWindow::prepareRenderingContext()
-{
-    /* This shouldn't be destroyed */
-    (void*)createWindow();
-}
-
 void WebAppWaylandWindow::prepare()
 {
     if (s_instance)

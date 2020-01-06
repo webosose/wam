@@ -26,7 +26,6 @@ public:
     WebAppWaylandWindow();
     virtual ~WebAppWaylandWindow() {}
     static WebAppWaylandWindow* take();
-    static void prepareRenderingContext();
     static void prepare();
 
     inline const WebAppWayland* webApp() const { return m_webApp; }
