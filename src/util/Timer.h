@@ -109,6 +109,7 @@ class ElapsedTimer {
 public:
     ElapsedTimer();
     ~ElapsedTimer();
+
     bool isRunning() const;
     void start();
     void stop();
@@ -116,6 +117,9 @@ public:
     int elapsed_us() const;
 
 private:
+    ElapsedTimer(const ElapsedTimer&) = delete;
+    ElapsedTimer& operator=(const ElapsedTimer&) = delete;
+
     bool m_isRunning;
     GTimer* m_timer;
 };

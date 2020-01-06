@@ -53,6 +53,10 @@ public:
     QString m_instanceId;
     QString m_url;
     std::shared_ptr<ApplicationDescription> m_appDesc;
+
+private:
+    WebAppBasePrivate(const WebAppBasePrivate&) = delete;
+    WebAppBasePrivate& operator=(const WebAppBasePrivate&) = delete;
 };
 
 WebAppBase::WebAppBase()

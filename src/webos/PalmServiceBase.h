@@ -278,7 +278,10 @@ protected:
     LSHandle* m_serviceHandle;
 
 private:
+    PalmServiceBase(const PalmServiceBase&) = delete;
+    PalmServiceBase& operator=(const PalmServiceBase&) = delete;
     static bool serviceConnectCallback(LSHandle* sh, LSMessage* message, void* ctx);
+
     bool call(LSHandle* service,
         const char* what,
         QJsonObject parameters,
