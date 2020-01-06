@@ -305,7 +305,7 @@ void WebAppBase::doPendingRelaunch()
 
 void WebAppBase::webPageClosePageRequestedSlot()
 {
-    LOG_INFO(MSGID_WINDOW_CLOSED_JS, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "%s", m_closePageRequested ? "duplicated window.close();" : "", isClosing() ? "app is closing; drop this window.close()": "");
+    LOG_INFO(MSGID_WINDOW_CLOSED_JS, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "%s%s", m_closePageRequested ? "duplicated window.close();" : "", isClosing() ? "app is closing; drop this window.close()": "");
     if (isClosing() || m_closePageRequested)
         return;
 
