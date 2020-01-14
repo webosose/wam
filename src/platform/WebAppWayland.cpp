@@ -666,6 +666,8 @@ void WebAppWayland::webViewRecreatedSlot()
     m_appWindow->attachWebContents(page()->getWebContents());
     m_appWindow->RecreatedWebContents();
     page()->setPageProperties();
+    if (keepAlive())
+        page()->setKeepAliveWebApp(keepAlive());
     focus();
 }
 
