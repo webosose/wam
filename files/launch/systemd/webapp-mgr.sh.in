@@ -133,6 +133,9 @@ export MSE_VIDEO_BUFFER_SIZE_LIMIT=52428800
 export ENABLE_BLINK_FEATURES=AudioFocusExtension,MediaSourceIsSupportedExtension,MediaTimelineOffset,UMSExtension
 
 
+# Disable blink features
+export DISABLE_BLINK_FEATURES=FontSrcLocalMatching
+
 # please keep it in alphabetical order
 export WAM_EXTRA_FLAGS=""
 export WAM_JS_FLAGS=""
@@ -150,6 +153,7 @@ export WAM_COMMON_SWITCHES=" \
     --enable-accelerated-plugin-rendering \
     --enable-aggressive-release-policy \
     --enable-blink-features=$ENABLE_BLINK_FEATURES \
+    --disable-blink-features=$DISABLE_BLINK_FEATURES \
     --enable-devtools-experiments \
     --enable-key-event-throttling \
     --enable-neva-ime \
