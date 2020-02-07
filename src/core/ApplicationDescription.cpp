@@ -67,6 +67,7 @@ ApplicationDescription::ApplicationDescription()
     , m_displayAffinity(kUndefinedDisplayId)
     , m_useVirtualKeyboard(true)
     , m_customSuspendDOMTime(0)
+    , m_mediaPreferences("")
 {
 }
 
@@ -182,6 +183,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
 
     appDesc->m_usePrerendering = jsonObj.contains("usePrerendering") && jsonObj["usePrerendering"].toBool();
     appDesc->m_disallowScrollingInMainFrame = !jsonObj.contains("disallowScrollingInMainFrame") || jsonObj["disallowScrollingInMainFrame"].toBool();
+    appDesc->m_mediaPreferences = QJsonDocument(jsonObj["mediaExtension"].toObject()).toJson().data();
 
     // Handle accessibility, supportsAudioGuidance
     if (!jsonObj.value("accessibility").isUndefined() && jsonObj.value("accessibility").isObject()) {

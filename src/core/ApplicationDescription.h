@@ -187,6 +187,7 @@ public:
     DisplayId getDisplayAffinity() { return m_displayAffinity; }
     void setDisplayAffinity(DisplayId display) { m_displayAffinity = display; }
     int customSuspendDOMTime() const { return m_customSuspendDOMTime; }
+    std::string mediaPreferences() const { return m_mediaPreferences; }
 
 private:
     std::string m_id;
@@ -235,6 +236,7 @@ private:
     std::string m_locationHint;
     bool m_useVirtualKeyboard;
     int m_customSuspendDOMTime;
+    std::string m_mediaPreferences;
 };
 
 #endif /* APPLICATIONDESCRIPTION_H */
