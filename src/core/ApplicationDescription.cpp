@@ -67,7 +67,6 @@ ApplicationDescription::ApplicationDescription()
     , m_displayAffinity(kUndefinedDisplayId)
     , m_useVirtualKeyboard(true)
     , m_customSuspendDOMTime(0)
-    , m_mediaPreferences("")
 {
 }
 
