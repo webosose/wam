@@ -159,7 +159,6 @@ int WebAppLauncherRuntime::run(int argc, const char** argv) {
   bool isWaitHostService = isWaitForHostService(args);
   m_id = getAppId(args);
   m_url = getAppUrl(args);
-  m_role = "WebApp";
 
   if(isWaitHostService) {
     while(!WebAppManagerServiceAGL::instance()->isHostServiceRunning()) {
@@ -217,15 +216,9 @@ bool WebAppLauncherRuntime::init() {
       if (n != std::string::npos) {
         std::string sport = authority.substr(n+1);
         m_host = authority.substr(0, n);
-        m_role.push_back('-');
-        m_role.append(m_host);
-        m_role.push_back('-');
-        m_role.append(sport);
         m_port = stringTo<int>(sport);
       } else {
         m_host = authority;
-        m_role.push_back('-');
-        m_role.append(m_host);
       }
     }
 
@@ -262,6 +255,9 @@ bool WebAppLauncherRuntime::init() {
       m_role = "homescreen";
     else if (m_id.rfind("webapps-homescreen", 0) == 0)
       m_role = "homescreen";
+    else {
+      m_role = m_id.substr(0,12);
+    }
 
     LOG_DEBUG("id=[%s], name=[%s], role=[%s], url=[%s], host=[%s], port=%d, token=[%s]",
             m_id.c_str(), m_name.c_str(), m_role.c_str(), m_url.c_str(),
