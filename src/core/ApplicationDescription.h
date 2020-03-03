@@ -151,7 +151,6 @@ public:
     bool disallowScrollingInMainFrame() const { return m_disallowScrollingInMainFrame; }
     int delayMsForLaunchOptimization() const { return m_delayMsForLanchOptimization; }
     bool useUnlimitedMediaPolicy() const { return m_useUnlimitedMediaPolicy; }
-    int memoryOptimizeLevel() const { return m_memoryOptimizeLevel; }
     const std::string& locationHint() const { return m_locationHint; }
 
     struct WindowOwnerInfo {
@@ -231,7 +230,6 @@ private:
     bool m_disallowScrollingInMainFrame;
     int m_delayMsForLanchOptimization;
     bool m_useUnlimitedMediaPolicy;
-    int m_memoryOptimizeLevel;
     int m_displayAffinity;
     std::string m_locationHint;
     bool m_useVirtualKeyboard;

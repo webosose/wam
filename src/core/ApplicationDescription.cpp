@@ -63,7 +63,6 @@ ApplicationDescription::ApplicationDescription()
     , m_disallowScrollingInMainFrame(true)
     , m_delayMsForLanchOptimization(0)
     , m_useUnlimitedMediaPolicy(false)
-    , m_memoryOptimizeLevel(0)
     , m_displayAffinity(kUndefinedDisplayId)
     , m_useVirtualKeyboard(true)
     , m_customSuspendDOMTime(0)
@@ -289,8 +288,6 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     }
 
     appDesc->m_useUnlimitedMediaPolicy = jsonObj.contains("useUnlimitedMediaPolicy") && jsonObj["useUnlimitedMediaPolicy"].toBool();
-    appDesc->m_memoryOptimizeLevel = jsonObj.contains("memoryOptimizeLevel")
-        && jsonObj["memoryOptimizeLevel"].toInt();
 
     if (!jsonObj.value("suspendDOMTime").isUndefined())
         appDesc->m_customSuspendDOMTime= jsonObj["suspendDOMTime"].toInt();
