@@ -181,6 +181,7 @@ export WAM_COMMON_SWITCHES=" \
     --touch-events=disabled \
     --ui-disable-opaque-shader-program \
     --user-data-dir=$WAM_DATA_PATH \
+    --use-viz-fmp-with-timeout=0 \
     --webos-wam \ "
 
 export WAM_LITE_SWITCHES=" \
