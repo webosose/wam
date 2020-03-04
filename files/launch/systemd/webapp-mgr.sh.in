@@ -145,6 +145,7 @@ export WAM_COMMON_SWITCHES=" \
     --application-cache-size=$WAM_APPCACHE_MAXSIZE \
     --autoplay-policy=no-user-gesture-required \
     --browser-subprocess-path=$WAM_EXE_PATH \
+    --deadline-to-synchronize-surfaces=40 \
     --disable-direct-npapi-requests \
     --disable-extensions \
     --disable-gpu-rasterization \
