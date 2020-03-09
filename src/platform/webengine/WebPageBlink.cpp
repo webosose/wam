@@ -1060,14 +1060,17 @@ void WebPageBlink::updateMediaCodecCapability()
 
 double WebPageBlink::devicePixelRatio()
 {
+    float devicePixelRatio = 1.0;
+
     int appWidth = m_appDesc->widthOverride();
     int appHeight =  m_appDesc->heightOverride();
     if(appWidth == 0) appWidth = currentUiWidth();
     if(appHeight == 0) appHeight = currentUiHeight();
+    if (appWidth == 0 || appHeight == 0)
+        return devicePixelRatio;
 
     int deviceWidth = 0;
     int deviceHeight = 0;
-
     QString hardwareWidth, hardwareHeight;
     if (getDeviceInfo("HardwareScreenWidth", hardwareWidth) &&
         getDeviceInfo("HardwareScreenHeight", hardwareHeight)) {
@@ -1080,7 +1083,6 @@ double WebPageBlink::devicePixelRatio()
 
     float ratioX = static_cast<float>(deviceWidth)/appWidth;
     float ratioY = static_cast<float>(deviceHeight)/appHeight;
-    float devicePixelRatio = 1.0;
     bool ratiosAreEqual = std::abs(ratioX - ratioY) < std::numeric_limits<float>::epsilon();
     if(!ratiosAreEqual) {
         // device resolution : 5120x2160 (UHD 21:9 - D9)
