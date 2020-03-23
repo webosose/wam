@@ -772,9 +772,7 @@ void WebPageBlink::recreateWebView()
         // 1. Reset state to mark next paint for notification when FMP done.
         //    It will be used to make webview visible later.
         d->pageView->ResetStateToMarkNextPaint();
-        // 2. While rendering ready, set webview hidden.
-        d->pageView->SetVisible(false);
-        // 3. Set VisibilityState as Launching
+        // 2. Set VisibilityState as Launching
         //    It will be used later, WebViewImpl set RenderWidgetCompositor visible,
         //    and make it keep to render the contents.
         setVisibilityState(WebPageBase::WebPageVisibilityState::WebPageVisibilityStateLaunching);
