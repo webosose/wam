@@ -134,7 +134,7 @@ export ENABLE_BLINK_FEATURES=AudioFocusExtension,MediaSourceIsSupportedExtension
 
 
 # Disable blink features
-export DISABLE_BLINK_FEATURES=FontSrcLocalMatching
+export DISABLE_BLINK_FEATURES=FontSrcLocalMatching,WebkitBoxLayoutUsesFlexLayout
 
 # please keep it in alphabetical order
 export WAM_EXTRA_FLAGS=""
