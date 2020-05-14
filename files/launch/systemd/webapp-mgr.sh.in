@@ -155,6 +155,7 @@ export WAM_COMMON_SWITCHES=" \
     --enable-aggressive-release-policy \
     --enable-blink-features=$ENABLE_BLINK_FEATURES \
     --disable-blink-features=$DISABLE_BLINK_FEATURES \
+    --local-storage-manager \
     --enable-devtools-experiments \
     --enable-key-event-throttling \
     --enable-neva-ime \

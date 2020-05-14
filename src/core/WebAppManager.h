@@ -148,6 +148,9 @@ public:
     void clearBrowsingData(const int removeBrowsingDataMask);
     int maskForBrowsingDataType(const char* type);
 
+    void appInstalled(const std::string& app_id);
+    void appRemoved(const std::string& app_id);
+
     QString identifierForSecurityOrigin(const QString& identifier);
 
 protected:

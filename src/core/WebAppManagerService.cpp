@@ -85,6 +85,14 @@ void WebAppManagerService::onClearBrowsingData(const int removeBrowsingDataMask)
     WebAppManager::instance()->clearBrowsingData(removeBrowsingDataMask);
 }
 
+void WebAppManagerService::onAppInstalled(const std::string& app_id) {
+  WebAppManager::instance()->appInstalled(app_id);
+}
+
+void WebAppManagerService::onAppRemoved(const std::string& app_id) {
+  WebAppManager::instance()->appRemoved(app_id);
+}
+
 void WebAppManagerService::setDeviceInfo(const QString &name, const QString &value)
 {
     WebAppManager::instance()->setDeviceInfo(name, value);

@@ -38,6 +38,7 @@
 #include "WebProcessManager.h"
 #include "WindowTypes.h"
 
+#include "webos/application_installation_handler.h"
 #include "webos/public/runtime.h"
 
 static const int kContinuousReloadingLimit = 3;
@@ -766,6 +767,20 @@ void WebAppManager::clearBrowsingData(const int removeBrowsingDataMask)
 int WebAppManager::maskForBrowsingDataType(const char* type)
 {
     return m_webProcessManager->maskForBrowsingDataType(type);
+}
+
+void WebAppManager::appInstalled(const std::string& app_id) {
+  LOG_INFO(MSGID_WAM_DEBUG, 0, "App installed; id=%s", app_id.c_str());
+  auto p = webos::ApplicationInstallationHandler::GetInstance();
+  if (p)
+    p->OnAppInstalled(app_id);
+}
+
+void WebAppManager::appRemoved(const std::string& app_id) {
+  LOG_INFO(MSGID_WAM_DEBUG, 0, "App removed; id=%s", app_id.c_str());
+  auto p = webos::ApplicationInstallationHandler::GetInstance();
+  if (p)
+    p->OnAppRemoved(app_id);
 }
 
 QString WebAppManager::identifierForSecurityOrigin(const QString& identifier)

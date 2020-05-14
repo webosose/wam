@@ -83,6 +83,8 @@ protected:
     QJsonObject closeByInstanceId(QString instanceId);
     int maskForBrowsingDataType(const char* type);
     void onClearBrowsingData(const int removeBrowsingDataMask);
+    void onAppInstalled(const std::string& app_id);
+    void onAppRemoved(const std::string& app_id);
 
     void setDeviceInfo(const QString& name, const QString& value);
     void setUiSize(int width, int height);

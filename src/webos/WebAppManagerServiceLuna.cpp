@@ -508,7 +508,14 @@ void WebAppManagerServiceLuna::getAppStatusCallback(QJsonObject reply)
         QJsonObject appObject = reply["app"].toObject();
         QString appId = appObject["id"].toString();
 
-        WebAppManagerService::deleteStorageData(appId);
+        LOG_INFO(MSGID_WAM_DEBUG, 0, "Application removed %s", qPrintable(appId));
+        WebAppManagerService::onAppRemoved(appId.toStdString());
+    }
+    if (reply["change"].toString() == "added") {
+        QJsonObject appObject = reply["app"].toObject();
+        QString appId = appObject["id"].toString();
+        LOG_INFO(MSGID_WAM_DEBUG, 0, "Application installed %s", qPrintable(appId));
+        WebAppManagerService::onAppInstalled(appId.toStdString());
     }
     if (reply["change"].toString() == "removed" ||
         reply["change"].toString() == "updated") {
