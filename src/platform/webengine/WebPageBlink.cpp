@@ -715,6 +715,11 @@ void WebPageBlink::loadFailed(const std::string& url, int errCode, const std::st
 
     Q_EMIT webPageLoadFailed(errCode);
 
+    if (errCode == -21/*ERR_NETWORK_CHANGED*/) {
+      loadUrl(d->pageView->GetUrl());
+      return;
+    }
+
     // We follow through only if we have SSL error
     if (errDesc != "SSL_ERROR")
         return;
