@@ -297,6 +297,9 @@ void WebAppManagerServiceAGL::triggetEventForApp(const std::string& action) {
   } else if (action == kDeactivateEvent) {
      startup_app_timer_.start(1000, this,
            &WebAppManagerServiceAGL::onDeactivateEvent);
+  } else if (action == kKilledApp) {
+    startup_app_timer_.start(1000, this,
+          &WebAppManagerServiceAGL::onKillEvent);
   }
 }
 
@@ -467,5 +470,11 @@ void WebAppManagerServiceAGL::onDeactivateEvent() {
   WebAppBase* web_app = WebAppManager::instance()->findAppById(app_id_event_target_);
   if (web_app)
     web_app->onStageDeactivated();
+  app_id_event_target_.clear();
+}
+
+void WebAppManagerServiceAGL::onKillEvent() {
+  LOG_DEBUG("Kill app=%s", app_id_event_target_.c_str());
+  WebAppManager::instance()->onKillApp(app_id_event_target_);
   app_id_event_target_.clear();
 }

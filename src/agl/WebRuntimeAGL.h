@@ -70,6 +70,7 @@ private:
   bool init_hs();
   int parse_config(const char *file);
   void setup_surface (int id);
+  void setup_signals();
 
   std::string m_id;
   std::string m_role;

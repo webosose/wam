@@ -7,6 +7,7 @@
 #include "Timer.h"
 
 constexpr char kStartApp[] = "start-app";
+constexpr char kKilledApp[] = "killed-app";
 constexpr char kActivateEvent[] = "activate-event";
 constexpr char kDeactivateEvent[] = "deactivate-event";
 
@@ -55,6 +56,7 @@ private:
 
     void onActivateEvent();
     void onDeactivateEvent();
+    void onKillEvent();
 
     std::string app_id_event_target_;
 

@@ -158,10 +158,6 @@ void BlinkWebView::LoadFinished(const std::string& url)
       return;
 
     m_delegate->loadFinished(url);
-
-#if !defined(OS_WEBOS)
-    LoadVisuallyCommitted();
-#endif
 }
 
 void BlinkWebView::LoadFailed(const std::string& url, int errCode, const std::string& errDesc)

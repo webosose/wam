@@ -21,7 +21,7 @@
 
 #define WEBAPP_CONFIG "config.xml"
 
-volatile sig_atomic_t e_flag = 0;
+volatile sig_atomic_t e_flag = 1;
 
 
 static std::string getAppId(const std::vector<std::string>& args) {
@@ -149,8 +149,18 @@ int SharedBrowserProcessWebAppLauncher::launch(const std::string& id, const std:
 
 int SharedBrowserProcessWebAppLauncher::loop(int argc, const char** argv, volatile sig_atomic_t& e_flag) {
   // TODO: wait for a pid
-  while (1)
+  while (e_flag)
     sleep(1);
+
+  std::vector<std::string> args(argv + 1, argv + argc);
+  std::string app_id = getAppId(args);
+  LOG_DEBUG("App finished, sending event: %s app: %s", kKilledApp, app_id.c_str());
+
+  std::vector<const char*> data;
+  data.push_back(kKilledApp);
+  data.push_back(app_id.c_str());
+  WebAppManagerServiceAGL::instance()->sendEvent(data.size(), data.data());
+
   return 0;
 }
 
@@ -176,9 +186,7 @@ int WebAppLauncherRuntime::run(int argc, const char** argv) {
     m_launcher = new SingleBrowserProcessWebAppLauncher();
   }
 
-
-  // Initialize SIGTERM handler
-  // TODO: init_signal();
+  setup_signals();
 
   if (!init())
     return -1;
@@ -195,6 +203,14 @@ int WebAppLauncherRuntime::run(int argc, const char** argv) {
   m_pending_create = true;
 
   return m_launcher->loop(argc, argv, e_flag);
+}
+
+void WebAppLauncherRuntime::setup_signals() {
+  auto sig_term_handler = [](int sig_num) {
+    LOG_DEBUG("WebAppLauncherRuntime::run - received SIGTERM signal");
+    e_flag = 0;
+  };
+  signal(SIGTERM, sig_term_handler);
 }
 
 bool WebAppLauncherRuntime::init() {
