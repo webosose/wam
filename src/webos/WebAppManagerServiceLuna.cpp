@@ -43,7 +43,6 @@ LSMethod WebAppManagerServiceLuna::s_methods[] = {
     LS2_METHOD_ENTRY(logControl),
     LS2_METHOD_ENTRY(discardCodeCache),
     LS2_METHOD_ENTRY(getWebProcessSize),
-    LS2_METHOD_ENTRY(closeByProcessId),
     LS2_METHOD_ENTRY(clearBrowsingData),
     LS2_SUBSCRIPTION_ENTRY(listRunningApps),
     LS2_SUBSCRIPTION_ENTRY(webProcessCreated),
@@ -75,7 +74,8 @@ QJsonObject WebAppManagerServiceLuna::launchApp(QJsonObject request)
     if (  !request["appDesc"].isObject()
        || !request["parameters"].isObject()
        || !request["launchingAppId"].isString()
-       || !request["launchingProcId"].isString()) {
+       || !request["launchingProcId"].isString()
+       || !request["instanceId"].isString()) {
         reply["returnValue"] = false;
         reply["errorCode"] = ERR_CODE_LAUNCHAPP_MISS_PARAM;
         reply["errorText"] = QString::fromStdString(err_missParam);
@@ -96,23 +96,34 @@ QJsonObject WebAppManagerServiceLuna::launchApp(QJsonObject request)
     if(request["keepAlive"].toBool()) {
         jsonParams["keepAlive"] = true;
     }
+
+    QString instanceId = request["instanceId"].toString();
+    if (!isValidInstanceId(instanceId)) {
+        reply["returnValue"] = false;
+        reply["errorCode"] = ERR_CODE_LAUNCHAPP_MISS_PARAM;
+        reply["errorText"] = QString::fromStdString(err_missParam);
+        return reply;
+    }
+    jsonParams["instanceId"] = instanceId;
+
     doc.setObject(jsonParams);
     QString params(doc.toJson());
 
     std::string appId = request["appDesc"].toObject()["id"].toString().toStdString();
-    LOG_INFO_WITH_CLOCK(MSGID_APPLAUNCH_START, 3,
+    LOG_INFO_WITH_CLOCK(MSGID_APPLAUNCH_START, 4,
                         PMLOGKS("PerfType","AppLaunch"),
                         PMLOGKS("PerfGroup", appId.c_str()),
-                        PMLOGKS("APP_ID", appId.c_str()), "params : %s", qPrintable(params));
+                        PMLOGKS("APP_ID", appId.c_str()),
+                        PMLOGKS("INSTANCE_ID", instanceId.toStdString().c_str()),
+                        "params : %s", qPrintable(params));
 
-    std::string instanceId;
     instanceId = WebAppManagerService::onLaunch(
                     QJsonDocument(request["appDesc"].toObject()).toJson().data(),
                     params.toStdString(),
                     request["launchingAppId"].toString().toStdString(),
-                    errCode, errMsg);
+                    errCode, errMsg).c_str();
 
-    if (instanceId.empty()) {
+    if (instanceId.isEmpty()) {
         reply["returnValue"] = false;
         reply["errorCode"] = errCode;
         reply["errorText"] = QString::fromStdString(errMsg);
@@ -120,31 +131,38 @@ QJsonObject WebAppManagerServiceLuna::launchApp(QJsonObject request)
     else {
         reply["returnValue"] = true;
         reply["appId"] = request["appDesc"].toObject()["id"];
-        reply["procId"] = QString::fromStdString(instanceId);
+        reply["instanceId"] = instanceId;
     }
     return reply;
+}
+
+bool WebAppManagerServiceLuna::isValidInstanceId(const QString& instanceId)
+{
+    return !instanceId.trimmed().isEmpty();
 }
 
 QJsonObject WebAppManagerServiceLuna::killApp(QJsonObject request)
 {
     bool instances;
+    std::string instanceId = request["instanceId"].toString().toStdString();
     std::string appId = request["appId"].toString().toStdString();
     std::string reason;
 
     if (!request.isEmpty() && request.contains("reason"))
         reason = request["reason"].toString().toStdString();
 
-    LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("APP_ID", appId.c_str()), PMLOGKS("API", "killApp"), "reason : %s", reason.c_str());
+    LOG_INFO(MSGID_LUNA_API, 3, PMLOGKS("APP_ID", appId.c_str()), PMLOGKS("INSTANCE_ID", instanceId.c_str()), PMLOGKS("API", "killApp"), "reason : %s", reason.c_str());
 
     if (reason == "memoryReclaim")
-        instances = WebAppManagerService::onKillApp(request["appId"].toString().toStdString(), true);
+        instances = WebAppManagerService::onKillApp(request["appId"].toString().toStdString(), request["instanceId"].toString().toStdString(), true);
     else
-        instances = WebAppManagerService::onKillApp(request["appId"].toString().toStdString(), false);
+        instances = WebAppManagerService::onKillApp(request["appId"].toString().toStdString(), request["instanceId"].toString().toStdString(), false);
 
     QJsonObject reply;
     if(instances)
     {
         reply["appId"] = request["appId"].toString();
+        reply["instanceId"] = request["instanceId"].toString();
         reply["returnValue"] = true;
     }
     else
@@ -158,15 +176,16 @@ QJsonObject WebAppManagerServiceLuna::killApp(QJsonObject request)
 
 QJsonObject WebAppManagerServiceLuna::pauseApp(QJsonObject request)
 {
-    std::string id{request["appId"].toString().toStdString()};
+    std::string id{request["instanceId"].toString().toStdString()};
 
-    LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("APP_ID", id.c_str()), PMLOGKS("API", "pauseApp"), "");
+    LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("INSTANCE_ID", id.c_str()), PMLOGKS("API", "pauseApp"), "");
 
     QJsonObject reply;
     if (WebAppManagerService::onPauseApp(id))
     {
         reply["returnValue"] = true;
         reply["appId"] = request["appId"].toString();
+        reply["instanceId"] = request["instanceId"].toString();
     }
     else
     {
@@ -273,18 +292,12 @@ QJsonObject WebAppManagerServiceLuna::listRunningApps(QJsonObject request, bool 
     for (auto it = apps.begin(); it != apps.end(); ++it) {
         QJsonObject app;
         app["id"] = it->appId;
-        app["processid"] = it->instanceId;
+        app["instanceId"] = it->instanceId;
         app["webprocessid"] = QString::number(it->pid);
         runningApps.append(app);
     }
     reply["running"] = runningApps;
     reply["returnValue"] = true;
-    return reply;
-}
-
-QJsonObject WebAppManagerServiceLuna::closeByProcessId(QJsonObject request)
-{
-    QJsonObject reply = WebAppManagerService::closeByInstanceId(request["processId"].toString());
     return reply;
 }
 
@@ -457,9 +470,10 @@ void WebAppManagerServiceLuna::getCloseAppIdCallback(QJsonObject reply)
     }
 
     QString appId = reply["id"].toString();
+    QString instanceId = reply["instanceId"].toString();
 
-    if(!appId.isEmpty())
-        WebAppManagerService::setForceCloseApp(appId);
+   if(!appId.isEmpty() && !instanceId.isEmpty())
+        WebAppManagerService::setForceCloseApp(appId, instanceId);
 }
 
 void WebAppManagerServiceLuna::thresholdChangedCallback(QJsonObject reply)
@@ -565,9 +579,9 @@ void WebAppManagerServiceLuna::getBootStatusCallback(QJsonObject reply)
 void WebAppManagerServiceLuna::closeApp(const std::string& id)
 {
     QJsonObject json;
-    json["id"] = QString::fromStdString(id);
+    json["instanceId"] = QString::fromStdString(id);
 
-    if (!LS2_CALL(closeAppCallback, "luna://com.webos.applicationManager/closeByAppId", json))
+    if (!LS2_CALL(closeAppCallback, "luna://com.webos.applicationManager/close", json))
         LOG_WARNING(MSGID_CLOSE_CALL_FAIL, 0, "Failed to send closeByAppId command to SAM");
 }
 
@@ -583,8 +597,9 @@ QJsonObject WebAppManagerServiceLuna::webProcessCreated(QJsonObject request, boo
 
      if (!appId.isEmpty())
      {
-        int pid = WebAppManagerService::getWebProcessId(request["appId"].toString());
-        reply["id"] = request["appId"].toString();
+        int pid = WebAppManagerService::getWebProcessId(appId, request["instanceId"].toString());
+        reply["id"] = appId;
+        reply["instanceId"] = request["instanceId"].toString();
 
         if (pid) {
             reply["webprocessid"] = pid;

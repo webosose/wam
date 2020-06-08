@@ -134,7 +134,7 @@ protected:
     virtual void showWindow();
 
     void setUiSize(int width, int height);
-    void setActiveAppId(QString id);
+    void setActiveInstanceId(QString id);
     void forceCloseAppInternal();
     void closeAppInternal();
 

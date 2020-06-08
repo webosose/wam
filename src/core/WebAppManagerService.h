@@ -60,7 +60,6 @@ public:
     virtual QJsonObject closeAllApps(QJsonObject request) = 0;
     virtual QJsonObject discardCodeCache(QJsonObject request) = 0;
     virtual QJsonObject listRunningApps(QJsonObject request, bool subscribed) = 0;
-    virtual QJsonObject closeByProcessId(QJsonObject request) = 0;
     virtual QJsonObject getWebProcessSize(QJsonObject request) = 0;
     virtual QJsonObject clearBrowsingData(QJsonObject request) = 0;
     virtual QJsonObject webProcessCreated(QJsonObject request, bool subscribed) = 0;
@@ -72,15 +71,14 @@ protected:
         int& errCode,
         std::string& errMsg);
 
-    bool onKillApp(const std::string& appId, bool force = false);
-    bool onPauseApp(const std::string& appId);
+    bool onKillApp(const std::string& appId, const std::string& instanceId, bool force = false);
+    bool onPauseApp(const std::string& instanceId);
     QJsonObject onLogControl(const std::string& keys, const std::string& value);
     bool onCloseAllApps(uint32_t pid = 0);
     bool isDiscardCodeCacheRequired();
     void onDiscardCodeCache(uint32_t pid);
     bool onPurgeSurfacePool(uint32_t pid);
     QJsonObject getWebProcessProfiling();
-    QJsonObject closeByInstanceId(QString instanceId);
     int maskForBrowsingDataType(const char* type);
     void onClearBrowsingData(const int removeBrowsingDataMask);
     void onAppInstalled(const std::string& app_id);
@@ -90,14 +88,14 @@ protected:
     void setUiSize(int width, int height);
     void setSystemLanguage(const QString& language);
     QString getSystemLanguage();
-    void setForceCloseApp(const QString& appId);
+    void setForceCloseApp(const QString& appId, const QString& instanceId);
     void deleteStorageData(const QString& identifier);
     void killCustomPluginProcess(const QString& appBasePath);
     void requestKillWebProcess(uint32_t pid);
     void updateNetworkStatus(const QJsonObject& object);
     void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level);
     void setAccessibilityEnabled(bool enable);
-    uint32_t getWebProcessId(const QString& appId);
+    uint32_t getWebProcessId(const QString& appId, const QString& instanceId);
 
     std::list<const WebAppBase*> runningApps();
     std::list<const WebAppBase*> runningApps(uint32_t pid);

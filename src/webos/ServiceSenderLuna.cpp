@@ -30,7 +30,7 @@ void ServiceSenderLuna::postlistRunningApps(std::vector<ApplicationInfo> &apps)
     for (auto it = apps.begin(); it != apps.end(); ++it) {
         QJsonObject app;
         app["id"] = it->appId;
-        app["processid"] = it->instanceId;
+        app["instanceid"] = it->instanceId;
         app["webprocessid"] = QString::number(it->pid);
         runningApps.append(app);
     }
@@ -40,10 +40,11 @@ void ServiceSenderLuna::postlistRunningApps(std::vector<ApplicationInfo> &apps)
     WebAppManagerServiceLuna::instance()->postSubscription("listRunningApps", reply);
 }
 
-void ServiceSenderLuna::postWebProcessCreated(const QString& appId, uint32_t pid)
+void ServiceSenderLuna::postWebProcessCreated(const QString& appId, const QString& instanceId, uint32_t pid)
 {
     QJsonObject reply;
     reply["id"] = appId;
+    reply["instanceid"] = instanceId;
     reply["webprocessid"] = (int)pid;
     reply["returnValue"] = true;
 

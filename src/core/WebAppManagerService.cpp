@@ -30,14 +30,14 @@ std::string WebAppManagerService::onLaunch(const std::string& appDescString, con
     return WebAppManager::instance()->launch(appDescString, params, launchingAppId, errCode, errMsg);
 }
 
-bool WebAppManagerService::onKillApp(const std::string& appId, bool force)
+bool WebAppManagerService::onKillApp(const std::string& appId, const std::string& instanceId, bool force)
 {
-    return WebAppManager::instance()->onKillApp(appId, force);
+    return WebAppManager::instance()->onKillApp(appId, instanceId, force);
 }
 
-bool WebAppManagerService::onPauseApp(const std::string& appId)
+bool WebAppManagerService::onPauseApp(const std::string& instanceId)
 {
-    return WebAppManager::instance()->onPauseApp(appId);
+    return WebAppManager::instance()->onPauseApp(instanceId);
 }
 
 QJsonObject WebAppManagerService::onLogControl(const std::string& keys, const std::string& value)
@@ -115,9 +115,9 @@ QString WebAppManagerService::getSystemLanguage()
     return language;
 }
 
-void WebAppManagerService::setForceCloseApp(const QString &appId)
+void WebAppManagerService::setForceCloseApp(const QString& appId, const QString& instanceId)
 {
-    WebAppManager::instance()->setForceCloseApp(appId);
+    WebAppManager::instance()->setForceCloseApp(appId, instanceId);
 }
 
 void WebAppManagerService::deleteStorageData(const QString &identifier)
@@ -150,39 +150,14 @@ std::vector<ApplicationInfo> WebAppManagerService::list(bool includeSystemApps)
     return WebAppManager::instance()->list(includeSystemApps);
 }
 
-QJsonObject WebAppManagerService::closeByInstanceId(QString instanceId)
-{
-    LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("INSTANCE_ID", qPrintable(instanceId)), PMLOGKS("API", "closeByInstanceId"), "");
-    WebAppBase* app = WebAppManager::instance()->findAppByInstanceId(instanceId);
-    QString appId;
-    if (app) {
-        appId = app->appId();
-        WebAppManager::instance()->forceCloseAppInternal(app);
-    }
-
-    QJsonObject reply;
-    if(!appId.isNull()) {
-        reply["appId"] = appId;
-        reply["processId"] = instanceId;
-        reply["returnValue"] = true;
-    }
-    else {
-        LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("INSTANCE_ID", qPrintable(instanceId)), PMLOGKS("API", "closeByInstanceId"), "No matched App; return false");
-        QString errMsg("Unknown Process");
-        reply["returnValue"] = false;
-        reply["errorText"] = errMsg;
-    }
-    return reply;
-}
-
 void WebAppManagerService::setAccessibilityEnabled(bool enable)
 {
     WebAppManager::instance()->setAccessibilityEnabled(enable);
 }
 
-uint32_t WebAppManagerService::getWebProcessId(const QString& appId)
+uint32_t WebAppManagerService::getWebProcessId(const QString& appId, const QString& instanceId)
 {
-    return WebAppManager::instance()->getWebProcessId(appId);
+    return WebAppManager::instance()->getWebProcessId(appId, instanceId);
 }
 
 void WebAppManagerService::updateNetworkStatus(const QJsonObject& object)
