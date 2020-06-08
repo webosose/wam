@@ -39,7 +39,6 @@ public:
     QJsonObject closeAllApps(QJsonObject request) override;
     QJsonObject discardCodeCache(QJsonObject request) override;
     QJsonObject listRunningApps(QJsonObject request, bool subscribed) override;
-    QJsonObject closeByProcessId(QJsonObject request) override;
     QJsonObject getWebProcessSize(QJsonObject request) override;
     QJsonObject pauseApp(QJsonObject request) override;
     QJsonObject clearBrowsingData(QJsonObject request) override;
@@ -80,6 +79,9 @@ protected:
     bool m_clearedCache;
     bool m_bootDone;
     QString m_debugLevel;
+
+private:
+    bool isValidInstanceId(const QString& instanceId);
 };
 
 #endif // WEBAPPMANAGERSERVICELUNA_H
