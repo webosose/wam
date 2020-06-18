@@ -136,6 +136,9 @@ export ENABLE_BLINK_FEATURES=AudioFocusExtension,MediaSourceIsSupportedExtension
 # Disable blink features
 export DISABLE_BLINK_FEATURES=FontSrcLocalMatching,WebkitBoxLayoutUsesFlexLayout
 
+# Enable runtime features
+export ENABLE_FEATURES=MediaControllerService
+
 # please keep it in alphabetical order
 export WAM_EXTRA_FLAGS=""
 export WAM_JS_FLAGS=""
@@ -155,6 +158,7 @@ export WAM_COMMON_SWITCHES=" \
     --enable-aggressive-release-policy \
     --enable-blink-features=$ENABLE_BLINK_FEATURES \
     --disable-blink-features=$DISABLE_BLINK_FEATURES \
+    --enable-features=$ENABLE_FEATURES \
     --local-storage-manager \
     --enable-devtools-experiments \
     --enable-key-event-throttling \
