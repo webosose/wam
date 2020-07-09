@@ -42,7 +42,6 @@
 #include "webos/public/runtime.h"
 
 static const int kContinuousReloadingLimit = 3;
-const char kSecurityOriginPostfix[] = "-webos";
 
 WebAppManager* WebAppManager::instance()
 {
@@ -789,5 +788,5 @@ QString WebAppManager::identifierForSecurityOrigin(const QString& identifier)
     if (lowcase_identifier != identifier) {
         LOG_WARNING(MSGID_APPID_HAS_UPPERCASE, 0, "Application id should not contain capital letters");
     }
-    return QString("%1%2").arg(lowcase_identifier).arg(kSecurityOriginPostfix);
+    return QString("%1%2").arg(lowcase_identifier).arg(webos::WebViewBase::kSecurityOriginPostfix.c_str());
 }
