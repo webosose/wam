@@ -50,7 +50,6 @@ WebPageBase::WebPageBase()
 WebPageBase::WebPageBase(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const QString& params)
     : m_appDesc(desc)
     , m_appId(QString::fromStdString(desc->id()))
-    , m_instanceId(QJsonDocument::fromJson(params.toUtf8()).object().value("instanceId").toString())
     , m_suspendAtLoad(false)
     , m_isClosing(false)
     , m_isLoadErrorPageFinish(false)
@@ -67,7 +66,7 @@ WebPageBase::WebPageBase(const QUrl& url, std::shared_ptr<ApplicationDescription
 
 WebPageBase::~WebPageBase()
 {
-    LOG_INFO(MSGID_WEBPAGE_CLOSED, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), "");
+    LOG_INFO(MSGID_WEBPAGE_CLOSED, 1, PMLOGKS("APP_ID", qPrintable(appId())), "");
 }
 
 QString WebPageBase::launchParams() const
@@ -97,11 +96,11 @@ QString WebPageBase::getIdentifier() const
 
 void WebPageBase::load()
 {
-    LOG_INFO(MSGID_WEBPAGE_LOAD, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "m_launchParams:%s", qPrintable(m_launchParams));
+    LOG_INFO(MSGID_WEBPAGE_LOAD, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "m_launchParams:%s", qPrintable(m_launchParams));
     /* this function is main load of WebPage : load default url */
     setupLaunchEvent();
     if (!doDeeplinking(m_launchParams)) {
-        LOG_INFO(MSGID_WEBPAGE_LOAD, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "loadDefaultUrl()");
+        LOG_INFO(MSGID_WEBPAGE_LOAD, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "loadDefaultUrl()");
         loadDefaultUrl();
     }
 }
@@ -158,7 +157,7 @@ bool WebPageBase::relaunch(const QString& launchParams, const QString& launching
     }
 
     if (!hasBeenShown()){
-        LOG_INFO(MSGID_WEBPAGE_RELAUNCH, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "In Loading(%d%%), Can not handle relaunch now, return false", progress());
+        LOG_INFO(MSGID_WEBPAGE_RELAUNCH, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "In Loading(%d%%), Can not handle relaunch now, return false", progress());
         return false;
     }
 
@@ -190,7 +189,7 @@ bool WebPageBase::doHostedWebAppRelaunch(const QString& launchParams)
         || obj.isEmpty() /* no launchParams, { }, and this should be check with object().isEmpty()*/
         || obj.value("contentTarget").isUndefined()
         || (m_appDesc && !m_appDesc->handlesDeeplinking())) {
-        LOG_INFO(MSGID_WEBPAGE_RELAUNCH, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()),
+        LOG_INFO(MSGID_WEBPAGE_RELAUNCH, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()),
             "%s; NOT enough deeplinking condition; return false", __func__);
         return false;
     }
@@ -209,7 +208,7 @@ bool WebPageBase::doDeeplinking(const QString& launchParams)
     std::string handledBy = obj.value("handledBy").isUndefined() ? "default" : obj.value("handledBy").toString().toStdString();
     if (handledBy == "platform") {
         std::string targetUrl = obj.value("contentTarget").toString().toStdString();
-        LOG_INFO(MSGID_DEEPLINKING, 4, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()),
+        LOG_INFO(MSGID_DEEPLINKING, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()),
             PMLOGKS("handledBy", handledBy.c_str()),
             "%s; load target URL:%s", __func__, targetUrl.c_str());
         // load the target URL directly
@@ -221,7 +220,7 @@ bool WebPageBase::doDeeplinking(const QString& launchParams)
         return false;
     } else {
         // handledBy == "default" or "other values"
-        LOG_INFO(MSGID_DEEPLINKING, 4, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()),
+        LOG_INFO(MSGID_DEEPLINKING, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()),
             PMLOGKS("handledBy", handledBy.c_str()), "%s; loadDefaultUrl", __func__);
         loadDefaultUrl();
         return true;
@@ -231,7 +230,7 @@ bool WebPageBase::doDeeplinking(const QString& launchParams)
 void WebPageBase::sendRelaunchEvent()
 {
     setVisible(true);
-    LOG_INFO(MSGID_SEND_RELAUNCHEVENT, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "");
+    LOG_INFO(MSGID_SEND_RELAUNCHEVENT, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "");
     // Send the relaunch event on the next tick after javascript is loaded
     // This is a workaround for a problem where WebKit can't free the page
     // if we don't use a timeout here.
@@ -256,9 +255,8 @@ void WebPageBase::handleLoadStarted()
 
 void WebPageBase::handleLoadFinished()
 {
-    LOG_INFO(MSGID_WAM_DEBUG, 3,
+    LOG_INFO(MSGID_WAM_DEBUG, 2,
         PMLOGKS("APP_ID", qPrintable(appId())),
-        PMLOGKS("INSTANCE_ID", qPrintable(instanceId())),
         PMLOGKFV("PID", "%d", getWebProcessPID()),
         "WebPageBase::handleLoadFinished; m_suspendAtLoad : %s",
             m_suspendAtLoad ? "true; suspend in this time" : "false");
@@ -330,7 +328,7 @@ WebAppManagerConfig* WebPageBase::getWebAppManagerConfig()
 
 bool WebPageBase::processCrashed()
 {
-    return WebAppManager::instance()->processCrashed(appId(), instanceId());
+    return WebAppManager::instance()->processCrashed(appId());
 }
 
 int WebPageBase::suspendDelay()
@@ -389,7 +387,7 @@ void WebPageBase::postRunningAppList()
 
 void WebPageBase::postWebProcessCreated(uint32_t pid)
 {
-    WebAppManager::instance()->postWebProcessCreated(m_appId, m_instanceId, pid);
+    WebAppManager::instance()->postWebProcessCreated(m_appId, pid);
 }
 
 void WebPageBase::setBackgroundColorOfBody(const QString& color)
@@ -478,7 +476,7 @@ void WebPageBase::setCustomUserScript()
     if(!QFileInfo(userScriptFilePath).isReadable())
         return;
 
-    LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "User Scripts exists : %s", qPrintable(userScriptFilePath));
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "User Scripts exists : %s", qPrintable(userScriptFilePath));
     addUserScriptUrl(QUrl::fromLocalFile(userScriptFilePath));
 }
 

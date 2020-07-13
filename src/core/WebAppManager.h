@@ -77,7 +77,6 @@ public:
     std::list<const WebAppBase*> runningApps();
     std::list<const WebAppBase*> runningApps(uint32_t pid);
     WebAppBase* findAppById(const QString& appId);
-    std::list<WebAppBase*> findAppsById(const QString& appId);
     WebAppBase* findAppByInstanceId(const QString& instanceId);
 
     std::string launch(const std::string& appDescString,
@@ -93,14 +92,14 @@ public:
     int currentUiHeight();
     void setUiSize(int width, int height);
 
-    void setActiveInstanceId(QString id) { m_activeInstanceId = id; }
-    const QString getActiveInstanceId() { return m_activeInstanceId; }
+    void setActiveAppId(QString id) { m_activeAppId = id; }
+    const QString getActiveAppId() { return m_activeAppId; }
 
     void onGlobalProperties(int key);
     bool purgeSurfacePool(uint32_t pid);
     void onShutdownEvent();
-    bool onKillApp(const std::string& appId, const std::string& instanceId, bool force = false);
-    bool onPauseApp(const std::string& instanceId);
+    bool onKillApp(const std::string& appId, bool force = false);
+    bool onPauseApp(const std::string& appId);
     bool isDiscardCodeCacheRequired();
     bool setInspectorEnable(QString& appId);
     void discardCodeCache(uint32_t pid);
@@ -112,14 +111,14 @@ public:
     const QString windowTypeFromString(const std::string& str);
 
     bool closeAllApps(uint32_t pid = 0);
-    void setForceCloseApp(const QString& appId, const QString& instanceId);
+    void setForceCloseApp(QString appId);
     void requestKillWebProcess(uint32_t pid);
 
     int getSuspendDelay() { return m_suspendDelay; }
     int getMaxCustomSuspendDelay() const { return m_maxCustomSuspendDelay; }
     void deleteStorageData(const QString& identifier);
     void killCustomPluginProcess(const QString& basePath);
-    bool processCrashed(QString appId, QString instanceId);
+    bool processCrashed(QString appId);
 
     void closeAppInternal(WebAppBase* app, bool ignoreCleanResource = false);
     void forceCloseAppInternal(WebAppBase* app);
@@ -131,12 +130,12 @@ public:
     void appDeleted(WebAppBase* app);
     void postRunningAppList();
     std::string generateInstanceId();
-    void removeClosingAppList(const QString& instanceId);
+    void removeClosingAppList(const QString& appId);
 
     bool isAccessibilityEnabled() { return m_isAccessibilityEnabled; }
     void setAccessibilityEnabled(bool enabled);
-    void postWebProcessCreated(const QString& appId, const QString& instanceId, uint32_t pid);
-    uint32_t getWebProcessId(const QString& appId, const QString& instanceId);
+    void postWebProcessCreated(const QString& appId, uint32_t pid);
+    uint32_t getWebProcessId(const QString& appId);
     void sendEventToAllAppsAndAllFrames(const QString& jsscript);
     void serviceCall(const QString& url, const QString& payload, const QString& appId);
     void updateNetworkStatus(const QJsonObject& object);
@@ -170,7 +169,8 @@ private:
     typedef std::list<WebAppBase*> AppList;
     typedef std::list<WebPageBase*> PageList;
 
-    bool isRunningApp(const std::string& id);
+    bool isRunningApp(const std::string& id, std::string& instanceId);
+
     QMap<QString, WebAppBase*> m_closingAppList;
 
     // Mappings
@@ -182,7 +182,6 @@ private:
     bool m_deletingPages;
 
     QString m_activeAppId;
-    QString m_activeInstanceId;
 
     std::unique_ptr<ServiceSender> m_serviceSender;
     std::unique_ptr<WebProcessManager> m_webProcessManager;
