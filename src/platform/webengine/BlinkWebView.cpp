@@ -182,8 +182,6 @@ void BlinkWebView::LoadAborted(const std::string& url)
 
 void BlinkWebView::LoadStarted()
 {
-    m_userScriptExecuted = false;
-
     if (!m_delegate)
         return;
 
@@ -202,6 +200,8 @@ void BlinkWebView::DidStartNavigation(const std::string& url, bool isInMainFrame
 {
     if (!m_delegate)
         return;
+
+    m_userScriptExecuted = false;
 
     m_delegate->didStartNavigation(url, isInMainFrame);
 }
