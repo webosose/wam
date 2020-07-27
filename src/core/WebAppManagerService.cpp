@@ -49,6 +49,7 @@ QJsonObject WebAppManagerService::onLogControl(const std::string& keys, const st
     reply["event"] = LogManager::getDebugEventsEnabled();
     reply["bundleMessage"] = LogManager::getDebugBundleMessagesEnabled();
     reply["mouseMove"] = LogManager::getDebugMouseMoveEnabled();
+    reply["returnValue"] = true;
 
     return reply;
 }
