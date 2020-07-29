@@ -72,9 +72,9 @@ QJsonObject WebAppManagerServiceLuna::launchApp(QJsonObject request)
     QJsonObject reply;
 
     if (  !request["appDesc"].isObject()
-       || !request["parameters"].isObject()
-       || !request["launchingAppId"].isString()
-       || !request["launchingProcId"].isString()
+       || (request.contains("parameters") && !request["parameters"].isObject())
+       || (request.contains("launchingAppId") && !request["launchingAppId"].isString())
+       || (request.contains("launchingProcId") && !request["launchingProcId"].isString())
        || !request["instanceId"].isString()) {
         reply["returnValue"] = false;
         reply["errorCode"] = ERR_CODE_LAUNCHAPP_MISS_PARAM;
