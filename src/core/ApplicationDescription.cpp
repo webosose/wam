@@ -294,3 +294,8 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
 
     return appDesc;
 }
+
+void ApplicationDescription::setMediaPreferences(const std::string& pref)
+{
+    m_mediaPreferences = pref;
+}

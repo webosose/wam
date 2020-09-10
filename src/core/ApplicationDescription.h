@@ -187,6 +187,7 @@ public:
     void setDisplayAffinity(DisplayId display) { m_displayAffinity = display; }
     int customSuspendDOMTime() const { return m_customSuspendDOMTime; }
     std::string mediaPreferences() const { return m_mediaPreferences; }
+    void setMediaPreferences(const std::string& pref);
 
 private:
     std::string m_id;

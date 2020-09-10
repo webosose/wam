@@ -19,6 +19,7 @@
 #include <cmath>
 
 #include <QtCore/QDir>
+#include <QtCore/QJsonDocument>
 #include <QtCore/QMultiMap>
 #include <QtCore/QUrl>
 #include <QtCore/QUrlQuery>
@@ -1109,7 +1110,15 @@ void WebPageBlink::setSupportDolbyHDRContents()
     QString supportDolbyHDRContents;
     getDeviceInfo("supportDolbyHDRContents", supportDolbyHDRContents);
     LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "supportDolbyHDRContents:%s", qPrintable(supportDolbyHDRContents));
-    d->pageView->SetSupportDolbyHDRContents(supportDolbyHDRContents == "true");
+
+    QJsonDocument doc = QJsonDocument::fromJson(m_appDesc->mediaPreferences().c_str());
+    QJsonObject obj = doc.object();
+
+    obj.insert("supportDolbyHDR", (supportDolbyHDRContents == "true" ? true : false));
+
+    doc.setObject(obj);
+    QString param(doc.toJson());
+    m_appDesc->setMediaPreferences(param.toStdString());
 }
 
 void WebPageBlink::updateDatabaseIdentifier()
