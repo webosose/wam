@@ -513,8 +513,6 @@ void WebAppWayland::doAttach()
     if (keepAlive())
         page()->setKeepAliveWebApp(keepAlive());
 
-    setForceActivateVtgIfRequired();
-
     connect(page(), SIGNAL(webPageClosePageRequested()), this, SLOT(webPageClosePageRequestedSlot()));
     connect(page(), SIGNAL(webViewRecreated()), this, SLOT(webViewRecreatedSlot()));
 }
@@ -595,8 +593,6 @@ void WebAppWayland::stateAboutToChange(webos::NativeWindowState willBe)
 
 void WebAppWayland::showWindow()
 {
-    setForceActivateVtgIfRequired();
-
     if (m_preloadState != NONE_PRELOAD) {
         LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::showWindow(); But Preloaded app; return");
         return;
@@ -682,18 +678,6 @@ void WebAppWayland::didSwapPageCompositorFrame()
 void WebAppWayland::didResumeDOM()
 {
     focus();
-}
-
-void WebAppWayland::setForceActivateVtgIfRequired()
-{
-    QString screenRotation;
-
-    if (WebAppManager::instance() && page()) {
-        if (WebAppManager::instance()->getDeviceInfo("ScreenRotation", screenRotation) && screenRotation != "off")
-            page()->setForceActivateVtg(true);
-        else
-            page()->setForceActivateVtg(false);
-    }
 }
 
 void InputManager::OnCursorVisibilityChanged(bool visible)

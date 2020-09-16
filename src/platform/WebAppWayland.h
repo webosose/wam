@@ -131,7 +131,6 @@ protected:
     void setupWindowGroup(ApplicationDescription* desc);
 
     void moveInputRegion(int height);
-    void setForceActivateVtgIfRequired();
 
 protected Q_SLOTS:
     virtual void showWindowSlot();
