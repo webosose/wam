@@ -211,12 +211,14 @@ WebPageBase* WebAppWayland::detach()
 
 void WebAppWayland::suspendAppRendering()
 {
+    onStageDeactivated();
     m_appWindow->hide();
 }
 
 void WebAppWayland::resumeAppRendering()
 {
     m_appWindow->show();
+    onStageActivated();
 }
 
 bool WebAppWayland::isFocused() const
@@ -248,15 +250,6 @@ bool WebAppWayland::isNormal()
 
 void WebAppWayland::onStageActivated()
 {
-    // NOTE!!!
-    // Calling WebAppWaylandWindow::show() at the end of this function
-    // might lead back to onStageActivated() call again and thus
-    // executingStageActivated guard.
-    static bool executingStageActivated = false;
-    if (executingStageActivated)
-        return;
-    executingStageActivated = true;
-
     if (getCrashState()) {
         LOG_INFO(MSGID_WEBAPP_STAGE_ACITVATED, 4, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), PMLOGKS("getCrashState()", "true; Reload default Page"), "");
         page()->reloadDefaultPage();
@@ -269,11 +262,9 @@ void WebAppWayland::onStageActivated()
 
     setActiveInstanceId(instanceId());
 
-    if (getHiddenWindow() || keepAlive())
-        m_appWindow->show();
+    m_appWindow->show();
 
     LOG_INFO(MSGID_WEBAPP_STAGE_ACITVATED, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
-    executingStageActivated = false;
 }
 
 void WebAppWayland::onStageDeactivated()
@@ -284,6 +275,7 @@ void WebAppWayland::onStageDeactivated()
     page()->suspendWebPageAll();
 
     LOG_INFO(MSGID_WEBAPP_STAGE_DEACITVATED, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
+    m_didActivateStage = false;
 }
 
 void WebAppWayland::configureWindow(QString& type)
@@ -477,6 +469,7 @@ void WebAppWayland::setOpacity(float opacity)
 void WebAppWayland::hide(bool forcedHide)
 {
     if (keepAlive() || forcedHide) {
+        onStageDeactivated();
         m_appWindow->hide();
         setHiddenWindow(true);
     }
@@ -591,6 +584,32 @@ void WebAppWayland::stateAboutToChange(webos::NativeWindowState willBe)
     }
 }
 
+void WebAppWayland::stateChanged(webos::NativeWindowState newState)
+{
+    if (isClosing()) {
+        LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 1, PMLOGKS("APP_ID", qPrintable(appId())), "In Closing; return;");
+        return;
+    }
+
+    switch (newState)
+    {
+        case webos::NATIVE_WINDOW_DEFAULT:
+        case webos::NATIVE_WINDOW_MAXIMIZED:
+        case webos::NATIVE_WINDOW_FULLSCREEN:
+            LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 1, PMLOGKS("APP_ID", qPrintable(appId())), "To FullScreen; call onStageActivated");
+            applyInputRegion();
+            onStageActivated();
+            break;
+        case webos::NATIVE_WINDOW_MINIMIZED:
+            LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 1, PMLOGKS("APP_ID", qPrintable(appId())), "To Minimized; call onStageDeactivated");
+            onStageDeactivated();
+            break;
+        default:
+            LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("HOST_STATE", "%d", newState), "Unknown state. Do not calling nothing anymore.");
+            break;
+    }
+}
+
 void WebAppWayland::showWindow()
 {
     if (m_preloadState != NONE_PRELOAD) {
@@ -600,7 +619,7 @@ void WebAppWayland::showWindow()
 
     setHiddenWindow(false);
 
-    m_appWindow->show();
+    onStageActivated();
     m_addedToWindowMgr = true;
     WebAppBase::showWindow();
 }
@@ -612,8 +631,7 @@ bool WebAppWayland::hideWindow()
 
     LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::hideWindow(); just hide this app");
     page()->closeVkb();
-    m_appWindow->hide();
-    setHiddenWindow(true);
+    hide(true);
     m_addedToWindowMgr = false;
     return true;
 }
@@ -638,7 +656,7 @@ void WebAppWayland::firstFrameVisuallyCommitted()
     if (!getHiddenWindow() && m_preloadState == NONE_PRELOAD) {
         LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "Not hidden window, preload, call showWindow");
         if (getAppDescription()->usePrerendering())
-          m_appWindow->resetPageFrameSwapped();
+            m_didActivateStage = false;
         showWindow();
     }
 }
@@ -671,8 +689,11 @@ void WebAppWayland::webViewRecreatedSlot()
 
 void WebAppWayland::didSwapPageCompositorFrame()
 {
-    if (m_appWindow)
-        m_appWindow->didSwapPageCompositorFrame();
+    if (!m_didActivateStage && !getHiddenWindow() && m_preloadState == NONE_PRELOAD) {
+        LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "Not hidden window, preload, activate stage");
+        onStageActivated();
+        m_didActivateStage = true;
+    }
 }
 
 void WebAppWayland::didResumeDOM()
