@@ -116,7 +116,6 @@ public:
     void applyInputRegion();
     void forwardWebOSEvent(WebOSEvent* event) const;
     void stateAboutToChange(webos::NativeWindowState willBe);
-    void stateChanged(webos::NativeWindowState newState);
     void setUseVirtualKeyboard(const bool enable) override;
 
     // from WebPageBlinkObserver
@@ -146,7 +145,6 @@ private:
     WebAppWaylandWindow* m_appWindow;
     QString m_windowType;
     int m_lastSwappedTime;
-    bool m_didActivateStage = false;
 
     std::vector<gfx::Rect> m_inputRegion;
     bool m_enableInputRegion;

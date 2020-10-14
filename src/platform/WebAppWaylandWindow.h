@@ -47,11 +47,16 @@ public:
     bool event(WebOSEvent* event) override;
     unsigned int CheckKeyFilterTable(unsigned keycode, unsigned* modifier) override;
 
+    void resetPageFrameSwapped() { m_hasPageFrameBeenSwapped = false; }
+
 protected:
     bool cursorVisible() { return m_cursorVisible; }
     void setCursorVisible(bool visible) { m_cursorVisible = visible; }
     bool cursorEnabled() { return m_cursorEnabled; }
     void setCursorEnabled(bool enabled) { m_cursorEnabled = enabled; }
+
+    void onStageActivated();
+    void onStageDeactivated();
 
 private:
     void onWindowStateChangeEvent();
@@ -69,6 +74,8 @@ private:
     bool m_xinputActivated;
 
     WebOSMouseEvent m_lastMouseEvent;
+    bool m_hasPageFrameBeenSwapped;
+    bool m_pendingShow;
 };
 
 #endif

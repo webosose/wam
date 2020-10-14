@@ -66,19 +66,32 @@ WebAppWaylandWindow::WebAppWaylandWindow()
     , m_cursorVisible(false)
     , m_xinputActivated(false)
     , m_lastMouseEvent(WebOSMouseEvent(WebOSEvent::None, -1., -1.))
+    , m_hasPageFrameBeenSwapped(false)
+    , m_pendingShow(false)
 {
     m_cursorEnabled = (qgetenv("ENABLE_CURSOR_BY_DEFAULT") == "1") ? true : false;;
 }
 
 void WebAppWaylandWindow::hide()
 {
-    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())), "WebAppWaylandWindow::hide()");
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())), "WebAppWaylandWindow::hide(); call onStageDeactivated");
+    onStageDeactivated();
     WebAppWindowBase::Hide();
+
+    m_hasPageFrameBeenSwapped = false;
 }
 
 void WebAppWaylandWindow::show()
 {
-    WebAppWindowBase::Show();
+    if (!m_hasPageFrameBeenSwapped) {
+        LOG_INFO(MSGID_WAM_DEBUG, 1, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), "WebAppWaylandWindow::show(),  Not PageFrameSwapped; Pending Show()");
+        m_pendingShow = true;
+    } else {
+        LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())), "WebAppWaylandWindow::show(); call onStageActivated");
+        onStageActivated();
+        WebAppWindowBase::Show();
+        m_pendingShow = false;
+    }
 }
 
 void WebAppWaylandWindow::platformBack()
@@ -112,6 +125,17 @@ void WebAppWaylandWindow::attachWebContents(void* webContents)
     WebAppWindowBase::AttachWebContents(webContents);
 }
 
+void WebAppWaylandWindow::didSwapPageCompositorFrame()
+{
+    if (!m_hasPageFrameBeenSwapped) {
+        LOG_INFO(MSGID_WAM_DEBUG, 1, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), "WebAppWaylandWindow::didSwapPageCompositorFrame(), PageFrameBeenSwapped; m_pendingShow : %s", m_pendingShow?"true":"false");
+        m_hasPageFrameBeenSwapped = true;
+        if (m_pendingShow) {
+            show();
+        }
+    }
+}
+
 bool WebAppWaylandWindow::event(WebOSEvent* event)
 {
     if (!m_webApp)
@@ -135,7 +159,7 @@ bool WebAppWaylandWindow::event(WebOSEvent* event)
                     m_webApp->forwardWebOSEvent(&m_lastMouseEvent);
                 }
             }
-            m_webApp->stateChanged(GetWindowHostState());
+            onWindowStateChangeEvent();
             break;
         case WebOSEvent::WindowStateAboutToChange:
             m_webApp->stateAboutToChange(GetWindowHostStateAboutToChange());
@@ -206,6 +230,49 @@ bool WebAppWaylandWindow::event(WebOSEvent* event)
     }
 
     return WebAppWindowDelegate::event(event);
+}
+
+void WebAppWaylandWindow::onStageActivated()
+{
+    if (!m_webApp)
+        return;
+
+    m_webApp->onStageActivated();
+}
+
+void WebAppWaylandWindow::onStageDeactivated()
+{
+    if (!m_webApp)
+        return;
+
+    m_webApp->onStageDeactivated();
+}
+
+void WebAppWaylandWindow::onWindowStateChangeEvent()
+{
+    if (m_webApp->isClosing()) {
+        LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 2, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())), "In Closing; return;");
+        return;
+    }
+
+    webos::NativeWindowState state = GetWindowHostState();
+    switch (state)
+    {
+        case webos::NATIVE_WINDOW_DEFAULT:
+        case webos::NATIVE_WINDOW_MAXIMIZED:
+        case webos::NATIVE_WINDOW_FULLSCREEN:
+            LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 2, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())), "To FullScreen; call onStageActivated");
+            m_webApp->applyInputRegion();
+            onStageActivated();
+            break;
+        case webos::NATIVE_WINDOW_MINIMIZED:
+            LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 2, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())), "To Minimized; call onStageDeactivated");
+            onStageDeactivated();
+            break;
+        default:
+            LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 3, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())), PMLOGKFV("HOST_STATE", "%d", state), "Unknown state. Do not calling nothing anymore.");
+            break;
+    }
 }
 
 bool WebAppWaylandWindow::onCursorVisibileChangeEvent(WebOSEvent* e)
