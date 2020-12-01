@@ -526,8 +526,15 @@ void WebAppWayland::raise()
         m_appWindow->SetWindowHostState(webos::NATIVE_WINDOW_FULLSCREEN);
     }
 
-    if (wasMinimizedState)
+    if (wasMinimizedState) {
+        // When resuming a web app from the launcher, that entry point is
+        // reached. So, before changing the page visibility, the DOM has to be
+        // resumed (if suspended - this is handled inside resumeWebPageAll()).
+        // Otherwise, corresponding event will never be delivered to its
+        // listener(s) (if any) on the JS layer.
+        page()->resumeWebPageAll();
         page()->setVisibilityState(WebPageBase::WebPageVisibilityState::WebPageVisibilityStateVisible);
+    }
 }
 
 void WebAppWayland::goBackground()
