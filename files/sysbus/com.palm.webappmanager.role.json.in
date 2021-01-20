@@ -1,6 +1,7 @@
 {
     \"exeName\":\"$$WEBOS_INSTALL_BINS/WebAppMgr\",
     \"type\": \"privileged\",
+    \"trustLevel\" : \"oem\",
     \"allowedNames\": [
         \"com.palm.webappmanager\",
         \"com.webos.service.webappmanager\",
@@ -12,7 +13,6 @@
         \"service\":\"com.palm.webappmanager\",
         \"outbound\":[
           \"com.palm.bus\",
-          \"com.palm.lunabus\",
           \"com.webos.applicationManager\",
           \"com.webos.bootManager\",
           \"com.webos.memorymanager\",
