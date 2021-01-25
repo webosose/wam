@@ -1,18 +1,18 @@
 {
     "com.palm.webappmanager": [
-        "activities",
-        "applications.internal",
-        "networking",
-        "settings.read",
-        "signals.all",
-        "signals.register",
-        "system"
+        "activity.operation",
+        "application.operation",
+        "application.launcher",
+        "networkconnection.query",
+        "settings.query",
+        "memorymanager.query"
     ],
     "com.webos.rm.client.*": [
-        "media"
+        "media.operation"
     ],
     "com.webos.settingsservice.client-*": [
-        "applications.internal",
-        "settings.read"
+        "application.operation",
+        "application.launcher",
+        "settings.query"
     ]
 }
