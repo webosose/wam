@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2018 LG Electronics, Inc.
+// Copyright (c) 2008-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -27,6 +27,7 @@
 #include <QJsonParseError>
 #include <QJsonValue>
 #include <QVariant>
+#include <qglobal.h>
 
 #include "ApplicationDescription.h"
 #include "LogManager.h"
@@ -208,7 +209,11 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     // Handle resolution
     if (!jsonObj.value("resolution").isUndefined()) {
         QString overrideResolution = jsonObj["resolution"].toString();
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+        QStringList resList(overrideResolution.split("x", Qt::KeepEmptyParts, Qt::CaseInsensitive));
+#else
         QStringList resList(overrideResolution.split("x", QString::KeepEmptyParts, Qt::CaseInsensitive));
+#endif
         if(resList.size() == 2) {
             appDesc->m_widthOverride = resList.at(0).toInt();
             appDesc->m_heightOverride = resList.at(1).toInt();

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2019 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -69,11 +69,11 @@ char* WebAppManagerUtils::skipToken(const char* p)
 
 long WebAppManagerUtils::percentages(int cnt, int* out, long* now, long* old, long* diffs)
 {
-    register long totalChange = 0;
-    register long* dp = diffs;
+    long totalChange = 0;
+    long* dp = diffs;
 
     for (int i = 0; i < cnt; i++) {
-        register long change = *now - *old;
+        long change = *now - *old;
         if (change < 0)
             change = (int)((unsigned long)*now-(unsigned long)*old);
         totalChange += (*dp++ = change);

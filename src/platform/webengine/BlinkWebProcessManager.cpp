@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -41,7 +41,7 @@ QJsonObject BlinkWebProcessManager::getWebProcessProfiling()
     uint32_t pid;
     QList<uint32_t> processIdList;
 
-    QMap<uint32_t, WebAppBase*> runningAppList;
+    QMultiMap<uint32_t, WebAppBase*> runningAppList;
     std::list<const WebAppBase*> running = runningApps();
     for (std::list<const WebAppBase*>::iterator it = running.begin(); it != running.end(); ++it) {
         WebAppBase* app = findAppByInstanceId((*it)->instanceId());
@@ -49,7 +49,7 @@ QJsonObject BlinkWebProcessManager::getWebProcessProfiling()
         if (!processIdList.contains(pid))
             processIdList.append(pid);
 
-        runningAppList.insertMulti(pid, app);
+        runningAppList.insert(pid, app);
     }
 
     for (int id = 0; id < processIdList.size(); id++) {
