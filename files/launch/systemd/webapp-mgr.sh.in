@@ -159,7 +159,7 @@ export WAM_COMMON_SWITCHES=" \
     --enable-blink-features=$ENABLE_BLINK_FEATURES \
     --disable-blink-features=$DISABLE_BLINK_FEATURES \
     --enable-features=$ENABLE_FEATURES \
-    --local-storage-manager \
+    --local-storage-tracker \
     --enable-devtools-experiments \
     --enable-key-event-throttling \
     --enable-neva-ime \

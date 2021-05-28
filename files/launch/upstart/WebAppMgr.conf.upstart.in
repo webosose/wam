@@ -175,7 +175,7 @@ script
         --touch-events=disabled \
         --ui-disable-opaque-shader-program \
         --user-data-dir=$WAM_DATA_PATH \
-        --local-storage-manager \
+        --local-storage-tracker \
         --enable-devtools-experiments \
         --webos-wam \
         --enable-neva-ime \
