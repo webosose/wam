@@ -1,4 +1,5 @@
-# Copyright (c) 2015-2018 LG Electronics, Inc.
+
+# Copyright (c) 2021 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,13 +15,20 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-TEMPLATE = subdirs
-CONFIG += ordered
+include(common.pri)
 
-wamcorelib.file = wamcorelib.pri
-wamlib.file = wamlib.pri
-wamplugin.file = wamplugin.pri
-wam.file = wam.pri
-tests.file = tests.pri
+PKGCONFIG += gmock_main gmock gtest
 
-SUBDIRS += wamcorelib wamlib wamplugin wam tests
+VPATH += ./src/tests
+
+SOURCES += \
+        NetworkStatusUnitTest.cpp \
+        NetworkStatus.cpp
+
+HEADERS += \
+        NetworkStatus.h
+
+target.path = $$WEBOS_INSTALL_TESTSDIR
+TARGET = WebAppMgrUnitTest
+
+INSTALLS += target
