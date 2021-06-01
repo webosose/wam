@@ -24,6 +24,7 @@
 #include "webos/public/runtime.h"
 #include "webos/webview_base.h"
 #include <string>
+#include <vector>
 
 // just to save some typing, the template filled out with the name of this class
 #define QCB(FUNC) bus_callback_qjson<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>
@@ -33,6 +34,18 @@
 
 #define GET_LS2_SERVER_STATUS(FUNC, PARAMS) call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>("luna://com.palm.lunabus/signal/registerServerStatus", PARAMS, this)
 #define LS2_CALL(FUNC, SERVICE, PARAMS) call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>(SERVICE, PARAMS, this)
+
+static void logJsonTruncated(const char* funcName, const QJsonObject& request)
+{
+    QJsonDocument doc(request);
+    QByteArray requestBuffer = doc.toJson(QJsonDocument::Compact);
+    const uint32_t chunkSize = 255;
+    const uint32_t chunksCount = requestBuffer.size() % chunkSize ? (requestBuffer.size() / chunkSize) + 1 : requestBuffer.size() / chunkSize;
+    for (int i = 0, part = 1; i < requestBuffer.size(); i += chunkSize, part++) {
+        const auto& chunk = requestBuffer.mid(i, chunkSize);
+        LOG_INFO(MSGID_WAM_DEBUG, 0, ">>>>>>> WebAppManagerServiceLuna::%s [%d/%d] request:\"%s\"", funcName, part, chunksCount, chunk.toStdString().c_str());
+    }
+}
 
 LSMethod WebAppManagerServiceLuna::s_methods[] = {
     LS2_METHOD_ENTRY(launchApp),
@@ -67,6 +80,7 @@ bool WebAppManagerServiceLuna::startService()
 
 QJsonObject WebAppManagerServiceLuna::launchApp(QJsonObject request)
 {
+    logJsonTruncated(__func__, request);
     int errCode;
     std::string errMsg;
     QJsonObject reply;
@@ -143,6 +157,7 @@ bool WebAppManagerServiceLuna::isValidInstanceId(const QString& instanceId)
 
 QJsonObject WebAppManagerServiceLuna::killApp(QJsonObject request)
 {
+    logJsonTruncated(__func__, request);
     bool instances;
     std::string instanceId = request["instanceId"].toString().toStdString();
     std::string appId = request["appId"].toString().toStdString();
@@ -176,6 +191,7 @@ QJsonObject WebAppManagerServiceLuna::killApp(QJsonObject request)
 
 QJsonObject WebAppManagerServiceLuna::pauseApp(QJsonObject request)
 {
+    logJsonTruncated(__func__, request);
     std::string id{request["instanceId"].toString().toStdString()};
 
     LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("INSTANCE_ID", id.c_str()), PMLOGKS("API", "pauseApp"), "");
@@ -198,6 +214,7 @@ QJsonObject WebAppManagerServiceLuna::pauseApp(QJsonObject request)
 
 QJsonObject WebAppManagerServiceLuna::setInspectorEnable(QJsonObject request)
 {
+    logJsonTruncated(__func__, request);
     LOG_DEBUG("WebAppManagerService::setInspectorEnable");
     QString appId = request["appId"].toString();
     QJsonObject reply;
@@ -212,6 +229,7 @@ QJsonObject WebAppManagerServiceLuna::setInspectorEnable(QJsonObject request)
 
 QJsonObject WebAppManagerServiceLuna::closeAllApps(QJsonObject request)
 {
+    logJsonTruncated(__func__, request);
     bool val = WebAppManagerService::onCloseAllApps();
 
     QJsonObject reply;
@@ -221,6 +239,7 @@ QJsonObject WebAppManagerServiceLuna::closeAllApps(QJsonObject request)
 
 QJsonObject WebAppManagerServiceLuna::logControl(QJsonObject request)
 {
+    logJsonTruncated(__func__, request);
     QJsonObject reply;
 
     if (!request.contains("keys") || !request.contains("value")) {
@@ -236,6 +255,7 @@ QJsonObject WebAppManagerServiceLuna::logControl(QJsonObject request)
 
 QJsonObject WebAppManagerServiceLuna::discardCodeCache(QJsonObject request)
 {
+    logJsonTruncated(__func__, request);
     bool forcedClearCache = false;
     uint32_t pid = 0;
     std::list<const WebAppBase*> running;
@@ -277,12 +297,14 @@ QJsonObject WebAppManagerServiceLuna::discardCodeCache(QJsonObject request)
 
 QJsonObject WebAppManagerServiceLuna::getWebProcessSize(QJsonObject request)
 {
+    logJsonTruncated(__func__, request);
     QJsonObject reply = WebAppManagerService::getWebProcessProfiling();
     return reply;
 }
 
 QJsonObject WebAppManagerServiceLuna::listRunningApps(QJsonObject request, bool subscribed)
 {
+    logJsonTruncated(__func__, request);
     bool includeSysApps = request["includeSysApps"].toBool();
 
     std::vector<ApplicationInfo> apps = WebAppManagerService::list(includeSysApps);
@@ -303,6 +325,7 @@ QJsonObject WebAppManagerServiceLuna::listRunningApps(QJsonObject request, bool 
 
 QJsonObject WebAppManagerServiceLuna::clearBrowsingData(QJsonObject request)
 {
+    logJsonTruncated(__func__, request);
     QJsonObject reply;
     QJsonValue value = request["types"];
     bool returnValue = true;
