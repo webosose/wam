@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2019 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -33,8 +33,11 @@
 #include "WebAppManagerConfig.h"
 #include "WebAppManagerTracer.h"
 #include "WebAppManagerUtils.h"
-#include "WebPageObserver.h"
 #include "WebPageBlinkObserver.h"
+#include "WebPageObserver.h"
+#include "WebView.h"
+#include "WebViewFactory.h"
+#include "WebViewImpl.h"
 
 /**
  * Hide dirty implementation details from
@@ -72,12 +75,15 @@ public:
 
 public:
     WebPageBlink *q;
-    BlinkWebView *pageView;
+    WebView *pageView;
     PalmSystemBlink* m_palmSystem;
 };
 
-
-WebPageBlink::WebPageBlink(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const QString& params)
+WebPageBlink::WebPageBlink(
+    const QUrl& url,
+    std::shared_ptr<ApplicationDescription> desc,
+    const QString& params,
+    std::unique_ptr<WebViewFactory> factory)
     : WebPageBase(url, desc, params)
     , d(new WebPageBlinkPrivate(this))
     , m_isPaused(false)
@@ -90,6 +96,14 @@ WebPageBlink::WebPageBlink(const QUrl& url, std::shared_ptr<ApplicationDescripti
     , m_trustLevel(QString::fromStdString(desc->trustLevel()))
     , m_customSuspendDOMTime(0)
     , m_observer(nullptr)
+    , m_factory(std::move(factory))
+{
+}
+
+WebPageBlink::WebPageBlink(const QUrl& url,
+                           std::shared_ptr<ApplicationDescription> desc,
+                           const QString& params)
+    : WebPageBlink(url, desc, params, nullptr)
 {
 }
 
@@ -830,12 +844,14 @@ void WebPageBlink::didFinishLaunchingSlot()
 }
 
 // functions from webappmanager2
-BlinkWebView * WebPageBlink::createPageView()
+WebView * WebPageBlink::createPageView()
 {
-    return new BlinkWebView();
+    if (m_factory)
+        return m_factory->createWebView();
+    return new WebViewImpl(std::make_unique<BlinkWebView>());
 }
 
-BlinkWebView* WebPageBlink::pageView() const
+WebView* WebPageBlink::pageView() const
 {
     return d->pageView;
 }

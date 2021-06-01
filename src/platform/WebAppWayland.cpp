@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -22,6 +22,9 @@
 #include "ApplicationDescription.h"
 #include "LogManager.h"
 #include "WebAppWaylandWindow.h"
+#include "WebAppWindow.h"
+#include "WebAppWindowFactory.h"
+#include "WebAppWindowImpl.h"
 #include "WebPageBase.h"
 #include "WindowTypes.h"
 
@@ -55,7 +58,7 @@ WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window,
                              int displayId,
                              const std::string& location_hint)
     : WebAppBase()
-    , m_appWindow(window)
+    , m_appWindow(new WebAppWindowImpl(std::unique_ptr<WebAppWaylandWindow>(window)))
     , m_windowType(type)
     , m_lastSwappedTime(0)
     , m_enableInputRegion(false)
@@ -64,6 +67,26 @@ WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window,
     , m_lostFocusBySetWindowProperty(false)
     , m_displayId(displayId)
     , m_locationHint(location_hint)
+{
+    init(width, height);
+}
+
+WebAppWayland::WebAppWayland(QString type,
+                             std::unique_ptr<WebAppWindowFactory> factory,
+                             int width, int height,
+                             int displayId,
+                             const std::string& location_hint)
+    : WebAppBase()
+    , m_appWindow(nullptr)
+    , m_windowType(type)
+    , m_lastSwappedTime(0)
+    , m_enableInputRegion(false)
+    , m_isFocused(false)
+    , m_vkbHeight(0)
+    , m_lostFocusBySetWindowProperty(false)
+    , m_displayId(displayId)
+    , m_locationHint(location_hint)
+    , m_windowFactory(std::move(factory))
 {
     init(width, height);
 }
@@ -96,8 +119,12 @@ static webos::WebAppWindowBase::LocationHint getLocationHintFromString(const std
 
 void WebAppWayland::init(int width, int height)
 {
-    if (!m_appWindow)
-        m_appWindow = WebAppWaylandWindow::take();
+    if (!m_appWindow) {
+        if (m_windowFactory)
+            m_appWindow = m_windowFactory->createWindow();
+        else
+            m_appWindow = new WebAppWindowImpl(std::unique_ptr<WebAppWaylandWindow>(WebAppWaylandWindow::take()));
+    }
     if (!(width && height)) {
         setUiSize(m_appWindow->DisplayWidth(), m_appWindow->DisplayHeight());
         m_appWindow->InitWindow(m_appWindow->DisplayWidth(), m_appWindow->DisplayHeight());

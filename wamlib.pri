@@ -36,7 +36,9 @@ SOURCES += \
     WebAppManagerServiceLunaImpl.cpp \
     WebAppWayland.cpp \
     WebAppWaylandWindow.cpp \
+    WebAppWindowImpl.cpp \
     WebPageBlink.cpp \
+    WebViewImpl.cpp \
 
 
 HEADERS += \
@@ -54,9 +56,15 @@ HEADERS += \
     WebAppManagerServiceLunaImpl.h \
     WebAppWayland.h \
     WebAppWaylandWindow.h \
+    WebAppWindow.h \
+    WebAppWindowFactory.h \
+    WebAppWindowImpl.h \
+    WebPageBlink.h \
     WebPageBlinkDelegate.h \
     WebPageBlinkObserver.h \
-    WebPageBlink.h \
+    WebView.h \
+    WebViewFactory.h \
+    WebViewImpl.h \
 
 TARGET = WebAppMgr
 

@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,6 +17,8 @@
 #ifndef WEBPAGEBLINK_H
 #define WEBPAGEBLINK_H
 
+#include <memory>
+
 #include <QtCore/QUrl>
 
 #include "Timer.h"
@@ -26,13 +28,18 @@
 #include "webos/webview_base.h"
 
 class WebAppBase;
-class BlinkWebView;
+class WebView;
 class WebPageBlinkPrivate;
 class WebPageBlinkObserver;
+class WebViewFactory;
 
 class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
     Q_OBJECT
 public:
+    WebPageBlink(const QUrl& url,
+                 std::shared_ptr<ApplicationDescription> desc,
+                 const QString& launchParams,
+                 std::unique_ptr<WebViewFactory> factory);
     WebPageBlink(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const QString& launchParams);
     ~WebPageBlink() override;
 
@@ -150,12 +157,12 @@ Q_SIGNALS:
     void compositorFrameSwapped();
 
 protected:
-    BlinkWebView* pageView() const;
+    WebView* pageView() const;
 
     // WebPageBase
     virtual void loadDefaultUrl();
     virtual void loadErrorPage(int errorCode);
-    virtual BlinkWebView* createPageView();
+    virtual WebView* createPageView();
     virtual void setupStaticUserScripts();
     virtual void addUserScript(const QString& script);
     virtual void addUserScriptUrl(const QUrl& url);
@@ -198,6 +205,8 @@ private:
     int m_customSuspendDOMTime;
 
     WebPageBlinkObserver *m_observer;
+
+    std::unique_ptr<WebViewFactory> m_factory;
 };
 
 #endif /* WEBPAGEBLINK_H */

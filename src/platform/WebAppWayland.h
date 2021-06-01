@@ -17,6 +17,8 @@
 #ifndef WEBAPPWAYLAND_H
 #define WEBAPPWAYLAND_H
 
+#include <memory>
+
 #include "DisplayId.h"
 #include "Timer.h"
 #include "WebAppBase.h"
@@ -31,6 +33,8 @@
 
 class ApplicationDescription;
 class WebAppWaylandWindow;
+class WebAppWindowFactory;
+class WebAppWindow;
 
 class InputManager : public webos::InputPointer {
 public:
@@ -57,6 +61,11 @@ public:
                   int displayId = kUndefinedDisplayId,
                   const std::string& location_hint = "");
     WebAppWayland(QString type, WebAppWaylandWindow* window,
+                  int width = 0, int height = 0,
+                  int displayId = kUndefinedDisplayId,
+                  const std::string& location_hint = "");
+
+    WebAppWayland(QString type, std::unique_ptr<WebAppWindowFactory> factory,
                   int width = 0, int height = 0,
                   int displayId = kUndefinedDisplayId,
                   const std::string& location_hint = "");
@@ -128,7 +137,6 @@ protected:
     virtual void doAttach();
     virtual void showWindow();
 
-    WebAppWaylandWindow* window() { return m_appWindow; }
     void setupWindowGroup(ApplicationDescription* desc);
 
     void moveInputRegion(int height);
@@ -143,7 +151,7 @@ private:
 
     void init(int width, int height);
 
-    WebAppWaylandWindow* m_appWindow;
+    WebAppWindow* m_appWindow;
     QString m_windowType;
     int m_lastSwappedTime;
     bool m_didActivateStage = false;
@@ -161,6 +169,8 @@ private:
 
     int m_displayId;
     std::string m_locationHint;
+
+    std::unique_ptr<WebAppWindowFactory> m_windowFactory;
 };
 
 #endif /* WEBAPPWAYLAND_H */
