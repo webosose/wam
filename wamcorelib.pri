@@ -29,7 +29,7 @@ SOURCES += \
         PlugInService.cpp \
         Timer.cpp \
         WebAppBase.cpp \
-        WebAppFactoryManager.cpp \
+        WebAppFactoryManagerImpl.cpp \
         WebAppManager.cpp \
         WebAppManagerConfig.cpp \
         WebAppManagerService.cpp \
@@ -55,6 +55,7 @@ HEADERS += \
         WebAppBase.h \
         WebAppFactoryInterface.h \
         WebAppFactoryManager.h \
+        WebAppFactoryManagerImpl.h \
         WebAppManager.h \
         WebAppManagerConfig.h \
         WebAppManagerService.h \

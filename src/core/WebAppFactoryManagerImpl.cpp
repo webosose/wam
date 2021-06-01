@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2018 LG Electronics, Inc.
+// Copyright (c) 2008-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,7 +14,7 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "WebAppFactoryManager.h"
+#include "WebAppFactoryManagerImpl.h"
 
 #include <QtCore/QDir>
 #include <QtCore/QJsonArray>
@@ -27,17 +27,17 @@
 #include "WebAppManager.h"
 #include "WebPageBase.h"
 
-WebAppFactoryManager* WebAppFactoryManager::m_instance = nullptr;
+WebAppFactoryManager* WebAppFactoryManagerImpl::m_instance = nullptr;
 
-WebAppFactoryManager* WebAppFactoryManager::instance()
+WebAppFactoryManager* WebAppFactoryManagerImpl::instance()
 {
     if(!m_instance) {
-        m_instance = new WebAppFactoryManager();
+        m_instance = new WebAppFactoryManagerImpl();
     }
     return m_instance;
 }
 
-WebAppFactoryManager::WebAppFactoryManager()
+WebAppFactoryManagerImpl::WebAppFactoryManagerImpl()
     : m_loadPluggableOnDemand(false)
 {
     WebAppManagerConfig* webAppManagerConfig = WebAppManager::instance()->config();
@@ -55,7 +55,9 @@ WebAppFactoryManager::WebAppFactoryManager()
         loadPluggable();
 }
 
-WebAppFactoryInterface* WebAppFactoryManager::getPluggable(QString appType)
+WebAppFactoryManagerImpl::~WebAppFactoryManagerImpl() = default;
+
+WebAppFactoryInterface* WebAppFactoryManagerImpl::getPluggable(QString appType)
 {
     QMap<QString, WebAppFactoryInterface*>::iterator iter = m_interfaces.find(appType);
     if (iter != m_interfaces.end())
@@ -64,7 +66,7 @@ WebAppFactoryInterface* WebAppFactoryManager::getPluggable(QString appType)
     return loadPluggable(appType);
 }
 
-WebAppFactoryInterface* WebAppFactoryManager::loadPluggable(QString appType)
+WebAppFactoryInterface* WebAppFactoryManagerImpl::loadPluggable(QString appType)
 {
     if (!appType.isEmpty() && !m_factoryEnv.contains(appType))
         return nullptr;
@@ -96,7 +98,7 @@ WebAppFactoryInterface* WebAppFactoryManager::loadPluggable(QString appType)
     return nullptr;
 }
 
-WebAppBase* WebAppFactoryManager::createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc, QString appType)
+WebAppBase* WebAppFactoryManagerImpl::createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc, QString appType)
 {
     WebAppFactoryInterface* interface = getPluggable(appType);
     if (interface)
@@ -105,16 +107,16 @@ WebAppBase* WebAppFactoryManager::createWebApp(QString winType, std::shared_ptr<
     return nullptr;
 }
 
-WebAppBase* WebAppFactoryManager::createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc, QString appType)
+WebAppBase* WebAppFactoryManagerImpl::createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc, QString appType)
 {
-    WebAppFactoryInterface* interface = getPluggable(appType);  
+    WebAppFactoryInterface* interface = getPluggable(appType);
     if (interface)
         return interface->createWebApp(winType, page, desc);
 
     return nullptr;
 }
 
-WebPageBase* WebAppFactoryManager::createWebPage(QString winType, QUrl url, std::shared_ptr<ApplicationDescription> desc, QString appType, QString launchParams)
+WebPageBase* WebAppFactoryManagerImpl::createWebPage(QString winType, QUrl url, std::shared_ptr<ApplicationDescription> desc, QString appType, QString launchParams)
 {
     WebPageBase *page = nullptr;
 

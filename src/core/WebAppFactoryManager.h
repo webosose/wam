@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2018 LG Electronics, Inc.
+// Copyright (c) 2008-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -19,27 +19,21 @@
 
 #include <memory>
 
-#include <QMap>
-#include <QStringList>
+#include <QString>
+#include <QUrl>
 
-#include "WebAppFactoryInterface.h"
+class ApplicationDescription;
+class WebAppBase;
+class WebPageBase;
 
 class WebAppFactoryManager {
 public:
-    static WebAppFactoryManager* instance();
-    WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "");
-    WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "");
-    WebPageBase* createWebPage(QString winType, QUrl url, std::shared_ptr<ApplicationDescription> desc, QString appType = "", QString launchParams = "");
-    WebAppFactoryInterface* getPluggable(QString appType);
-    WebAppFactoryInterface* loadPluggable(QString appType = "");
+    WebAppFactoryManager() = default;
+    virtual ~WebAppFactoryManager() = default;
 
-private:
-    static WebAppFactoryManager* m_instance;
-    WebAppFactoryManager();
-    QMap<QString, WebAppFactoryInterface*> m_interfaces;
-    QString m_webAppFactoryPluginPath;
-    QStringList m_factoryEnv;
-    bool m_loadPluggableOnDemand;
+    virtual WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "") = 0;
+    virtual WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "") = 0;
+    virtual WebPageBase* createWebPage(QString winType, QUrl url, std::shared_ptr<ApplicationDescription> desc, QString appType = "", QString launchParams = "") = 0;
 };
 
-#endif /* WEBAPPFACTORY_H */
+#endif /* WEBAPPFACTORYMANAGER_H */

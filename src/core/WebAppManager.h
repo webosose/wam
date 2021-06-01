@@ -35,6 +35,7 @@ class NetworkStatusManager;
 class PlatformModuleFactory;
 class ServiceSender;
 class WebProcessManager;
+class WebAppFactoryManager;
 class WebAppManagerConfig;
 class WebAppBase;
 class WebPageBase;
@@ -71,6 +72,7 @@ public:
     virtual ~WebAppManager();
 
     void setPlatformModules(std::unique_ptr<PlatformModuleFactory> factory);
+    void setWebAppFactory(std::unique_ptr<WebAppFactoryManager> factory);
     bool run();
     void quit();
 
@@ -156,6 +158,7 @@ public:
 
 protected:
 private:
+    WebAppFactoryManager* getWebAppFactory();
     void loadEnvironmentVariable();
 
     WebAppBase* onLaunchUrl(const std::string& url, QString winType,
@@ -189,6 +192,7 @@ private:
     std::unique_ptr<DeviceInfo> m_deviceInfo;
     std::unique_ptr<WebAppManagerConfig> m_webAppManagerConfig;
     std::unique_ptr<NetworkStatusManager> m_networkStatusManager;
+    std::unique_ptr<WebAppFactoryManager> m_webAppFactory;
 
     QMap<QString, int> m_lastCrashedAppIds;
 

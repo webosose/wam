@@ -30,7 +30,7 @@
 #include "PlatformModuleFactory.h"
 #include "ServiceSender.h"
 #include "WebAppBase.h"
-#include "WebAppFactoryManager.h"
+#include "WebAppFactoryManagerImpl.h"
 #include "WebAppManagerConfig.h"
 #include "WebAppManagerService.h"
 #include "WebAppManagerTracer.h"
@@ -93,8 +93,11 @@ void WebAppManager::setPlatformModules(std::unique_ptr<PlatformModuleFactory> fa
     m_deviceInfo = factory->getDeviceInfo();
     m_deviceInfo->initialize();
 
-    WebAppFactoryManager::instance();
     loadEnvironmentVariable();
+}
+
+void WebAppManager::setWebAppFactory(std::unique_ptr<WebAppFactoryManager> factory) {
+    m_webAppFactory = std::move(factory);
 }
 
 bool WebAppManager::run()
@@ -105,6 +108,10 @@ bool WebAppManager::run()
 
 void WebAppManager::quit()
 {
+}
+
+WebAppFactoryManager* WebAppManager::getWebAppFactory() {
+    return m_webAppFactory ? m_webAppFactory.get() : WebAppFactoryManagerImpl::instance();
 }
 
 void WebAppManager::loadEnvironmentVariable()
@@ -283,7 +290,8 @@ WebAppBase* WebAppManager::onLaunchUrl(const std::string& url, QString winType,
                                        const std::string& args, const std::string& launchingAppId,
                                        int& errCode, std::string& errMsg)
 {
-    WebAppBase* app = WebAppFactoryManager::instance()->createWebApp(winType, appDesc, appDesc->subType().c_str());
+    WebAppFactoryManager* factory = getWebAppFactory();
+    WebAppBase* app = factory->createWebApp(winType, appDesc, appDesc->subType().c_str());
 
     if (!app) {
         errCode = ERR_CODE_LAUNCHAPP_UNSUPPORTED_TYPE;
@@ -291,7 +299,7 @@ WebAppBase* WebAppManager::onLaunchUrl(const std::string& url, QString winType,
         return nullptr;
     }
 
-    WebPageBase* page = WebAppFactoryManager::instance()->createWebPage(winType, QUrl(url.c_str()), appDesc, appDesc->subType().c_str(), args.c_str());
+    WebPageBase* page =  factory->createWebPage(winType, QUrl(url.c_str()), appDesc, appDesc->subType().c_str(), args.c_str());
 
     //set use launching time optimization true while app loading.
     page->setUseLaunchOptimization(true);
