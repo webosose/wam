@@ -32,47 +32,52 @@ WebAppManagerConfig::WebAppManagerConfig()
     initConfiguration();
 }
 
+std::string WebAppManagerConfig::wamGetEnv(const char *name)
+{
+    return qgetenv(name).toStdString();
+}
+
 void WebAppManagerConfig::initConfiguration()
 {
-    m_webAppFactoryPluginTypes = QLatin1String(qgetenv("WEBAPPFACTORY"));
+    m_webAppFactoryPluginTypes = QLatin1String(wamGetEnv("WEBAPPFACTORY").c_str());
 
-    m_webAppFactoryPluginPath = QLatin1String(qgetenv("WEBAPPFACTORY_PLUGIN_PATH"));
+    m_webAppFactoryPluginPath = QLatin1String(wamGetEnv("WEBAPPFACTORY_PLUGIN_PATH").c_str());
     if (m_webAppFactoryPluginPath.isEmpty()) {
         m_webAppFactoryPluginPath = QLatin1String("/usr/lib/webappmanager/plugins");
     }
 
-    QString suspendDelay = QLatin1String(qgetenv("WAM_SUSPEND_DELAY_IN_MS"));
+    QString suspendDelay = QLatin1String(wamGetEnv("WAM_SUSPEND_DELAY_IN_MS").c_str());
     m_suspendDelayTime = std::max(suspendDelay.toInt(), 1);
 
-    QString maxCustomSuspendDelay = QLatin1String(qgetenv("MAX_CUSTOM_SUSPEND_DELAY_IN_MS"));
+    QString maxCustomSuspendDelay = QLatin1String(wamGetEnv("MAX_CUSTOM_SUSPEND_DELAY_IN_MS").c_str());
     m_maxCustomSuspendDelayTime = std::max(maxCustomSuspendDelay.toInt(), 0);
 
-    m_webProcessConfigPath = QLatin1String(qgetenv("WEBPROCESS_CONFIGURATION_PATH"));
+    m_webProcessConfigPath = QLatin1String(wamGetEnv("WEBPROCESS_CONFIGURATION_PATH").c_str());
     if (m_webProcessConfigPath.isEmpty())
         m_webProcessConfigPath = QLatin1String("/etc/wam/com.webos.wam.json");
 
-    m_errorPageUrl = QLatin1String(qgetenv("WAM_ERROR_PAGE"));
+    m_errorPageUrl = QLatin1String(wamGetEnv("WAM_ERROR_PAGE").c_str());
 
-    if (qgetenv("LOAD_DYNAMIC_PLUGGABLE") == "1")
-        m_dynamicPluggableLoadEnabled = true;
+    m_dynamicPluggableLoadEnabled =
+            wamGetEnv("LOAD_DYNAMIC_PLUGGABLE").compare("1") == 0;
 
-    if (qgetenv("POST_WEBPROCESS_CREATED_DISABLED") == "1")
-        m_postWebProcessCreatedDisabled =  true;
+    m_postWebProcessCreatedDisabled =
+            wamGetEnv("POST_WEBPROCESS_CREATED_DISABLED").compare("1") == 0;
 
-    if (qgetenv("LAUNCH_TIME_CHECK") == "1")
-        m_checkLaunchTimeEnabled = true;
+    m_checkLaunchTimeEnabled =
+            wamGetEnv("LAUNCH_TIME_CHECK").compare("1") == 0;
 
-    if (qgetenv("USE_SYSTEM_APP_OPTIMIZATION") == "1")
-        m_useSystemAppOptimization = true;
+    m_useSystemAppOptimization =
+            wamGetEnv("USE_SYSTEM_APP_OPTIMIZATION").compare("1") == 0;
 
-    if (qgetenv("ENABLE_LAUNCH_OPTIMIZATION") == "1")
-        m_launchOptimizationEnabled = true;
+    m_launchOptimizationEnabled =
+            wamGetEnv("ENABLE_LAUNCH_OPTIMIZATION").compare("1") == 0;
 
-    m_userScriptPath = QLatin1String(qgetenv("USER_SCRIPT_PATH"));
+    m_userScriptPath = QLatin1String(wamGetEnv("USER_SCRIPT_PATH").c_str());
     if (m_userScriptPath.isEmpty())
         m_userScriptPath = QLatin1String("webOSUserScripts/userScript.js");
 
-    m_name = qgetenv("WAM_NAME").data();
+    m_name = wamGetEnv("WAM_NAME");
 }
 
 QVariant WebAppManagerConfig::getConfiguration(QString name)
@@ -99,6 +104,32 @@ void WebAppManagerConfig::postInitConfiguration()
 
     if (access("/var/luna/preferences/devmode_enabled", F_OK) == 0) {
         m_devModeEnabled = true;
-        m_telluriumNubPath = QLatin1String(qgetenv("TELLURIUM_NUB_PATH"));
+        m_telluriumNubPath = QLatin1String(wamGetEnv("TELLURIUM_NUB_PATH").c_str());
     }
+}
+
+void WebAppManagerConfig::resetConfiguration()
+{
+    m_suspendDelayTime = 0;
+    m_maxCustomSuspendDelayTime = 0;
+
+    m_devModeEnabled = false;
+    m_inspectorEnabled = false;
+    m_dynamicPluggableLoadEnabled = false;
+    m_postWebProcessCreatedDisabled = false;
+    m_checkLaunchTimeEnabled = false;
+    m_useSystemAppOptimization = false;
+    m_launchOptimizationEnabled = false;
+
+    m_webAppFactoryPluginTypes.clear();
+    m_webAppFactoryPluginPath.clear();
+    m_webProcessConfigPath.clear();
+    m_errorPageUrl.clear();
+    m_telluriumNubPath.clear();
+    m_userScriptPath.clear();
+    m_name.clear();
+
+    m_configuration.clear();
+
+    initConfiguration();
 }

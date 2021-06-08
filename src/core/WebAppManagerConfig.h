@@ -48,6 +48,8 @@ public:
 protected:
     virtual QVariant getConfiguration(QString name);
     virtual void setConfiguration(QString name, QVariant value);
+    virtual std::string wamGetEnv(const char *name);
+    void resetConfiguration();
 
 private:
     void initConfiguration();
