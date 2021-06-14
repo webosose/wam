@@ -19,16 +19,22 @@ include(common.pri)
 
 PKGCONFIG += gmock_main gmock gtest
 
-VPATH += ./src/tests
+VPATH += \
+        ./src/tests \
+        ./src/tests/mocks \
 
-SOURCES += \
-        NetworkStatusUnitTest.cpp \
-        NetworkStatus.cpp
+INCLUDEPATH += $$VPATH
 
-HEADERS += \
-        NetworkStatus.h
+SOURCES += $$files($$PWD/src/tests/*.cpp, true)
+message($$SOURCES)
+
+HEADERS += $$files($$PWD/src/tests/*.h, true)
+message($$HEADERS)
 
 target.path = $$WEBOS_INSTALL_TESTSDIR
+
+LIBS += -lWebAppMgr -lWebAppMgrCore
+
 TARGET = WebAppMgrUnitTest
 
 INSTALLS += target
