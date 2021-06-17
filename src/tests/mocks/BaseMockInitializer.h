@@ -28,7 +28,8 @@
 #include "WebViewMock.h"
 #include "webos/window_group_configuration.h"
 
-template <typename T = NiceWebViewMock, typename U = NiceWebAppWindowMock>
+template <typename T = NiceWebViewMock, typename U = NiceWebAppWindowMock,
+          typename P = PlatformModuleFactoryImpl>
 class BaseMockInitializer {
  public:
   BaseMockInitializer()
@@ -37,7 +38,7 @@ class BaseMockInitializer {
         web_view_(new T()),
         web_app_window_(new U()) {
     WebAppManager::instance()->setPlatformModules(
-        std::make_unique<PlatformModuleFactoryImpl>());
+        std::make_unique<P>());
 
     auto web_app_factory_manager = std::make_unique<WebAppFactoryManagerMock>();
     web_app_factory_manager->setWebViewFactory(web_view_factory_);

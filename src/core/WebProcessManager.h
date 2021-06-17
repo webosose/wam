@@ -35,7 +35,7 @@ public:
 
     uint32_t getWebProcessProxyID(const ApplicationDescription* desc) const;
     uint32_t getWebProcessProxyID(uint32_t pid) const;
-    QString getWebProcessMemSize(uint32_t pid) const; //change name from webProcessSize(uint32_t pid)
+    virtual QString getWebProcessMemSize(uint32_t pid) const; //change name from webProcessSize(uint32_t pid)
     void killWebProcess(uint32_t pid);
     void requestKillWebProcess(uint32_t pid);
     bool webProcessInfoMapReady();
