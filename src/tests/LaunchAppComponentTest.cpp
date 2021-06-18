@@ -274,3 +274,23 @@ TEST_F(LaunchAppTestSuite, LaunchOnSecondaryDisplay)
     EXPECT_STREQ(result["instanceId"].toString().toStdString().c_str(), instanceId);
     EXPECT_STREQ(result["appId"].toString().toStdString().c_str(), appId);
 }
+
+TEST_F(LaunchAppTestSuite, LaunchAppsWithParams)
+{
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(launchBareAppJsonBody).toUtf8(), &parseError);
+    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+
+    QJsonObject root = doc.object();
+    QJsonObject parameters = root["parameters"].toObject();
+    parameters["testParamField"] = "testParamValue";
+    root["parameters"] = parameters;
+    doc.setObject(root);
+
+    EXPECT_CALL(*webView, addUserScript(::testing::HasSubstr("\"testParamField\": \"testParamValue\"")));
+
+    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(doc.object());
+    ASSERT_TRUE(result.contains("returnValue"));
+    ASSERT_TRUE(result.contains("instanceId"));
+    ASSERT_TRUE(result.contains("appId"));
+}
