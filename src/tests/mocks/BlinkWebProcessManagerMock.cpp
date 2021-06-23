@@ -20,3 +20,8 @@ uint32_t BlinkWebProcessManagerMock::getWebProcessPID(const WebAppBase* app) con
 {
     return getWebProcessPIDMock();
 }
+
+void BlinkWebProcessManager::clearBrowsingData(const int removeBrowsingDataMask)
+{
+    // Block real call of BlinkWebViewProfileHelper::clearBrowsingData(removeBrowsingDataMask);
+}

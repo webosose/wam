@@ -31,6 +31,7 @@ public:
 
     MOCK_METHOD(uint32_t, getWebProcessPIDMock, (), (const));
     MOCK_METHOD(QString, getWebProcessMemSize, (uint32_t), (const, override));
+    MOCK_METHOD(void, clearBrowsingData, (const int), (override));
 
     uint32_t getWebProcessPID(const WebAppBase* app) const override;
 };
