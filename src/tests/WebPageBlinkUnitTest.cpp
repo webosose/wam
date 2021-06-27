@@ -19,15 +19,25 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
+#include <QJsonDocument>
+#include <QJsonObject>
+#include <QString>
+
 #include "ApplicationDescription.h"
 #include "PlatformModuleFactoryImpl.h"
 #include "WebAppManager.h"
 #include "WebPageBlink.h"
+#include "WebPageBlinkDelegate.h"
 #include "WebView.h"
 #include "WebViewFactory.h"
 #include "WebViewMock.h"
 
 namespace {
+
+using ::testing::_;
+using ::testing::Return;
+using ::testing::HasSubstr;
+
 const std::string appDescString = R"({
   "accessibility": {
     "supportsAudioGuidance": false
@@ -57,6 +67,7 @@ const std::string appDescString = R"({
   "noSplashOnLaunch": false,
   "privilegedJail": false,
   "removable": false,
+  "customPlugin": true,
   "requiredPermissions": [
     "audio.operation",
     "media.operation",
@@ -75,6 +86,30 @@ const std::string appDescString = R"({
   "vendor": "LG Silicon Valley Labs",
   "version": "1.0.0",
   "visible": true
+})";
+
+
+static constexpr char localeInfo[] = R"({
+    "subscribed": false,
+    "returnValue": true,
+    "method": "getSystemSettings",
+    "settings": {
+        "localeInfo": {
+            "keyboards": [
+                "en"
+            ],
+            "locales": {
+                "UI": "en-US",
+                "FMT": "en-US",
+                "NLP": "en-US",
+                "AUD": "en-US",
+                "AUD2": "en-US",
+                "STT": "en-US"
+            },
+            "clock": "locale",
+            "timezone": ""
+        }
+    }
 })";
 
 const std::string params = R"({"displayAffinity": 0, "instanceId": ""})";
@@ -118,7 +153,7 @@ void WebPageBlinkTestSuite::SetUp()
 {
     ASSERT_TRUE(description);
     factory = std::make_unique<WebViewFactoryMock>();
-    EXPECT_CALL(*factory, createWebView()).Times(1).WillRepeatedly(::testing::Return(factory->webView));
+    EXPECT_CALL(*factory, createWebView()).Times(1).WillRepeatedly(Return(factory->webView));
 }
 
 
@@ -139,4 +174,76 @@ TEST_F(WebPageBlinkTestSuite, CheckWebViewLoad)
     WebPageBlink webPage(QUrl(description->entryPoint().c_str()), description, params.c_str(), std::move(factory));
     webPage.init();
     webPage.load();
+}
+
+
+TEST_F(WebPageBlinkTestSuite, AddCustomPluginDir)
+{
+    //TODO: Rework this test. Avoid to create some folders on real FS
+    constexpr char path[] = "/usr/palm/applications/com.webos.app.test.webrtc/plugins";
+    int result = mkdir(path, 0777);
+    ASSERT_FALSE(result && result == EEXIST);
+
+    EXPECT_CALL(*factory->webView, AddCustomPluginDir(path));
+    EXPECT_CALL(*factory->webView, AddAvailablePluginDir(path));
+
+    WebPageBlink webPage(QUrl(description->entryPoint().c_str()), description, params.c_str(), std::move(factory));
+    webPage.init();
+
+    result = remove(path);
+    ASSERT_FALSE(result);
+}
+
+TEST_F(WebPageBlinkTestSuite, PriviledgetPluginPath)
+{
+    constexpr char path[] = "/usr/palm/applications/com.webos.app.test.webrtc/";
+    constexpr char varName[] = "PRIVILEGED_PLUGIN_PATH";
+    auto actualValue = getenv(varName);
+    std::string testValue(path);
+    if (!actualValue) {
+        int result = setenv(varName, path, false);
+        ASSERT_FALSE(result);
+    } else {
+        testValue = actualValue;
+    }
+
+    EXPECT_CALL(*factory->webView, AddAvailablePluginDir(testValue));
+
+    WebPageBlink webPage(QUrl(description->entryPoint().c_str()), description, params.c_str(), std::move(factory));
+    webPage.init();
+
+    if (!actualValue) {
+        int result = unsetenv(varName);
+        ASSERT_FALSE(result);
+    }
+}
+
+TEST_F(WebPageBlinkTestSuite, SetMediaCodecCapability)
+{
+    EXPECT_CALL(*factory->webView, SetMediaCodecCapability(HasSubstr("LICENSE  Copyright (c) 2018-2019 LG Electronics, Inc")));
+    WebPageBlink webPage(QUrl(description->entryPoint().c_str()), description, params.c_str(), std::move(factory));
+    webPage.init();
+}
+
+TEST_F(WebPageBlinkTestSuite, addUserScript)
+{
+    constexpr char path[] = "/usr/palm/tellurium/telluriumnub.js";
+    constexpr char varName[] = "TELLURIUM_NUB_PATH";
+    auto actualValue = getenv(varName);
+    if (!actualValue) {
+        int result = setenv(varName, path, false);
+        ASSERT_FALSE(result);
+    }
+
+    WebAppManager::instance()->setPlatformModules(std::make_unique<PlatformModuleFactoryImpl>());
+    ASSERT_TRUE(WebAppManager::instance()->config()->isDevModeEnabled()) << "Devmode should be enabled for this test";
+
+    EXPECT_CALL(*factory->webView, addUserScript(HasSubstr("@class Telluriumnub")));
+    WebPageBlink webPage(QUrl(description->entryPoint().c_str()), description, params.c_str(), std::move(factory));
+    webPage.init();
+
+    if (!actualValue) {
+        int result = unsetenv(varName);
+        ASSERT_FALSE(result);
+    }
 }

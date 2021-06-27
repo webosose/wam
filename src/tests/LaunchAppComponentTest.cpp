@@ -155,6 +155,30 @@ static constexpr char launchWebRTCAppJsonBody[] = R"({
   "reason": "com.webos.app.home"
 })";
 
+
+static constexpr char localeInfo[] = R"({
+    "subscribed": false,
+    "returnValue": true,
+    "method": "getSystemSettings",
+    "settings": {
+        "localeInfo": {
+            "keyboards": [
+                "en"
+            ],
+            "locales": {
+                "UI": "en-US",
+                "FMT": "en-US",
+                "NLP": "en-US",
+                "AUD": "en-US",
+                "AUD2": "en-US",
+                "STT": "en-US"
+            },
+            "clock": "locale",
+            "timezone": ""
+        }
+    }
+})";
+
 } // namespace
 
 class LaunchAppTestSuite : public ::testing::Test {
@@ -293,4 +317,56 @@ TEST_F(LaunchAppTestSuite, LaunchAppsWithParams)
     ASSERT_TRUE(result.contains("returnValue"));
     ASSERT_TRUE(result.contains("instanceId"));
     ASSERT_TRUE(result.contains("appId"));
+}
+
+TEST_F(LaunchAppTestSuite, LaunchAppsWithError)
+{
+    constexpr char path[] = "file:///usr/share/localization/wam/loaderror.html";
+    constexpr char varName[] = "WAM_ERROR_PAGE";
+    const auto actualValue = getenv(varName);
+    if (!actualValue) {
+         int result = setenv(varName, path, false);
+         ASSERT_FALSE(result);
+     }
+     WebAppManager::instance()->setPlatformModules(std::make_unique<PlatformModuleFactoryImpl>());
+
+    EXPECT_CALL(*webView, LoadUrl(_));
+    EXPECT_CALL(*webView, LoadUrl(::testing::HasSubstr("index.html"))).WillOnce(Invoke([&](const std::string& url) {
+        viewUrl = url;
+        if (!webViewDelegate) {
+            return;
+        }
+        webViewDelegate->loadStarted();
+        webViewDelegate->loadProgressChanged(100.0);
+        webViewDelegate->loadVisuallyCommitted();
+        webViewDelegate->loadFailed(url, 404, "SSL_ERROR");
+    }));
+    EXPECT_CALL(*webView, LoadUrl(::testing::HasSubstr("loaderror.html"))).WillOnce(Invoke([&](const std::string& url) {
+        viewUrl = url;
+        if (!webViewDelegate) {
+            return;
+        }
+        webViewDelegate->loadStarted();
+        webViewDelegate->loadProgressChanged(100.0);
+        webViewDelegate->loadVisuallyCommitted();
+        webViewDelegate->loadFinished(url);
+    }));
+
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(localeInfo).toUtf8(), &parseError);
+    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+
+    WebAppManagerServiceLuna::instance()->getSystemLocalePreferencesCallback(doc.object());
+
+    doc = QJsonDocument::fromJson(QString::fromUtf8(launchWebRTCAppJsonBody).toUtf8(), &parseError);
+
+    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(doc.object());
+    ASSERT_TRUE(result.contains("returnValue"));
+    ASSERT_TRUE(result.contains("instanceId"));
+    ASSERT_TRUE(result.contains("appId"));
+
+    if (!actualValue) {
+        int result = unsetenv(varName);
+        ASSERT_FALSE(result);
+    }
 }
