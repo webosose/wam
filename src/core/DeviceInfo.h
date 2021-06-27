@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,7 +17,7 @@
 #ifndef DEVICEINFO_H
 #define DEVICEINFO_H
 
-#include <QMap>
+#include <map>
 #include <QString>
 
 class DeviceInfo {
@@ -40,7 +40,7 @@ public:
     virtual void setDeviceInfo(QString name, QString value);
 
 private:
-    QMap<QString, QString> m_deviceInfo;
+    std::map<std::string, std::string> m_deviceInfo;
 };
 
 #endif /* DEVICEINFO_H */

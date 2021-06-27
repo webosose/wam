@@ -30,8 +30,16 @@ enum ErrorCode {
     ERR_CODE_NO_RUNNING_APP = 2000,
     ERR_CODE_CLEAR_DATA_BRAWSING_EMPTY_ARRAY = 3000,
     ERR_CODE_CLEAR_DATA_BRAWSING_INVALID_VALUE = 3001,
-    ERR_CODE_CLEAR_DATA_BRAWSING_UNKNOWN_DATA = 3002
+    ERR_CODE_CLEAR_DATA_BRAWSING_UNKNOWN_DATA = 3002,
+    ERR_CODE_KILL_APP_INVALID_PARAM = 4100,
+    ERR_CODE_PAUSE_APP_INVALID_PARAM = 4200,
+    ERR_CODE_LOG_CONTROL_INVALID_PARAM = 4300,
+    ERR_CODE_DISCARD_CODE_CACHE_INVALID_PARAM = 4400,
+    ERR_CODE_CLEAR_BROWSING_DATA_INVALID_PARAM = 4500,
+    ERR_CODE_WEB_PROCESS_CREATED_INVALID_PARAM = 4600
 };
+
+const std::string err_invalidParam = "Incoming JSON is invalid or not completed";
 
 const std::string err_missParam = "Miss launch parameter(s)";
 const std::string err_unsupportedType = "Unsupported app type (Check subType)";

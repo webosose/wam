@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2018 LG Electronics, Inc.
+// Copyright (c) 2008-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -18,6 +18,7 @@
 #define PalmServiceBase_H
 
 #include <glib.h>
+#include <json/json.h>
 #include <luna-service2/lunaservice.h>
 
 #include <QJsonDocument>
@@ -285,7 +286,7 @@ private:
 
     bool call(LSHandle* service,
         const char* what,
-        QJsonObject parameters,
+        QJsonObject qParameters,
         const char* applicationId,
         LSCalloutContext* context);
     std::string m_serviceName;

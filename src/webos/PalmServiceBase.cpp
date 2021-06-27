@@ -1,4 +1,4 @@
-// Copyright (c) 2008-2018 LG Electronics, Inc.
+// Copyright (c) 2008-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,7 +15,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "PalmServiceBase.h"
+
 #include "LogManager.h"
+#include "QtLessTemporaryHelpers.h"
 
 PalmServiceBase::PalmServiceBase()
     : m_serviceHandle(0)
@@ -95,17 +97,27 @@ bool PalmServiceBase::stopService()
 bool PalmServiceBase::call(
         LSHandle* handle,
         const char* what,
-        QJsonObject parameters,
+        QJsonObject qParameters,
         const char* applicationId = 0,
         LSCalloutContext* context = 0)
 {
+    Json::Value parameters = qtless::JsonHelper::jsonCppFromQjson(qParameters);
+    std::string parametersAsString = qtless::JsonHelper::jsonCppToString(parameters);
+    if (!parameters.isObject()) {
+        LOG_WARNING(MSGID_LS2_CALL_FAIL, 2,
+            PMLOGKS("SERVICE", serviceName()),
+            PMLOGKFV("parameters", "%s", parametersAsString.c_str()),
+            "");
+        return false;
+    }
+
     LSErrorSafe lsError;
     bool callRet;
-    if(parameters.value("subscribe").toBool() || parameters.value("watch").toBool()) {
-        if(context) {
+    if (parameters["subscribe"] == true || parameters["watch"] == true) {
+        if (context) {
             callRet = LSCallFromApplication(handle,
                     what,
-                    QJsonDocument(parameters).toJson().data(),
+                    parametersAsString.c_str(),
                     applicationId,
                     LSCallbackHandler::callback,
                     static_cast<LSCallbackHandler*>(context),
@@ -116,16 +128,16 @@ bool PalmServiceBase::call(
             //caller does not care about reply from call
             callRet = LSCallFromApplication(handle,
                     what,
-                    QJsonDocument(parameters).toJson().data(),
+                    parametersAsString.c_str(),
                     applicationId,
                     0, 0, 0,
                     &lsError);
         }
     } else {
-        if(context) {
+        if (context) {
             callRet = LSCallFromApplicationOneReply(handle,
                     what,
-                    QJsonDocument(parameters).toJson().data(),
+                    parametersAsString.c_str(),
                     applicationId,
                     LSCallbackHandler::callback,
                     static_cast<LSCallbackHandler*>(context),
@@ -136,13 +148,13 @@ bool PalmServiceBase::call(
             //caller does not care about reply from call
             callRet = LSCallFromApplicationOneReply(handle,
                     what,
-                    QJsonDocument(parameters).toJson().data(),
+                    parametersAsString.c_str(),
                     applicationId,
                     0, 0, 0,
                     &lsError);
         }
     }
-    if(!callRet) {
+    if (!callRet) {
         LOG_WARNING(MSGID_LS2_CALL_FAIL, 2,
                     PMLOGKS("SERVICE", serviceName()),
                     PMLOGKS("ERROR", lsError.message), "");
@@ -175,6 +187,3 @@ bool LSCalloutContext::cancel() {
         m_token = LSMESSAGE_TOKEN_INVALID;
         return true;
 }
-
-
-

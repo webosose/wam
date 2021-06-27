@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -16,6 +16,8 @@
 
 #include "DeviceInfo.h"
 
+#include "QtLessTemporaryHelpers.h"
+
 bool DeviceInfo::getDisplayWidth(int &value)
 {
     bool ret = false;
@@ -29,7 +31,7 @@ bool DeviceInfo::getDisplayWidth(int &value)
 
 void DeviceInfo::setDisplayWidth(int value)
 {
-    m_deviceInfo.insert("DisplayWidth", QString::number(value));
+    m_deviceInfo.insert({"DisplayWidth", qtless::StringHelper::intToStr(value)});
 }
 
 bool DeviceInfo::getDisplayHeight(int &value)
@@ -45,7 +47,7 @@ bool DeviceInfo::getDisplayHeight(int &value)
 
 void DeviceInfo::setDisplayHeight(int value)
 {
-    m_deviceInfo.insert("DisplayHeight", QString::number(value));
+    m_deviceInfo.insert({"DisplayHeight", qtless::StringHelper::intToStr(value)});
 }
 
 bool DeviceInfo::getSystemLanguage(QString &value)
@@ -55,13 +57,14 @@ bool DeviceInfo::getSystemLanguage(QString &value)
 
 void DeviceInfo::setSystemLanguage(QString value)
 {
-    m_deviceInfo.insert("SystemLanguage", value);
+    m_deviceInfo.insert({"SystemLanguage", value.toStdString()});
 }
 
 bool DeviceInfo::getDeviceInfo(QString name, QString &value)
 {
-    if (m_deviceInfo.contains(name)) {
-        value = m_deviceInfo.value(name);
+    auto info = m_deviceInfo.find(name.toStdString());
+    if (info != m_deviceInfo.end()) {
+        value = info->second.c_str();
         return true;
     }
 
@@ -70,5 +73,5 @@ bool DeviceInfo::getDeviceInfo(QString name, QString &value)
 
 void DeviceInfo::setDeviceInfo(QString name, QString value)
 {
-    m_deviceInfo.insert(name, value);
+    m_deviceInfo.insert({name.toStdString(), value.toStdString()});
 }

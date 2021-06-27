@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 LG Electronics, Inc.
+// Copyright (c) 2014-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -15,14 +15,14 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "DeviceInfoImpl.h"
-#include "LogManager.h"
 
-#include <lunaprefs.h>
-#include <glib.h>
-#include <QFile>
-#include <QJsonDocument>
-#include <QJsonObject>
 #include <string>
+
+#include <glib.h>
+#include <lunaprefs.h>
+
+#include "LogManager.h"
+#include "QtLessTemporaryHelpers.h"
 
 DeviceInfoImpl::DeviceInfoImpl()
     : m_screenWidth(0)
@@ -35,33 +35,36 @@ DeviceInfoImpl::DeviceInfoImpl()
     , m_platformVersionDot(0)
     , m_3DSupport(false)
     , m_hardwareVersion("0x00000001")
-    , m_firmwareVersion("00.00.01") {}
+    , m_firmwareVersion("00.00.01")
+{
+}
 
 void DeviceInfoImpl::initialize()
 {
-    QFile file("/var/luna/preferences/localeInfo");
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text)) {
+    std::string jsonString;
+    if (!qtless::FileHelper::tryGetFileEntry("/var/luna/preferences/localeInfo", jsonString)) {
         return;
     }
 
-    QString jsonStr = file.readAll();
-    file.close();
-
-    QJsonDocument localeInfoDoc = QJsonDocument::fromJson(jsonStr.toUtf8());
-    if (localeInfoDoc.isNull()) {
-        LOG_ERROR(MSGID_LOCALEINFO_READ_FAIL, 1, PMLOGKS("CONTENT", jsonStr.toStdString().c_str()), "");
+    Json::Value localeJson = qtless::JsonHelper::jsonCppFromString(jsonString);
+    if (!localeJson.isObject() || localeJson.empty()
+       || !localeJson["localeInfo"].isObject()
+       || !localeJson["localeInfo"]["locales"].isString()
+       || !localeJson["localeInfo"]["country"].isString()
+       || !localeJson["localeInfo"]["smartServiceCountryCode3"].isString()) {
+        LOG_ERROR(MSGID_LOCALEINFO_READ_FAIL, 1, PMLOGKS("CONTENT", jsonString.c_str()), "");
         return;
     }
 
-    QJsonObject localeInfo = localeInfoDoc.object().value("localeInfo").toObject();
+    Json::Value localeInfo = localeJson["localeInfo"];
 
-    QString language(localeInfo.value("locales").toObject().value("UI").toString());
-    QString localcountry(localeInfoDoc.object().value("country").toString());
-    QString smartservicecountry(localeInfoDoc.object().value("smartServiceCountryCode3").toString());
+    std::string language(localeInfo["locales"].asString());
+    std::string localcountry(localeInfo["country"].asString());
+    std::string smartservicecountry(localeInfo["smartServiceCountryCode3"].asString());
 
-    setSystemLanguage(language);
-    setDeviceInfo("LocalCountry", localcountry);
-    setDeviceInfo("SmartServiceCountry", smartservicecountry);
+    setSystemLanguage(language.c_str());
+    setDeviceInfo("LocalCountry", localcountry.c_str());
+    setDeviceInfo("SmartServiceCountry", smartservicecountry.c_str());
 }
 
 bool DeviceInfoImpl::getInfoFromLunaPrefs(const char* key, std::string& value)
@@ -69,11 +72,11 @@ bool DeviceInfoImpl::getInfoFromLunaPrefs(const char* key, std::string& value)
     char* str = 0;
     if (LP_ERR_NONE == LPSystemCopyStringValue(key, &str) && str) {
         value = str;
-        g_free((gchar*) str);
+        g_free((gchar*)str);
         return true;
     }
 
-    g_free((gchar*) str);
+    g_free((gchar*)str);
     value = "Unknown";
     return false;
 }
@@ -87,18 +90,16 @@ void DeviceInfoImpl::initDisplayInfo()
 
     QString hardwareScreenWidthStr;
     QString hardwareScreenHeightStr;
-    if (getDeviceInfo("HardwareScreenWidth", hardwareScreenWidthStr) &&
-        getDeviceInfo("HardwareScreenHeight", hardwareScreenHeightStr)) {
-        hardwareScreenWidth = hardwareScreenWidthStr.toInt();
-        hardwareScreenHeight = hardwareScreenHeightStr.toInt();
+    if (getDeviceInfo("HardwareScreenWidth", hardwareScreenWidthStr) && getDeviceInfo("HardwareScreenHeight", hardwareScreenHeightStr)) {
+        hardwareScreenWidth = qtless::StringHelper::strToInt(hardwareScreenWidthStr.toStdString());
+        hardwareScreenHeight = qtless::StringHelper::strToInt(hardwareScreenHeightStr.toStdString());
     } else {
         getDisplayWidth(hardwareScreenWidth);
         getDisplayHeight(hardwareScreenHeight);
     }
 
-    m_screenWidth = (int) (hardwareScreenWidth / m_screenDensity);
-    m_screenHeight = (int) (hardwareScreenHeight / m_screenDensity);
-
+    m_screenWidth = (int)(hardwareScreenWidth / m_screenDensity);
+    m_screenHeight = (int)(hardwareScreenHeight / m_screenDensity);
 }
 
 void DeviceInfoImpl::initPlatformInfo()
@@ -113,24 +114,23 @@ void DeviceInfoImpl::initPlatformInfo()
     */
 
     QString value;
-     if (getDeviceInfo("ModelName", value))
-         m_modelName = value.toStdString();
-     if (getDeviceInfo("FirmwareVersion", value))
+    if (getDeviceInfo("ModelName", value))
+        m_modelName = value.toStdString();
+    if (getDeviceInfo("FirmwareVersion", value))
         m_platformVersion = value.toStdString();
 
     std::string platformVersion = m_platformVersion;
 
     size_t npos1 = 0, npos2 = 0;
-    npos1 = platformVersion.find_first_of ('.');
+    npos1 = platformVersion.find_first_of('.');
     if (npos1 != std::string::npos && npos1 <= platformVersion.size() - 1)
-        npos2 = platformVersion.find_first_of ('.', npos1 + 1);
-    if (npos1 == std::string::npos || npos2 == std::string::npos)  {
+        npos2 = platformVersion.find_first_of('.', npos1 + 1);
+    if (npos1 == std::string::npos || npos2 == std::string::npos) {
         m_platformVersionMajor = m_platformVersionMinor = m_platformVersionDot = -1;
-    }
-    else {
-        m_platformVersionMajor = atoi ((platformVersion.substr (0, npos1)).c_str());
-        m_platformVersionMinor = atoi ((platformVersion.substr (npos1+1, npos2)).c_str());
-        m_platformVersionDot = atoi ((platformVersion.substr (npos2+1)).c_str());
+    } else {
+        m_platformVersionMajor = qtless::StringHelper::strToInt(platformVersion.substr(0, npos1));
+        m_platformVersionMinor = qtless::StringHelper::strToInt(platformVersion.substr(npos1 + 1, npos2));
+        m_platformVersionDot = qtless::StringHelper::strToInt(platformVersion.substr(npos2 + 1));
     }
 }
 
