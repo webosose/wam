@@ -20,6 +20,7 @@ include(common.pri)
 
 SOURCES += \
         ApplicationDescription.cpp \
+        BCP47.cpp \
         DeviceInfo.cpp \
         LogManager.cpp \
         LogManagerPmLog.cpp \
@@ -30,6 +31,7 @@ SOURCES += \
         PluginLibWrapper.cpp \
         PluginLoader.cpp \
         Timer.cpp \
+        Utils.cpp \
         WebAppBase.cpp \
         WebAppFactoryManagerImpl.cpp \
         WebAppManager.cpp \
@@ -42,6 +44,7 @@ SOURCES += \
 
 HEADERS += \
         ApplicationDescription.h \
+        BCP47.h \
         DeviceInfo.h \
         LogManager.h \
         LogManagerPmLog.h \
@@ -56,6 +59,7 @@ HEADERS += \
         PluginLoader.h \
         ServiceSender.h \
         Timer.h \
+        Utils.h \
         WebAppBase.h \
         WebAppFactoryInterface.h \
         WebAppFactoryManager.h \

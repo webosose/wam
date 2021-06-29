@@ -17,13 +17,18 @@
 #ifndef PALMSYSTEMBLINK_H_
 #define PALMSYSTEMBLINK_H_
 
+#include <string>
+#include <vector>
+
+#include <json/json.h>
+
 #include "PalmSystemWebOS.h"
 
 class PalmSystemBlink : public PalmSystemWebOS {
 public:
     PalmSystemBlink(WebAppBase* app);
 
-    QString handleBrowserControlMessage(const QString& message, const QStringList& params);
+    std::string handleBrowserControlMessage(const std::string& command, const std::vector<std::string>& arguments);
 
     // PalmSystemWebOS
     void setCountry() override;
@@ -36,11 +41,11 @@ public:
 
 protected:
     // PalmSystemWebOS
-    QJsonDocument initialize();
+    Json::Value initialize();
     QString identifier() const override;
     void setLoadErrorPolicy(const QString& params) override;
 
-    virtual QString trustLevel() const;
+    virtual std::string trustLevel() const;
     virtual void onCloseNotify(const QString& params);
 
 private:

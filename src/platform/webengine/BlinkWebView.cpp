@@ -15,10 +15,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "BlinkWebView.h"
-#include "WebPageBlinkDelegate.h"
 
 #include "LogManager.h"
-#include <QStringList>
+#include "WebPageBlinkDelegate.h"
 
 BlinkWebView::BlinkWebView(bool doInitialize)
     : WebViewBase::WebViewBase()
@@ -57,24 +56,14 @@ void BlinkWebView::setDelegate(WebPageBlinkDelegate* delegate)
 void BlinkWebView::HandleBrowserControlCommand(const std::string& command, const std::vector<std::string>& arguments)
 {
     if (m_delegate) {
-        QString message = QString::fromStdString(command);
-        QStringList params;
-        Q_FOREACH (const std::string& arg, arguments)
-             params << QString::fromStdString(arg);
-        m_delegate->handleBrowserControlCommand(message, params);
+        m_delegate->handleBrowserControlCommand(command, arguments);
     }
 }
 
 void BlinkWebView::HandleBrowserControlFunction(const std::string& command, const std::vector<std::string>& arguments, std::string* result)
 {
     if (m_delegate) {
-        QString message = QString::fromStdString(command);
-        QStringList params;
-        Q_FOREACH (const std::string& arg, arguments)
-            params << QString::fromStdString(arg);
-        QString ret;
-        m_delegate->handleBrowserControlFunction(message, params, &ret);
-        *result = ret.toStdString();
+        m_delegate->handleBrowserControlFunction(command, arguments, result);
     }
 }
 

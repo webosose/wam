@@ -18,6 +18,8 @@
 #define WEBPAGEBLINK_H
 
 #include <memory>
+#include <string>
+#include <vector>
 
 #include <QtCore/QUrl>
 
@@ -122,8 +124,8 @@ public:
 
     void updateExtensionData(const QString& key, const QString& value);
     void setLoadErrorPolicy(const QString& policy);
-    void setTrustLevel(const QString& trustLevel) { m_trustLevel = trustLevel; }
-    QString trustLevel() const { return m_trustLevel; }
+    void setTrustLevel(const QString& trustLevel) { m_trustLevel = trustLevel.toStdString(); }
+    QString trustLevel() const { return  QString::fromStdString(m_trustLevel); }
     QString defaultTrustLevel() const;
     QString escapeData(const QString& value);
     int renderProcessPid() const;
@@ -173,10 +175,10 @@ protected:
     bool inspectable();
 
     // WebPageDelegate
-    void handleBrowserControlCommand(const QString& command, const QStringList& arguments) override;
-    void handleBrowserControlFunction(const QString& command, const QStringList& arguments, QString* result) override;
+    void handleBrowserControlCommand(const std::string& command, const std::vector<std::string>& arguments) override;
+    void handleBrowserControlFunction(const std::string& command, const std::vector<std::string>& arguments, std::string* result) override;
 
-    QString handleBrowserControlMessage(const QString& message, const QStringList& params);
+    std::string handleBrowserControlMessage(const std::string& command, const std::vector<std::string>& arguments);
 
 protected Q_SLOTS:
     virtual void didFinishLaunchingSlot();
@@ -185,6 +187,7 @@ protected Q_SLOTS:
 private:
     void setCustomPluginIfNeeded();
     void setDisallowScrolling(bool disallow);
+    std::vector<std::string> getErrorPagePath(const std::string& errorpage);
 
 private:
     WebPageBlinkPrivate* d;
@@ -194,13 +197,13 @@ private:
     bool m_hasCustomPolicyForResponse;
     bool m_hasBeenShown;
     OneShotTimer<WebPageBlink> m_domSuspendTimer;
-    QString m_customPluginPath;
+    std::string m_customPluginPath;
     qreal m_vkbHeight;
     bool m_vkbWasOverlap;
     bool m_hasCloseCallback;
     OneShotTimer<WebPageBlink> m_closeCallbackTimer;
-    QString m_trustLevel;
-    QString m_loadFailedHostname;
+    std::string m_trustLevel;
+    std::string m_loadFailedHostname;
     std::string m_loadingUrl;
     int m_customSuspendDOMTime;
 

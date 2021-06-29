@@ -15,6 +15,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <string>
+#include <vector>
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
@@ -211,11 +212,11 @@ void PalmSystemBlinkTestSuite::TearDown()
 
 TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_initialize)
 {
-    QString returnValue;
-    webViewDelegate->handleBrowserControlFunction(QString("initialize"), QStringList(), &returnValue);
+    std::string returnValue;
+    webViewDelegate->handleBrowserControlFunction("initialize", std::vector<std::string>(), &returnValue);
 
     QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(returnValue.toUtf8(), &parseError);
+    QJsonDocument doc = QJsonDocument::fromJson(QString::fromStdString(returnValue).toUtf8(), &parseError);
     QJsonObject initValue = doc.object();
     ASSERT_EQ(parseError.error, QJsonParseError::NoError);
 
@@ -235,63 +236,65 @@ TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_isKeyboardVisible)
 {
     EXPECT_CALL(*webAppWindow, IsKeyboardVisible()).WillOnce(Return(false));
 
-    QString returnValue;
-    webViewDelegate->handleBrowserControlFunction(QString("isKeyboardVisible"), QStringList(), &returnValue);
+    std::string returnValue;
+    webViewDelegate->handleBrowserControlFunction("isKeyboardVisible", std::vector<std::string>(), &returnValue);
 
-    EXPECT_STREQ(returnValue.toStdString().c_str(), "false");
+    EXPECT_STREQ(returnValue.c_str(), "false");
 }
 
 TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_getIdentifier)
 {
-    QString returnValue;
-    webViewDelegate->handleBrowserControlFunction(QString("getIdentifier"), QStringList(), &returnValue);
+    std::string returnValue;
+    webViewDelegate->handleBrowserControlFunction("getIdentifier", std::vector<std::string>(), &returnValue);
 
-    EXPECT_STREQ(returnValue.toStdString().c_str(), "bareapp");
+    EXPECT_STREQ(returnValue.c_str(), "bareapp");
 
-    webViewDelegate->handleBrowserControlFunction(QString("identifier"), QStringList(), &returnValue);
+    webViewDelegate->handleBrowserControlFunction("identifier", std::vector<std::string>(), &returnValue);
 
-    EXPECT_STREQ(returnValue.toStdString().c_str(), "bareapp");
+    EXPECT_STREQ(returnValue.c_str(), "bareapp");
 }
 
 TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_isActivated)
 {
-    QString returnValue;
+    std::string returnValue;
     webApp->unfocus();
-    webViewDelegate->handleBrowserControlFunction(QString("isActivated"), QStringList(), &returnValue);
+    webViewDelegate->handleBrowserControlFunction("isActivated", std::vector<std::string>(), &returnValue);
 
-    EXPECT_STREQ(returnValue.toStdString().c_str(), "false");
+    EXPECT_STREQ(returnValue.c_str(), "false");
 }
 
 TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_setWindowProperty)
 {
-    QString returnValue;
-    QStringList params;
-    params << QString("TestProperty");
-    params << QString("TestValue");
+    std::string returnValue;
+    std::vector<std::string> params;
+    params.reserve(2);
+    params.emplace_back("TestProperty");
+    params.emplace_back("TestValue");
 
     EXPECT_CALL(*webAppWindow, SetWindowProperty(StrEq("TestProperty"), StrEq("TestValue")));
 
-    webViewDelegate->handleBrowserControlFunction(QString("setWindowProperty"), params, &returnValue);
+    webViewDelegate->handleBrowserControlFunction("setWindowProperty", params, &returnValue);
 }
 
 TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_setCursor)
 {
-    QString returnValue;
-    QStringList params;
-    params << QString("Cursor");
-    params << QString::number(1);
-    params << QString::number(2);
+    std::string returnValue;
+    std::vector<std::string> params;
+    params.reserve(3);
+    params.emplace_back("Cursor");
+    params.emplace_back(std::to_string(1));
+    params.emplace_back(std::to_string(2));
 
-    EXPECT_CALL(*webAppWindow, setCursor(Eq(QString("Cursor")), 1, 2));
+    EXPECT_CALL(*webAppWindow, setCursor(Eq(QString::fromStdString("Cursor")), 1, 2));
 
-    webViewDelegate->handleBrowserControlFunction(QString("setCursor"), params, &returnValue);
+    webViewDelegate->handleBrowserControlFunction("setCursor", params, &returnValue);
 }
 
 TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_platformBack)
 {
-    QString returnValue;
+    std::string returnValue;
     EXPECT_CALL(*webAppWindow, platformBack());
-    webViewDelegate->handleBrowserControlFunction(QString("platformBack"), QStringList(), &returnValue);
+    webViewDelegate->handleBrowserControlFunction("platformBack", std::vector<std::string>(), &returnValue);
 }
 
 TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_setKeyMask_Home)

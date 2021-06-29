@@ -18,7 +18,8 @@
 #define BLINKWEBVIEW_H
 
 #include "webos/webview_base.h"
-#include <QString>
+
+#include <string>
 #include <vector>
 
 class WebPageBlinkDelegate;
@@ -27,7 +28,7 @@ class BlinkWebView : public webos::WebViewBase {
 public:
     // TODO need to refactor both constructors (here & pluggables)
     BlinkWebView(bool doInitialize = true);
-    BlinkWebView(const QString& group)
+    BlinkWebView(const std::string& group)
         : BlinkWebView()
     {
     }

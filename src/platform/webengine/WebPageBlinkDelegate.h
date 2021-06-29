@@ -17,8 +17,8 @@
 #ifndef WEBPAGE_BLINK_DELEGATE_H_
 #define WEBPAGE_BLINK_DELEGATE_H_
 
-#include <QString>
-#include <QStringList>
+#include <string>
+#include <vector>
 
 class WebPageBlinkDelegate {
 public:
@@ -30,8 +30,8 @@ public:
     virtual bool acceptsVideoCapture() = 0;
     virtual bool acceptsAudioCapture() = 0;
     virtual void didFirstFrameFocused() = 0;
-    virtual void handleBrowserControlCommand(const QString& command, const QStringList& arguments) = 0;
-    virtual void handleBrowserControlFunction(const QString& command, const QStringList& arguments, QString* result) = 0;
+    virtual void handleBrowserControlCommand(const std::string& command, const std::vector<std::string>& arguments) = 0;
+    virtual void handleBrowserControlFunction(const std::string& command, const std::vector<std::string>& arguments, std::string* result) = 0;
     virtual void loadFinished(const std::string& url) = 0;
     virtual void loadFailed(const std::string& url, int errCode, const std::string& errDesc) = 0;
     virtual void loadStopped() = 0;

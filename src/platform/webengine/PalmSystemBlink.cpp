@@ -14,137 +14,146 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include "json/json.h"
+
 #include "ApplicationDescription.h"
 #include "LogManager.h"
 #include "PalmSystemBlink.h"
+#include "Utils.h"
 #include "WebAppBase.h"
 #include "WebAppWayland.h"
 #include "WebPageBlink.h"
 
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonDocument>
-#include <QtCore/QDataStream>
+namespace {
+
+const char* toStr(const bool value)
+{
+    return value ? "true" : "false";
+}
+
+std::string toStr(const Json::Value& object)
+{
+    static Json::StreamWriterBuilder builder;
+    return Json::writeString(builder, object);
+}
+
+} // namespace
+
 PalmSystemBlink::PalmSystemBlink(WebAppBase* app)
     : PalmSystemWebOS(app)
     , m_initialized(false)
 {
 }
 
-QString PalmSystemBlink::handleBrowserControlMessage(const QString& message, const QStringList& params)
+std::string PalmSystemBlink::handleBrowserControlMessage(const std::string& command, const std::vector<std::string>& arguments)
 {
-    if (message == "initialize") {
-        return initialize().toJson();
-    } else if (message == "country") {
-        return country();
-    } else if (message == "locale") {
-        return locale();
-    } else if (message == "localeRegion") {
-        return localeRegion();
-    } else if (message == "isMinimal") {
-        if(isMinimal())
-            return QString("true");
-        else
-            return QString("false");
-    } else if (message == "identifier") {
-        return identifier();
-    } else if (message == "screenOrientation") {
-        return screenOrientation();
-    } else if (message == "currentCountryGroup") {
-        return getDeviceInfo("CountryGroup");
-    } else if (message == "stageReady") {
+    if (command == "initialize") {
+        return toStr(initialize());
+    } else if (command == "country") {
+        return country().toStdString();
+    } else if (command == "locale") {
+        return locale().toStdString();
+    } else if (command == "localeRegion") {
+        return localeRegion().toStdString();
+    } else if (command == "isMinimal") {
+        return toStr(isMinimal());
+    } else if (command == "identifier") {
+        return identifier().toStdString();
+    } else if (command == "screenOrientation") {
+        return screenOrientation().toStdString();
+    } else if (command == "currentCountryGroup") {
+        return getDeviceInfo("CountryGroup").toStdString();
+    } else if (command == "stageReady") {
         stageReady();
-    } else if (message == "activate") {
+    } else if (command == "activate") {
         LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.activate()");
         activate();
-    } else if (message == "deactivate") {
+    } else if (command == "deactivate") {
         LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.deactivate()");
         deactivate();
-    } else if (message == "isActivated") {
-        if(isActivated())
-            return QString("true");
-        else
-            return QString("false");
-    } else if (message == "isKeyboardVisible") {
-        if(isKeyboardVisible())
-            return QString("true");
-        else
-            return QString("false");
-    } else if (message == "getIdentifier" || message == "identifier") {
-        return QString(identifier().toUtf8());
-    } else if (message == "launchParams") {
-        LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.launchParams Updated by app; %s", qPrintable(params[0]));
-        updateLaunchParams(params[0]);
-    } else if (message == "screenOrientation") {
-        QByteArray res;
-        QDataStream out(res);
-        out << QVariant(screenOrientation());
-        return QString(res);
-    } else if (message == "keepAlive") {
-        if (params.size() > 0)
-            setKeepAlive(params[0] == "true");
-    } else if (message == "PmLogInfoWithClock") {
-        if (params.size() == 3)
-            pmLogInfoWithClock(params[0], params[1], params[2]);
-    } else if (message == "PmLogString") {
-        if (params.size() > 3)
-            pmLogString(static_cast<PmLogLevel>(params[0].toInt()), params[1], params[2], params[3]);
-    } else if (message == "setWindowProperty") {
-        if (params.size() > 1) {
-            LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()),
-                "webOSSystem.window.setProperty('%s', '%s')", qPrintable(params[0]), qPrintable(params[1]));
-            m_app->setWindowProperty(params[0], params[1]);
+    } else if (command == "isActivated") {
+        return toStr(isActivated());
+    } else if (command == "isKeyboardVisible") {
+        return toStr(isKeyboardVisible());
+    } else if (command == "getIdentifier" || command == "identifier") {
+        return QString(identifier().toUtf8()).toStdString();
+    } else if (command == "launchParams") {
+        LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.launchParams Updated by app; %s", arguments[0].c_str());
+        updateLaunchParams(QString::fromStdString(arguments[0]));
+    } else if (command == "screenOrientation") {
+        return screenOrientation().toStdString();
+    } else if (command == "keepAlive") {
+        if (arguments.size() > 0)
+            setKeepAlive(arguments[0] == "true");
+    } else if (command == "PmLogInfoWithClock") {
+        if (arguments.size() == 3)
+            pmLogInfoWithClock(QString::fromStdString(arguments[0]), QString::fromStdString(arguments[1]), QString::fromStdString(arguments[2]));
+    } else if (command == "PmLogString") {
+        if (arguments.size() > 3) {
+            int32_t v1;
+            if (strToInt(arguments[0], v1))
+                pmLogString(static_cast<PmLogLevel>(v1), QString::fromStdString(arguments[1]), QString::fromStdString(arguments[2]), QString::fromStdString(arguments[3]));
         }
-    } else if (message == "platformBack") {
+    } else if (command == "setWindowProperty") {
+        if (arguments.size() > 1) {
+            LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()),
+                "webOSSystem.window.setProperty('%s', '%s')", arguments[0].c_str(), arguments[1].c_str());
+            m_app->setWindowProperty(QString::fromStdString(arguments[0]), QString::fromStdString(arguments[1]));
+        }
+    } else if (command == "platformBack") {
         LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.platformBack()");
         m_app->platformBack();
-    } else if (message == "setCursor") {
-        QVariant v1, v2, v3;
-        v1 = params.at(0);
-        v2 = params.at(1);
-        v3 = params.at(2);
-        m_app->setCursor(v1.toString(), v2.toInt(), v3.toInt());
-    } else if (message == "setInputRegion") {
+    } else if (command == "setCursor") {
+        if (arguments.size() == 3) {
+            std::string v1 = arguments[0];
+            int32_t v2, v3;
+            const bool v2_conversion = strToInt(arguments[1], v2);
+            const bool v3_conversion = strToInt(arguments[2], v3);
+            if (v2_conversion && v3_conversion)
+                m_app->setCursor(QString::fromStdString(v1), v2, v3);
+        }
+    } else if (command == "setInputRegion") {
         QByteArray data;
-        for (int i = 0; i < params.count(); i++) {
-            data.append(params.at(i).toUtf8());
+        for (const auto& argument : arguments) {
+            data.append(QString::fromStdString(argument).toUtf8());
         }
         setInputRegion(data);
-    } else if (message == "setKeyMask") {
+    } else if (command == "setKeyMask") {
         QByteArray data;
-        for (int i = 0; i < params.count(); i++) {
-            data.append(params.at(i).toUtf8());
+        for (const auto& argument : arguments) {
+            data.append(QString::fromStdString(argument).toUtf8());
         }
         setGroupClientEnvironment(KeyMask, data);
-    } else if (message == "focusOwner") {
+    } else if (command == "focusOwner") {
         setGroupClientEnvironment(FocusOwner, NULL);
-    } else if (message == "focusLayer") {
+    } else if (command == "focusLayer") {
         setGroupClientEnvironment(FocusLayer, NULL);
-    } else if (message == "hide") {
+    } else if (command == "hide") {
         hide();
-    } else if (message == "setLoadErrorPolicy") {
-        if (params.size() > 0) {
-            LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.setLoadErrorPolicy(%s)", qPrintable(params[0]));
-            setLoadErrorPolicy(params[0]);
+    } else if (command == "setLoadErrorPolicy") {
+        if (arguments.size() > 0) {
+            LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.setLoadErrorPolicy(%s)", arguments[0].c_str());
+            setLoadErrorPolicy(QString::fromStdString(arguments[0]));
         }
-    } else if (message == "onCloseNotify") {
-        if (params.size() > 0) {
-            LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.onCloseNotify(%s)", qPrintable(params[0]));
-            onCloseNotify(params[0]);
+    } else if (command == "onCloseNotify") {
+        if (arguments.size() > 0) {
+            LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.onCloseNotify(%s)", arguments[0].c_str());
+            onCloseNotify(QString::fromStdString(arguments[0]));
         }
-    } else if (message == "cursorVisibility") {
-        return cursorVisibility() ? "true" : "false";
-    } else if (message == "serviceCall") {
+    } else if (command == "cursorVisibility") {
+        return toStr(cursorVisibility());
+    } else if (command == "serviceCall") {
         if (m_app->page()->isClosing()) {
-          LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.serviceCall(%s, %s)", qPrintable(params[0]), qPrintable(params[1]));
-          m_app->serviceCall(params[0], params[1], m_app->appId());
+          LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())), PMLOGKFV("PID", "%d", m_app->page()->getWebProcessPID()), "webOSSystem.serviceCall(%s, %s)", arguments[0].c_str(), arguments[1].c_str());
+          m_app->serviceCall(QString::fromStdString(arguments[0]), QString::fromStdString(arguments[1]), m_app->appId());
         } else {
             LOG_WARNING(MSGID_SERVICE_CALL_FAIL, 3, PMLOGKS("APP_ID", qPrintable(m_app->appId())),
               PMLOGKS("INSTANCE_ID", qPrintable(m_app->instanceId())),
-              PMLOGKS("URL", qPrintable(params[0])), "Page is NOT in closing");
+              PMLOGKS("URL", arguments[0].c_str()), "Page is NOT in closing");
         }
     }
 
-    return QString();
+    return std::string();
 }
 
 void PalmSystemBlink::setCountry()
@@ -176,9 +185,9 @@ void PalmSystemBlink::setLoadErrorPolicy(const QString& params)
     static_cast<WebPageBlink*>(m_app->page())->setLoadErrorPolicy(params);
 }
 
-QString PalmSystemBlink::trustLevel() const
+std::string PalmSystemBlink::trustLevel() const
 {
-    return static_cast<WebPageBlink*>(m_app->page())->trustLevel();
+    return static_cast<WebPageBlink*>(m_app->page())->trustLevel().toStdString();
 }
 
 void PalmSystemBlink::onCloseNotify(const QString& params)
@@ -196,29 +205,28 @@ double PalmSystemBlink::devicePixelRatio()
     return static_cast<WebPageBlink*>(m_app->page())->devicePixelRatio();
 }
 
-QJsonDocument PalmSystemBlink::initialize()
+Json::Value PalmSystemBlink::initialize()
 {
     m_initialized = true;
 
-    QJsonObject data;
-    data.insert(QStringLiteral("launchParams"), launchParams());
-    data.insert(QStringLiteral("country"), country());
-    data.insert(QStringLiteral("tvSystemName"), getDeviceInfo("TvSystemName"));
-    data.insert(QStringLiteral("currentCountryGroup"), getDeviceInfo("CountryGroup"));
-    data.insert(QStringLiteral("locale"), locale());
-    data.insert(QStringLiteral("localeRegion"), localeRegion());
-    data.insert(QStringLiteral("isMinimal"), isMinimal());
-    data.insert(QStringLiteral("identifier"), identifier());
-    data.insert(QStringLiteral("screenOrientation"), screenOrientation());
-    data.insert(QStringLiteral("deviceInfo"), getDeviceInfo("TvDeviceInfo"));
-    data.insert(QStringLiteral("activityId"), QJsonValue((double)activityId()));
-    data.insert(QStringLiteral("phoneRegion"), phoneRegion());
-    data.insert(QStringLiteral("folderPath"), QString::fromStdString((m_app->getAppDescription())->folderPath()));
+    Json::Value data;
+    data["launchParams"] = launchParams().toStdString();
+    data["country"] = country().toStdString();
+    data["tvSystemName"] = getDeviceInfo("TvSystemName").toStdString();
+    data["currentCountryGroup"] = getDeviceInfo("CountryGroup").toStdString();
+    data["locale"] = locale().toStdString();
+    data["localeRegion"] = localeRegion().toStdString();
+    data["isMinimal"] = isMinimal();
+    data["identifier"] = identifier().toStdString();
+    data["screenOrientation"] = screenOrientation().toStdString();
+    data["deviceInfo"] = getDeviceInfo("TvDeviceInfo").toStdString();
+    data["activityId"] = (double)activityId();
+    data["phoneRegion"] = phoneRegion().toStdString();
+    data["folderPath"] = m_app->getAppDescription()->folderPath();
 
-    data.insert(QStringLiteral("devicePixelRatio"), devicePixelRatio());
-    data.insert(QStringLiteral("trustLevel"), trustLevel());
-    QJsonDocument doc(data);
-    return doc;
+    data["devicePixelRatio"] = devicePixelRatio();
+    data["trustLevel"] = trustLevel();
+    return data;
 }
 
 

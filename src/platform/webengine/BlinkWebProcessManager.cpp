@@ -14,10 +14,13 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include <set>
+#include <unordered_map>
+
 #include <QtCore/QJsonArray>
 #include <QtCore/QJsonObject>
-#include <QtCore/QList>
-#include <QString>
+#include <QtCore/QJsonDocument>
+#include <json/json.h>
 
 #include "BlinkWebProcessManager.h"
 #include "WebPageBlink.h"
@@ -28,6 +31,21 @@
 #include "BlinkWebViewProfileHelper.h"
 #include "WebProcessManager.h"
 
+namespace {
+bool convert(const Json::Value& object, QJsonObject& value)
+{
+    static Json::StreamWriterBuilder builder;
+    std::string jsonString = Json::writeString(builder, object);
+    QJsonParseError parseError;
+    QJsonDocument doc = QJsonDocument::fromJson(QString::fromStdString(jsonString).toUtf8(), &parseError);
+    if (parseError.error != QJsonParseError::NoError)
+        return false;
+
+    value = doc.object();
+    return true;
+}
+}
+
 uint32_t BlinkWebProcessManager::getWebProcessPID(const WebAppBase* app) const
 {
     return static_cast<WebPageBlink*>(app->page())->renderProcessPid();
@@ -35,36 +53,33 @@ uint32_t BlinkWebProcessManager::getWebProcessPID(const WebAppBase* app) const
 
 QJsonObject BlinkWebProcessManager::getWebProcessProfiling()
 {
-    QJsonObject reply;
-    QJsonArray processArray;
-    QJsonObject processObject;
-    uint32_t pid;
-    QList<uint32_t> processIdList;
+    Json::Value reply;
+    Json::Value processArray(Json::arrayValue);
+    Json::Value processObject;
 
-    QMultiMap<uint32_t, WebAppBase*> runningAppList;
-    std::list<const WebAppBase*> running = runningApps();
-    for (std::list<const WebAppBase*>::iterator it = running.begin(); it != running.end(); ++it) {
-        WebAppBase* app = findAppByInstanceId((*it)->instanceId());
-        pid = getWebProcessPID(app);
-        if (!processIdList.contains(pid))
-            processIdList.append(pid);
+    std::set<uint32_t> processIdList;
+    std::unordered_multimap<uint32_t, WebAppBase*> runningAppList;
 
-        runningAppList.insert(pid, app);
+    const std::list<const WebAppBase*>& running = runningApps();
+
+    for (const auto& elem : running) {
+        WebAppBase* app = findAppByInstanceId((elem)->instanceId());
+        const uint32_t pid = getWebProcessPID(app);
+        processIdList.insert(pid);
+        runningAppList.emplace(pid, app);
     }
 
-    for (int id = 0; id < processIdList.size(); id++) {
-        QJsonObject appObject;
-        QJsonArray appArray;
-        pid = processIdList.at(id);
+    for (uint32_t pid: processIdList) {
+        Json::Value appObject;
+        Json::Value appArray(Json::arrayValue);
 
-        processObject["pid"] = QString::number(pid);
-        processObject["webProcessSize"] = getWebProcessMemSize(pid);
-        //starfish-surface is note used on Blink
+        processObject["pid"] = std::to_string(pid);
+        processObject["webProcessSize"] = getWebProcessMemSize(pid).toStdString();
         processObject["tileSize"] = 0;
-        QList<WebAppBase*> processApp = runningAppList.values(pid);
-        for (int app = 0; app < processApp.size(); app++) {
-            appObject["id"] = processApp.at(app)->appId();
-            appObject["instanceId"] = processApp.at(app)->instanceId();
+        auto processes = runningAppList.equal_range(pid);
+        for (auto app = processes.first; app != processes.second; app++) {
+            appObject["id"] = app->second->appId().toStdString();
+            appObject["instanceId"] = app->second->instanceId().toStdString();
             appArray.append(appObject);
         }
         processObject["runningApps"] = appArray;
@@ -73,7 +88,8 @@ QJsonObject BlinkWebProcessManager::getWebProcessProfiling()
 
     reply["WebProcesses"] = processArray;
     reply["returnValue"] = true;
-    return reply;
+    QJsonObject result;
+    return convert(reply, result) ? result : QJsonObject();
 }
 
 void BlinkWebProcessManager::deleteStorageData(const QString& identifier)

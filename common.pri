@@ -109,4 +109,4 @@ OBJECTS_DIR = $$DESTDIR/.obj
 MOC_DIR = $$DESTDIR/.moc
 LIBS += -L$$DESTDIR
 
-LIBS += -lcbe
+LIBS += -lcbe -lboost_filesystem
