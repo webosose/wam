@@ -21,11 +21,7 @@
 
 #include <QtCore/QUrl>
 
-class WebAppFactoryLuna : public QObject,
-                          public WebAppFactoryInterface {
-    Q_OBJECT
-    Q_PLUGIN_METADATA(IID "org.qt-project.Qt.WebAppFactoryInterface" FILE "webappfactoryluna-plugin.json")
-    Q_INTERFACES(WebAppFactoryInterface)
+class WebAppFactoryLuna : public WebAppFactoryInterface {
 
 public:
     virtual WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr);

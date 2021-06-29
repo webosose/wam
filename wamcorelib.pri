@@ -27,6 +27,8 @@ SOURCES += \
         NetworkStatusManager.cpp \
         PalmSystemBase.cpp \
         PlugInService.cpp \
+        PluginLibWrapper.cpp \
+        PluginLoader.cpp \
         Timer.cpp \
         WebAppBase.cpp \
         WebAppFactoryManagerImpl.cpp \
@@ -50,6 +52,8 @@ HEADERS += \
         PalmSystemBase.h \
         PlatformModuleFactory.h \
         PlugInService.h \
+        PluginLibWrapper.h \
+        PluginLoader.h \
         ServiceSender.h \
         Timer.h \
         WebAppBase.h \
@@ -78,6 +82,8 @@ lttng {
 }
 
 TARGET = WebAppMgrCore
+
+LIBS += -ldl
 
 headers.files = $$HEADERS
 headers.path = $${PREFIX}/include/webappmanager

@@ -23,8 +23,19 @@
 #include "WebPageBlink.h"
 #include "WindowTypes.h"
 #include "LogManager.h"
+#include "PluginInterface.h"
 
 #include <QString>
+
+const char* kPluginApplicationType = "default";
+
+WebAppFactoryInterface* CreateInstance() {
+  return new WebAppFactoryLuna();
+}
+
+void DeleteInstance(WebAppFactoryInterface* interface) {
+  delete interface;
+}
 
 WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc)
 {

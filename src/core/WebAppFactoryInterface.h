@@ -33,9 +33,7 @@ public:
     virtual WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr) = 0;
     virtual WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr) = 0;
     virtual WebPageBase* createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, QString launchParams = "") = 0;
+    virtual ~WebAppFactoryInterface() {};
 };
-
-#define WebAppFactoryInterface_iid "org.qt-project.Qt.WebAppFactoryInterface"
-Q_DECLARE_INTERFACE(WebAppFactoryInterface, WebAppFactoryInterface_iid)
 
 #endif // WEBAPPFACTORYINTERFACE_H

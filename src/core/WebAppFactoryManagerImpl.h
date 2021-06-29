@@ -18,12 +18,15 @@
 #define WEBAPPFACTORYMANAGERIMPL_H
 
 #include <memory>
-
-#include <QMap>
-#include <QStringList>
+#include <string>
+#include <unordered_map>
+#include <unordered_set>
 
 #include "WebAppFactoryInterface.h"
 #include "WebAppFactoryManager.h"
+
+class PluginLoader;
+class PluginLibWrapper;
 
 class WebAppFactoryManagerImpl : public WebAppFactoryManager {
 public:
@@ -32,18 +35,19 @@ public:
     WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "") override;
     WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "") override;
     WebPageBase* createWebPage(QString winType, QUrl url, std::shared_ptr<ApplicationDescription> desc, QString appType = "", QString launchParams = "") override;
-    WebAppFactoryInterface* getPluggable(QString appType);
-    WebAppFactoryInterface* loadPluggable(QString appType = "");
+    WebAppFactoryInterface* getPluggable(const std::string& appType);
+    WebAppFactoryInterface* loadPluggable(const std::string& appType = "");
 
 private:
     WebAppFactoryManagerImpl();
     ~WebAppFactoryManagerImpl() override;
 
     static WebAppFactoryManager* m_instance;
-    QMap<QString, WebAppFactoryInterface*> m_interfaces;
-    QString m_webAppFactoryPluginPath;
-    QStringList m_factoryEnv;
+    std::unordered_map<std::string, WebAppFactoryInterface*> m_interfaces;
+    std::string m_webAppFactoryPluginPath;
+    std::unordered_set<std::string> m_factoryEnv;
     bool m_loadPluggableOnDemand;
+    std::unique_ptr<PluginLoader> m_pluginLoader;
 };
 
 #endif /* WEBAPPFACTORYMANAGERIMPL_H */

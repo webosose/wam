@@ -17,7 +17,7 @@
 TEMPLATE = lib
 
 include(common.pri)
-CONFIG += plugin
+CONFIG += unversioned_libname
 
 SOURCES += \
         WebAppFactoryLuna.cpp \
@@ -33,5 +33,4 @@ headers.files = $$HEADERS
 headers.path = $${PREFIX}/include/webappmanager
 target.path = $${PREFIX}/lib/webappmanager/plugins
 
-OTHER_FILES += webappfactoryluna-plugin.json
 INSTALLS += target
