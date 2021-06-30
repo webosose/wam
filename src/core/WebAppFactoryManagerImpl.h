@@ -31,6 +31,13 @@ class PluginLibWrapper;
 class WebAppFactoryManagerImpl : public WebAppFactoryManager {
 public:
     static WebAppFactoryManager* instance();
+    // For testing purpose.
+    using RemovableManagerPtr = std::unique_ptr<WebAppFactoryManagerImpl, std::function<void(WebAppFactoryManagerImpl*)>>;
+    static RemovableManagerPtr testInstance(
+            const std::string& plugin_path,
+            const std::string& factoryEnv,
+            bool load_plugin_on_demand,
+            std::unique_ptr<PluginLibWrapper> lib_wrapper);
 
     WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "") override;
     WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "") override;
@@ -40,6 +47,11 @@ public:
 
 private:
     WebAppFactoryManagerImpl();
+    // For testing purpose.
+    WebAppFactoryManagerImpl(const std::string& plugin_path,
+                             const std::string& factoryEnv,
+                             bool load_plugin_on_demand,
+                             std::unique_ptr<PluginLibWrapper> lib_wrapper);
     ~WebAppFactoryManagerImpl() override;
 
     static WebAppFactoryManager* m_instance;

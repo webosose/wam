@@ -73,7 +73,7 @@ WebAppBase::WebAppBase()
 
 WebAppBase::~WebAppBase()
 {
-    LOG_INFO(MSGID_WEBAPP_CLOSED, 3, PMLOGKS("APP_ID", appId().isEmpty() ? "unknown" : qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
+    LOG_INFO(MSGID_WEBAPP_CLOSED, 3, PMLOGKS("APP_ID", appId().isEmpty() ? "unknown" : qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page() ? page()->getWebProcessPID() : 0), "");
     cleanResources();
     delete d;
 }

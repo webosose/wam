@@ -1,4 +1,4 @@
-# Copyright (c) 2015-2018 LG Electronics, Inc.
+# Copyright (c) 2021 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,14 +14,24 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-TEMPLATE = subdirs
-CONFIG += ordered
+include(common.pri)
 
-wamcorelib.file = wamcorelib.pri
-wamlib.file = wamlib.pri
-wamplugin.file = wamplugin.pri
-wam.file = wam.pri
-tests.file = tests.pri
-testplugin.file = testplugin.pri
+TEMPLATE = lib
 
-SUBDIRS += wamcorelib wamlib wamplugin wam tests testplugin
+CONFIG += unversioned_libname
+
+VPATH += \
+        ./src/testplugin \
+        ./src/tests/mocks \
+
+INCLUDEPATH += $$VPATH
+
+SOURCES += TestPlugin.cpp
+
+HEADERS += TestPlugin.h
+
+TARGET = webappmgr-test-plugin
+
+target.path = /usr/libexec/tests/webappmanager/plugins
+
+INSTALLS += target

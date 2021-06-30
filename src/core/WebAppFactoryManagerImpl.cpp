@@ -71,6 +71,18 @@ WebAppFactoryManager* WebAppFactoryManagerImpl::instance()
     return m_instance;
 }
 
+WebAppFactoryManagerImpl::RemovableManagerPtr WebAppFactoryManagerImpl::testInstance(
+    const std::string& plugin_path,
+    const std::string& factoryEnv,
+    bool load_plugin_on_demand,
+    std::unique_ptr<PluginLibWrapper> lib_wrapper)
+{
+    RemovableManagerPtr unique_instance(new WebAppFactoryManagerImpl(
+        plugin_path, factoryEnv, load_plugin_on_demand, std::move(lib_wrapper)),
+        [](WebAppFactoryManagerImpl* p) { delete p; });
+    return unique_instance;
+}
+
 WebAppFactoryManagerImpl::WebAppFactoryManagerImpl()
     : m_loadPluggableOnDemand(false)
     , m_pluginLoader(std::make_unique<PluginLoader>(
@@ -87,6 +99,20 @@ WebAppFactoryManagerImpl::WebAppFactoryManagerImpl()
     if (webAppManagerConfig->isDynamicPluggableLoadEnabled())
         m_loadPluggableOnDemand = true;
 
+    if (!m_loadPluggableOnDemand)
+        loadPluggable();
+}
+
+WebAppFactoryManagerImpl::WebAppFactoryManagerImpl(
+    const std::string& plugin_path,
+    const std::string& factory_env,
+    bool load_plugin_on_demand,
+    std::unique_ptr<PluginLibWrapper> lib_wrapper)
+    : m_webAppFactoryPluginPath(plugin_path)
+    , m_loadPluggableOnDemand(load_plugin_on_demand)
+    , m_pluginLoader(std::make_unique<PluginLoader>(std::move(lib_wrapper))) {
+    m_factoryEnv = SplitPluginTypes(factory_env);
+    m_factoryEnv.emplace("default");
     if (!m_loadPluggableOnDemand)
         loadPluggable();
 }
