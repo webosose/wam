@@ -17,8 +17,8 @@
 #ifndef PLUGINSERVICE_H
 #define PLUGINSERVICE_H
 
-#include <QString>
 #include <list>
+#include <string>
 
 class WebAppBase;
 
@@ -28,9 +28,9 @@ public:
     virtual void startService() = 0;
 
 protected:
-    WebAppBase* findAppById(QString appId);
-    WebAppBase* findAppByInstanceId(QString instanceId);
-    QString getActiveInstanceId();
+    WebAppBase* findAppById(const std::string& appId);
+    WebAppBase* findAppByInstanceId(const std::string& instanceId);
+    std::string getActiveInstanceId();
 
     std::list<const WebAppBase*> runningApps();
 };

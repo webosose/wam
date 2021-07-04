@@ -21,6 +21,7 @@
 #include <map>
 #include <memory>
 #include <string>
+#include <unordered_map>
 #include <vector>
 
 #include <QJsonObject>
@@ -95,8 +96,8 @@ public:
     int currentUiHeight();
     void setUiSize(int width, int height);
 
-    void setActiveInstanceId(QString id) { m_activeInstanceId = id; }
-    const QString getActiveInstanceId() { return m_activeInstanceId; }
+    void setActiveInstanceId(QString id) { m_activeInstanceId = id.toStdString(); }
+    const std::string getActiveInstanceId() { return m_activeInstanceId; }
 
     void onGlobalProperties(int key);
     bool purgeSurfacePool(uint32_t pid);
@@ -111,7 +112,7 @@ public:
     void setDeviceInfo(QString name, QString value);
     WebAppManagerConfig* config() { return m_webAppManagerConfig.get(); }
 
-    const QString windowTypeFromString(const std::string& str);
+    const std::string windowTypeFromString(const std::string& str);
 
     bool closeAllApps(uint32_t pid = 0);
     void setForceCloseApp(const QString& appId, const QString& instanceId);
@@ -154,14 +155,14 @@ public:
     void appInstalled(const std::string& app_id);
     void appRemoved(const std::string& app_id);
 
-    QString identifierForSecurityOrigin(const QString& identifier);
+    std::string identifierForSecurityOrigin(const std::string& identifier);
 
 protected:
 private:
     WebAppFactoryManager* getWebAppFactory();
     void loadEnvironmentVariable();
 
-    WebAppBase* onLaunchUrl(const std::string& url, QString winType,
+    WebAppBase* onLaunchUrl(const std::string& url, const std::string& winType,
         std::shared_ptr<ApplicationDescription> appDesc, const std::string& instanceId,
         const std::string& args, const std::string& launchingAppId,
         int& errCode, std::string& errMsg);
@@ -174,18 +175,17 @@ private:
     typedef std::list<WebPageBase*> PageList;
 
     bool isRunningApp(const std::string& id);
-    QMap<QString, WebAppBase*> m_closingAppList;
+    std::unordered_map<std::string, WebAppBase*> m_closingAppList;
 
     // Mappings
-    QMap<std::string, WebPageBase*> m_shellPageMap;
+    std::unordered_map<std::string, WebPageBase*> m_shellPageMap;
     AppList m_appList;
-    QMultiMap<std::string, WebPageBase*> m_appPageMap;
+    std::unordered_multimap<std::string, WebPageBase*> m_appPageMap;
 
     PageList m_pagesToDeleteList;
     bool m_deletingPages;
 
-    QString m_activeAppId;
-    QString m_activeInstanceId;
+    std::string m_activeInstanceId;
 
     std::unique_ptr<ServiceSender> m_serviceSender;
     std::unique_ptr<WebProcessManager> m_webProcessManager;
@@ -194,7 +194,7 @@ private:
     std::unique_ptr<NetworkStatusManager> m_networkStatusManager;
     std::unique_ptr<WebAppFactoryManager> m_webAppFactory;
 
-    QMap<QString, int> m_lastCrashedAppIds;
+    std::unordered_map<std::string, int> m_lastCrashedAppIds;
 
     int m_suspendDelay;
     int m_maxCustomSuspendDelay;

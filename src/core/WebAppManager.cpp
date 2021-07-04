@@ -16,9 +16,10 @@
 
 #include "WebAppManager.h"
 
+#include <algorithm>
 #include <assert.h>
-#include <string>
 #include <sstream>
+#include <string>
 #include <unistd.h>
 
 #include <QtCore/QJsonDocument>
@@ -285,13 +286,13 @@ std::list<const WebAppBase*> WebAppManager::runningApps(uint32_t pid)
     return apps;
 }
 
-WebAppBase* WebAppManager::onLaunchUrl(const std::string& url, QString winType,
+WebAppBase* WebAppManager::onLaunchUrl(const std::string& url, const std::string& winType,
                                        std::shared_ptr<ApplicationDescription> appDesc, const std::string& instanceId,
                                        const std::string& args, const std::string& launchingAppId,
                                        int& errCode, std::string& errMsg)
 {
     WebAppFactoryManager* factory = getWebAppFactory();
-    WebAppBase* app = factory->createWebApp(winType, appDesc, appDesc->subType().c_str());
+    WebAppBase* app = factory->createWebApp(winType.c_str(), appDesc, appDesc->subType().c_str());
 
     if (!app) {
         errCode = ERR_CODE_LAUNCHAPP_UNSUPPORTED_TYPE;
@@ -299,7 +300,7 @@ WebAppBase* WebAppManager::onLaunchUrl(const std::string& url, QString winType,
         return nullptr;
     }
 
-    WebPageBase* page =  factory->createWebPage(winType, QUrl(url.c_str()), appDesc, appDesc->subType().c_str(), args.c_str());
+    WebPageBase* page =  factory->createWebPage(winType.c_str(), QUrl(url.c_str()), appDesc, appDesc->subType().c_str(), args.c_str());
 
     //set use launching time optimization true while app loading.
     page->setUseLaunchOptimization(true);
@@ -344,11 +345,9 @@ void WebAppManager::forceCloseAppInternal(WebAppBase* app)
 
 void WebAppManager::removeClosingAppList(const QString& instanceId)
 {
-    QMap<QString, WebAppBase*>::iterator it = m_closingAppList.find(instanceId);
-    if (it == m_closingAppList.end())
-        return;
-
-   m_closingAppList.remove(instanceId);
+    while (m_closingAppList.find(instanceId.toStdString()) != m_closingAppList.end()) {
+        m_closingAppList.erase(instanceId.toStdString());
+    }
 }
 
 void WebAppManager::closeAppInternal(WebAppBase* app, bool ignoreCleanResource)
@@ -368,7 +367,7 @@ void WebAppManager::closeAppInternal(WebAppBase* app, bool ignoreCleanResource)
     webPageRemoved(app->page());
     removeWebAppFromWebProcessInfoMap(app->appId());
     postRunningAppList();
-    m_lastCrashedAppIds = QMap<QString, int>();
+    m_lastCrashedAppIds = std::unordered_map<std::string, int>();
 
     // Set m_isClosing flag first, this flag will be checked in web page suspending
     page->setClosing(true);
@@ -382,7 +381,7 @@ void WebAppManager::closeAppInternal(WebAppBase* app, bool ignoreCleanResource)
     if (ignoreCleanResource)
         delete app;
     else {
-        m_closingAppList.insert(app->instanceId(), app);
+        m_closingAppList.emplace(std::make_pair(app->instanceId().toStdString(), app));
 
         if (page->isRegisteredCloseCallback()) {
             LOG_INFO(MSGID_CLOSE_APP_INTERNAL, 3, PMLOGKS("APP_ID", qPrintable(app->appId())), PMLOGKS("INSTANCE_ID", qPrintable(app->instanceId())), PMLOGKFV("PID", "%d", app->page()->getWebProcessPID()), "CloseCallback; execute");
@@ -421,10 +420,15 @@ bool WebAppManager::closeAllApps(uint32_t pid)
 
 void WebAppManager::webPageAdded(WebPageBase* page)
 {
-    if (m_appPageMap.contains(page->appId().toStdString(), page))
-        return;
+    std::string appId = page->appId().toStdString();
 
-    m_appPageMap.insert(page->appId().toStdString(), page);
+    auto found = find_if(m_appPageMap.begin(), m_appPageMap.end(), [&](const auto& item) {
+        return (item.first == appId) && (item.second == page);
+    });
+
+    if (found == m_appPageMap.end()) {
+        m_appPageMap.insert(std::make_pair(appId, page));
+    }
 }
 
 void WebAppManager::webPageRemoved(WebPageBase* page)
@@ -437,7 +441,16 @@ void WebAppManager::webPageRemoved(WebPageBase* page)
         }
     }
 
-    m_appPageMap.remove(page->appId().toStdString(), page);
+    std::string appId = page->appId().toStdString();
+    auto range = m_appPageMap.equal_range(appId);
+    auto it = range.first;
+    while (it != range.second) {
+        if (it->second == page) {
+            it = m_appPageMap.erase(it);
+        } else {
+            it++;
+        }
+    }
 }
 
 void WebAppManager::removeWebAppFromWebProcessInfoMap(QString appId)
@@ -494,7 +507,7 @@ void WebAppManager::appDeleted(WebAppBase* app)
     m_appList.remove(app);
 
     if (!appId.empty())
-        m_shellPageMap.remove(appId);
+        m_shellPageMap.erase(appId);
 }
 
 void WebAppManager::setSystemLanguage(QString language)
@@ -539,12 +552,10 @@ bool WebAppManager::processCrashed(QString appId, QString instanceId) {
 
     if (app->isWindowed()) {
         if (app->isActivated()) {
-            int count = m_lastCrashedAppIds[app->appId()];
-            m_lastCrashedAppIds[app->appId()] = count + 1;
-
+            m_lastCrashedAppIds[app->appId().toStdString()]++;
             int reloadingLimit = app->isNormal() ? kContinuousReloadingLimit-1 : kContinuousReloadingLimit;
 
-            if (m_lastCrashedAppIds[app->appId()] >= reloadingLimit) {
+            if (m_lastCrashedAppIds[app->appId().toStdString()] >= reloadingLimit) {
                 LOG_INFO(MSGID_WEBPROC_CRASH, 4, PMLOGKS("APP_ID", qPrintable(appId)), PMLOGKS("INSTANCE_ID", qPrintable(instanceId)), PMLOGKS("InForeground", "true"), PMLOGKS("Reloading limit", "Close app"),  "");
                 closeAppInternal(app, true);
             }
@@ -561,7 +572,7 @@ bool WebAppManager::processCrashed(QString appId, QString instanceId) {
     return true;
 }
 
-const QString WebAppManager::windowTypeFromString(const std::string& str)
+const std::string WebAppManager::windowTypeFromString(const std::string& str)
 {
     if(str == "overlay")
         return WT_OVERLAY;
@@ -600,7 +611,8 @@ void WebAppManager::requestKillWebProcess(uint32_t pid)
 
 void WebAppManager::deleteStorageData(const QString& identifier)
 {
-    m_webProcessManager->deleteStorageData(identifierForSecurityOrigin(identifier));
+    QString qt_identifier = identifierForSecurityOrigin(identifier.toStdString()).c_str();//TODO: remove during Qtless
+    m_webProcessManager->deleteStorageData(qt_identifier);
 }
 
 void WebAppManager::killCustomPluginProcess(const QString &basePath)
@@ -627,7 +639,7 @@ std::string WebAppManager::launch(const std::string& appDescString, const std::s
         return std::string();
 
     std::string url = desc->entryPoint();
-    QString winType = windowTypeFromString(desc->defaultWindowType());
+    std::string winType = windowTypeFromString(desc->defaultWindowType());
     errMsg.erase();
 
     // Set displayAffinity (multi display support)
@@ -803,11 +815,13 @@ void WebAppManager::appRemoved(const std::string& app_id) {
     p->OnAppRemoved(app_id);
 }
 
-QString WebAppManager::identifierForSecurityOrigin(const QString& identifier)
+std::string WebAppManager::identifierForSecurityOrigin(const std::string& identifier)
 {
-    QString lowcase_identifier = identifier.toLower();
+    std::string lowcase_identifier = identifier;
+    std::transform(lowcase_identifier.begin(), lowcase_identifier.end(), lowcase_identifier.begin(), tolower);
+
     if (lowcase_identifier != identifier) {
         LOG_WARNING(MSGID_APPID_HAS_UPPERCASE, 0, "Application id should not contain capital letters");
     }
-    return QString("%1%2").arg(lowcase_identifier).arg(webos::WebViewBase::kSecurityOriginPostfix.c_str());
+    return (lowcase_identifier + webos::WebViewBase::kSecurityOriginPostfix);
 }

@@ -16,17 +16,23 @@
 
 #include "WebProcessManager.h"
 
+#include <climits>
+#include <cstdio>
+#include <fstream>
 #include <signal.h>
+#include <string>
+
 #include <QFile>
-#include <QJsonDocument>
 #include <QJsonArray>
+#include <QJsonDocument>
 
 #include "ApplicationDescription.h"
 #include "LogManager.h"
+#include "TypeConverter.h"
 #include "WebAppBase.h"
+#include "WebAppManager.h"
 #include "WebAppManagerConfig.h"
 #include "WebAppManagerUtils.h"
-#include "WebAppManager.h"
 #include "WebPageBase.h"
 
 #include <glib.h>
@@ -47,9 +53,9 @@ std::list<const WebAppBase*> WebProcessManager::runningApps(uint32_t pid)
     return WebAppManager::instance()->runningApps(pid);
 }
 
-WebAppBase* WebProcessManager::findAppById(const QString& appId)
+WebAppBase* WebProcessManager::findAppById(const std::string& appId)
 {
-    return WebAppManager::instance()->findAppById(appId);
+    return WebAppManager::instance()->findAppById(QString::fromStdString(appId));
 }
 
 WebAppBase* WebProcessManager::findAppByInstanceId(const QString& appId)
@@ -61,7 +67,7 @@ bool WebProcessManager::webProcessInfoMapReady()
 {
     uint32_t count = 0;
     for (const auto& it : m_webProcessInfoMap) {
-        if (it.proxyID != 0)
+        if (it.second.proxyID != 0)
             count++;
     }
 
@@ -73,81 +79,75 @@ uint32_t WebProcessManager::getWebProcessProxyID(const ApplicationDescription *d
     if (!desc)
         return 0;
 
-    QString key = getProcessKey(desc);
+    std::string key = getProcessKey(desc);
 
-    QMap<QString, WebProcessInfo>::const_iterator it = m_webProcessInfoMap.find(key);
-    if (it == m_webProcessInfoMap.end() || !it.value().proxyID) {
+    auto it = m_webProcessInfoMap.find(key);
+    if (it == m_webProcessInfoMap.end() || !it->second.proxyID) {
         return getInitialWebViewProxyID();
     }
 
-    return it.value().proxyID;
+    return it->second.proxyID;
 }
 
 uint32_t WebProcessManager::getWebProcessProxyID(uint32_t pid) const
 {
-    for (QMap<QString, WebProcessInfo>::const_iterator it = m_webProcessInfoMap.begin(); it != m_webProcessInfoMap.end(); it++) {
-        if (it.value().webProcessPid == pid)
-            return it.value().proxyID;
+    auto res = find_if(m_webProcessInfoMap.begin(), m_webProcessInfoMap.end(), [pid](const auto& item) {
+        return (item.second.webProcessPid == pid);
+    });
+
+    if (res != m_webProcessInfoMap.end()) {
+        return res->second.proxyID;
     }
     return 0;
 }
 
 QString WebProcessManager::getWebProcessMemSize(uint32_t pid) const
 {
-    QString filePath = QString("/proc/") + QString::number(pid) + QString("/status");
-    FILE *fd = fopen(filePath.toStdString().c_str(), "r");
-    QString vmrss;
-    char line[128];
+    std::string path = "/proc/" + std::to_string(pid) + "/status";
+    std::ifstream in(path);
 
-    if (!fd)
-        return vmrss;
+    if (!in.is_open())
+        return {};
 
-    while (fgets(line, 128, fd) != NULL) {
-        if(!strncmp(line, "VmRSS:", 6)) {
-            vmrss = QString(&line[8]);
-            break;
+    std::string line;
+    while (std::getline(in, line)) {
+        if(!line.find("VmRSS:", 0, 6)) {
+            return trimString(std::string(line, 6)).c_str();
         }
     }
-
-    fclose(fd);
-    return vmrss.simplified();
+    return {};
 }
 
 void WebProcessManager::readWebProcessPolicy()
 {
-    QString webProcessConfigurationPath = WebAppManager::instance()->config()->getWebProcessConfigPath();
+    Json::Value webProcessEnvironment;
+    std::string configPath = WebAppManager::instance()->config()->getWebProcessConfigPath().toStdString();
+    bool config = fileToJson(configPath, webProcessEnvironment);
 
-    QFile file(webProcessConfigurationPath);
-    if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
-        return;
-
-    QString jsonStr = file.readAll();
-    file.close();
-
-    QJsonDocument webProcessEnvironment = QJsonDocument::fromJson(jsonStr.toUtf8());
-    if (webProcessEnvironment.isNull()) {
-        LOG_ERROR(MSGID_WEBPROCESSENV_READ_FAIL, 1, PMLOGKS("CONTENT", jsonStr.toStdString().c_str()), "");
+    if (!config || webProcessEnvironment.isNull()) {
+        LOG_ERROR(MSGID_WEBPROCESSENV_READ_FAIL, 1, PMLOGKS("PATH", configPath.c_str()), "JSON parsing failed");
         return;
     }
 
-    bool createProcessForEachApp = webProcessEnvironment.object().value("createProcessForEachApp").toBool();
-    if (createProcessForEachApp)
+    auto createProcessForEachApp = webProcessEnvironment["createProcessForEachApp"];
+    if (createProcessForEachApp.isBool() && createProcessForEachApp.asBool())
         m_maximumNumberOfProcesses = UINT_MAX;
     else {
-        QJsonArray webProcessArray = webProcessEnvironment.object().value("webProcessList").toArray();
-        Q_FOREACH (const QJsonValue &value, webProcessArray) {
-            QJsonObject obj = value.toObject();
-            if (!obj.value("id").isUndefined()) {
-                QString id = obj.value("id").toString();
-
-                m_webProcessGroupAppIDList.append(id);
-                setWebProcessCacheProperty(obj, id);
-            }
-            else if (!obj.value("trustLevel").isUndefined()) {
-                QString trustLevel = obj.value("trustLevel").toString();
-
-                m_webProcessGroupTrustLevelList.append(trustLevel);
-                setWebProcessCacheProperty(obj, trustLevel);
+        auto webProcessArray = webProcessEnvironment["webProcessList"];
+        if (webProcessArray.isArray()) {
+            for (const auto &value : webProcessArray) {
+                if (!value.isObject())
+                    continue;
+                auto id = value["id"];
+                if (id.isString()) {
+                    m_webProcessGroupAppIDList.push_back(id.asString());
+                    setWebProcessCacheProperty(value, id.asString());
+                }
+                auto trustLevel = value["trustLevel"];
+                if (trustLevel.isString()) {
+                    m_webProcessGroupTrustLevelList.push_back(trustLevel.asString());
+                    setWebProcessCacheProperty(value, trustLevel.asString());
+                }
             }
         }
         m_maximumNumberOfProcesses = (m_webProcessGroupTrustLevelList.size() + m_webProcessGroupAppIDList.size());
@@ -158,85 +158,82 @@ void WebProcessManager::readWebProcessPolicy()
             PMLOGKFV("GROUP_APP_IDS_COUNT", "%d", m_webProcessGroupAppIDList.size()), "");
 }
 
-void WebProcessManager::setWebProcessCacheProperty(QJsonObject object, QString key)
+void WebProcessManager::setWebProcessCacheProperty(const Json::Value &object, const std::string& key)
 {
     WebProcessInfo info = WebProcessInfo(0, 0);
-    QString memoryCacheStr, codeCacheStr;
-    if (!object.value("memoryCache").isUndefined()) {
-        memoryCacheStr = object.value("memoryCache").toString();
-        if (memoryCacheStr.contains("MB"))
-            memoryCacheStr.remove(QString("MB"));
-
-        if (memoryCacheStr.toUInt())
-            info.memoryCacheSize = memoryCacheStr.toUInt();
-    }
-    if (!object.value("codeCache").isUndefined()) {
-        codeCacheStr = object.value("codeCache").toString();
-        if (codeCacheStr.contains("MB"))
-            codeCacheStr.remove(QString("MB"));
-
-        if (codeCacheStr.toUInt())
-            info.codeCacheSize = codeCacheStr.toUInt();
+    auto memoryCache = object["memoryCache"];
+    if (memoryCache.isString()) {
+        int memCacheSize = 0;
+        stringToInt(memoryCache.asString(), memCacheSize);
+        info.memoryCacheSize = memCacheSize;
     }
 
-    m_webProcessInfoMap.insert(key, info);
+    auto codeCache = object["codeCache"];
+    if (codeCache.isString()) {
+        int codeCacheInt = 0;
+        stringToInt(codeCache.asString(), codeCacheInt);
+        info.codeCacheSize = codeCacheInt;
+    }
+
+    m_webProcessInfoMap.emplace(key, info);
 }
 
-QString WebProcessManager::getProcessKey(const ApplicationDescription* desc) const
+std::string WebProcessManager::getProcessKey(const ApplicationDescription* desc) const
 {
     if (!desc)
-        return QString();
+        return std::string();
 
-    QString key;
-    QStringList idList, trustLevelList;
+    std::string key;
+    std::vector<std::string> idList, trustLevelList;
     if (m_maximumNumberOfProcesses == 1)
-        key = QStringLiteral("system");
+        key = "system";
     else if (m_maximumNumberOfProcesses == UINT_MAX) {
         if (desc->trustLevel() == "default" || desc->trustLevel() == "trusted")
-            key = QStringLiteral("system");
+            key = "system";
         else
-            key = desc->id().c_str();
+            key = desc->id();
     }
     else {
-        for (int i = 0; i < m_webProcessGroupAppIDList.size(); i++) {
-            QString appId = m_webProcessGroupAppIDList.at(i);
-            if (appId.contains("*")) {
-                appId.remove(QChar('*'));
-                idList.append(appId.split(","));
-                Q_FOREACH(QString id, idList) {
-                    if (QString::fromUtf8(desc->id().c_str()).startsWith(id))
+        for (size_t i = 0; i < m_webProcessGroupAppIDList.size(); i++) {
+            std::string appId = m_webProcessGroupAppIDList.at(i);
+            if (appId.find('*') != std::string::npos) {
+                replaceSubstrings(appId, "*");
+                auto l = splitString(appId, ',');
+                idList.insert(idList.end(), l.begin(), l.end());
+                for (const auto& id : idList)
+                    if (!desc->id().compare(0, id.size(), id))
                         key = m_webProcessGroupAppIDList.at(i);
-                }
             } else {
-                idList.append(appId.split(","));
-                Q_FOREACH(QString id, idList) {
-                    if (!id.compare(desc->id().c_str()))
+                auto l = splitString(appId, ',');
+                idList.insert(idList.end(), l.begin(), l.end());
+                for (const auto& id : idList)
+                    if (id == desc->id())
                         return m_webProcessGroupAppIDList.at(i);
-                }
             }
         }
-        if (!key.isEmpty())
+        if (!key.empty())
             return key;
 
-        for (int i = 0; i < m_webProcessGroupTrustLevelList.size(); i++) {
-            QString trustLevel = m_webProcessGroupTrustLevelList.at(i);
-            trustLevelList.append(trustLevel.split(","));
-            Q_FOREACH(QString trust, trustLevelList) {
-                if (!trust.compare(desc->trustLevel().c_str())) {
+        for (size_t i = 0; i < m_webProcessGroupTrustLevelList.size(); i++) {
+            std::string trustLevel = m_webProcessGroupTrustLevelList.at(i);
+            auto l = splitString(trustLevel, ',');
+            trustLevelList.insert(trustLevelList.end(), l.begin(), l.end());
+            for (const auto& trust : trustLevelList) {
+                if (trust == desc->trustLevel()) {
                     return m_webProcessGroupTrustLevelList.at(i);
                 }
             }
         }
-        key = QStringLiteral("system");
+        key = "system";
     }
     return key;
 }
 
 void WebProcessManager::killWebProcess(uint32_t pid)
 {
-    for(QMap<QString, WebProcessInfo>::iterator it = m_webProcessInfoMap.begin(); it != m_webProcessInfoMap.end(); it++) {
-        if (it.value().webProcessPid == pid) {
-            it.value().requestKill = false;
+    for(auto &it : m_webProcessInfoMap) {
+        if (it.second.webProcessPid == pid) {
+            it.second.requestKill = false;
             break;
         }
     }
@@ -249,10 +246,10 @@ void WebProcessManager::killWebProcess(uint32_t pid)
 
 void WebProcessManager::requestKillWebProcess(uint32_t pid)
 {
-    for (QMap<QString, WebProcessInfo>::iterator it = m_webProcessInfoMap.begin(); it != m_webProcessInfoMap.end(); it++) {
-        if (it.value().webProcessPid == pid) {
+    for(auto &it : m_webProcessInfoMap) {
+        if (it.second.webProcessPid == pid) {
             LOG_INFO(MSGID_KILL_WEBPROCESS_DELAYED, 1, PMLOGKFV("PID", "%u", pid), "");
-            it.value().requestKill = true;
+            it.second.requestKill = true;
             return;
         }
     }

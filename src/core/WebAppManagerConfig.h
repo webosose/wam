@@ -17,6 +17,8 @@
 #ifndef WEBAPPMANAGERCONFIG_H
 #define WEBAPPMANAGERCONFIG_H
 
+#include <string>
+
 #include <QMap>
 #include <QString>
 #include <QVariant>
@@ -26,52 +28,48 @@ public:
     WebAppManagerConfig();
     virtual ~WebAppManagerConfig() {}
 
-    virtual QString getWebAppFactoryPluginTypes() const { return m_webAppFactoryPluginTypes; }
-    virtual QString getWebAppFactoryPluginPath() const { return m_webAppFactoryPluginPath; }
+    virtual QString getWebAppFactoryPluginTypes() const { return QString::fromStdString(m_webAppFactoryPluginTypes); }
+    virtual QString getWebAppFactoryPluginPath() const { return QString::fromStdString(m_webAppFactoryPluginPath); }
     virtual int getSuspendDelayTime() const { return m_suspendDelayTime; }
     virtual int getMaxCustomSuspendDelayTime() const { return m_maxCustomSuspendDelayTime; }
-    virtual QString getWebProcessConfigPath() const { return m_webProcessConfigPath; }
+    virtual QString getWebProcessConfigPath() const { return QString::fromStdString(m_webProcessConfigPath); }
     virtual bool isInspectorEnabled() const { return m_inspectorEnabled; }
     virtual bool isDevModeEnabled() const { return m_devModeEnabled; }
-    virtual QString getErrorPageUrl() const { return m_errorPageUrl; }
-    virtual QString getTelluriumNubPath() const { return m_telluriumNubPath; }
+    virtual QString getErrorPageUrl() const { return QString::fromStdString(m_errorPageUrl); }
+    virtual QString getTelluriumNubPath() const { return QString::fromStdString(m_telluriumNubPath); }
     virtual void postInitConfiguration();
     virtual bool isDynamicPluggableLoadEnabled() const { return m_dynamicPluggableLoadEnabled; }
     virtual bool isPostWebProcessCreatedDisabled() const { return m_postWebProcessCreatedDisabled; }
     virtual bool isCheckLaunchTimeEnabled() const { return m_checkLaunchTimeEnabled; }
     virtual bool isUseSystemAppOptimization() const { return m_useSystemAppOptimization; }
-    virtual QString getUserScriptPath() const { return m_userScriptPath; }
+    virtual QString getUserScriptPath() const { return QString::fromStdString(m_userScriptPath); }
     virtual std::string getName() const { return m_name; }
 
     virtual bool isLaunchOptimizationEnabled() const { return m_launchOptimizationEnabled; }
 
 protected:
-    virtual QVariant getConfiguration(QString name);
-    virtual void setConfiguration(QString name, QVariant value);
     virtual std::string wamGetEnv(const char *name);
     void resetConfiguration();
 
 private:
     void initConfiguration();
 
-    QString m_webAppFactoryPluginTypes;
-    QString m_webAppFactoryPluginPath;
+    std::string m_webAppFactoryPluginTypes;
+    std::string m_webAppFactoryPluginPath;
     int m_suspendDelayTime;
     int m_maxCustomSuspendDelayTime;
-    QString m_webProcessConfigPath;
+    std::string m_webProcessConfigPath;
     bool m_devModeEnabled;
     bool m_inspectorEnabled;
-    QString m_errorPageUrl;
-    QString m_telluriumNubPath;
+    std::string m_errorPageUrl;
+    std::string m_telluriumNubPath;
     bool m_dynamicPluggableLoadEnabled;
     bool m_postWebProcessCreatedDisabled;
     bool m_checkLaunchTimeEnabled;
     bool m_useSystemAppOptimization;
     bool m_launchOptimizationEnabled;
-    QString m_userScriptPath;
+    std::string m_userScriptPath;
     std::string m_name;
-
-    QMap<QString, QVariant> m_configuration;
 };
 
 #endif /* WEBAPPMANAGERCONFIG_H */

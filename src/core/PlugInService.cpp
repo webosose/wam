@@ -18,17 +18,17 @@
 #include "WebAppBase.h"
 #include "WebAppManager.h"
 
-WebAppBase* PlugInService::findAppById(QString appId)
+WebAppBase* PlugInService::findAppById(const std::string& appId)
 {
-    return WebAppManager::instance()->findAppById(appId);
+    return WebAppManager::instance()->findAppById(appId.c_str());
 }
 
-WebAppBase* PlugInService::findAppByInstanceId(QString instanceId)
+WebAppBase* PlugInService::findAppByInstanceId(const std::string& instanceId)
 {
-    return WebAppManager::instance()->findAppByInstanceId(instanceId);
+    return WebAppManager::instance()->findAppByInstanceId(QString::fromStdString(instanceId));
 }
 
-QString PlugInService::getActiveInstanceId()
+std::string PlugInService::getActiveInstanceId()
 {
     return WebAppManager::instance()->getActiveInstanceId();
 }

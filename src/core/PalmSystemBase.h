@@ -27,7 +27,6 @@ public:
 
 protected:
     virtual QString getDeviceInfo(QString name);
-    virtual QVariant getResource(QVariant a, QVariant b);
     virtual QString country() const;
     virtual QString locale() const;
     virtual QString localeRegion() const;

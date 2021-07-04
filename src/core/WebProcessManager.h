@@ -18,11 +18,16 @@
 #define WEBPROCESSMANAGER_H
 
 #include <list>
+#include <string>
+#include <unordered_map>
+#include <vector>
 
 #include <QJsonObject>
 #include <QList>
 #include <QMap>
 #include <QString>
+
+#include <json/json.h>
 
 class ApplicationDescription;
 class WebPageBase;
@@ -39,9 +44,9 @@ public:
     void killWebProcess(uint32_t pid);
     void requestKillWebProcess(uint32_t pid);
     bool webProcessInfoMapReady();
-    void setWebProcessCacheProperty(QJsonObject object, QString key); //change name from setWebProcessProperty()
+    void setWebProcessCacheProperty(const Json::Value &object, const std::string& key); //change name from setWebProcessProperty()
     void readWebProcessPolicy(); //chane name from setWebProcessEnvironment()
-    QString getProcessKey(const ApplicationDescription* desc) const; //change name from getKey()
+    std::string getProcessKey(const ApplicationDescription* desc) const; //change name from getKey()
 
     virtual QJsonObject getWebProcessProfiling() = 0;
     virtual uint32_t getWebProcessPID(const WebAppBase* app) const = 0;
@@ -53,7 +58,7 @@ public:
 protected:
     std::list<const WebAppBase*> runningApps();
     std::list<const WebAppBase*> runningApps(uint32_t pid);
-    WebAppBase* findAppById(const QString& appId);
+    WebAppBase* findAppById(const std::string& appId);
     WebAppBase* findAppByInstanceId(const QString& instanceId);
 
 protected:
@@ -82,11 +87,11 @@ protected:
         uint32_t codeCacheSize;
         bool requestKill;
     };
-    QMap<QString, WebProcessInfo> m_webProcessInfoMap;
+    std::unordered_map<std::string, WebProcessInfo> m_webProcessInfoMap;
 
     uint32_t m_maximumNumberOfProcesses;
-    QList<QString> m_webProcessGroupAppIDList;
-    QList<QString> m_webProcessGroupTrustLevelList;
+    std::vector<std::string> m_webProcessGroupAppIDList;
+    std::vector<std::string> m_webProcessGroupTrustLevelList;
 };
 
 #endif /* WEBPROCESSMANAGER_H */

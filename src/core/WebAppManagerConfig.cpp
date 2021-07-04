@@ -18,6 +18,8 @@
 
 #include <unistd.h>
 
+#include "TypeConverter.h"
+
 WebAppManagerConfig::WebAppManagerConfig()
     : m_suspendDelayTime(0)
     , m_maxCustomSuspendDelayTime(0)
@@ -39,24 +41,28 @@ std::string WebAppManagerConfig::wamGetEnv(const char *name)
 
 void WebAppManagerConfig::initConfiguration()
 {
-    m_webAppFactoryPluginTypes = QLatin1String(wamGetEnv("WEBAPPFACTORY").c_str());
+    m_webAppFactoryPluginTypes = wamGetEnv("WEBAPPFACTORY");
 
-    m_webAppFactoryPluginPath = QLatin1String(wamGetEnv("WEBAPPFACTORY_PLUGIN_PATH").c_str());
-    if (m_webAppFactoryPluginPath.isEmpty()) {
-        m_webAppFactoryPluginPath = QLatin1String("/usr/lib/webappmanager/plugins");
+    m_webAppFactoryPluginPath = wamGetEnv("WEBAPPFACTORY_PLUGIN_PATH");
+    if (m_webAppFactoryPluginPath.empty()) {
+        m_webAppFactoryPluginPath = "/usr/lib/webappmanager/plugins";
     }
 
-    QString suspendDelay = QLatin1String(wamGetEnv("WAM_SUSPEND_DELAY_IN_MS").c_str());
-    m_suspendDelayTime = std::max(suspendDelay.toInt(), 1);
+    std::string suspendDelay = wamGetEnv("WAM_SUSPEND_DELAY_IN_MS");
+    int suspendDelayInt = 0;
+    stringToInt(suspendDelay, suspendDelayInt);
+    m_suspendDelayTime = std::max(suspendDelayInt, 1);
 
-    QString maxCustomSuspendDelay = QLatin1String(wamGetEnv("MAX_CUSTOM_SUSPEND_DELAY_IN_MS").c_str());
-    m_maxCustomSuspendDelayTime = std::max(maxCustomSuspendDelay.toInt(), 0);
+    std::string maxCustomSuspendDelay = wamGetEnv("MAX_CUSTOM_SUSPEND_DELAY_IN_MS");
+    int maxCustomSuspendDelayInt = 0;
+    stringToInt(maxCustomSuspendDelay, maxCustomSuspendDelayInt);
+    m_maxCustomSuspendDelayTime = std::max(maxCustomSuspendDelayInt, 0);
 
-    m_webProcessConfigPath = QLatin1String(wamGetEnv("WEBPROCESS_CONFIGURATION_PATH").c_str());
-    if (m_webProcessConfigPath.isEmpty())
-        m_webProcessConfigPath = QLatin1String("/etc/wam/com.webos.wam.json");
+    m_webProcessConfigPath = wamGetEnv("WEBPROCESS_CONFIGURATION_PATH");
+    if (m_webProcessConfigPath.empty())
+        m_webProcessConfigPath = "/etc/wam/com.webos.wam.json";
 
-    m_errorPageUrl = QLatin1String(wamGetEnv("WAM_ERROR_PAGE").c_str());
+    m_errorPageUrl = wamGetEnv("WAM_ERROR_PAGE");
 
     m_dynamicPluggableLoadEnabled =
             wamGetEnv("LOAD_DYNAMIC_PLUGGABLE").compare("1") == 0;
@@ -73,27 +79,11 @@ void WebAppManagerConfig::initConfiguration()
     m_launchOptimizationEnabled =
             wamGetEnv("ENABLE_LAUNCH_OPTIMIZATION").compare("1") == 0;
 
-    m_userScriptPath = QLatin1String(wamGetEnv("USER_SCRIPT_PATH").c_str());
-    if (m_userScriptPath.isEmpty())
-        m_userScriptPath = QLatin1String("webOSUserScripts/userScript.js");
+    m_userScriptPath = wamGetEnv("USER_SCRIPT_PATH");
+    if (m_userScriptPath.empty())
+        m_userScriptPath = "webOSUserScripts/userScript.js";
 
     m_name = wamGetEnv("WAM_NAME");
-}
-
-QVariant WebAppManagerConfig::getConfiguration(QString name)
-{
-    QVariant value(0);
-
-    if (m_configuration.contains(name)) {
-        value = m_configuration.value(name);
-    }
-
-    return value;
-}
-
-void WebAppManagerConfig::setConfiguration(QString name, QVariant value)
-{
-    m_configuration.insert(name, value);
 }
 
 void WebAppManagerConfig::postInitConfiguration()
@@ -104,7 +94,7 @@ void WebAppManagerConfig::postInitConfiguration()
 
     if (access("/var/luna/preferences/devmode_enabled", F_OK) == 0) {
         m_devModeEnabled = true;
-        m_telluriumNubPath = QLatin1String(wamGetEnv("TELLURIUM_NUB_PATH").c_str());
+        m_telluriumNubPath = wamGetEnv("TELLURIUM_NUB_PATH");
     }
 }
 
@@ -128,8 +118,6 @@ void WebAppManagerConfig::resetConfiguration()
     m_telluriumNubPath.clear();
     m_userScriptPath.clear();
     m_name.clear();
-
-    m_configuration.clear();
 
     initConfiguration();
 }

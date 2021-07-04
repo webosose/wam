@@ -15,10 +15,16 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "PalmSystemBase.h"
-#include "WebAppManager.h"
+
+#include <string>
 
 #include <QByteArray>
-#include <QFile>
+
+#include <json/json.h>
+
+#include "TypeConverter.h"
+#include "WebAppManager.h"
+
 
 QString PalmSystemBase::getDeviceInfo(QString name)
 {
@@ -28,30 +34,20 @@ QString PalmSystemBase::getDeviceInfo(QString name)
     return value;
 }
 
-QVariant PalmSystemBase::getResource(QVariant a, QVariant b)
-{
-    QFile f(a.toString());
-    if (!f.open(QIODevice::ReadOnly))
-        return QVariant();
-
-    QByteArray data = f.readAll();
-
-    return QVariant(data.constData());
-}
-
 QString PalmSystemBase::country() const
 {
-    QString localcountry;
-    QString smartServiceCountry;
-    QString country;
+    QString q_localcountry;
+    QString q_smartServiceCountry;
 
-    WebAppManager::instance()->getDeviceInfo("LocalCountry", localcountry);
-    WebAppManager::instance()->getDeviceInfo("SmartServiceCountry", smartServiceCountry);
+    WebAppManager::instance()->getDeviceInfo("LocalCountry", q_localcountry);
+    WebAppManager::instance()->getDeviceInfo("SmartServiceCountry", q_smartServiceCountry);
 
-    country = QString("{ \"country\": \"%1\", \"smartServiceCountry\": \"%2\" }");
-    country = country.arg(localcountry).arg(smartServiceCountry);
-
-    return country;
+    std::string country;
+    Json::Value obj(Json::objectValue);
+    obj["country"] = q_localcountry.toStdString();
+    obj["smartServiceCountry"] = q_smartServiceCountry.toStdString();
+    jsonToString(obj, country);
+    return QString::fromStdString(country);
 }
 
 QString PalmSystemBase::locale() const

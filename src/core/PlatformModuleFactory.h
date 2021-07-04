@@ -19,10 +19,10 @@
 
 #include <memory>
 
-#include "ServiceSender.h"
-#include "WebProcessManager.h"
 #include "DeviceInfo.h"
+#include "ServiceSender.h"
 #include "WebAppManagerConfig.h"
+#include "WebProcessManager.h"
 
 class PlatformModuleFactory {
 public:

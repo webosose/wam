@@ -18,13 +18,13 @@
 #define WEBPAGEBASE_H
 
 #include <memory>
+#include <string>
 
 #include <QObject>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
 #include "ObserverList.h"
-
 #include "webos/webview_base.h"
 
 class ApplicationDescription;
@@ -139,7 +139,6 @@ public:
     void addObserver(WebPageObserver* observer);
     void removeObserver(WebPageObserver* observer);
 
-    static QString truncateURL(const QString& url);
     virtual QString getIdentifierForSecurityOrigin() const;
 
     virtual void activateRendererCompositor() { }
@@ -171,7 +170,7 @@ protected:
     virtual void loadErrorPage(int errorCode) = 0;
     virtual void recreateWebView() = 0;
     virtual void setVisible(bool visible) {}
-    virtual bool doDeeplinking(const QString& launchParams);
+    virtual bool doDeeplinking(const std::string& launchParams);
 
     void handleLoadStarted();
     void handleLoadFinished();
@@ -207,7 +206,7 @@ protected:
     ObserverList<WebPageObserver> m_observers;
 
 private:
-    void setBackgroundColorOfBody(const QString& color);
+    void setBackgroundColorOfBody(const std::string& color);
     void setupLaunchEvent();
 
     bool m_cleaningResources;

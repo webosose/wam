@@ -31,6 +31,7 @@ SOURCES += \
         PluginLibWrapper.cpp \
         PluginLoader.cpp \
         Timer.cpp \
+        TypeConverter.cpp \
         Utils.cpp \
         WebAppBase.cpp \
         WebAppFactoryManagerImpl.cpp \
@@ -59,6 +60,7 @@ HEADERS += \
         PluginLoader.h \
         ServiceSender.h \
         Timer.h \
+        TypeConverter.h \
         Utils.h \
         WebAppBase.h \
         WebAppFactoryInterface.h \

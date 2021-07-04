@@ -16,16 +16,16 @@
 
 #include "WebAppFactoryManagerImpl.h"
 
-#include <string>
-#include <vector>
 #include <dirent.h>
+#include <string>
 #include <sys/types.h>
+#include <vector>
 
-#include "PluginLoader.h"
 #include "LogManager.h"
+#include "PluginLoader.h"
 #include "WebAppBase.h"
-#include "WebAppManagerConfig.h"
 #include "WebAppManager.h"
+#include "WebAppManagerConfig.h"
 #include "WebPageBase.h"
 
 namespace {

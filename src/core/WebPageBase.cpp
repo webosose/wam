@@ -14,7 +14,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#include "WebPageBase.h"
+
+#include <boost/filesystem.hpp>
 #include <memory>
+#include <sstream>
 
 #include <QDir>
 #include <QFileInfo>
@@ -23,11 +27,13 @@
 
 #include "ApplicationDescription.h"
 #include "LogManager.h"
-#include "WebAppManagerConfig.h"
+#include "TypeConverter.h"
 #include "WebAppManager.h"
-#include "WebPageBase.h"
+#include "WebAppManagerConfig.h"
 #include "WebPageObserver.h"
 #include "WebProcessManager.h"
+
+namespace fs = boost::filesystem;
 
 #define CONSOLE_DEBUG(AAA) evaluateJavaScript(QStringLiteral("console.debug('") + QStringLiteral(AAA) + QStringLiteral("');"))
 
@@ -100,7 +106,7 @@ void WebPageBase::load()
     LOG_INFO(MSGID_WEBPAGE_LOAD, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "m_launchParams:%s", qPrintable(m_launchParams));
     /* this function is main load of WebPage : load default url */
     setupLaunchEvent();
-    if (!doDeeplinking(m_launchParams)) {
+    if (!doDeeplinking(m_launchParams.toStdString())) {
         LOG_INFO(MSGID_WEBPAGE_LOAD, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()), "loadDefaultUrl()");
         loadDefaultUrl();
     }
@@ -108,36 +114,38 @@ void WebPageBase::load()
 
 void WebPageBase::setupLaunchEvent()
 {
-    QString launchEventJS = QStringLiteral(
-            "(function() {"
-            "    var dispatchLaunchEvent = function() {"
-            "        var launchEvent = new CustomEvent('webOSLaunch', { detail: %1 });"
-            "        setTimeout(function() {"
-            "            document.dispatchEvent(launchEvent);"
-            "        }, 1);"
-            "    };"
-            "    if (document.readyState === 'complete') {"
-            "        dispatchLaunchEvent();"
-            "    } else {"
-            "        document.onreadystatechange = function() {"
-            "            if (document.readyState === 'complete') {"
-            "                dispatchLaunchEvent();"
-            "            }"
-            "        };"
-            "    }"
-            "})();"
-            ).arg(launchParams().isEmpty() ? "{}" : launchParams());
-    addUserScript(launchEventJS);
+    std::stringstream launchEvent;
+    std::string params = launchParams().isEmpty() ? "{}" : launchParams().toStdString();
+    launchEvent
+        << "(function() {"
+        << "    var dispatchLaunchEvent = function() {"
+        << "        var launchEvent = new CustomEvent('webOSLaunch', { detail: " << params << " });"
+        << "        setTimeout(function() {"
+        << "            document.dispatchEvent(launchEvent);"
+        << "        }, 1);"
+        << "    };"
+        << "    if (document.readyState === 'complete') {"
+        << "        dispatchLaunchEvent();"
+        << "    } else {"
+        << "        document.onreadystatechange = function() {"
+        << "            if (document.readyState === 'complete') {"
+        << "                dispatchLaunchEvent();"
+        << "            }"
+        << "        };"
+        << "    }"
+        << "})();";
+
+    addUserScript(launchEvent.str().c_str());
 }
 
 void WebPageBase::sendLocaleChangeEvent(const QString& language)
 {
-    evaluateJavaScript(QStringLiteral(
+    evaluateJavaScript(
         "setTimeout(function () {"
         "    var localeEvent=new CustomEvent('webOSLocaleChange');"
         "    document.dispatchEvent(localeEvent);"
         "}, 1);"
-    ));
+    );
 }
 
 void WebPageBase::cleanResources()
@@ -187,11 +195,13 @@ bool WebPageBase::doHostedWebAppRelaunch(const QString& launchParams)
     To support backward compatibility, should cover the case not having "handledBy"
     */
     // check deeplinking relaunch condition
-    QJsonObject obj = QJsonDocument::fromJson(launchParams.toUtf8()).object();
+    Json::Value obj;
+    stringToJson(launchParams.toStdString(), obj);
+
     if (url().scheme() ==  "file"
         || m_defaultUrl.scheme() != "file"
-        || obj.isEmpty() /* no launchParams, { }, and this should be check with object().isEmpty()*/
-        || obj.value("contentTarget").isUndefined()
+        || !obj.isObject() /* no launchParams, { }, and this should be check with object().isEmpty()*/
+        || obj["contentTarget"].isNull()
         || (m_appDesc && !m_appDesc->handlesDeeplinking())) {
         LOG_INFO(MSGID_WEBPAGE_RELAUNCH, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()),
             "%s; NOT enough deeplinking condition; return false", __func__);
@@ -200,18 +210,19 @@ bool WebPageBase::doHostedWebAppRelaunch(const QString& launchParams)
 
     // Do deeplinking relaunch
     setLaunchParams(launchParams);
-    return doDeeplinking(launchParams);
+    return doDeeplinking(launchParams.toStdString());
 }
 
-bool WebPageBase::doDeeplinking(const QString& launchParams)
+bool WebPageBase::doDeeplinking(const std::string& launchParams)
 {
-    QJsonObject obj = QJsonDocument::fromJson(launchParams.toUtf8()).object();
-    if (obj.isEmpty() || obj.value("contentTarget").isUndefined())
+    Json::Value obj;
+    stringToJson(launchParams, obj);
+    if (!obj.isObject() || obj["contentTarget"].isNull())
         return false;
 
-    std::string handledBy = obj.value("handledBy").isUndefined() ? "default" : obj.value("handledBy").toString().toStdString();
+    std::string handledBy = obj["handledBy"].isNull() ? "default" : obj["handledBy"].asString();
     if (handledBy == "platform") {
-        std::string targetUrl = obj.value("contentTarget").toString().toStdString();
+        std::string targetUrl = obj["contentTarget"].asString();
         LOG_INFO(MSGID_DEEPLINKING, 4, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", getWebProcessPID()),
             PMLOGKS("handledBy", handledBy.c_str()),
             "%s; load target URL:%s", __func__, targetUrl.c_str());
@@ -238,12 +249,15 @@ void WebPageBase::sendRelaunchEvent()
     // Send the relaunch event on the next tick after javascript is loaded
     // This is a workaround for a problem where WebKit can't free the page
     // if we don't use a timeout here.
-    evaluateJavaScript(QStringLiteral(
-        "setTimeout(function () {"
-        "    console.log('[WAM] fires webOSRelaunch event');"
-        "    var launchEvent=new CustomEvent('webOSRelaunch', { detail: %1 });"
-        "    document.dispatchEvent(launchEvent);"
-        "}, 1);").arg(launchParams().isEmpty() ? "{}" : launchParams()));
+    std::stringstream relaunchEvent;
+    std::string detail = launchParams().isEmpty() ? "{}" : launchParams().toStdString();
+    relaunchEvent
+        << "setTimeout(function () {"
+        << "    console.log('[WAM] fires webOSRelaunch event');"
+        << "    var launchEvent=new CustomEvent('webOSRelaunch', { detail: " << detail << " });"
+        << "    document.dispatchEvent(launchEvent);"
+        << "}, 1);";
+    evaluateJavaScript(relaunchEvent.str().c_str());
 }
 
 void WebPageBase::urlChangedSlot()
@@ -358,14 +372,17 @@ void WebPageBase::doLoadSlot()
 
 bool WebPageBase::hasLoadErrorPolicy(bool isHttpResponseError, int errorCode)
 {
-    if (!m_loadErrorPolicy.compare("event")) {
-       evaluateJavaScript(QStringLiteral(
-           "{"
-           "    console.log('[WAM3] create webOSLoadError event');"
-           "    var launchEvent=new CustomEvent('webOSLoadError', { detail : { genericError : %1, errorCode : %2}});"
-           "    document.dispatchEvent(launchEvent);"
-           "}" ).arg(isHttpResponseError?"false":"true").arg(errorCode));
+    if (m_loadErrorPolicy == "event") {
+        std::stringstream jss;
+        std::string genericError = isHttpResponseError ? "false" : "true";
+        jss << "{"
+            << "    console.log('[WAM3] create webOSLoadError event');"
+            << "    var launchEvent=new CustomEvent('webOSLoadError',"
+            << "        { detail : { genericError : " << genericError << ", errorCode : " << errorCode <<" }});"
+            << "    document.dispatchEvent(launchEvent);"
+            << "}";
        //App has load error policy, do not show platform load error page
+       evaluateJavaScript(jss.str().c_str());
        return true;
     }
     return false;
@@ -373,14 +390,14 @@ bool WebPageBase::hasLoadErrorPolicy(bool isHttpResponseError, int errorCode)
 
 void WebPageBase::applyPolicyForUrlResponse(bool isMainFrame, const QString& url, int status_code)
 {
-    QUrl qUrl(url);
+    QUrl qUrl(url); // Should be replaced when QT interface will be removed
     static const int s_httpErrorStatusCode = 400;
     if (qUrl.scheme() != "file" &&  status_code >= s_httpErrorStatusCode) {
         if(!hasLoadErrorPolicy(true, status_code) && isMainFrame) {
             // If app does not have policy for load error and
             // this error response is from main frame document
             // then before open server error page, reset the body's background color to white
-            setBackgroundColorOfBody(QStringLiteral("white"));
+            setBackgroundColorOfBody("white");
         }
     }
 }
@@ -395,36 +412,37 @@ void WebPageBase::postWebProcessCreated(uint32_t pid)
     WebAppManager::instance()->postWebProcessCreated(m_appId, m_instanceId, pid);
 }
 
-void WebPageBase::setBackgroundColorOfBody(const QString& color)
+void WebPageBase::setBackgroundColorOfBody(const std::string& color)
 {
     // for error page only, set default background color to white by executing javascript
-    QString whiteBackground = QStringLiteral(
-        "(function() {"
-        "    if(document.readyState === 'complete' || document.readyState === 'interactive') { "
-        "       if(document.body.style.backgroundColor)"
-        "           console.log('[Server Error] Already set document.body.style.backgroundColor');"
-        "       else {"
-        "           console.log('[Server Error] set background Color of body to %1');"
-        "           document.body.style.backgroundColor = '%2';"
-        "       }"
-        "     } else {"
-        "        document.addEventListener('DOMContentLoaded', function() {"
-        "           if(document.body.style.backgroundColor)"
-        "               console.log('[Server Error] Already set document.body.style.backgroundColor');"
-        "           else {"
-        "               console.log('[Server Error] set background Color of body to %3');"
-        "               document.body.style.backgroundColor = '%4';"
-        "           }"
-        "        });"
-        "    }"
-        "})();"
-    ).arg(color).arg(color).arg(color).arg(color);
-    evaluateJavaScript(whiteBackground);
+    std::stringstream backgroundColorOfBody;
+    backgroundColorOfBody
+        << "(function() {"
+        << "    if(document.readyState === 'complete' || document.readyState === 'interactive') { "
+        << "       if(document.body.style.backgroundColor)"
+        << "           console.log('[Server Error] Already set document.body.style.backgroundColor');"
+        << "       else {"
+        << "           console.log('[Server Error] set background Color of body to " << color << "');"
+        << "           document.body.style.backgroundColor = '" << color << "';"
+        << "       }"
+        << "     } else {"
+        << "        document.addEventListener('DOMContentLoaded', function() {"
+        << "           if(document.body.style.backgroundColor)"
+        << "               console.log('[Server Error] Already set document.body.style.backgroundColor');"
+        << "           else {"
+        << "               console.log('[Server Error] set background Color of body to '" << color << "');"
+        << "               document.body.style.backgroundColor = '" << color << "';"
+        << "           }"
+        << "        });"
+        << "    }"
+        << "})();";
+
+    evaluateJavaScript(backgroundColorOfBody.str().c_str());
 }
 
 QString WebPageBase::defaultFont()
 {
-    QString defaultFont = "LG Display-Regular";
+    std::string defaultFont = "LG Display-Regular";
     QString language;
     QString country;
     getSystemLanguage(language);
@@ -439,8 +457,8 @@ QString WebPageBase::defaultFont()
     else if(language == "ur-IN")
         defaultFont = "LG Display_Urdu";
 
-    LOG_DEBUG("[%s] country : [%s], language : [%s], default font : [%s]", qPrintable(appId()), qPrintable(country), qPrintable(language), qPrintable(defaultFont));
-    return defaultFont;
+    LOG_DEBUG("[%s] country : [%s], language : [%s], default font : [%s]", qPrintable(appId()), qPrintable(country), qPrintable(language), defaultFont.c_str());
+    return defaultFont.c_str();
 }
 
 void WebPageBase::updateIsLoadErrorPageFinish()
@@ -448,30 +466,24 @@ void WebPageBase::updateIsLoadErrorPageFinish()
     // ex)
     // Target error page URL : file:///usr/share/localization/webappmanager2/resources/ko/html/loaderror.html?errorCode=65&webkitErrorCode=65
     // WAM error page : file:///usr/share/localization/webappmanager2/loaderror.html
-
     m_isLoadErrorPageFinish = false;
 
     if (!url().isLocalFile()) return;
 
-    QString urlString = url().toString();
-    QString urlFileName = url().fileName();
-    QString errorPageFileName = QUrl(getWebAppManagerConfig()->getErrorPageUrl()).fileName();
-    QString errorPageDirPath = getWebAppManagerConfig()->getErrorPageUrl().remove(errorPageFileName);
-    if (urlString.startsWith(errorPageDirPath) && !urlFileName.compare(errorPageFileName)) {
-        LOG_DEBUG("[%s] This is WAM ErrorPage; URL: %s ", qPrintable(appId()), qPrintable(urlString));
+    fs::path urlPath(url().toLocalFile().toStdString());
+    fs::path urlFileName = urlPath.filename();
+
+    fs::path urlDirPath = urlPath.parent_path();
+    fs::path errPath(QUrl(getWebAppManagerConfig()->getErrorPageUrl()).toLocalFile().toStdString());
+    fs::path errFileName = errPath.filename();
+    fs::path errDirPath = errPath.parent_path();
+
+    if ((urlDirPath.string().find(errDirPath.string()) == 0) // urlDirPath starts with errDirPath
+            && urlFileName == errFileName) {
+        LOG_DEBUG("[%s] This is WAM ErrorPage; URL: %s ", appId().toStdString().c_str(), url().toString().toStdString().c_str());
         m_isLoadErrorPageFinish = true;
     }
 }
-
-#define URL_SIZE_LIMIT 768
-QString WebPageBase::truncateURL(const QString& url)
-{
-    if(url.size() < URL_SIZE_LIMIT)
-        return url;
-    QString res = QString(url);
-    return res.replace(URL_SIZE_LIMIT / 2, url.size() - URL_SIZE_LIMIT, QStringLiteral(" ... "));
-}
-
 
 void WebPageBase::setCustomUserScript()
 {
@@ -502,5 +514,5 @@ bool WebPageBase::isAccessibilityEnabled() const
 
 QString WebPageBase::getIdentifierForSecurityOrigin() const
 {
-    return WebAppManager::instance()->identifierForSecurityOrigin(getIdentifier());
+    return QString::fromStdString(WebAppManager::instance()->identifierForSecurityOrigin(getIdentifier().toStdString()));
 }

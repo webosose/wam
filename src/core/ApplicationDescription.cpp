@@ -15,10 +15,13 @@
 // SPDX-License-Identifier: Apache-2.0
 
 
-#include <limits>
+#include "ApplicationDescription.h"
 
-#include <sys/types.h>
+#include <iostream>
+#include <limits>
+#include <sstream>
 #include <sys/stat.h>
+#include <sys/types.h>
 #include <unistd.h>
 
 #include <QJsonDocument>
@@ -29,8 +32,10 @@
 #include <QVariant>
 #include <qglobal.h>
 
-#include "ApplicationDescription.h"
+#include <json/json.h>
+
 #include "LogManager.h"
+#include "TypeConverter.h"
 
 bool ApplicationDescription::checkTrustLevel(std::string trustLevel)
 {
@@ -75,13 +80,19 @@ const ApplicationDescription::WindowGroupInfo ApplicationDescription::getWindowG
     ApplicationDescription::WindowGroupInfo info;
 
     if (!m_groupWindowDesc.empty()) {
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(QByteArray(m_groupWindowDesc.c_str()));
-        QJsonObject jsonObject = jsonDoc.object();
+        Json::Value json;
+        stringToJson(m_groupWindowDesc, json);
 
-        if (!jsonObject.value("name").isUndefined())
-            info.name = jsonObject.value("name").toString();
-        if (!jsonObject.value("owner").isUndefined())
-            info.isOwner = jsonObject.value("owner").toBool();
+        if (json.isObject()) {
+            auto name = json["name"];
+            if (name.isString()) {
+                info.name = name.asString().c_str(); //Remove c_str() during QTless interface
+            }
+
+            auto isOwner = json["owner"];
+            if (isOwner.isBool())
+                info.isOwner = isOwner.asBool();
+        }
     }
 
     return info;
@@ -91,21 +102,22 @@ const ApplicationDescription::WindowOwnerInfo ApplicationDescription::getWindowO
 {
     ApplicationDescription::WindowOwnerInfo info;
     if (!m_groupWindowDesc.empty()) {
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(QByteArray(m_groupWindowDesc.c_str()));
-        QJsonObject jsonObject = jsonDoc.object();
+        Json::Value json;
+        stringToJson(m_groupWindowDesc, json);
 
-        if (!jsonObject.value("ownerInfo").isUndefined()) {
-            QJsonObject ownerJsonObject = jsonObject.value("ownerInfo").toObject();
-            if (!ownerJsonObject.value("allowAnonymous").isUndefined())
-                info.allowAnonymous =ownerJsonObject.value("allowAnonymous").toBool();
+        auto ownerInfo = json["ownerInfo"];
+        if (ownerInfo.isObject()) {
+            if (ownerInfo["allowAnonymous"].isBool())
+                info.allowAnonymous = ownerInfo["allowAnonymous"].asBool();
 
-            if (!ownerJsonObject.value("layers").isUndefined()) {
-                QJsonArray ownerJsonArray = ownerJsonObject.value("layers").toArray();
-
-                for (int i=0; i<ownerJsonArray.size(); i++) {
-                    QVariantMap map = ownerJsonArray[i].toObject().toVariantMap();
-                    if (!map.empty())
-                        info.layers.insert(map["name"].toString(), map["z"].toString().toInt());
+            auto layers = ownerInfo["layers"];
+            if (layers.isArray()) {
+                for (const auto &layer : layers) {
+                    auto name = layer["name"];
+                    auto z = layer["z"];
+                    if (name.isString() && z.isInt()) {
+                        info.layers.insert(name.asString().c_str(), z.asInt());
+                    }
                 }
             }
         }
@@ -118,16 +130,18 @@ const ApplicationDescription::WindowClientInfo ApplicationDescription::getWindow
 {
     ApplicationDescription::WindowClientInfo info;
     if (!m_groupWindowDesc.empty()) {
-        QJsonDocument jsonDoc = QJsonDocument::fromJson(QByteArray(m_groupWindowDesc.c_str()));
-        QJsonObject jsonObject = jsonDoc.object();
+        Json::Value json;
+        stringToJson(m_groupWindowDesc, json);
 
-        if (!jsonObject.value("clientInfo").isUndefined()) {
-            QJsonObject clientJsonObject = jsonObject.value("clientInfo").toObject();
-            if (!clientJsonObject.value("layer").isUndefined())
-                info.layer = clientJsonObject.value("layer").toString();
+        auto clientInfo = json["clientInfo"];
+        if (clientInfo.isObject()) {
+            auto layer = clientInfo["layer"];
+            if (layer.isString())
+                info.layer = layer.asString().c_str();
 
-            if (!clientJsonObject.value("hint").isUndefined())
-                info.hint = clientJsonObject.value("hint").toString();
+            auto hint = clientInfo["hint"];
+            if (hint.isString())
+                info.hint = hint.asString().c_str();
         }
     }
     return info;
@@ -135,65 +149,74 @@ const ApplicationDescription::WindowClientInfo ApplicationDescription::getWindow
 
 std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(const char* jsonStr)
 {
-    QJsonParseError parseError;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(QByteArray(jsonStr), &parseError);
-    if (parseError.error != QJsonParseError::NoError) {
+    Json::Value jsonObj;
+    stringToJson(jsonStr, jsonObj);
+    if (!jsonObj.isObject()) {
         LOG_WARNING(MSGID_APP_DESC_PARSE_FAIL, 1,
                     PMLOGKFV("JSON", "%s", jsonStr), "Failed to parse JSON string");
         return nullptr;
     }
-    QJsonObject jsonObj = jsonDoc.object();
 
     auto appDesc = std::unique_ptr<ApplicationDescription>(new ApplicationDescription());
 
-    appDesc->m_transparency = jsonObj["transparent"].toBool();
-    appDesc->m_vendorExtension = QJsonDocument(jsonObj["vendorExtension"].toObject()).toJson().data();
-    appDesc->m_trustLevel = jsonObj["trustLevel"].toString().toStdString();
-    appDesc->m_subType = jsonObj["subType"].toString().toStdString();
-    appDesc->m_deeplinkingParams = jsonObj["deeplinkingParams"].toString().toStdString();
-    appDesc->m_handlesRelaunch = jsonObj["handlesRelaunch"].toBool();
-    appDesc->m_defaultWindowType = jsonObj["defaultWindowType"].toString().toStdString();
-    appDesc->m_inspectable = jsonObj["inspectable"].toBool();
-    appDesc->m_enyoBundleVersion = jsonObj["enyoBundleVersion"].toString().toStdString();
-    appDesc->m_enyoVersion = jsonObj["enyoVersion"].toString().toStdString();
-    appDesc->m_version = jsonObj["version"].toString().toStdString();
-    appDesc->m_customPlugin = jsonObj["customPlugin"].toBool();
-    appDesc->m_backHistoryAPIDisabled = jsonObj["disableBackHistoryAPI"].toBool();
-    appDesc->m_groupWindowDesc = QJsonDocument(jsonObj["windowGroup"].toObject()).toJson().data();
+    appDesc->m_transparency = jsonObj["transparent"].asBool();
+    auto vendorExtension = jsonObj.get("vendorExtension", Json::Value(Json::objectValue));
+    jsonToString(vendorExtension, appDesc->m_vendorExtension);
+    appDesc->m_trustLevel = jsonObj["trustLevel"].asString();
+    appDesc->m_subType = jsonObj["subType"].asString();
+    appDesc->m_deeplinkingParams = jsonObj["deeplinkingParams"].asString();
+    appDesc->m_handlesRelaunch = jsonObj["handlesRelaunch"].asBool();
+    appDesc->m_defaultWindowType = jsonObj["defaultWindowType"].asString();
+    appDesc->m_inspectable = jsonObj["inspectable"].asBool();
+    appDesc->m_enyoBundleVersion = jsonObj["enyoBundleVersion"].asString();
+    appDesc->m_enyoVersion = jsonObj["enyoVersion"].asString();
+    appDesc->m_version = jsonObj["version"].asString();
+    appDesc->m_customPlugin = jsonObj["customPlugin"].asBool();
+    appDesc->m_backHistoryAPIDisabled = jsonObj["disableBackHistoryAPI"].asBool();
+    auto groupWindowDesc = jsonObj.get("windowGroup", Json::Value(Json::objectValue));
+    jsonToString(groupWindowDesc, appDesc->m_groupWindowDesc);
 
-    if (jsonObj.contains("supportedEnyoBundleVersions")) {
-        QJsonArray versions = jsonObj["supportedEnyoBundleVersions"].toArray();
-        for (int i=0; i < versions.size(); i++)
-            appDesc->m_supportedEnyoBundleVersions.append(versions[i].toString());
+    auto supportedVersions = jsonObj["supportedEnyoBundleVersions"];
+    if (supportedVersions.isArray()) {
+        for (const Json::Value &version : supportedVersions)
+            appDesc->m_supportedEnyoBundleVersions.insert(version.asString());
     }
 
-    appDesc->m_id = jsonObj["id"].toString().toStdString();
-    appDesc->m_entryPoint= jsonObj["main"].toString().toStdString();
-    appDesc->m_icon = jsonObj["icon"].toString().toStdString();
-    appDesc->m_folderPath = jsonObj["folderPath"].toString().toStdString();
-    appDesc->m_requestedWindowOrientation = jsonObj["requestedWindowOrientation"].toString().toStdString();
-    appDesc->m_title = jsonObj["title"].toString().toStdString();
-    appDesc->m_doNotTrack = jsonObj["doNotTrack"].toBool();
-    appDesc->m_handleExitKey = jsonObj["handleExitKey"].toBool();
-    appDesc->m_enableBackgroundRun = jsonObj["enableBackgroundRun"].toBool();
-    appDesc->m_allowVideoCapture = jsonObj["allowVideoCapture"].toBool();
-    appDesc->m_allowAudioCapture = jsonObj["allowAudioCapture"].toBool();
-    appDesc->m_useVirtualKeyboard = jsonObj.contains("enableKeyboard") ? jsonObj["enableKeyboard"].toBool() : true;
+    appDesc->m_id = jsonObj["id"].asString();
+    appDesc->m_entryPoint= jsonObj["main"].asString();
+    appDesc->m_icon = jsonObj["icon"].asString();
+    appDesc->m_folderPath = jsonObj["folderPath"].asString();
+    appDesc->m_requestedWindowOrientation = jsonObj["requestedWindowOrientation"].asString();
+    appDesc->m_title = jsonObj["title"].asString();
+    appDesc->m_doNotTrack = jsonObj["doNotTrack"].asBool();
+    appDesc->m_handleExitKey = jsonObj["handleExitKey"].asBool();
+    appDesc->m_enableBackgroundRun = jsonObj["enableBackgroundRun"].asBool();
+    appDesc->m_allowVideoCapture = jsonObj["allowVideoCapture"].asBool();
+    appDesc->m_allowAudioCapture = jsonObj["allowAudioCapture"].asBool();
 
-    appDesc->m_usePrerendering = jsonObj.contains("usePrerendering") && jsonObj["usePrerendering"].toBool();
-    appDesc->m_disallowScrollingInMainFrame = !jsonObj.contains("disallowScrollingInMainFrame") || jsonObj["disallowScrollingInMainFrame"].toBool();
-    appDesc->m_mediaPreferences = QJsonDocument(jsonObj["mediaExtension"].toObject()).toJson().data();
+    auto enableKeyboard = jsonObj["enableKeyboard"];
+    appDesc->m_useVirtualKeyboard = enableKeyboard.isBool() && enableKeyboard.asBool();
+
+    auto usePrerendering = jsonObj["usePrerendering"];
+    appDesc->m_usePrerendering = usePrerendering.isBool() && usePrerendering.asBool();
+
+    auto disallowScrolling = jsonObj["disallowScrollingInMainFrame"];
+    appDesc->m_disallowScrollingInMainFrame = disallowScrolling.isBool() && disallowScrolling.asBool();
+
+    auto mediaExtension = jsonObj.get("mediaExtension", Json::Value(Json::objectValue));
+    jsonToString(mediaExtension, appDesc->m_mediaPreferences);
 
     // Handle accessibility, supportsAudioGuidance
-    if (!jsonObj.value("accessibility").isUndefined() && jsonObj.value("accessibility").isObject()) {
-        QJsonObject accessibilityObj = jsonObj["accessibility"].toObject();
-        if (!accessibilityObj.value("supportsAudioGuidance").isUndefined())
-            appDesc->m_supportsAudioGuidance = accessibilityObj["supportsAudioGuidance"].toBool();
+    auto accessibility = jsonObj["accessibility"];
+    if (accessibility.isObject()) {
+        auto audioGuidance = accessibility["supportsAudioGuidance"];
+        appDesc->m_supportsAudioGuidance = audioGuidance.isBool() && audioGuidance.asBool();
     }
 
     // Handle v8 snapshot file
-    if (!jsonObj.value("v8SnapshotFile").isUndefined()) {
-        std::string snapshotFile = jsonObj["v8SnapshotFile"].toString().toStdString();
+    auto v8SnapshotFile = jsonObj["v8SnapshotFile"];
+    if (v8SnapshotFile.isString()) {
+        std::string snapshotFile = v8SnapshotFile.asString();
         if (snapshotFile.length() > 0) {
             if (snapshotFile.at(0) == '/')
                 appDesc->m_v8SnapshotPath = snapshotFile;
@@ -203,20 +226,18 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     }
 
     // Handle v8 extra flags
-    if (!jsonObj.value("v8ExtraFlags").isUndefined())
-        appDesc->m_v8ExtraFlags = jsonObj["v8ExtraFlags"].toString().toStdString();
+    auto v8ExtraFlags = jsonObj["v8ExtraFlags"];
+    if (v8ExtraFlags.isString())
+        appDesc->m_v8ExtraFlags = v8ExtraFlags.asString();
 
     // Handle resolution
-    if (!jsonObj.value("resolution").isUndefined()) {
-        QString overrideResolution = jsonObj["resolution"].toString();
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-        QStringList resList(overrideResolution.split("x", Qt::KeepEmptyParts, Qt::CaseInsensitive));
-#else
-        QStringList resList(overrideResolution.split("x", QString::KeepEmptyParts, Qt::CaseInsensitive));
-#endif
+    auto resolution = jsonObj["resolution"];
+    if (resolution.isString()) {
+        std::string overrideResolution = jsonObj["resolution"].asString();
+        auto resList = splitString(overrideResolution, 'x');
         if(resList.size() == 2) {
-            appDesc->m_widthOverride = resList.at(0).toInt();
-            appDesc->m_heightOverride = resList.at(1).toInt();
+            stringToInt(resList.at(0), appDesc->m_widthOverride);
+            stringToInt(resList.at(1), appDesc->m_heightOverride);
         }
         if(appDesc->m_widthOverride < 0 || appDesc->m_heightOverride < 0) {
             appDesc->m_widthOverride = 0;
@@ -224,17 +245,21 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
         }
     }
 
-    if (!jsonObj.value("locationHint").isUndefined())
-        appDesc->m_locationHint = jsonObj["locationHint"].toString().toStdString();
+    auto locationHint =  jsonObj["locationHint"];
+    if (locationHint.isString())
+        appDesc->m_locationHint = locationHint.asString();
 
     // Handle keyFilterTable
     //Key code is changed only for facebooklogin WebApp
-    if (!jsonObj.value("keyFilterTable").isUndefined()) {
-        QJsonArray keyFilterTable = jsonObj["keyFilterTable"].toArray();
-        for (int i=0 ; i < keyFilterTable.size() ; i++) {
-            QVariantMap map = keyFilterTable[i].toObject().toVariantMap();
-            if (!map.empty())
-                appDesc->m_keyFilterTable[map["from"].toString().toInt()] = qMakePair(map["to"].toString().toInt(), map["modifier"].toString().toInt());
+    auto keyFilterTable = jsonObj["keyFilterTable"];
+    if (keyFilterTable.isArray()) {
+        for (const auto &k : keyFilterTable) {
+            if (!k.isObject())
+                continue;
+            int from = k["from"].asInt();
+            int to = k["to"].asInt();
+            int modifier = k["modifier"].asInt();
+            appDesc->m_keyFilterTable[from] = std::make_pair(to, modifier);
         }
     }
 
@@ -255,9 +280,9 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     // class : { "hidden" : boolean }
     //
     WindowClass classValue = WindowClass_Normal;
-    if (!jsonObj.value("class").isUndefined() && jsonObj.value("class").isObject()) {
-        QJsonObject classObj = jsonObj["class"].toObject();
-        if (classObj["hidden"].toBool())
+    auto clazz = jsonObj["class"];
+    if (clazz.isObject()) {
+        if (clazz["hidden"].isBool() && clazz["hidden"].asBool())
             classValue = WindowClass_Hidden;
     }
     appDesc->m_windowClassValue = classValue;
@@ -275,27 +300,32 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
             appDesc->m_icon = tempPath;
         }
     }
-    appDesc->m_useNativeScroll = jsonObj.contains("useNativeScroll") && jsonObj["useNativeScroll"].toBool();
+    appDesc->m_useNativeScroll = jsonObj["useNativeScroll"].isBool() && jsonObj["useNativeScroll"].asBool();
 
     // Set network stable timeout
-    if(jsonObj.contains("networkStableTimeout")) {
-        if (jsonObj["networkStableTimeout"].type() != QJsonValue::Double)
+    auto networkStableTimeout = jsonObj["networkStableTimeout"];
+    if (!networkStableTimeout.isDouble()) {
             LOG_ERROR(MSGID_TYPE_ERROR, 2, PMLOGKS("APP_ID", appDesc->id().c_str()),
-                PMLOGKFV("DATA_TYPE", "%d", jsonObj["networkStableTimeout"].type()),  "Invaild QJsonValue type");
-        else
-            appDesc->m_networkStableTimeout = jsonObj["networkStableTimeout"].toDouble();
+            PMLOGKFV("DATA_TYPE", "%d", networkStableTimeout.type()),  "Invaild JsonValue type");
+    } else {
+        appDesc->m_networkStableTimeout = networkStableTimeout.asDouble();
     }
 
     // Set delay millisecond for launch optimization
-    if (jsonObj.contains("delayMsForLaunchOptimization")) {
-        int delayMs = jsonObj["delayMsForLaunchOptimization"].toInt();
+    auto delayMsForLaunchOptimization = jsonObj["delayMsForLaunchOptimization"];
+    if (delayMsForLaunchOptimization.isInt()) {
+        int delayMs = delayMsForLaunchOptimization.asInt();
         appDesc->m_delayMsForLanchOptimization = (delayMs >= 0) ? delayMs : 0;
     }
 
-    appDesc->m_useUnlimitedMediaPolicy = jsonObj.contains("useUnlimitedMediaPolicy") && jsonObj["useUnlimitedMediaPolicy"].toBool();
+    auto useUnlimitedMediaPolicy = jsonObj["useUnlimitedMediaPolicy"];
+    if (useUnlimitedMediaPolicy.isBool()) {
+        appDesc->m_useUnlimitedMediaPolicy = useUnlimitedMediaPolicy.asBool();
+    }
 
-    if (!jsonObj.value("suspendDOMTime").isUndefined())
-        appDesc->m_customSuspendDOMTime= jsonObj["suspendDOMTime"].toInt();
+    auto suspendDOMTime = jsonObj["suspendDOMTime"];
+    if (suspendDOMTime.isInt())
+        appDesc->m_customSuspendDOMTime= suspendDOMTime.asInt();
 
     return appDesc;
 }

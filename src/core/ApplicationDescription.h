@@ -17,13 +17,16 @@
 #ifndef APPLICATIONDESCRIPTION_H
 #define APPLICATIONDESCRIPTION_H
 
-#include <memory>
-
 #include <QJsonObject>
 #include <QMap>
 #include <QPair>
 #include <QString>
 #include <QStringList>
+
+#include <memory>
+#include <set>
+#include <string>
+#include <unordered_map>
 
 #include "DisplayId.h"
 
@@ -89,9 +92,14 @@ public:
         return m_enyoBundleVersion;
     }
 
-    const QStringList& supportedEnyoBundleVersions() const
+    const QStringList& supportedEnyoBundleVersions() //TODO: restore "const" during QtLess interface
     {
-        return m_supportedEnyoBundleVersions;
+        //TODO: should be deleted: temporary conversion to support current QT interface
+        qt_supportedEnyoBundleVersions.clear();
+        for(auto e: m_supportedEnyoBundleVersions) {
+            qt_supportedEnyoBundleVersions.append(e.c_str());
+        }
+        return qt_supportedEnyoBundleVersions;
     }
 
     const std::string& enyoVersion() const
@@ -142,9 +150,15 @@ public:
 
     virtual bool useVirtualKeyboard() const { return m_useVirtualKeyboard; }
     //Key code is changed only for facebooklogin WebApp
-    const QMap<int, QPair<int, int>>& keyFilterTable() const
+    const QMap<int, QPair<int, int>>& keyFilterTable()
     {
-        return m_keyFilterTable;
+        //TODO: temporary conversion to support QT interface
+        qt_keyFilterTable.clear();
+        for(const auto &e: m_keyFilterTable) {
+            qt_keyFilterTable.insert(e.first, qMakePair(e.second.first, e.second.second));
+        }
+
+        return qt_keyFilterTable;
     }
 
     double networkStableTimeout() const { return m_networkStableTimeout; }
@@ -206,7 +220,8 @@ private:
     std::string m_folderPath;
     std::string m_defaultWindowType;
     std::string m_enyoBundleVersion;
-    QStringList m_supportedEnyoBundleVersions;
+    QStringList qt_supportedEnyoBundleVersions; // to support QT interface: should be deleted later
+    std::set<std::string> m_supportedEnyoBundleVersions;
     std::string m_enyoVersion;
     std::string m_version;
     std::string m_v8SnapshotPath;
@@ -216,7 +231,8 @@ private:
     bool m_backHistoryAPIDisabled;
     int m_widthOverride;
     int m_heightOverride;
-    QMap<int, QPair<int, int>> m_keyFilterTable;
+    QMap<int, QPair<int, int>> qt_keyFilterTable; // to support QT interface: should be deleted later
+    std::unordered_map<int, std::pair<int, int>> m_keyFilterTable;
     std::string m_groupWindowDesc;
     bool m_doNotTrack;
     bool m_handleExitKey;
