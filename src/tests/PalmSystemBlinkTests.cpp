@@ -86,7 +86,21 @@ static constexpr char launchBareAppJsonBody[] = R"({
     "removable": true,
     "type": "web",
     "disableBackHistoryAPI": false,
-    "bgImage": ""
+    "bgImage": "",
+    "windowGroup":{
+            "name":"Window group name",
+            "owner":false,
+            "ownerInfo":{
+                "allowAnonymous":false,
+                "layers":[
+                    {"name":"Owner layer name", "z":111}
+                ]
+            },
+            "clientInfo":{
+                "layer":"Client layer name",
+                "hint":"Client layer hint"
+            }
+        }
   },
   "appId": "bareapp",
   "parameters": {
@@ -278,5 +292,60 @@ TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_platformBack)
     QString returnValue;
     EXPECT_CALL(*webAppWindow, platformBack());
     webViewDelegate->handleBrowserControlFunction(QString("platformBack"), QStringList(), &returnValue);
+}
+
+TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_setKeyMask_Home)
+{
+    QString returnValue;
+    QStringList params;
+    params << QString(R"(["KeyMaskHome"])");
+
+    EXPECT_CALL(*webAppWindow, SetKeyMask(webos::WebOSKeyMask::KEY_MASK_HOME));
+    webViewDelegate->handleBrowserControlFunction(QString("setKeyMask"), params, &returnValue);
+}
+
+
+TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_setKeyMask_Back)
+{
+    QString returnValue;
+    QStringList params;
+    params << QString(R"(["KeyMaskBack"])");
+
+    EXPECT_CALL(*webAppWindow, SetKeyMask(webos::WebOSKeyMask::KEY_MASK_BACK));
+    webViewDelegate->handleBrowserControlFunction(QString("setKeyMask"), params, &returnValue);
+}
+
+TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_setKeyMask_Exit)
+{
+    QString returnValue;
+    QStringList params;
+    params << QString(R"(["KeyMaskExit"])");
+
+    EXPECT_CALL(*webAppWindow, SetKeyMask(webos::WebOSKeyMask::KEY_MASK_EXIT));
+    webViewDelegate->handleBrowserControlFunction(QString("setKeyMask"), params, &returnValue);
+}
+
+TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_setKeyMask_Incorrect)
+{
+    QString returnValue;
+    QStringList params;
+    params << QString(R"(["Incorrect value"])");
+
+    EXPECT_CALL(*webAppWindow, SetKeyMask(static_cast<webos::WebOSKeyMask>(0)));
+    webViewDelegate->handleBrowserControlFunction(QString("setKeyMask"), params, &returnValue);
+}
+
+TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_setKeyMask_Combination)
+{
+    QString returnValue;
+    QStringList params;
+    params << QString(R"(["KeyMaskExit", "KeyMaskBack"])");
+
+    int keymask = 0;
+    keymask |= webos::WebOSKeyMask::KEY_MASK_EXIT;
+    keymask |= webos::WebOSKeyMask::KEY_MASK_BACK;
+
+    EXPECT_CALL(*webAppWindow, SetKeyMask(static_cast<webos::WebOSKeyMask>(keymask)));
+    webViewDelegate->handleBrowserControlFunction(QString("setKeyMask"), params, &returnValue);
 }
 

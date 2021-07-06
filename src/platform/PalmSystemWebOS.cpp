@@ -16,6 +16,11 @@
 
 #include "PalmSystemWebOS.h"
 
+#include <memory>
+
+#include <json/json.h>
+#include <sys/stat.h>
+
 #include "ApplicationDescription.h"
 #include "LogManager.h"
 #include "WebAppBase.h"
@@ -26,20 +31,46 @@
 #include <QtCore/QJsonObject>
 #include <QtCore/QJsonDocument>
 
+
+namespace {
+
+// TODO: Move it after merge
+bool doesPathExist(const std::string& path)
+{
+    if (path.empty())
+        return false;
+
+    struct stat st;
+    if (stat(path.c_str(), &st))
+        return false;
+
+    return st.st_mode & S_IFDIR || st.st_mode & S_IFREG;
+}
+
+// TODO: Remove after finishing QTLess implementaion
+bool parseJson(const std::string& source, Json::Value& result)
+{
+    Json::CharReaderBuilder builder;
+    std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+    return reader->parse(source.c_str(), source.c_str() + source.size(), &result, nullptr);
+}
+}
+
 PalmSystemWebOS::PalmSystemWebOS(WebAppBase* app)
     : m_app(static_cast<WebAppWayland*>(app))
-    , m_launchParams(QString())
+    , m_launchParams()
 {
 }
 
 void PalmSystemWebOS::setLaunchParams(const QString& params)
 {
-    QString p = params;
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(QByteArray(params.toStdString().c_str()));
-    QJsonObject jsonObject = jsonDoc.object();
+    std::string p = params.toStdString();
+    Json::Value jsonDoc = Json::nullValue;
 
-    if (jsonDoc.isEmpty() || jsonObject.isEmpty())
-        p = QString();
+    const bool result = parseJson(p, jsonDoc);
+
+    if (!result || jsonDoc.isNull())
+        p.erase();
 
     m_launchParams = p;
 }
@@ -56,7 +87,7 @@ bool PalmSystemWebOS::isKeyboardVisible() const
 
 bool PalmSystemWebOS::isMinimal() const
 {
-    return QFile::exists("/var/luna/preferences/ran-firstuse");
+    return doesPathExist("/var/luna/preferences/ran-firstuse");
 }
 
 int PalmSystemWebOS::activityId() const

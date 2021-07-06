@@ -39,7 +39,7 @@ protected:
     };
 
     virtual QString identifier() const = 0;
-    virtual QString launchParams() const { return m_launchParams; }
+    virtual QString launchParams() const { return  QString::fromStdString(m_launchParams); }
     virtual QString version() const { return QString(); }
 
     virtual QString screenOrientation() const { return QString("up"); }
@@ -69,7 +69,7 @@ protected:
 
 protected:
     WebAppWayland* m_app;
-    QString m_launchParams;
+    std::string m_launchParams;
 };
 
 #endif // PALMSYSTEMWEBOS_H_

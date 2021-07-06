@@ -16,6 +16,11 @@
 
 #include "WebAppWayland.h"
 
+#include <sstream>
+#include <unordered_map>
+
+#include <json/json.h>
+
 #include <QtCore/QJsonDocument>
 #include <QtCore/QJsonArray>
 
@@ -34,6 +39,51 @@
 #include "webos/window_group_configuration.h"
 
 static int kLaunchFinishAssureTimeoutMs = 5000;
+
+namespace {
+
+const std::unordered_map<std::string, webos::WebOSKeyMask>& getKeyMaskTable()
+{
+    static const std::unordered_map<std::string, webos::WebOSKeyMask> mapTable{
+        {"KeyMaskNone", static_cast<webos::WebOSKeyMask>(0)},
+        {"KeyMaskHome", webos::WebOSKeyMask::KEY_MASK_HOME},
+        {"KeyMaskBack", webos::WebOSKeyMask::KEY_MASK_BACK},
+        {"KeyMaskExit", webos::WebOSKeyMask::KEY_MASK_EXIT},
+        {"KeyMaskLeft", webos::WebOSKeyMask::KEY_MASK_LEFT},
+        {"KeyMaskRight", webos::WebOSKeyMask::KEY_MASK_RIGHT},
+        {"KeyMaskUp", webos::WebOSKeyMask::KEY_MASK_UP},
+        {"KeyMaskDown", webos::WebOSKeyMask::KEY_MASK_DOWN},
+        {"KeyMaskOk", webos::WebOSKeyMask::KEY_MASK_OK},
+        {"KeyMaskNumeric", webos::WebOSKeyMask::KEY_MASK_NUMERIC},
+        {"KeyMaskRed", webos::WebOSKeyMask::KEY_MASK_REMOTECOLORRED},
+        {"KeyMaskGreen", webos::WebOSKeyMask::KEY_MASK_REMOTECOLORGREEN},
+        {"KeyMaskYellow", webos::WebOSKeyMask::KEY_MASK_REMOTECOLORYELLOW},
+        {"KeyMaskBlue", webos::WebOSKeyMask::KEY_MASK_REMOTECOLORBLUE},
+        {"KeyMaskProgramme", webos::WebOSKeyMask::KEY_MASK_REMOTEPROGRAMMEGROUP},
+        {"KeyMaskPlayback", webos::WebOSKeyMask::KEY_MASK_REMOTEPLAYBACKGROUP},
+        {"KeyMaskTeletext", webos::WebOSKeyMask::KEY_MASK_REMOTETELETEXTGROUP},
+        {"KeyMaskDefault", webos::WebOSKeyMask::KEY_MASK_DEFAULT},
+    };
+    return mapTable;
+}
+
+const webos::WebOSKeyMask getKeyMask(const std::string& key)
+{
+    static const auto& mapTable = getKeyMaskTable();
+    auto iter = mapTable.find(key);
+    return iter != mapTable.end() ? iter->second : static_cast<webos::WebOSKeyMask>(0);
+}
+
+// TODO: Remove after change interface to QTLess implementaion
+bool convert(const QJsonDocument& object, Json::Value& value)
+{
+    const std::string& json = object.toJson(QJsonDocument::Compact).toStdString();
+    Json::CharReaderBuilder builder;
+    std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+    return reader->parse(json.c_str(), json.c_str() + json.size(), &value, nullptr);
+}
+
+} // namespace
 
 WebAppWayland::WebAppWayland(QString type,
                              int width, int height,
@@ -349,6 +399,8 @@ void WebAppWayland::setupWindowGroup(ApplicationDescription* desc)
         ApplicationDescription::WindowOwnerInfo ownerInfo = desc->getWindowOwnerInfo();
         webos::WindowGroupConfiguration config(groupInfo.name.toStdString());
         config.SetIsAnonymous(ownerInfo.allowAnonymous);
+
+        // TODO: Rework after changing interface of ownerInfo.layers
         QMap<QString, int>::iterator iter = ownerInfo.layers.begin();
         while (iter != ownerInfo.layers.end()){
           config.AddLayer(webos::WindowGroupLayerConfiguration(iter.key().toStdString(), iter.value()));
@@ -385,16 +437,21 @@ void WebAppWayland::setInputRegion(const QJsonDocument& jsonDoc)
 {
     m_inputRegion.clear();
 
-    if (jsonDoc.isArray()) {
-        QJsonArray jsonArray = jsonDoc.array();
+    Json::Value value;
 
-        for (int i = 0; i < jsonArray.size(); i++) {
-            QVariantMap map = jsonArray[i].toObject().toVariantMap();
-            m_inputRegion.push_back(gfx::Rect(
-                                map["x"].toInt() * m_scaleFactor,
-                                map["y"].toInt() * m_scaleFactor,
-                                map["width"].toInt() * m_scaleFactor,
-                                map["height"].toInt() * m_scaleFactor));
+    // TODO: Remove after change interface to QTLess implementaion
+    if (!convert(jsonDoc, value)) {
+        LOG_ERROR(MSGID_TYPE_ERROR, 0, "%s: Error during json conversion", __func__);
+        return;
+    }
+
+    if (value.isArray()) {
+        for(const auto& region: value) {
+            m_inputRegion.emplace_back(gfx::Rect(
+                                region["x"].asInt() * m_scaleFactor,
+                                region["y"].asInt() * m_scaleFactor,
+                                region["width"].asInt() * m_scaleFactor,
+                                region["height"].asInt() * m_scaleFactor));
         }
     }
 
@@ -425,44 +482,19 @@ void WebAppWayland::setCursor(const QString& cursorArg, int hotspot_x, int hotsp
     m_appWindow->setCursor(cursorArg, hotspot_x, hotspot_y);
 }
 
-static QMap<QString, webos::WebOSKeyMask>& getKeyMaskTable()
-{
-    static QMap<QString, webos::WebOSKeyMask> mapTable;
-
-    if (mapTable.isEmpty()) {
-        mapTable["KeyMaskNone"]      = static_cast<webos::WebOSKeyMask>(0);
-        mapTable["KeyMaskHome"]      = webos::WebOSKeyMask::KEY_MASK_HOME;
-        mapTable["KeyMaskBack"]      = webos::WebOSKeyMask::KEY_MASK_BACK;
-        mapTable["KeyMaskExit"]      = webos::WebOSKeyMask::KEY_MASK_EXIT;
-        mapTable["KeyMaskLeft"]      = webos::WebOSKeyMask::KEY_MASK_LEFT;
-        mapTable["KeyMaskRight"]     = webos::WebOSKeyMask::KEY_MASK_RIGHT;
-        mapTable["KeyMaskUp"]        = webos::WebOSKeyMask::KEY_MASK_UP;
-        mapTable["KeyMaskDown"]      = webos::WebOSKeyMask::KEY_MASK_DOWN;
-        mapTable["KeyMaskOk"]        = webos::WebOSKeyMask::KEY_MASK_OK;
-        mapTable["KeyMaskNumeric"]   = webos::WebOSKeyMask::KEY_MASK_NUMERIC;
-        mapTable["KeyMaskRed"]       = webos::WebOSKeyMask::KEY_MASK_REMOTECOLORRED;
-        mapTable["KeyMaskGreen"]     = webos::WebOSKeyMask::KEY_MASK_REMOTECOLORGREEN;
-        mapTable["KeyMaskYellow"]    = webos::WebOSKeyMask::KEY_MASK_REMOTECOLORYELLOW;
-        mapTable["KeyMaskBlue"]      = webos::WebOSKeyMask::KEY_MASK_REMOTECOLORBLUE;
-        mapTable["KeyMaskProgramme"] = webos::WebOSKeyMask::KEY_MASK_REMOTEPROGRAMMEGROUP;
-        mapTable["KeyMaskPlayback"]  = webos::WebOSKeyMask::KEY_MASK_REMOTEPLAYBACKGROUP;
-        mapTable["KeyMaskTeletext"]  = webos::WebOSKeyMask::KEY_MASK_REMOTETELETEXTGROUP;
-        mapTable["KeyMaskDefault"]   = webos::WebOSKeyMask::KEY_MASK_DEFAULT;
-    }
-
-    return mapTable;
-}
-
 void WebAppWayland::setKeyMask(const QJsonDocument& jsonDoc)
 {
-    static QMap<QString, webos::WebOSKeyMask>& mapTable = getKeyMaskTable();
     unsigned int keyMask = 0;
+    Json::Value value;
+    // TODO: Remove after change interface to QTLess implementaion
+    if (!convert(jsonDoc, value)) {
+        LOG_ERROR(MSGID_TYPE_ERROR, 0, "%s: Error during json conversion", __func__);
+        return;
+    }
 
-    if (jsonDoc.isArray()) {
-        QJsonArray jsonArray = jsonDoc.array();
-
-        for (int i = 0; i < jsonArray.size(); i++)
-            keyMask |= mapTable.value(jsonArray[i].toString());
+    if (value.isArray()) {
+        for (const auto& child : value)
+            keyMask |= getKeyMask(child.asString());
     }
 
     m_appWindow->SetKeyMask(static_cast<webos::WebOSKeyMask>(keyMask));
@@ -743,28 +775,28 @@ void InputManager::OnCursorVisibilityChanged(bool visible)
     LOG_DEBUG("InputManager::onCursorVisibilityChanged; Global Cursor visibility Changed to %s; send cursorStateChange event to all app, all frames", visible? "true" : " false");
     SetVisible(visible);
     // send event about  cursorStateChange
-    QString cursorStateChangeEvt = QStringLiteral(
-        "    var cursorEvent=new CustomEvent('cursorStateChange', { detail: { 'visibility' : %1 } });"
-        "    cursorEvent.visibility = %2;"
-        "    if(document) document.dispatchEvent(cursorEvent);"
-    ).arg(visible ? "true" : "false"). arg(visible ? "true" : "false");
+    std::stringstream ss;
+    const std::string str = visible ? "true" : "false";
+    ss << "var cursorEvent=new CustomEvent('cursorStateChange', { detail: { 'visibility' :" << str << "} });"
+       << "cursorEvent.visibility = " << str << ";"
+       << " if(document) document.dispatchEvent(cursorEvent);";
 
     // send javascript event : cursorStateChange with param to All app
     // if javascript has setTimeout() like webOSlaunch or webOSRelaunch, then app can not get this event when app is in background
     // because javascript is freezed and timer is too, since app is in background, timer is never fired
-    WebAppBase::onCursorVisibilityChanged(cursorStateChangeEvt);
+    WebAppBase::onCursorVisibilityChanged(QString::fromStdString(ss.str()));
 }
 
 void WebAppWayland::sendWebOSMouseEvent(const QString& eventName)
 {
     if (eventName == "Enter" || eventName == "Leave") {
         // send webOSMouse event to app
-        QString javascript = QStringLiteral(
-            "console.log('[WAM] fires webOSMouse event : %1');"
-            "var mouseEvent =new CustomEvent('webOSMouse', { detail: { type : '%2' }});"
-            "document.dispatchEvent(mouseEvent);").arg(eventName).arg(eventName);
+        std::stringstream ss;
+        ss << "console.log('[WAM] fires webOSMouse event : " << eventName.toStdString() << "');"
+           << "var mouseEvent =new CustomEvent('webOSMouse', { detail: { type : '" << eventName.toStdString() << "' }});"
+           << "document.dispatchEvent(mouseEvent);";
         LOG_DEBUG("[%s] WebAppWayland::sendWebOSMouseEvent; dispatch webOSMouse; %s", qPrintable(appId()), qPrintable(eventName));
-        page()->evaluateJavaScript(javascript);
+        page()->evaluateJavaScript(QString::fromStdString(ss.str()));
     }
 }
 
