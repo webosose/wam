@@ -19,20 +19,20 @@
 
 #include "NetworkStatus.h"
 
-#include <QMap>
-#include <QPair>
-#include <QString>
+#include <string>
+#include <unordered_map>
+#include <utility>
 
 class NetworkStatusManager {
 public:
     void updateNetworkStatus(const NetworkStatus& status);
     void checkInformationChange(const NetworkStatus::Information& information);
-    void appendLogList(const QString& key, const QString& previous, const QString& current);
+    void appendLogList(const std::string& key, const std::string& previous, const std::string& current);
     void printLog();
 
 private:
     NetworkStatus m_current;
-    QMap<QString, QPair<QString, QString>> m_logList;
+    std::unordered_map<std::string, std::pair<std::string, std::string>> m_logList;
 };
 
 #endif //#ifndef NETWORKSTATUS_MANAGER_H

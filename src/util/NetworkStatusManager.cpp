@@ -24,7 +24,7 @@ void NetworkStatusManager::updateNetworkStatus(const NetworkStatus& status)
 
     checkInformationChange(status.information());
     if (m_logList.size() > 0) { // one more information was changed
-        appendLogList(QString("date"), m_current.savedDate(), status.savedDate());
+        appendLogList("date", m_current.savedDate(), status.savedDate());
         printLog();
         m_current = status;
     }
@@ -33,37 +33,36 @@ void NetworkStatusManager::updateNetworkStatus(const NetworkStatus& status)
 void NetworkStatusManager::checkInformationChange(const NetworkStatus::Information& info)
 {
     if (m_current.information().ipAddress() != info.ipAddress())
-        appendLogList(QString("ipAddress"), m_current.information().ipAddress(), info.ipAddress());
+        appendLogList("ipAddress", m_current.information().ipAddress(), info.ipAddress());
     if (m_current.information().dns1() != info.dns1())
-        appendLogList(QString("dns1"), m_current.information().dns1(), info.dns1());
+        appendLogList("dns1", m_current.information().dns1(), info.dns1());
     if (m_current.information().dns2() != info.dns2())
-        appendLogList(QString("dns2"), m_current.information().dns2(), info.dns2());
+        appendLogList("dns2", m_current.information().dns2(), info.dns2());
     if (m_current.information().method() != info.method())
-        appendLogList(QString("method"), m_current.information().method(), info.method());
+        appendLogList("method", m_current.information().method(), info.method());
     if (m_current.information().state() != info.state())
-        appendLogList(QString("state"), m_current.information().state(), info.state());
+        appendLogList("state", m_current.information().state(), info.state());
     if (m_current.information().gateway() != info.gateway())
-        appendLogList(QString("gateway"), m_current.information().gateway(), info.gateway());
+        appendLogList("gateway", m_current.information().gateway(), info.gateway());
     if (m_current.information().interfaceName() != info.interfaceName())
-        appendLogList(QString("interfaceName"), m_current.information().interfaceName(), info.interfaceName());
+        appendLogList("interfaceName", m_current.information().interfaceName(), info.interfaceName());
     if (m_current.information().onInternet() != info.onInternet())
-        appendLogList(QString("onInternet"), m_current.information().onInternet(), info.onInternet());
+        appendLogList("onInternet", m_current.information().onInternet(), info.onInternet());
 }
 
-void NetworkStatusManager::appendLogList(const QString& key, const QString& previous, const QString& current)
+void NetworkStatusManager::appendLogList(const std::string& key, const std::string& previous, const std::string& current)
 {
-    QPair<QString, QString> pair = qMakePair(previous, current);
-    m_logList[key] = pair;
+    m_logList.emplace(std::piecewise_construct,
+                      std::forward_as_tuple(key),
+                      std::forward_as_tuple(previous, current));
 }
 
 void NetworkStatusManager::printLog()
 {
-    QMapIterator<QString, QPair<QString, QString> > itr(m_logList);
-    while (itr.hasNext()) {
-        itr.next();
-        LOG_INFO(MSGID_NETWORKSTATUS_INFO, 3, PMLOGKS("CHANGE", qPrintable(itr.key())),
-            PMLOGKS("Previous", qPrintable(itr.value().first)),
-            PMLOGKS("Current", qPrintable(itr.value().second)), "");
+    for (const auto &line : m_logList) {
+        LOG_INFO(MSGID_NETWORKSTATUS_INFO, 3, PMLOGKS("CHANGE", line.first.c_str()),
+                 PMLOGKS("Previous", line.second.first.c_str()),
+                 PMLOGKS("Current", line.second.second.c_str()), "");
     }
     m_logList.clear();
 }

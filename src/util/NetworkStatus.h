@@ -17,8 +17,14 @@
 #ifndef NETWORKSTATUS_H
 #define NETWORKSTATUS_H
 
+#include <string>
+
+namespace Json {
+class Value;
+};
+
+//TODO: remove header when QT less implementation will be completed.
 #include <QJsonObject>
-#include <QString>
 
 class NetworkStatus {
 public:
@@ -26,40 +32,42 @@ public:
 
     class Information {
     public:
-        void fromJsonObject(const QJsonObject&);
-        QString netmask() const { return m_netmask; }
-        QString dns1() const { return m_dns1; }
-        QString dns2() const { return m_dns2; }
-        QString ipAddress() const { return m_ipAddress; }
-        QString method() const { return m_method; }
-        QString state() const { return m_state; }
-        QString gateway() const { return m_gateway; }
-        QString interfaceName() const { return m_interfaceName; }
-        QString onInternet() const { return m_onInternet; }
+        void fromJsonObject(const Json::Value& info);
+        std::string netmask() const { return m_netmask; }
+        std::string dns1() const { return m_dns1; }
+        std::string dns2() const { return m_dns2; }
+        std::string ipAddress() const { return m_ipAddress; }
+        std::string method() const { return m_method; }
+        std::string state() const { return m_state; }
+        std::string gateway() const { return m_gateway; }
+        std::string interfaceName() const { return m_interfaceName; }
+        std::string onInternet() const { return m_onInternet; }
 
     private:
-        QString m_netmask;
-        QString m_dns1;
-        QString m_dns2;
-        QString m_ipAddress;
-        QString m_method;
-        QString m_state;
-        QString m_gateway;
-        QString m_interfaceName;
-        QString m_onInternet;
+        std::string m_netmask;
+        std::string m_dns1;
+        std::string m_dns2;
+        std::string m_ipAddress;
+        std::string m_method;
+        std::string m_state;
+        std::string m_gateway;
+        std::string m_interfaceName;
+        std::string m_onInternet;
     };
 
+    //TODO: remove this method when QT less implementation will be completed.
     void fromJsonObject(const QJsonObject&);
-    QString type() const { return m_type; }
+    void fromJsonObject(const Json::Value& object);
+    std::string type() const { return m_type; }
     Information information() const { return m_information; }
-    QString savedDate() const { return m_savedDate; }
+    std::string savedDate() const { return m_savedDate; }
     bool isInternetConnectionAvailable() { return m_isInternetConnectionAvailable; }
 
 private:
-    QString m_type;
+    std::string m_type;
     Information m_information;
     bool m_isInternetConnectionAvailable;
     bool m_returnValue;
-    QString m_savedDate;
+    std::string m_savedDate;
 };
 #endif

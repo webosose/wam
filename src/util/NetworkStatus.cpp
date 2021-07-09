@@ -15,7 +15,12 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <time.h>
+
+#include <json/json.h>
+
+#include "JsonHelper.h"
 #include "NetworkStatus.h"
+#include "StringUtils.h"
 
 NetworkStatus::NetworkStatus()
     : m_isInternetConnectionAvailable(false)
@@ -23,39 +28,49 @@ NetworkStatus::NetworkStatus()
 {
 }
 
-void NetworkStatus::fromJsonObject(const QJsonObject& object)
+void NetworkStatus::fromJsonObject(const Json::Value& object)
 {
-    m_returnValue = object["returnValue"].toBool();
-    m_isInternetConnectionAvailable = object["isInternetConnectionAvailable"].toBool();
+    if (!object.isObject())
+        return;
+    m_returnValue = object["returnValue"].asBool();
+    m_isInternetConnectionAvailable = object["isInternetConnectionAvailable"].asBool();
     if (m_returnValue) {
-        if (!object["wired"].isUndefined()) {
+        if (object["wired"].isObject()) {
             m_type = "wired";
-            m_information.fromJsonObject(object["wired"].toObject());
-        } else if (!object["wifi"].isUndefined()) {
+            m_information.fromJsonObject(object["wired"]);
+        } else if (object["wifi"].isObject()) {
             m_type = "wifi";
-            m_information.fromJsonObject(object["wifi"].toObject());
+            m_information.fromJsonObject(object["wifi"]);
         } else {
             m_type = "wifiDirect";
-            m_information.fromJsonObject(object["wifiDirect"].toObject());
+            m_information.fromJsonObject(object["wifiDirect"]);
         }
     }
 
     time_t raw_time;
     time(&raw_time);
-    m_savedDate = QString(ctime(&raw_time));
-    m_savedDate = m_savedDate.trimmed();
+    m_savedDate = util::trim(ctime(&raw_time));
 }
 
-void NetworkStatus::Information::fromJsonObject(const QJsonObject& info)
+//TODO: remove this method when QT less implementation will be completed.
+void NetworkStatus::fromJsonObject(const QJsonObject& object) {
+    Json::Value value;
+    if (util::JsonValueFromQJsonObject(object, value))
+        fromJsonObject(value);
+}
+
+void NetworkStatus::Information::fromJsonObject(const Json::Value& info)
 {
-    m_netmask = info["netmask"].toString();
-    m_dns1 = info["dns1"].toString();
-    if (!info["dns2"].isUndefined())
-        m_dns2 = info["dns2"].toString();
-    m_ipAddress = info["ipAddress"].toString();
-    m_method = info["method"].toString();
-    m_state = info["state"].toString();
-    m_gateway = info["gateway"].toString();
-    m_interfaceName = info["interfaceName"].toString();
-    m_onInternet = info["onInternet"].toString();
+    if (!info.isObject())
+        return;
+    m_netmask = info["netmask"].asString();
+    m_dns1 = info["dns1"].asString();
+    if (info["dns2"].isString())
+        m_dns2 = info["dns2"].asString();
+    m_ipAddress = info["ipAddress"].asString();
+    m_method = info["method"].asString();
+    m_state = info["state"].asString();
+    m_gateway = info["gateway"].asString();
+    m_interfaceName = info["interfaceName"].asString();
+    m_onInternet = info["onInternet"].asString();
 }
