@@ -46,8 +46,13 @@
 
 #else
 
-#include "LogManagerPmLog.h"
 #include "LogMsgId.h"
+
+#ifdef DISABLE_PMLOG
+#include "LogManagerConsole.h"
+#else
+#include "LogManagerPmLog.h"
+#endif
 
 #endif
 

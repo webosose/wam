@@ -24,7 +24,6 @@ SOURCES += \
         DeviceInfo.cpp \
         JsonHelper.cpp \
         LogManager.cpp \
-        LogManagerPmLog.cpp \
         NetworkStatus.cpp \
         NetworkStatusManager.cpp \
         PalmSystemBase.cpp \
@@ -52,7 +51,6 @@ HEADERS += \
         DeviceInfo.h \
         JsonHelper.h \
         LogManager.h \
-        LogManagerPmLog.h \
         LogMsgId.h \
         NetworkStatus.h \
         NetworkStatusManager.h \
@@ -81,6 +79,18 @@ HEADERS += \
         WebProcessManager.h \
         WebViewBase.h \
         WindowTypes.h
+
+!isEmpty(DISABLE_PMLOG) {
+    SOURCES += \
+        LogManagerConsole.cpp
+
+    HEADERS += \
+        LogManagerConsole.h
+        LogManagerConsoleHelpers.h
+} else {
+    HEADERS += LogManagerPmLog.h
+    SOURCES += LogManagerPmLog.cpp
+}
 
 lttng {
     DEFINES += HAS_LTTNG

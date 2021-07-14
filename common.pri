@@ -110,3 +110,7 @@ MOC_DIR = $$DESTDIR/.moc
 LIBS += -L$$DESTDIR
 
 LIBS += -lcbe -lboost_filesystem
+
+!isEmpty(DISABLE_PMLOG) {
+    DEFINES += DISABLE_PMLOG
+}

@@ -26,3 +26,6 @@ CONFIG += release
 
 PKGCONFIG += luna-prefs PmLogLib
 
+!isEmpty(DISABLE_PMLOG) {
+    PKGCONFIG -= PmLogLib
+}
