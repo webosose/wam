@@ -37,6 +37,12 @@
 #define LOG_CRITICAL(...) \
     do {                  \
     } while (0)
+#define LOG_INFO_WITH_CLOCK(...) \
+    do {                         \
+    } while (0)
+#define LOG_STRING(...) \
+    do {                \
+    } while (0)
 
 #else
 

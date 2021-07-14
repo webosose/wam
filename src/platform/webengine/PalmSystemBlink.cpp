@@ -92,7 +92,7 @@ std::string PalmSystemBlink::handleBrowserControlMessage(const std::string& comm
         if (arguments.size() > 3) {
             int32_t v1;
             if (strToInt(arguments[0], v1))
-                pmLogString(static_cast<PmLogLevel>(v1), QString::fromStdString(arguments[1]), QString::fromStdString(arguments[2]), QString::fromStdString(arguments[3]));
+                pmLogString(v1, QString::fromStdString(arguments[1]), QString::fromStdString(arguments[2]), QString::fromStdString(arguments[3]));
         }
     } else if (command == "setWindowProperty") {
         if (arguments.size() > 1) {

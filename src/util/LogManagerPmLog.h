@@ -38,6 +38,8 @@
 #define LOG_ERROR(__msgid, ...) PmLogError(GetWAMPmLogContext(), __msgid, ##__VA_ARGS__)
 #define LOG_CRITICAL(__msgid, ...) PmLogCritical(GetWAMPmLogContext(), __msgid, ##__VA_ARGS__)
 
+#define LOG_STRING(__level, __msgid, ...) PmLogString(GetWAMPmLogContext(), static_cast<PmLogLevel>(__level), __msgid, ##__VA_ARGS__)
+
 PmLogContext GetWAMPmLogContext();
 
 #endif // LOGMANAGERPMLOG_H

@@ -357,3 +357,29 @@ TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_setKeyMask_Combinat
     webViewDelegate->handleBrowserControlFunction("setKeyMask", params, &returnValue);
 }
 
+// NOTE: just ensure that we will not crash on this call
+TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_PmLogInfoWithClock)
+{
+    std::string returnValue;
+    std::vector<std::string> params;
+    params.reserve(3);
+    params.emplace_back("");
+    params.emplace_back("");
+    params.emplace_back("");
+
+    webViewDelegate->handleBrowserControlFunction("PmLogInfoWithClock", params, &returnValue);
+}
+
+// NOTE: just ensure that we will not crash on this call
+TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_PmLogString)
+{
+    std::string returnValue;
+    std::vector<std::string> params;
+    params.reserve(4);
+    params.emplace_back(std::to_string(7));
+    params.emplace_back("");
+    params.emplace_back("");
+    params.emplace_back("");
+
+    webViewDelegate->handleBrowserControlFunction("PmLogString", params, &returnValue);
+}

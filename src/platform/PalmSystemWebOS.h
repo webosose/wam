@@ -18,7 +18,6 @@
 #define PALMSYSTEMWEBOS_H_
 
 #include "PalmSystemBase.h"
-#include <PmLogLib.h>
 
 class WebAppBase;
 class WebAppWayland;
@@ -63,7 +62,7 @@ protected:
     virtual void setGroupClientEnvironment(GroupClientCallKey callKey, const QByteArray& params);
 
     virtual void pmLogInfoWithClock(const QVariant& msgid, const QVariant& perfType, const QVariant& perfGroup);
-    virtual void pmLogString(PmLogLevel level, const QVariant& msgid, const QVariant& kvpairs, const QVariant& message);
+    virtual void pmLogString(int32_t level, const QVariant& msgid, const QVariant& kvpairs, const QVariant& message);
     virtual bool cursorVisibility();
     virtual void updateLaunchParams(const QString& launchParams);
 

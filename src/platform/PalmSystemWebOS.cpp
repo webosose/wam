@@ -171,18 +171,14 @@ void PalmSystemWebOS::setKeepAlive(bool keep)
 
 void PalmSystemWebOS::pmLogInfoWithClock(const QVariant& msgid, const QVariant& perfType, const QVariant& perfGroup)
 {
-    PmLogContext context;
-    PmLogGetContext(qPrintable(m_app->page()->appId()), &context);
-    PmLogInfoWithClock(context, msgid.toByteArray().size() ? msgid.toByteArray().data() : NULL, 2,
+    LOG_INFO_WITH_CLOCK(msgid.toByteArray().size() ? msgid.toByteArray().data() : NULL, 2,
                        PMLOGKS("PerfType", perfType.toByteArray().size() ? perfType.toByteArray().data() : "empty"),
                        PMLOGKS("PerfGroup", perfGroup.toByteArray().size() ? perfGroup.toByteArray().data() : "empty"), "");
 }
 
-void PalmSystemWebOS::pmLogString(PmLogLevel level, const QVariant& msgid, const QVariant& kvpairs, const QVariant& message)
+void PalmSystemWebOS::pmLogString(int32_t level, const QVariant& msgid, const QVariant& kvpairs, const QVariant& message)
 {
-    PmLogContext context;
-    PmLogGetContext(qPrintable(m_app->page()->appId()), &context);
-    PmLogString(context, level, msgid.toByteArray().size() ? msgid.toByteArray().data() : NULL,
+    LOG_STRING(level, msgid.toByteArray().size() ? msgid.toByteArray().data() : NULL,
             kvpairs.toByteArray().size() ? kvpairs.toByteArray().data() : NULL, message.toByteArray().data());
 }
 
