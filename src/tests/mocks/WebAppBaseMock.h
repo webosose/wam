@@ -68,7 +68,7 @@ class WebAppBaseMock : public WebAppBase {
   bool isKeyboardVisible() override { return false; }
   bool hideWindow() override { return false; }
   void doAttach() override {}
-  void webPageLoadFailedSlot(int errorCode) override {}
+  void webPageLoadFailed(int errorCode) override {}
 };
 
 #endif  // WEBAPPBASEMOCK_H

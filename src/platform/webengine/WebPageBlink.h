@@ -36,7 +36,6 @@ class WebPageBlinkObserver;
 class WebViewFactory;
 
 class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
-    Q_OBJECT
 public:
     WebPageBlink(const QUrl& url,
                  std::shared_ptr<ApplicationDescription> desc,
@@ -151,12 +150,6 @@ public:
     void setAudioGuidanceOn(bool on) override;
     void updateBackHistoryAPIDisabled();
 
-Q_SIGNALS:
-    void webPageClosePageRequested();
-    void webPageTitleChanged();
-    void webViewRecreated();
-    void moveInputRegion(qreal);
-    void compositorFrameSwapped();
 
 protected:
     WebView* pageView() const;
@@ -180,9 +173,7 @@ protected:
 
     std::string handleBrowserControlMessage(const std::string& command, const std::vector<std::string>& arguments);
 
-protected Q_SLOTS:
-    virtual void didFinishLaunchingSlot();
-    virtual void suspendWebPagePaintingAndJSExecution();
+    void suspendWebPagePaintingAndJSExecution() override;
 
 private:
     void setCustomPluginIfNeeded();

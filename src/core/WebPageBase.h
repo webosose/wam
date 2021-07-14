@@ -20,7 +20,6 @@
 #include <memory>
 #include <string>
 
-#include <QObject>
 #include <QtCore/QString>
 #include <QtCore/QUrl>
 
@@ -37,9 +36,7 @@ class WebProcessManager;
  * Common base class for UI independent
  * web page functionality
  */
-class WebPageBase : public QObject {
-    Q_OBJECT
-
+class WebPageBase {
 public:
     // Originally, webview_base.h, WebPageVisibilityState.h, PageVisibilityState.h
     // we can use enum of webview_base.h directly but this is WebPageBase in core
@@ -144,18 +141,6 @@ public:
     virtual void activateRendererCompositor() { }
     virtual void deactivateRendererCompositor() { }
 
-Q_SIGNALS:
-    void webPageUrlChanged();
-    void webPageLoadFinished();
-    void webPageLoadFailed(int errorCode);
-    void closeCallbackExecuted();
-    void timeoutExecuteCloseCallback();
-    void closingAppProcessDidCrashed();
-    void didDispatchUnload();
-
-protected Q_SLOTS:
-    virtual void urlChangedSlot();
-    void doLoadSlot();
     virtual void suspendWebPagePaintingAndJSExecution() = 0;
 
 protected:

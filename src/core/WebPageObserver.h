@@ -21,9 +21,17 @@ class WebPageBase;
 
 class WebPageObserver {
 public:
-    virtual void titleChanged() {}
+    virtual void closeCallbackExecuted() {}
+    virtual void closingAppProcessDidCrashed() {}
+    virtual void didDispatchUnload() {}
     virtual void firstFrameVisuallyCommitted() {}
     virtual void navigationHistoryChanged() {}
+    virtual void timeoutExecuteCloseCallback() {}
+    virtual void titleChanged() {}
+    virtual void webPageClosePageRequested() {}
+    virtual void webPageLoadFailed(int errorCode) {}
+    virtual void webPageLoadFinished() {}
+    virtual void webViewRecreated() {}
 
 protected:
     WebPageObserver(WebPageBase* page);

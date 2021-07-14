@@ -17,6 +17,8 @@
 #ifndef PalmServiceBase_H
 #define PalmServiceBase_H
 
+#include <functional>
+
 #include <glib.h>
 #include <json/json.h>
 #include <luna-service2/lunaservice.h>
@@ -52,12 +54,10 @@ public:
  * QJsonObject handlerFunc(QJsonObject payload)
  *
  * */
-class LSCallbackHandler : public QObject {
-    Q_OBJECT
+class LSCallbackHandler {
 public:
-    LSCallbackHandler(QObject* receiver, const char* slot)
-        : m_receiver(receiver)
-        , m_slot(slot)
+    LSCallbackHandler(std::function<QJsonObject(const QJsonObject&)>& func)
+        : m_func(func)
     {
     }
 
@@ -66,11 +66,7 @@ public:
 protected:
     QJsonObject called(QJsonObject payload)
     {
-        QJsonObject retVal;
-        QMetaObject::invokeMethod(m_receiver, m_slot,
-            Q_RETURN_ARG(QJsonObject, retVal),
-            Q_ARG(QJsonObject, payload));
-        return retVal;
+        return m_func(payload);
     }
 
     static bool callback(LSHandle* handle, LSMessage* message, void* user_data)
@@ -94,8 +90,7 @@ protected:
             return true;
     }
 
-    QObject* m_receiver;
-    const char* m_slot;
+    std::function<QJsonObject(const QJsonObject&)> m_func;
 };
 
 /**
@@ -105,8 +100,8 @@ class LSCalloutContext : public LSCallbackHandler {
     friend class PalmServiceBase;
 
 public:
-    LSCalloutContext(QObject* receiver, const char* slot)
-        : LSCallbackHandler(receiver, slot)
+    LSCalloutContext(std::function<QJsonObject(const QJsonObject&)> func)
+        : LSCallbackHandler(func)
         , m_service(0)
         , m_token(LSMESSAGE_TOKEN_INVALID){};
 

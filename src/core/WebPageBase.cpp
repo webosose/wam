@@ -260,10 +260,6 @@ void WebPageBase::sendRelaunchEvent()
     evaluateJavaScript(relaunchEvent.str().c_str());
 }
 
-void WebPageBase::urlChangedSlot()
-{
-    Q_EMIT webPageUrlChanged();
-}
 
 void WebPageBase::handleLoadStarted()
 {
@@ -280,7 +276,7 @@ void WebPageBase::handleLoadFinished()
         "WebPageBase::handleLoadFinished; m_suspendAtLoad : %s",
             m_suspendAtLoad ? "true; suspend in this time" : "false");
 
-    Q_EMIT webPageLoadFinished();
+    FOR_EACH_OBSERVER(WebPageObserver, m_observers, webPageLoadFinished());
 
     // if there was an attempt made to suspend while this page was loading, then
     // we flag m_suspendAtLoad = true, and suspend it after it is loaded. This is
@@ -365,10 +361,6 @@ QString WebPageBase::telluriumNubPath()
     return getWebAppManagerConfig()->getTelluriumNubPath();
 }
 
-void WebPageBase::doLoadSlot()
-{
-    loadDefaultUrl();
-}
 
 bool WebPageBase::hasLoadErrorPolicy(bool isHttpResponseError, int errorCode)
 {

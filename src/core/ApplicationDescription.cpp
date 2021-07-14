@@ -303,12 +303,14 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     appDesc->m_useNativeScroll = jsonObj["useNativeScroll"].isBool() && jsonObj["useNativeScroll"].asBool();
 
     // Set network stable timeout
-    auto networkStableTimeout = jsonObj["networkStableTimeout"];
-    if (!networkStableTimeout.isDouble()) {
+    if (jsonObj.isMember("networkStableTimeout")) {
+        auto networkStableTimeout = jsonObj["networkStableTimeout"];
+        if (!networkStableTimeout.isDouble()) {
             LOG_ERROR(MSGID_TYPE_ERROR, 2, PMLOGKS("APP_ID", appDesc->id().c_str()),
             PMLOGKFV("DATA_TYPE", "%d", networkStableTimeout.type()),  "Invaild JsonValue type");
-    } else {
-        appDesc->m_networkStableTimeout = networkStableTimeout.asDouble();
+        } else {
+            appDesc->m_networkStableTimeout = networkStableTimeout.asDouble();
+        }
     }
 
     // Set delay millisecond for launch optimization

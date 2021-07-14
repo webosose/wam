@@ -53,8 +53,6 @@ public:
 };
 
 class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
-    Q_OBJECT
-
 public:
     WebAppWayland(QString type,
                   int width = 0, int height = 0,
@@ -141,11 +139,9 @@ protected:
 
     void moveInputRegion(int height);
 
-protected Q_SLOTS:
-    virtual void showWindowSlot();
-    virtual void webPageLoadFinishedSlot();
-    virtual void webPageLoadFailedSlot(int errorCode);
-    virtual void webViewRecreatedSlot();
+    void webPageLoadFinished() override;
+    void webPageLoadFailed(int errorCode) override;
+    void webViewRecreated() override;
 
 private:
 

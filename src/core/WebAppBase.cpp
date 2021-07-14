@@ -210,16 +210,12 @@ void WebAppBase::attach(WebPageBase* page)
     d->m_page->createPalmSystem(this);
 
     observe(d->m_page);
-    connect(d->m_page, SIGNAL(webPageUrlChanged()), this, SLOT(webPageUrlChangedSlot()));
-    connect(d->m_page, SIGNAL(webPageLoadFinished()), this, SLOT(webPageLoadFinishedSlot()));
-    connect(d->m_page, SIGNAL(webPageLoadFailed(int)), this, SLOT(webPageLoadFailedSlot(int)));
 }
 
 WebPageBase* WebAppBase::detach(void)
 {
     WebPageBase* p = d->m_page;
 
-    disconnect(d->m_page, 0, this, 0);
     unobserve(d->m_page);
 
     d->m_page = 0;
@@ -289,7 +285,7 @@ void WebAppBase::relaunch(const QString& args, const QString& launchingAppId)
     }
 }
 
-void WebAppBase::webPageLoadFinishedSlot()
+void WebAppBase::webPageLoadFinished()
 {
     doPendingRelaunch();
 }
@@ -309,7 +305,7 @@ void WebAppBase::doPendingRelaunch()
     }
 }
 
-void WebAppBase::webPageClosePageRequestedSlot()
+void WebAppBase::webPageClosePageRequested()
 {
     LOG_INFO(MSGID_WINDOW_CLOSED_JS, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "%s%s", m_closePageRequested ? "duplicated window.close();" : "", isClosing() ? "app is closing; drop this window.close()": "");
     if (isClosing() || m_closePageRequested)
@@ -336,10 +332,6 @@ void WebAppBase::showWindow()
     setUseAccessibility(WebAppManager::instance()->isAccessibilityEnabled());
 }
 
-void WebAppBase::showWindowSlot()
-{
-    showWindow();
-}
 
 void WebAppBase::setAppDescription(std::shared_ptr<ApplicationDescription> appDesc)
 {
@@ -451,11 +443,6 @@ void WebAppBase::setUiSize(int width, int height) {
     WebAppManager::instance()->setUiSize(width, height);
 }
 
-void WebAppBase::webPageUrlChangedSlot()
-{
-    d->m_url = d->m_page->url().toString();
-}
-
 void WebAppBase::setPreferredLanguages(QString language)
 {
     if (!d->m_page)
@@ -492,14 +479,31 @@ void WebAppBase::setUseAccessibility(bool enabled)
 
 void WebAppBase::executeCloseCallback()
 {
-    connect(d->m_page, SIGNAL(closeCallbackExecuted()),this, SLOT(closeWebAppSlot()));
-    connect(d->m_page, SIGNAL(timeoutExecuteCloseCallback()),this, SLOT(closeWebAppSlot()));
-    connect(d->m_page, SIGNAL(closingAppProcessDidCrashed()),this, SLOT(closeWebAppSlot()));
     page()->executeCloseCallback(forceClose());
     LOG_INFO(MSGID_EXECUTE_CLOSECALLBACK,3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
 }
 
-void WebAppBase::closeWebAppSlot()
+void WebAppBase::closeCallbackExecuted()
+{
+    closeWebApp();
+}
+
+void WebAppBase::timeoutExecuteCloseCallback()
+{
+    closeWebApp();
+}
+
+void WebAppBase::closingAppProcessDidCrashed()
+{
+    closeWebApp();
+}
+
+void WebAppBase::didDispatchUnload()
+{
+    closeWebApp();
+}
+
+void WebAppBase::closeWebApp()
 {
     LOG_INFO(MSGID_CLEANRESOURCE_COMPLETED, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "closeCallback/about:blank is DONE");
     WebAppManager::instance()->removeClosingAppList(appId());
@@ -508,8 +512,6 @@ void WebAppBase::closeWebAppSlot()
 
 void WebAppBase::dispatchUnload()
 {
-    connect(d->m_page, SIGNAL(didDispatchUnload()),this, SLOT(closeWebAppSlot()));
-    connect(d->m_page, SIGNAL(closingAppProcessDidCrashed()),this, SLOT(closeWebAppSlot()));
     page()->cleanResources();
 }
 
