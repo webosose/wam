@@ -21,6 +21,7 @@
 
 #include "ApplicationDescription.h"
 #include "PlatformModuleFactoryImpl.h"
+#include "Utils.h"
 #include "WebAppManager.h"
 #include "WebPageBlink.h"
 #include "WebPageBlinkDelegate.h"
@@ -216,9 +217,22 @@ TEST_F(WebPageBlinkTestSuite, PriviledgetPluginPath)
 
 TEST_F(WebPageBlinkTestSuite, SetMediaCodecCapability)
 {
-    EXPECT_CALL(*factory->webView, SetMediaCodecCapability(HasSubstr("LICENSE  Copyright (c) 2018-2019 LG Electronics, Inc")));
+    // TODO: JSON file path hardcoding should be refactored.
+    // Actually this path is hardcoded inside of 
+    // WebPageBlink::updateMediaCodecCapability() method.
+    // That's a reason why it's also hardcoded here.
+    bool skip = false;
+    if (util::doesPathExist("/etc/umediaserver/device_codec_capability_config.json")) {
+        EXPECT_CALL(*factory->webView, SetMediaCodecCapability(HasSubstr("LICENSE  Copyright (c) 2018-2019 LG Electronics, Inc")));
+    } else {
+        skip = true;
+    }
+
     WebPageBlink webPage(wam::Url(description->entryPoint()), description, params.c_str(), std::move(factory));
     webPage.init();
+
+    if (skip)
+        GTEST_SKIP();
 }
 
 TEST_F(WebPageBlinkTestSuite, addUserScript)
