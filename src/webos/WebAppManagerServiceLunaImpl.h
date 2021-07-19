@@ -19,15 +19,17 @@
 
 #include "WebAppManagerServiceLuna.h"
 
-class QJsonObject;
+namespace Json {
+class Value;
+};
 
 class WebAppManagerServiceLunaImpl : public WebAppManagerServiceLuna {
 public:
     // Overridden from WebAppManagerServiceLuna
-    void systemServiceConnectCallback(QJsonObject reply);
-    QJsonObject setInspectorEnable(QJsonObject request);
+    void systemServiceConnectCallback(const Json::Value& reply);
+    Json::Value setInspectorEnable(const Json::Value& request);
 
-    void getSystemOptionCallback(QJsonObject reply);
+    void getSystemOptionCallback(const Json::Value& reply);
 
 private:
 };

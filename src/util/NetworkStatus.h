@@ -23,9 +23,6 @@ namespace Json {
 class Value;
 };
 
-//TODO: remove header when QT less implementation will be completed.
-#include <QJsonObject>
-
 class NetworkStatus {
 public:
     NetworkStatus();
@@ -55,8 +52,6 @@ public:
         std::string m_onInternet;
     };
 
-    //TODO: remove this method when QT less implementation will be completed.
-    void fromJsonObject(const QJsonObject&);
     void fromJsonObject(const Json::Value& object);
     std::string type() const { return m_type; }
     Information information() const { return m_information; }

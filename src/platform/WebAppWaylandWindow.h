@@ -35,7 +35,7 @@ public:
     virtual void show();
 
     void platformBack();
-    void setCursor(const QString& cursorArg, int hotspot_x = -1, int hotspot_y = -1);
+    void setCursor(const std::string& cursorArg, int hotspot_x = -1, int hotspot_y = -1);
 
     void attachWebContents(void* webContents);
 

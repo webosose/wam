@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include "TypeConverter.h"
+#include "Utils.h"
 
 WebAppManagerConfig::WebAppManagerConfig()
     : m_suspendDelayTime(0)
@@ -36,7 +37,7 @@ WebAppManagerConfig::WebAppManagerConfig()
 
 std::string WebAppManagerConfig::wamGetEnv(const char *name)
 {
-    return qgetenv(name).toStdString();
+    return getEnvVar(name);
 }
 
 void WebAppManagerConfig::initConfiguration()

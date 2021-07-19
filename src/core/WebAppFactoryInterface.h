@@ -18,21 +18,22 @@
 #define WEBAPPFACTORYINTERFACE_H
 
 #include <memory>
-
-#include <QString>
-#include <QUrl>
-#include <QtPlugin>
+#include <string>
 
 #include "ApplicationDescription.h"
+
+namespace wam {
+    class Url;
+}
 
 class WebAppBase;
 class WebPageBase;
 
 class WebAppFactoryInterface {
 public:
-    virtual WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr) = 0;
-    virtual WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr) = 0;
-    virtual WebPageBase* createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, QString launchParams = "") = 0;
+    virtual WebAppBase* createWebApp(const std::string& winType, std::shared_ptr<ApplicationDescription> desc = nullptr) = 0;
+    virtual WebAppBase* createWebApp(const std::string& winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr) = 0;
+    virtual WebPageBase* createWebPage(const wam::Url& url, std::shared_ptr<ApplicationDescription> desc, const std::string& launchParams = {}) = 0;
     virtual ~WebAppFactoryInterface() {};
 };
 

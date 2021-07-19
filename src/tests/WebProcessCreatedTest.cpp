@@ -16,11 +16,10 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <json/json.h>
 
 #include "BaseMockInitializer.h"
+#include "JsonHelper.h"
 #include "WebAppManagerServiceLuna.h"
 #include "WebViewMockImpl.h"
 
@@ -84,49 +83,51 @@ constexpr char kLaunchAppJsonBody[] = R"({
 }  // namespace
 
 TEST(WebProcessCreatedTest, WebProcessNotExist) {
-  const QJsonObject request{{"instanceId", kInstanceId}, {"appId", kAppId}};
-  const QJsonObject reply =
+  Json::Value request;
+  request["instanceId"] = kInstanceId;
+  request["appId"] = kAppId;
+  const auto reply =
       WebAppManagerServiceLuna::instance()->webProcessCreated(request, false);
 
-  EXPECT_TRUE(reply.contains("id"));
-  EXPECT_STREQ(reply["id"].toString().toStdString().c_str(), kAppId);
+  ASSERT_TRUE(reply.isObject());
+  EXPECT_TRUE(reply.isMember("id"));
+  EXPECT_STREQ(reply["id"].asString().c_str(), kAppId);
 
-  EXPECT_TRUE(reply.contains("instanceId"));
-  EXPECT_STREQ(reply["instanceId"].toString().toStdString().c_str(),
-               kInstanceId);
+  EXPECT_TRUE(reply.isMember("instanceId"));
+  EXPECT_STREQ(reply["instanceId"].asString().c_str(), kInstanceId);
 
-  EXPECT_TRUE(reply.contains("returnValue"));
-  EXPECT_FALSE(reply["returnValue"].toBool());
+  EXPECT_TRUE(reply.isMember("returnValue"));
+  EXPECT_FALSE(reply["returnValue"].asBool());
 
-  EXPECT_TRUE(reply.contains("errorText"));
-  EXPECT_STREQ(reply["errorText"].toString().toStdString().c_str(),
-               "process is not running");
+  EXPECT_TRUE(reply.isMember("errorText"));
+  EXPECT_STREQ(reply["errorText"].asString().c_str(), "process is not running");
 }
 
 TEST(WebProcessCreatedTest, BadRequest) {
-  const QJsonObject request{};
-  const QJsonObject reply =
+  Json::Value request(Json::objectValue);
+  const auto reply =
       WebAppManagerServiceLuna::instance()->webProcessCreated(request, false);
 
-  EXPECT_FALSE(reply.contains("id"));
-  EXPECT_FALSE(reply.contains("instanceId"));
-  EXPECT_TRUE(reply.contains("returnValue"));
-  EXPECT_FALSE(reply["returnValue"].toBool());
-  EXPECT_TRUE(reply.contains("errorText"));
-  EXPECT_STREQ(reply["errorText"].toString().toStdString().c_str(),
-               "parameter error");
+  ASSERT_TRUE(reply.isObject());
+  EXPECT_TRUE(reply["id"].isNull());
+  EXPECT_TRUE(reply["instanceId"].isNull());
+  EXPECT_TRUE(reply.isMember("returnValue"));
+  EXPECT_FALSE(reply["returnValue"].asBool());
+  EXPECT_TRUE(reply.isMember("errorText"));
+  EXPECT_STREQ(reply["errorText"].asString().c_str(), "parameter error");
 }
 
 TEST(WebProcessCreatedTest, CheckSubscribe) {
-  const QJsonObject request{};
-  const QJsonObject reply =
+  const Json::Value request(Json::objectValue);
+  const auto reply =
       WebAppManagerServiceLuna::instance()->webProcessCreated(request, true);
 
-  EXPECT_FALSE(reply.contains("id"));
-  EXPECT_FALSE(reply.contains("instanceId"));
-  EXPECT_TRUE(reply.contains("returnValue"));
-  EXPECT_TRUE(reply["returnValue"].toBool());
-  EXPECT_FALSE(reply.contains("errorText"));
+  ASSERT_TRUE(reply.isObject());
+  EXPECT_TRUE(reply["id"].isNull());
+  EXPECT_TRUE(reply["instanceId"].isNull());
+  EXPECT_TRUE(reply.isMember("returnValue"));
+  EXPECT_TRUE(reply["returnValue"].asBool());
+  EXPECT_TRUE(reply["errorText"].isNull());
 }
 
 TEST(WebProcessCreatedTest, WebProcessCreated) {
@@ -134,34 +135,35 @@ TEST(WebProcessCreatedTest, WebProcessCreated) {
   mock_initializer.GetWebViewMock()->SetOnInitActions();
   mock_initializer.GetWebViewMock()->SetOnLoadURLActions();
 
-  QJsonParseError parse_error;
-  QJsonDocument doc = QJsonDocument::fromJson(
-      QString::fromUtf8(kLaunchAppJsonBody).toUtf8(), &parse_error);
-  ASSERT_EQ(parse_error.error, QJsonParseError::NoError);
+  Json::Value launch_request;
+  ASSERT_TRUE(util::JsonValueFromString(kLaunchAppJsonBody, launch_request));
   WebAppManagerServiceLuna* luna_service = WebAppManagerServiceLuna::instance();
-  const QJsonObject result = luna_service->launchApp(doc.object());
+  const auto result = luna_service->launchApp(launch_request);
 
-  ASSERT_TRUE(result.contains("returnValue"));
-  ASSERT_TRUE(result["returnValue"].toBool());
+  ASSERT_TRUE(result.isObject());
+  ASSERT_TRUE(result.isMember("returnValue"));
+  ASSERT_TRUE(result["returnValue"].asBool());
 
   EXPECT_CALL(*mock_initializer.GetWebViewMock(), RenderProcessPid())
       .WillRepeatedly(testing::Return(kPid));
 
-  const QJsonObject request{{"instanceId", kInstanceId}, {"appId", kAppId}};
-  const QJsonObject reply = luna_service->webProcessCreated(request, false);
+  Json::Value request;
+  request["instanceId"] = kInstanceId;
+  request["appId"] = kAppId;
+  const auto reply = luna_service->webProcessCreated(request, false);
 
-  EXPECT_FALSE(reply.contains("errorText"));
+  ASSERT_TRUE(reply.isObject());
+  EXPECT_TRUE(reply["errorText"].isNull());
 
-  EXPECT_TRUE(reply.contains("id"));
-  EXPECT_STREQ(reply["id"].toString().toStdString().c_str(), kAppId);
+  EXPECT_TRUE(reply.isMember("id"));
+  EXPECT_STREQ(reply["id"].asString().c_str(), kAppId);
 
-  EXPECT_TRUE(reply.contains("instanceId"));
-  EXPECT_STREQ(reply["instanceId"].toString().toStdString().c_str(),
-               kInstanceId);
+  EXPECT_TRUE(reply.isMember("instanceId"));
+  EXPECT_STREQ(reply["instanceId"].asString().c_str(), kInstanceId);
 
-  EXPECT_TRUE(reply.contains("returnValue"));
-  EXPECT_TRUE(reply["returnValue"].toBool());
+  EXPECT_TRUE(reply.isMember("returnValue"));
+  EXPECT_TRUE(reply["returnValue"].asBool());
 
-  EXPECT_TRUE(reply.contains("webprocessid"));
-  EXPECT_EQ(kPid, reply["webprocessid"].toInt());
+  EXPECT_TRUE(reply.isMember("webprocessid"));
+  EXPECT_EQ(kPid, reply["webprocessid"].asInt());
 }

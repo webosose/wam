@@ -16,53 +16,49 @@
 
 #include "PalmSystemBase.h"
 
-#include <string>
-
-#include <QByteArray>
-
 #include <json/json.h>
 
 #include "TypeConverter.h"
 #include "WebAppManager.h"
 
 
-QString PalmSystemBase::getDeviceInfo(QString name)
+std::string PalmSystemBase::getDeviceInfo(const std::string& name) const
 {
-    QString value;
+    std::string value;
     WebAppManager::instance()->getDeviceInfo(name, value);
 
     return value;
 }
 
-QString PalmSystemBase::country() const
+std::string PalmSystemBase::country() const
 {
-    QString q_localcountry;
-    QString q_smartServiceCountry;
+    std::string q_localcountry;
+    std::string q_smartServiceCountry;
 
     WebAppManager::instance()->getDeviceInfo("LocalCountry", q_localcountry);
     WebAppManager::instance()->getDeviceInfo("SmartServiceCountry", q_smartServiceCountry);
 
     std::string country;
     Json::Value obj(Json::objectValue);
-    obj["country"] = q_localcountry.toStdString();
-    obj["smartServiceCountry"] = q_smartServiceCountry.toStdString();
+    obj["country"] = q_localcountry;
+    obj["smartServiceCountry"] = q_smartServiceCountry;
     jsonToString(obj, country);
-    return QString::fromStdString(country);
+    return country;
 }
 
-QString PalmSystemBase::locale() const
+std::string PalmSystemBase::locale() const
 {
-    QString systemlocale;
+    std::string systemlocale;
     WebAppManager::instance()->getSystemLanguage(systemlocale);
     return systemlocale;
 }
 
-QString PalmSystemBase::localeRegion() const
+std::string PalmSystemBase::localeRegion() const
 {
-    return QString("US");
+    return std::string("US");
 }
 
-QString PalmSystemBase::phoneRegion() const
+std::string PalmSystemBase::phoneRegion() const
 {
-    return QString("");
+    return std::string();
 }

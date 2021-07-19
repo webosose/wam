@@ -17,9 +17,6 @@
 #include <set>
 #include <unordered_map>
 
-#include <QtCore/QJsonArray>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonDocument>
 #include <json/json.h>
 
 #include "BlinkWebProcessManager.h"
@@ -31,27 +28,12 @@
 #include "BlinkWebViewProfileHelper.h"
 #include "WebProcessManager.h"
 
-namespace {
-bool convert(const Json::Value& object, QJsonObject& value)
-{
-    static Json::StreamWriterBuilder builder;
-    std::string jsonString = Json::writeString(builder, object);
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromStdString(jsonString).toUtf8(), &parseError);
-    if (parseError.error != QJsonParseError::NoError)
-        return false;
-
-    value = doc.object();
-    return true;
-}
-}
-
 uint32_t BlinkWebProcessManager::getWebProcessPID(const WebAppBase* app) const
 {
     return static_cast<WebPageBlink*>(app->page())->renderProcessPid();
 }
 
-QJsonObject BlinkWebProcessManager::getWebProcessProfiling()
+Json::Value BlinkWebProcessManager::getWebProcessProfiling()
 {
     Json::Value reply;
     Json::Value processArray(Json::arrayValue);
@@ -74,12 +56,12 @@ QJsonObject BlinkWebProcessManager::getWebProcessProfiling()
         Json::Value appArray(Json::arrayValue);
 
         processObject["pid"] = std::to_string(pid);
-        processObject["webProcessSize"] = getWebProcessMemSize(pid).toStdString();
+        processObject["webProcessSize"] = getWebProcessMemSize(pid);
         processObject["tileSize"] = 0;
         auto processes = runningAppList.equal_range(pid);
         for (auto app = processes.first; app != processes.second; app++) {
-            appObject["id"] = app->second->appId().toStdString();
-            appObject["instanceId"] = app->second->instanceId().toStdString();
+            appObject["id"] = app->second->appId();
+            appObject["instanceId"] = app->second->instanceId();
             appArray.append(appObject);
         }
         processObject["runningApps"] = appArray;
@@ -88,11 +70,10 @@ QJsonObject BlinkWebProcessManager::getWebProcessProfiling()
 
     reply["WebProcesses"] = processArray;
     reply["returnValue"] = true;
-    QJsonObject result;
-    return convert(reply, result) ? result : QJsonObject();
+    return reply;
 }
 
-void BlinkWebProcessManager::deleteStorageData(const QString& identifier)
+void BlinkWebProcessManager::deleteStorageData(const std::string& identifier)
 {
     std::list<const WebAppBase*> runningAppList = runningApps();
     if (!runningAppList.empty()) {
@@ -102,7 +83,7 @@ void BlinkWebProcessManager::deleteStorageData(const QString& identifier)
 
     BlinkWebView* webview = new BlinkWebView();
     if (webview) {
-        webview->DeleteWebStorages(identifier.toStdString());
+        webview->DeleteWebStorages(identifier);
         delete webview;
     }
 }

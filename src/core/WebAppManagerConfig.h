@@ -19,30 +19,26 @@
 
 #include <string>
 
-#include <QMap>
-#include <QString>
-#include <QVariant>
-
 class WebAppManagerConfig {
 public:
     WebAppManagerConfig();
     virtual ~WebAppManagerConfig() {}
 
-    virtual QString getWebAppFactoryPluginTypes() const { return QString::fromStdString(m_webAppFactoryPluginTypes); }
-    virtual QString getWebAppFactoryPluginPath() const { return QString::fromStdString(m_webAppFactoryPluginPath); }
+    virtual std::string getWebAppFactoryPluginTypes() const { return m_webAppFactoryPluginTypes; }
+    virtual std::string getWebAppFactoryPluginPath() const { return m_webAppFactoryPluginPath; }
     virtual int getSuspendDelayTime() const { return m_suspendDelayTime; }
     virtual int getMaxCustomSuspendDelayTime() const { return m_maxCustomSuspendDelayTime; }
-    virtual QString getWebProcessConfigPath() const { return QString::fromStdString(m_webProcessConfigPath); }
+    virtual std::string getWebProcessConfigPath() const { return m_webProcessConfigPath; }
     virtual bool isInspectorEnabled() const { return m_inspectorEnabled; }
     virtual bool isDevModeEnabled() const { return m_devModeEnabled; }
-    virtual QString getErrorPageUrl() const { return QString::fromStdString(m_errorPageUrl); }
-    virtual QString getTelluriumNubPath() const { return QString::fromStdString(m_telluriumNubPath); }
+    virtual std::string getErrorPageUrl() const { return m_errorPageUrl; }
+    virtual std::string getTelluriumNubPath() const { return m_telluriumNubPath; }
     virtual void postInitConfiguration();
     virtual bool isDynamicPluggableLoadEnabled() const { return m_dynamicPluggableLoadEnabled; }
     virtual bool isPostWebProcessCreatedDisabled() const { return m_postWebProcessCreatedDisabled; }
     virtual bool isCheckLaunchTimeEnabled() const { return m_checkLaunchTimeEnabled; }
     virtual bool isUseSystemAppOptimization() const { return m_useSystemAppOptimization; }
-    virtual QString getUserScriptPath() const { return QString::fromStdString(m_userScriptPath); }
+    virtual std::string getUserScriptPath() const { return m_userScriptPath; }
     virtual std::string getName() const { return m_name; }
 
     virtual bool isLaunchOptimizationEnabled() const { return m_launchOptimizationEnabled; }

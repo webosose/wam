@@ -19,10 +19,12 @@
 #include <string>
 
 #include <glib.h>
+#include <json/value.h>
 #include <lunaprefs.h>
 
 #include "LogManager.h"
 #include "QtLessTemporaryHelpers.h"
+#include "Utils.h"
 
 DeviceInfoImpl::DeviceInfoImpl()
     : m_screenWidth(0)
@@ -88,11 +90,11 @@ void DeviceInfoImpl::initDisplayInfo()
     int hardwareScreenWidth = 0;
     int hardwareScreenHeight = 0;
 
-    QString hardwareScreenWidthStr;
-    QString hardwareScreenHeightStr;
+    std::string hardwareScreenWidthStr;
+    std::string hardwareScreenHeightStr;
     if (getDeviceInfo("HardwareScreenWidth", hardwareScreenWidthStr) && getDeviceInfo("HardwareScreenHeight", hardwareScreenHeightStr)) {
-        hardwareScreenWidth = qtless::StringHelper::strToInt(hardwareScreenWidthStr.toStdString());
-        hardwareScreenHeight = qtless::StringHelper::strToInt(hardwareScreenHeightStr.toStdString());
+        hardwareScreenWidth = strToIntWithDefault(hardwareScreenWidthStr, 0);
+        hardwareScreenHeight = strToIntWithDefault(hardwareScreenHeightStr, 0);
     } else {
         getDisplayWidth(hardwareScreenWidth);
         getDisplayHeight(hardwareScreenHeight);
@@ -113,11 +115,11 @@ void DeviceInfoImpl::initPlatformInfo()
        "platformVersionMinor": 00,
     */
 
-    QString value;
+    std::string value;
     if (getDeviceInfo("ModelName", value))
-        m_modelName = value.toStdString();
+        m_modelName = value;
     if (getDeviceInfo("FirmwareVersion", value))
-        m_platformVersion = value.toStdString();
+        m_platformVersion = value;
 
     std::string platformVersion = m_platformVersion;
 
@@ -128,9 +130,9 @@ void DeviceInfoImpl::initPlatformInfo()
     if (npos1 == std::string::npos || npos2 == std::string::npos) {
         m_platformVersionMajor = m_platformVersionMinor = m_platformVersionDot = -1;
     } else {
-        m_platformVersionMajor = qtless::StringHelper::strToInt(platformVersion.substr(0, npos1));
-        m_platformVersionMinor = qtless::StringHelper::strToInt(platformVersion.substr(npos1 + 1, npos2));
-        m_platformVersionDot = qtless::StringHelper::strToInt(platformVersion.substr(npos2 + 1));
+        m_platformVersionMajor = strToIntWithDefault(platformVersion.substr(0, npos1), 0);
+        m_platformVersionMinor = strToIntWithDefault(platformVersion.substr(npos1 + 1, npos2), 0);
+        m_platformVersionDot = strToIntWithDefault(platformVersion.substr(npos2 + 1), 0);
     }
 }
 

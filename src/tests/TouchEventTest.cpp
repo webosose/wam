@@ -18,10 +18,9 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <json/json.h>
 
-#include <QJsonDocument>
-#include <QJsonObject>
-
+#include "JsonHelper.h"
 #include "PlatformModuleFactoryImpl.h"
 #include "WebAppFactoryManagerMock.h"
 #include "WebAppManager.h"
@@ -154,15 +153,15 @@ void TouchEventTestSuite::SetUp()
         webViewDelegate->loadFinished(url);
     }));
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(launchBareAppJsonBody).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value launch_request;
+    ASSERT_TRUE(util::JsonValueFromString(launchBareAppJsonBody, launch_request));
+    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(launch_request);
 
-    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(doc.object());
-    ASSERT_TRUE(result.contains("returnValue"));
-    ASSERT_TRUE(result.contains("instanceId"));
-    ASSERT_TRUE(result.contains("appId"));
-    EXPECT_TRUE(result["returnValue"].toBool());
+    ASSERT_TRUE(result.isObject());
+    ASSERT_TRUE(result.isMember("returnValue"));
+    ASSERT_TRUE(result.isMember("instanceId"));
+    ASSERT_TRUE(result.isMember("appId"));
+    EXPECT_TRUE(result["returnValue"].asBool());
 }
 
 void TouchEventTestSuite::TearDown()

@@ -22,9 +22,9 @@
 class TestPlugin : public WebAppFactoryInterface {
 
 public:
-    virtual WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr);
-    virtual WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr);
-    virtual WebPageBase* createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, QString launchParams = "");
+    virtual WebAppBase* createWebApp(const std::string& winType, std::shared_ptr<ApplicationDescription> desc = nullptr) override;
+    virtual WebAppBase* createWebApp(const std::string& winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr) override;
+    virtual WebPageBase* createWebPage(const wam::Url& url, std::shared_ptr<ApplicationDescription> desc, const std::string& launchParams = {}) override;
 };
 
 #endif /* TESTPLUGIN_H */

@@ -21,11 +21,9 @@
 
 #include <json/json.h>
 
-#include <QtCore/QJsonDocument>
-#include <QtCore/QJsonArray>
-
 #include "ApplicationDescription.h"
 #include "LogManager.h"
+#include "Utils.h"
 #include "WebAppWaylandWindow.h"
 #include "WebAppWindow.h"
 #include "WebAppWindowFactory.h"
@@ -74,18 +72,9 @@ const webos::WebOSKeyMask getKeyMask(const std::string& key)
     return iter != mapTable.end() ? iter->second : static_cast<webos::WebOSKeyMask>(0);
 }
 
-// TODO: Remove after change interface to QTLess implementaion
-bool convert(const QJsonDocument& object, Json::Value& value)
-{
-    const std::string& json = object.toJson(QJsonDocument::Compact).toStdString();
-    Json::CharReaderBuilder builder;
-    std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
-    return reader->parse(json.c_str(), json.c_str() + json.size(), &value, nullptr);
-}
-
 } // namespace
 
-WebAppWayland::WebAppWayland(QString type,
+WebAppWayland::WebAppWayland(const std::string& type,
                              int width, int height,
                              int displayId,
                              const std::string& location_hint)
@@ -103,7 +92,7 @@ WebAppWayland::WebAppWayland(QString type,
     init(width, height);
 }
 
-WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window,
+WebAppWayland::WebAppWayland(const std::string& type, WebAppWaylandWindow* window,
                              int width, int height,
                              int displayId,
                              const std::string& location_hint)
@@ -121,7 +110,7 @@ WebAppWayland::WebAppWayland(QString type, WebAppWaylandWindow* window,
     init(width, height);
 }
 
-WebAppWayland::WebAppWayland(QString type,
+WebAppWayland::WebAppWayland(const std::string& type,
                              std::unique_ptr<WebAppWindowFactory> factory,
                              int width, int height,
                              int displayId,
@@ -192,16 +181,17 @@ void WebAppWayland::init(int width, int height)
     m_appWindow->setWebApp(this);
 
     // set compositor window type
-    setWindowProperty(QStringLiteral("_WEBOS_WINDOW_TYPE"), m_windowType);
-    LOG_DEBUG("App created window [%s]", qPrintable(m_windowType));
+    setWindowProperty("_WEBOS_WINDOW_TYPE", m_windowType);
+    LOG_DEBUG("App created window [%s]", m_windowType.c_str());
 
     if (m_displayId != kUndefinedDisplayId) {
-      setWindowProperty(QStringLiteral("displayAffinity"), m_displayId);
+      setWindowProperty("displayAffinity", std::to_string(m_displayId));
       LOG_DEBUG("App window for display[%d]", m_displayId);
     }
 
-    if (qgetenv("LAUNCH_FINISH_ASSURE_TIMEOUT").toInt() != 0)
-        kLaunchFinishAssureTimeoutMs = qgetenv("LAUNCH_FINISH_ASSURE_TIMEOUT").toInt();
+    int timeout = strToIntWithDefault(getEnvVar("LAUNCH_FINISH_ASSURE_TIMEOUT"), 0);
+    if (timeout != 0)
+        kLaunchFinishAssureTimeoutMs = timeout;
 
     if (!webos::WebOSPlatform::GetInstance()->GetInputPointer()) {
         // Create InputManager instance.
@@ -212,7 +202,7 @@ void WebAppWayland::init(int width, int height)
 void WebAppWayland::startLaunchTimer()
 {
     if(!getHiddenWindow()) {
-        LOG_DEBUG("APP_LAUNCHTIME_CHECK_STARTED [appId:%s]", qPrintable(appId()));
+        LOG_DEBUG("APP_LAUNCHTIME_CHECK_STARTED [appId:%s]", appId().c_str());
         m_elapsedLaunchTimer.start();
     }
 }
@@ -234,7 +224,7 @@ void WebAppWayland::onLaunchTimeout()
     if(m_elapsedLaunchTimer.isRunning()) {
         m_launchTimeoutTimer.stop();
         m_elapsedLaunchTimer.stop();
-        LOG_DEBUG("APP_LAUNCHTIME_CHECK_ALL_FRAMES_DONE [appId:%s time:%d]", qPrintable(appId()), m_lastSwappedTime);
+        LOG_DEBUG("APP_LAUNCHTIME_CHECK_ALL_FRAMES_DONE [appId:%s time:%d]", appId().c_str(), m_lastSwappedTime);
     }
 }
 
@@ -247,22 +237,17 @@ void WebAppWayland::attach(WebPageBase *page)
 {
     WebAppBase::attach(page);
 
-    setWindowProperty(QStringLiteral("appId"), appId());
-    setWindowProperty(QStringLiteral("instanceId"), instanceId());
-    setWindowProperty(QStringLiteral("launchingAppId"), launchingAppId());
-    setWindowProperty(QStringLiteral("title"),
-        QString::fromStdString(getAppDescription()->title()));
-    setWindowProperty(QStringLiteral("icon"),
-        QString::fromStdString(getAppDescription()->icon()));
-    setWindowProperty(QStringLiteral("subtitle"), QStringLiteral(""));
-    setWindowProperty(QStringLiteral("_WEBOS_WINDOW_CLASS"),
-        QVariant((int)getAppDescription()->windowClassValue()));
-    setWindowProperty(QStringLiteral("_WEBOS_ACCESS_POLICY_KEYS_BACK"),
-                      getAppDescription()->backHistoryAPIDisabled()
-                      ? QStringLiteral("true") : QStringLiteral("false"));
-    setWindowProperty(QStringLiteral("_WEBOS_ACCESS_POLICY_KEYS_EXIT"),
-                      getAppDescription()->handleExitKey()
-                      ? QStringLiteral("true") : QStringLiteral("false"));
+    setWindowProperty("appId", appId());
+    setWindowProperty("instanceId", instanceId());
+    setWindowProperty("launchingAppId", launchingAppId());
+    setWindowProperty("title", getAppDescription()->title());
+    setWindowProperty("icon", getAppDescription()->icon());
+    setWindowProperty("subtitle", std::string());
+    setWindowProperty("_WEBOS_WINDOW_CLASS", std::to_string(static_cast<int>(getAppDescription()->windowClassValue())));
+    setWindowProperty("_WEBOS_ACCESS_POLICY_KEYS_BACK", getAppDescription()->backHistoryAPIDisabled()
+                      ? "true" : "false");
+    setWindowProperty("_WEBOS_ACCESS_POLICY_KEYS_EXIT", getAppDescription()->handleExitKey()
+                      ? "true" : "false");
     setKeyMask(webos::WebOSKeyMask::KEY_MASK_BACK,
         getAppDescription()->backHistoryAPIDisabled());
     setKeyMask(webos::WebOSKeyMask::KEY_MASK_EXIT,
@@ -328,7 +313,7 @@ bool WebAppWayland::isNormal()
 void WebAppWayland::onStageActivated()
 {
     if (getCrashState()) {
-        LOG_INFO(MSGID_WEBAPP_STAGE_ACITVATED, 4, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), PMLOGKS("getCrashState()", "true; Reload default Page"), "");
+        LOG_INFO(MSGID_WEBAPP_STAGE_ACITVATED, 4, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), PMLOGKS("getCrashState()", "true; Reload default Page"), "");
         page()->reloadDefaultPage();
         setCrashState(false);
     }
@@ -341,7 +326,7 @@ void WebAppWayland::onStageActivated()
 
     m_appWindow->show();
 
-    LOG_INFO(MSGID_WEBAPP_STAGE_ACITVATED, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
+    LOG_INFO(MSGID_WEBAPP_STAGE_ACITVATED, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
 }
 
 void WebAppWayland::onStageDeactivated()
@@ -352,29 +337,29 @@ void WebAppWayland::onStageDeactivated()
     page()->suspendWebPageAll();
     setHiddenWindow(true);
 
-    LOG_INFO(MSGID_WEBAPP_STAGE_DEACITVATED, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
+    LOG_INFO(MSGID_WEBAPP_STAGE_DEACITVATED, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
     m_didActivateStage = false;
 }
 
-void WebAppWayland::configureWindow(QString& type)
+void WebAppWayland::configureWindow(const std::string& type)
 {
     m_windowType = type;
     m_appWindow->setWebApp(this);
 
-    setWindowProperty(QStringLiteral("_WEBOS_WINDOW_TYPE"), type);
-    setWindowProperty(QStringLiteral("appId"), appId());
-    setWindowProperty(QStringLiteral("instanceId"), instanceId());
-    setWindowProperty(QStringLiteral("launchingAppId"), launchingAppId());
-    setWindowProperty(QStringLiteral("title"), QString::fromStdString(getAppDescription()->title()));
-    setWindowProperty(QStringLiteral("icon"), QString::fromStdString(getAppDescription()->icon()));
-    setWindowProperty(QStringLiteral("subtitle"), QStringLiteral(""));
-    setWindowProperty(QStringLiteral("_WEBOS_WINDOW_CLASS"), QVariant((int)getAppDescription()->windowClassValue()));
-    setWindowProperty(QStringLiteral("_WEBOS_ACCESS_POLICY_KEYS_BACK"),
+    setWindowProperty("_WEBOS_WINDOW_TYPE", type);
+    setWindowProperty("appId", appId());
+    setWindowProperty("instanceId", instanceId());
+    setWindowProperty("launchingAppId", launchingAppId());
+    setWindowProperty("title", getAppDescription()->title());
+    setWindowProperty("icon", getAppDescription()->icon());
+    setWindowProperty("subtitle", std::string());
+    setWindowProperty("_WEBOS_WINDOW_CLASS", std::to_string(static_cast<int>(getAppDescription()->windowClassValue())));
+    setWindowProperty("_WEBOS_ACCESS_POLICY_KEYS_BACK",
                       getAppDescription()->backHistoryAPIDisabled()
-                      ? QStringLiteral("true") : QStringLiteral("false"));
-    setWindowProperty(QStringLiteral("_WEBOS_ACCESS_POLICY_KEYS_EXIT"),
+                      ? "true" : "false");
+    setWindowProperty("_WEBOS_ACCESS_POLICY_KEYS_EXIT",
                       getAppDescription()->handleExitKey()
-                      ? QStringLiteral("true") : QStringLiteral("false"));
+                      ? "true" : "false");
     setKeyMask(webos::WebOSKeyMask::KEY_MASK_BACK,
         getAppDescription()->backHistoryAPIDisabled());
     setKeyMask(webos::WebOSKeyMask::KEY_MASK_EXIT,
@@ -392,26 +377,25 @@ void WebAppWayland::setupWindowGroup(ApplicationDescription* desc)
         return;
 
     ApplicationDescription::WindowGroupInfo groupInfo = desc->getWindowGroupInfo();
-    if (groupInfo.name.isEmpty())
+    if (groupInfo.name.empty())
         return;
 
     if (groupInfo.isOwner) {
         ApplicationDescription::WindowOwnerInfo ownerInfo = desc->getWindowOwnerInfo();
-        webos::WindowGroupConfiguration config(groupInfo.name.toStdString());
+        webos::WindowGroupConfiguration config(groupInfo.name);
         config.SetIsAnonymous(ownerInfo.allowAnonymous);
 
-        // TODO: Rework after changing interface of ownerInfo.layers
-        QMap<QString, int>::iterator iter = ownerInfo.layers.begin();
+        auto iter = ownerInfo.layers.begin();
         while (iter != ownerInfo.layers.end()){
-          config.AddLayer(webos::WindowGroupLayerConfiguration(iter.key().toStdString(), iter.value()));
+          config.AddLayer(webos::WindowGroupLayerConfiguration(iter->first, iter->second));
           iter++;
         }
         m_appWindow->CreateWindowGroup(config);
-        LOG_INFO(MSGID_CREATE_SURFACEGROUP, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
+        LOG_INFO(MSGID_CREATE_SURFACEGROUP, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
     } else {
         ApplicationDescription::WindowClientInfo clientInfo = desc->getWindowClientInfo();
-        m_appWindow->AttachToWindowGroup(groupInfo.name.toStdString(), clientInfo.layer.toStdString());
-        LOG_INFO(MSGID_ATTACH_SURFACEGROUP, 4, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("OWNER_ID", qPrintable(groupInfo.name)), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
+        m_appWindow->AttachToWindowGroup(groupInfo.name, clientInfo.layer);
+        LOG_INFO(MSGID_ATTACH_SURFACEGROUP, 4, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("OWNER_ID", groupInfo.name.c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "");
     }
 }
 
@@ -433,17 +417,9 @@ void WebAppWayland::applyInputRegion()
     }
 }
 
-void WebAppWayland::setInputRegion(const QJsonDocument& jsonDoc)
+void WebAppWayland::setInputRegion(const Json::Value& value)
 {
     m_inputRegion.clear();
-
-    Json::Value value;
-
-    // TODO: Remove after change interface to QTLess implementaion
-    if (!convert(jsonDoc, value)) {
-        LOG_ERROR(MSGID_TYPE_ERROR, 0, "%s: Error during json conversion", __func__);
-        return;
-    }
 
     if (value.isArray()) {
         for(const auto& region: value) {
@@ -459,7 +435,7 @@ void WebAppWayland::setInputRegion(const QJsonDocument& jsonDoc)
 }
 
 
-void WebAppWayland::setWindowProperty(const QString& name, const QVariant& value)
+void WebAppWayland::setWindowProperty(const std::string& name, const std::string& value)
 {
     webos::WebOSKeyMask mask = static_cast<webos::WebOSKeyMask>(0);
     if (name == "_WEBOS_ACCESS_POLICY_KEYS_BACK")
@@ -467,9 +443,10 @@ void WebAppWayland::setWindowProperty(const QString& name, const QVariant& value
     else if (name == "_WEBOS_ACCESS_POLICY_KEYS_EXIT")
         mask = webos::WebOSKeyMask::KEY_MASK_EXIT;
     // if mask is not set, not need to call setKeyMask
-    if (mask != static_cast<webos::WebOSKeyMask>(0))
-        setKeyMask(mask, value.toBool());
-    m_appWindow->SetWindowProperty(name.toStdString(), value.toString().toStdString());
+    if (mask != static_cast<webos::WebOSKeyMask>(0)) {
+        setKeyMask(mask, value == "true");
+    }
+    m_appWindow->SetWindowProperty(name, value);
 }
 
 void WebAppWayland::platformBack()
@@ -477,21 +454,14 @@ void WebAppWayland::platformBack()
     m_appWindow->platformBack();
 }
 
-void WebAppWayland::setCursor(const QString& cursorArg, int hotspot_x, int hotspot_y)
+void WebAppWayland::setCursor(const std::string& cursorArg, int hotspot_x, int hotspot_y)
 {
     m_appWindow->setCursor(cursorArg, hotspot_x, hotspot_y);
 }
 
-void WebAppWayland::setKeyMask(const QJsonDocument& jsonDoc)
+void WebAppWayland::setKeyMask(const Json::Value& value)
 {
     unsigned int keyMask = 0;
-    Json::Value value;
-    // TODO: Remove after change interface to QTLess implementaion
-    if (!convert(jsonDoc, value)) {
-        LOG_ERROR(MSGID_TYPE_ERROR, 0, "%s: Error during json conversion", __func__);
-        return;
-    }
-
     if (value.isArray()) {
         for (const auto& child : value)
             keyMask |= getKeyMask(child.asString());
@@ -508,7 +478,7 @@ void WebAppWayland::setKeyMask(webos::WebOSKeyMask keyMask)
 void WebAppWayland::focusOwner()
 {
     m_appWindow->FocusWindowGroupOwner();
-    LOG_DEBUG("FocusOwner [%s]", qPrintable(appId()));
+    LOG_DEBUG("FocusOwner [%s]", appId().c_str());
 }
 
 void WebAppWayland::focusLayer()
@@ -517,7 +487,7 @@ void WebAppWayland::focusLayer()
     ApplicationDescription * desc = getAppDescription();
     if (desc) {
         ApplicationDescription::WindowClientInfo clientInfo = desc->getWindowClientInfo();
-        LOG_DEBUG("FocusLayer(layer:%s) [%s]",qPrintable(clientInfo.layer) ,qPrintable(appId()));
+        LOG_DEBUG("FocusLayer(layer:%s) [%s]", clientInfo.layer.c_str(), appId().c_str());
     }
 }
 
@@ -575,10 +545,10 @@ void WebAppWayland::raise()
     //1. When overlay window is raised
     //2. When there's only one keepAlive app, and this keepAlive app is closed and is shown again
     if ((getWindowType() == WT_OVERLAY) || (keepAlive() && !wasMinimizedState)) {
-        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::raise(); call onStageActivated");
+        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::raise(); call onStageActivated");
         onStageActivated();
     } else {
-        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::raise(); call setWindowState(webos::NATIVE_WINDOW_FULLSCREEN)");
+        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::raise(); call setWindowState(webos::NATIVE_WINDOW_FULLSCREEN)");
         m_appWindow->SetWindowHostState(webos::NATIVE_WINDOW_FULLSCREEN);
     }
 
@@ -596,10 +566,10 @@ void WebAppWayland::raise()
 void WebAppWayland::goBackground()
 {
     if (getWindowType() == WT_OVERLAY) {
-        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::goBackground(); windowType:OVERLAY; Try close; call doClose()");
+        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::goBackground(); windowType:OVERLAY; Try close; call doClose()");
         doClose();
     } else {
-        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::goBackground(); call setWindowState(webos::NATIVE_WINDOW_MINIMIZED)");
+        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::goBackground(); call setWindowState(webos::NATIVE_WINDOW_MINIMIZED)");
         m_appWindow->SetWindowHostState(webos::NATIVE_WINDOW_MINIMIZED);
     }
 }
@@ -627,7 +597,7 @@ void WebAppWayland::webPageLoadFailed(int errorCode)
 void WebAppWayland::doClose()
 {
     if (forceClose()) {
-        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::doClose(); forceClose() TRUE; call forceCloseAppInternal() and return");
+        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::doClose(); forceClose() TRUE; call forceCloseAppInternal() and return");
         forceCloseAppInternal();
         return;
     }
@@ -635,14 +605,14 @@ void WebAppWayland::doClose()
     if (keepAlive() && hideWindow())
         return;
 
-    LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::doClose(); call closeAppInternal()");
+    LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::doClose(); call closeAppInternal()");
     closeAppInternal();
 }
 
 void WebAppWayland::stateAboutToChange(webos::NativeWindowState willBe)
 {
     if (willBe == webos::NATIVE_WINDOW_MINIMIZED) {
-        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::stateAboutToChange; will be Minimized; suspend media and fire visibilitychange event");
+        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::stateAboutToChange; will be Minimized; suspend media and fire visibilitychange event");
         page()->suspendWebPageMedia();
         page()->setVisibilityState(WebPageBase::WebPageVisibilityState::WebPageVisibilityStateHidden);
     }
@@ -651,7 +621,7 @@ void WebAppWayland::stateAboutToChange(webos::NativeWindowState willBe)
 void WebAppWayland::stateChanged(webos::NativeWindowState newState)
 {
     if (isClosing()) {
-        LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 1, PMLOGKS("APP_ID", qPrintable(appId())), "In Closing; return;");
+        LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 1, PMLOGKS("APP_ID", appId().c_str()), "In Closing; return;");
         return;
     }
 
@@ -660,16 +630,16 @@ void WebAppWayland::stateChanged(webos::NativeWindowState newState)
         case webos::NATIVE_WINDOW_DEFAULT:
         case webos::NATIVE_WINDOW_MAXIMIZED:
         case webos::NATIVE_WINDOW_FULLSCREEN:
-            LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 1, PMLOGKS("APP_ID", qPrintable(appId())), "To FullScreen; call onStageActivated");
+            LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 1, PMLOGKS("APP_ID", appId().c_str()), "To FullScreen; call onStageActivated");
             applyInputRegion();
             onStageActivated();
             break;
         case webos::NATIVE_WINDOW_MINIMIZED:
-            LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 1, PMLOGKS("APP_ID", qPrintable(appId())), "To Minimized; call onStageDeactivated");
+            LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 1, PMLOGKS("APP_ID", appId().c_str()), "To Minimized; call onStageDeactivated");
             onStageDeactivated();
             break;
         default:
-            LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("HOST_STATE", "%d", newState), "Unknown state. Do not calling nothing anymore.");
+            LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("HOST_STATE", "%d", newState), "Unknown state. Do not calling nothing anymore.");
             break;
     }
 }
@@ -677,7 +647,7 @@ void WebAppWayland::stateChanged(webos::NativeWindowState newState)
 void WebAppWayland::showWindow()
 {
     if (m_preloadState != NONE_PRELOAD) {
-        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::showWindow(); But Preloaded app; return");
+        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::showWindow(); But Preloaded app; return");
         return;
     }
 
@@ -693,7 +663,7 @@ bool WebAppWayland::hideWindow()
     if (page()->isLoadErrorPageFinish())
         return false;
 
-    LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::hideWindow(); just hide this app");
+    LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "WebAppWayland::hideWindow(); just hide this app");
     page()->closeVkb();
     hide(true);
     m_addedToWindowMgr = false;
@@ -702,17 +672,17 @@ bool WebAppWayland::hideWindow()
 
 void WebAppWayland::titleChanged()
 {
-    setWindowProperty(QStringLiteral("subtitle"), page()->title());
+    setWindowProperty("subtitle", page()->title());
 }
 
 void WebAppWayland::firstFrameVisuallyCommitted()
 {
-    LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "firstFrameVisuallyCommitted");
+    LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "firstFrameVisuallyCommitted");
     // if m_preloadState != NONE_PRELOAD, then we must ignore the first frame commit
     // if getHiddenWindow() == true, then we have specifically requested that the window is to be hidden,
     // and therefore we have to do an explicit show
     if (!getHiddenWindow() && m_preloadState == NONE_PRELOAD) {
-        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKS("INSTANCE_ID", qPrintable(instanceId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "Not hidden window, preload, call showWindow");
+        LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "Not hidden window, preload, call showWindow");
         if (getAppDescription()->usePrerendering())
             m_didActivateStage = false;
         showWindow();
@@ -728,10 +698,10 @@ void WebAppWayland::navigationHistoryChanged()
 {
     if (!getAppDescription()->backHistoryAPIDisabled()) {
         // if backHistoryAPIDisabled is true, no chance to change this value
-        setWindowProperty(QStringLiteral("_WEBOS_ACCESS_POLICY_KEYS_BACK"),
+        setWindowProperty("_WEBOS_ACCESS_POLICY_KEYS_BACK",
                           page()->canGoBack() ?
-                          QStringLiteral("true") : /* send next back key to WAM */
-                          QStringLiteral("false")); /* Do not send back key to WAM. LSM should handle it */
+                          "true" : /* send next back key to WAM */
+                          "false"); /* Do not send back key to WAM. LSM should handle it */
     }
 }
 
@@ -748,7 +718,7 @@ void WebAppWayland::webViewRecreated()
 void WebAppWayland::didSwapPageCompositorFrame()
 {
     if (!m_didActivateStage && !getHiddenWindow() && m_preloadState == NONE_PRELOAD) {
-        LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(appId())), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "Not hidden window, preload, activate stage");
+        LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", appId().c_str()), PMLOGKFV("PID", "%d", page()->getWebProcessPID()), "Not hidden window, preload, activate stage");
         onStageActivated();
         m_didActivateStage = true;
     }
@@ -775,19 +745,19 @@ void InputManager::OnCursorVisibilityChanged(bool visible)
     // send javascript event : cursorStateChange with param to All app
     // if javascript has setTimeout() like webOSlaunch or webOSRelaunch, then app can not get this event when app is in background
     // because javascript is freezed and timer is too, since app is in background, timer is never fired
-    WebAppBase::onCursorVisibilityChanged(QString::fromStdString(ss.str()));
+    WebAppBase::onCursorVisibilityChanged(ss.str());
 }
 
-void WebAppWayland::sendWebOSMouseEvent(const QString& eventName)
+void WebAppWayland::sendWebOSMouseEvent(const std::string& eventName)
 {
     if (eventName == "Enter" || eventName == "Leave") {
         // send webOSMouse event to app
         std::stringstream ss;
-        ss << "console.log('[WAM] fires webOSMouse event : " << eventName.toStdString() << "');"
-           << "var mouseEvent =new CustomEvent('webOSMouse', { detail: { type : '" << eventName.toStdString() << "' }});"
+        ss << "console.log('[WAM] fires webOSMouse event : " << eventName << "');"
+           << "var mouseEvent =new CustomEvent('webOSMouse', { detail: { type : '" << eventName << "' }});"
            << "document.dispatchEvent(mouseEvent);";
-        LOG_DEBUG("[%s] WebAppWayland::sendWebOSMouseEvent; dispatch webOSMouse; %s", qPrintable(appId()), qPrintable(eventName));
-        page()->evaluateJavaScript(QString::fromStdString(ss.str()));
+        LOG_DEBUG("[%s] WebAppWayland::sendWebOSMouseEvent; dispatch webOSMouse; %s", appId().c_str(), eventName.c_str());
+        page()->evaluateJavaScript(ss.str());
     }
 }
 

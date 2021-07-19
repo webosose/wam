@@ -24,14 +24,6 @@
 #include <sys/types.h>
 #include <unistd.h>
 
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonArray>
-#include <QJsonParseError>
-#include <QJsonValue>
-#include <QVariant>
-#include <qglobal.h>
-
 #include <json/json.h>
 
 #include "LogManager.h"
@@ -86,7 +78,7 @@ const ApplicationDescription::WindowGroupInfo ApplicationDescription::getWindowG
         if (json.isObject()) {
             auto name = json["name"];
             if (name.isString()) {
-                info.name = name.asString().c_str(); //Remove c_str() during QTless interface
+                info.name = name.asString();
             }
 
             auto isOwner = json["owner"];
@@ -116,7 +108,7 @@ const ApplicationDescription::WindowOwnerInfo ApplicationDescription::getWindowO
                     auto name = layer["name"];
                     auto z = layer["z"];
                     if (name.isString() && z.isInt()) {
-                        info.layers.insert(name.asString().c_str(), z.asInt());
+                        info.layers.emplace(name.asString(), z.asInt());
                     }
                 }
             }
@@ -137,11 +129,11 @@ const ApplicationDescription::WindowClientInfo ApplicationDescription::getWindow
         if (clientInfo.isObject()) {
             auto layer = clientInfo["layer"];
             if (layer.isString())
-                info.layer = layer.asString().c_str();
+                info.layer = layer.asString();
 
             auto hint = clientInfo["hint"];
             if (hint.isString())
-                info.hint = hint.asString().c_str();
+                info.hint = hint.asString();
         }
     }
     return info;

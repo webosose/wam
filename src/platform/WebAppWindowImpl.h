@@ -56,7 +56,7 @@ class WebAppWindowImpl : public WebAppWindow {
   void hide() override;
   void show() override;
   void platformBack() override;
-  void setCursor(const QString& cursorArg,
+  void setCursor(const std::string& cursorArg,
                  int hotspot_x,
                  int hotspot_y) override;
   void attachWebContents(void* webContents) override;

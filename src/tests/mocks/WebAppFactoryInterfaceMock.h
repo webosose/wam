@@ -20,6 +20,7 @@
 #include <gmock/gmock.h>
 
 #include "WebAppFactoryInterface.h"
+#include "util/Url.h"
 
 class WebAppFactoryInterfaceMock : public WebAppFactoryInterface {
  public:
@@ -28,15 +29,19 @@ class WebAppFactoryInterfaceMock : public WebAppFactoryInterface {
 
   MOCK_METHOD(WebAppBase*,
               createWebApp,
-              (QString, std::shared_ptr<ApplicationDescription>),
+              (const std::string&, std::shared_ptr<ApplicationDescription>),
               (override));
   MOCK_METHOD(WebAppBase*,
               createWebApp,
-              (QString, WebPageBase*, std::shared_ptr<ApplicationDescription>),
+              (const std::string&,
+               WebPageBase*,
+               std::shared_ptr<ApplicationDescription>),
               (override));
   MOCK_METHOD(WebPageBase*,
               createWebPage,
-              (QUrl, std::shared_ptr<ApplicationDescription>, QString),
+              (const wam::Url&,
+               std::shared_ptr<ApplicationDescription>,
+               const std::string&),
               (override));
 };
 

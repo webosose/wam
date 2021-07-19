@@ -18,13 +18,10 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QJsonValue>
+#include <json/json.h>
 
 #include "BaseMockInitializer.h"
+#include "JsonHelper.h"
 #include "WebAppManagerService.h"
 #include "WebAppManagerServiceLuna.h"
 #include "WebViewMockImpl.h"
@@ -155,52 +152,55 @@ TEST(ListRunningAppsTest, IncludeSysApps) {
   EXPECT_CALL(*mock_initializer.GetWebViewMock(), RenderProcessPid())
       .WillRepeatedly(testing::Return(pid));
 
-  QJsonParseError parse_error;
-  QJsonDocument bare_request = QJsonDocument::fromJson(
-      QString::fromUtf8(launchBareAppJsonBody).toUtf8(), &parse_error);
-  ASSERT_EQ(parse_error.error, QJsonParseError::NoError);
+  Json::Value bare_request;
+  ASSERT_TRUE(util::JsonValueFromString(launchBareAppJsonBody, bare_request));
   WebAppManagerServiceLuna* luna_service = WebAppManagerServiceLuna::instance();
-  QJsonObject result = luna_service->launchApp(bare_request.object());
+  auto result = luna_service->launchApp(bare_request);
 
-  ASSERT_TRUE(result.contains("returnValue"));
-  ASSERT_TRUE(result["returnValue"].toBool());
+  ASSERT_TRUE(result.isObject());
+  ASSERT_TRUE(result.isMember("returnValue"));
+  ASSERT_TRUE(result["returnValue"].asBool());
 
-  QJsonDocument webrtc_request = QJsonDocument::fromJson(
-      QString::fromUtf8(launchWebRTCAppJsonBody).toUtf8(), &parse_error);
-  ASSERT_EQ(parse_error.error, QJsonParseError::NoError);
-  result = luna_service->launchApp(webrtc_request.object());
+  Json::Value webrtc_request;
+  ASSERT_TRUE(
+      util::JsonValueFromString(launchWebRTCAppJsonBody, webrtc_request));
+  result = luna_service->launchApp(webrtc_request);
 
-  ASSERT_TRUE(result.contains("returnValue"));
-  ASSERT_TRUE(result["returnValue"].toBool());
+  ASSERT_TRUE(result.isObject());
+  ASSERT_TRUE(result.isMember("returnValue"));
+  ASSERT_TRUE(result["returnValue"].asBool());
 
-  const QJsonObject request{{"includeSysApps", true}};
-  const QJsonObject reply = luna_service->listRunningApps(request, true);
+  Json::Value request;
+  request["includeSysApps"] = true;
+  const auto reply = luna_service->listRunningApps(request, true);
 
-  ASSERT_TRUE(reply.contains("returnValue"));
-  ASSERT_TRUE(reply["returnValue"].toBool());
-  ASSERT_TRUE(reply.contains("running"));
-  const auto running_apps = reply["running"].toArray();
+  ASSERT_TRUE(reply.isObject());
+  ASSERT_TRUE(result.isMember("returnValue"));
+  ASSERT_TRUE(reply["returnValue"].asBool());
+  ASSERT_TRUE(reply["running"].isArray());
+  const auto running_apps = reply["running"];
   ASSERT_EQ(2, running_apps.size());
 
-  auto running_app = running_apps[0].toObject();
-  EXPECT_TRUE(running_app.contains("id"));
-  EXPECT_EQ(bare_request["appDesc"].toObject()["id"].toString(),
-            running_app["id"].toString());
-  EXPECT_TRUE(running_app.contains("instanceId"));
-  EXPECT_EQ(bare_request["instanceId"], running_app["instanceId"].toString());
-  EXPECT_TRUE(running_app.contains("webprocessid"));
-  EXPECT_EQ(QString::number(pid).toStdString(),
-            running_app["webprocessid"].toString().toStdString());
+  ASSERT_TRUE(running_apps[0].isObject());
+  auto running_app = running_apps[0];
+  EXPECT_TRUE(running_app.isMember("id"));
+  EXPECT_EQ(bare_request["appDesc"]["id"].asString(),
+            running_app["id"].asString());
+  EXPECT_TRUE(running_app.isMember("instanceId"));
+  EXPECT_EQ(bare_request["instanceId"].asString(),
+            running_app["instanceId"].asString());
+  EXPECT_TRUE(running_app.isMember("webprocessid"));
+  EXPECT_EQ(std::to_string(pid), running_app["webprocessid"].asString());
 
-  running_app = running_apps[1].toObject();
-  EXPECT_TRUE(running_app.contains("id"));
-  EXPECT_EQ(webrtc_request["appDesc"].toObject()["id"].toString(),
-            running_app["id"].toString());
-  EXPECT_TRUE(running_app.contains("instanceId"));
-  EXPECT_EQ(webrtc_request["instanceId"], running_app["instanceId"].toString());
-  EXPECT_TRUE(running_app.contains("webprocessid"));
-  EXPECT_EQ(QString::number(pid).toStdString(),
-            running_app["webprocessid"].toString().toStdString());
+  running_app = running_apps[1];
+  EXPECT_TRUE(running_app.isMember("id"));
+  EXPECT_EQ(webrtc_request["appDesc"]["id"].asString(),
+            running_app["id"].asString());
+  EXPECT_TRUE(running_app.isMember("instanceId"));
+  EXPECT_EQ(webrtc_request["instanceId"].asString(),
+            running_app["instanceId"].asString());
+  EXPECT_TRUE(running_app.isMember("webprocessid"));
+  EXPECT_EQ(std::to_string(pid), running_app["webprocessid"].asString());
 }
 
 TEST(ListRunningAppsTest, ExcludeSysApps) {
@@ -212,40 +212,42 @@ TEST(ListRunningAppsTest, ExcludeSysApps) {
   EXPECT_CALL(*mock_initializer.GetWebViewMock(), RenderProcessPid())
       .WillRepeatedly(testing::Return(pid));
 
-  QJsonParseError parse_error;
-  QJsonDocument bare_request = QJsonDocument::fromJson(
-      QString::fromUtf8(launchBareAppJsonBody).toUtf8(), &parse_error);
-  ASSERT_EQ(parse_error.error, QJsonParseError::NoError);
+  Json::Value bare_request;
+  ASSERT_TRUE(util::JsonValueFromString(launchBareAppJsonBody, bare_request));
   WebAppManagerServiceLuna* luna_service = WebAppManagerServiceLuna::instance();
-  QJsonObject result = luna_service->launchApp(bare_request.object());
+  auto result = luna_service->launchApp(bare_request);
 
-  ASSERT_TRUE(result.contains("returnValue"));
-  ASSERT_TRUE(result["returnValue"].toBool());
+  ASSERT_TRUE(result.isObject());
+  ASSERT_TRUE(result.isMember("returnValue"));
+  ASSERT_TRUE(result["returnValue"].asBool());
 
-  QJsonDocument webrtc_request = QJsonDocument::fromJson(
-      QString::fromUtf8(launchWebRTCAppJsonBody).toUtf8(), &parse_error);
-  ASSERT_EQ(parse_error.error, QJsonParseError::NoError);
-  result = luna_service->launchApp(webrtc_request.object());
+  Json::Value webrtc_request;
+  ASSERT_TRUE(
+      util::JsonValueFromString(launchWebRTCAppJsonBody, webrtc_request));
+  result = luna_service->launchApp(webrtc_request);
 
-  ASSERT_TRUE(result.contains("returnValue"));
-  ASSERT_TRUE(result["returnValue"].toBool());
+  ASSERT_TRUE(result.isObject());
+  ASSERT_TRUE(result.isMember("returnValue"));
+  ASSERT_TRUE(result["returnValue"].asBool());
 
-  const QJsonObject request{{"includeSysApps", false}};
-  const QJsonObject reply = luna_service->listRunningApps(request, true);
+  Json::Value request;
+  request["includeSysApps"] = false;
+  const auto reply = luna_service->listRunningApps(request, true);
 
-  ASSERT_TRUE(reply.contains("returnValue"));
-  ASSERT_TRUE(reply["returnValue"].toBool());
-  ASSERT_TRUE(reply.contains("running"));
-  const auto running_apps = reply["running"].toArray();
+  ASSERT_TRUE(reply.isObject());
+  ASSERT_TRUE(reply.isMember("returnValue"));
+  ASSERT_TRUE(reply["returnValue"].asBool());
+  ASSERT_TRUE(reply["running"].isArray());
+  const auto running_apps = reply["running"];
   ASSERT_EQ(1, running_apps.size());
 
-  auto running_app = running_apps[0].toObject();
-  EXPECT_TRUE(running_app.contains("id"));
-  EXPECT_EQ(bare_request["appDesc"].toObject()["id"].toString(),
-            running_app["id"].toString());
-  EXPECT_TRUE(running_app.contains("instanceId"));
-  EXPECT_EQ(bare_request["instanceId"], running_app["instanceId"].toString());
-  EXPECT_TRUE(running_app.contains("webprocessid"));
-  EXPECT_EQ(QString::number(pid).toStdString(),
-            running_app["webprocessid"].toString().toStdString());
+  auto running_app = running_apps[0];
+  EXPECT_TRUE(running_app.isMember("id"));
+  EXPECT_EQ(bare_request["appDesc"]["id"].asString(),
+            running_app["id"].asString());
+  EXPECT_TRUE(running_app.isMember("instanceId"));
+  EXPECT_EQ(bare_request["instanceId"].asString(),
+            running_app["instanceId"].asString());
+  EXPECT_TRUE(running_app.isMember("webprocessid"));
+  EXPECT_EQ(std::to_string(pid), running_app["webprocessid"].asString());
 }

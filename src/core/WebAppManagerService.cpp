@@ -16,8 +16,6 @@
 
 #include "WebAppManagerService.h"
 
-#include <vector>
-
 #include <json/value.h>
 
 #include "LogManager.h"
@@ -43,11 +41,11 @@ bool WebAppManagerService::onPauseApp(const std::string& instanceId)
     return WebAppManager::instance()->onPauseApp(instanceId);
 }
 
-QJsonObject WebAppManagerService::onLogControl(const std::string& keys, const std::string& value)
+Json::Value WebAppManagerService::onLogControl(const std::string& keys, const std::string& value)
 {
     LogManager::setLogControl(keys, value);
 
-    QJsonObject reply;
+    Json::Value reply;
 
     reply["event"] = LogManager::getDebugEventsEnabled();
     reply["bundleMessage"] = LogManager::getDebugBundleMessagesEnabled();
@@ -79,7 +77,7 @@ bool WebAppManagerService::onPurgeSurfacePool(uint32_t pid)
     return WebAppManager::instance()->purgeSurfacePool(pid);
 }
 
-QJsonObject WebAppManagerService::getWebProcessProfiling()
+Json::Value WebAppManagerService::getWebProcessProfiling()
 {
     return WebAppManager::instance()->getWebProcessProfiling();
 }
@@ -97,7 +95,7 @@ void WebAppManagerService::onAppRemoved(const std::string& app_id) {
   WebAppManager::instance()->appRemoved(app_id);
 }
 
-void WebAppManagerService::setDeviceInfo(const QString &name, const QString &value)
+void WebAppManagerService::setDeviceInfo(const std::string& name, const std::string& value)
 {
     WebAppManager::instance()->setDeviceInfo(name, value);
 }
@@ -107,29 +105,29 @@ void WebAppManagerService::setUiSize(int width, int height)
     WebAppManager::instance()->setUiSize(width, height);
 }
 
-void WebAppManagerService::setSystemLanguage(const QString &language)
+void WebAppManagerService::setSystemLanguage(const std::string& language)
 {
     WebAppManager::instance()->setSystemLanguage(language);
 }
 
-QString WebAppManagerService::getSystemLanguage()
+std::string WebAppManagerService::getSystemLanguage()
 {
-    QString language;
+    std::string language;
     WebAppManager::instance()->getSystemLanguage(language);
     return language;
 }
 
-void WebAppManagerService::setForceCloseApp(const QString& appId, const QString& instanceId)
+void WebAppManagerService::setForceCloseApp(const std::string& appId, const std::string& instanceId)
 {
     WebAppManager::instance()->setForceCloseApp(appId, instanceId);
 }
 
-void WebAppManagerService::deleteStorageData(const QString &identifier)
+void WebAppManagerService::deleteStorageData(const std::string &identifier)
 {
     WebAppManager::instance()->deleteStorageData(identifier);
 }
 
-void WebAppManagerService::killCustomPluginProcess(const QString &appBasePath)
+void WebAppManagerService::killCustomPluginProcess(const std::string &appBasePath)
 {
     WebAppManager::instance()->killCustomPluginProcess(appBasePath);
 }
@@ -159,12 +157,12 @@ void WebAppManagerService::setAccessibilityEnabled(bool enable)
     WebAppManager::instance()->setAccessibilityEnabled(enable);
 }
 
-uint32_t WebAppManagerService::getWebProcessId(const QString& appId, const QString& instanceId)
+uint32_t WebAppManagerService::getWebProcessId(const std::string& appId, const std::string& instanceId)
 {
     return WebAppManager::instance()->getWebProcessId(appId, instanceId);
 }
 
-void WebAppManagerService::updateNetworkStatus(const QJsonObject& object)
+void WebAppManagerService::updateNetworkStatus(const Json::Value& object)
 {
     WebAppManager::instance()->updateNetworkStatus(object);
 }
@@ -174,7 +172,7 @@ void WebAppManagerService::notifyMemoryPressure(webos::WebViewBase::MemoryPressu
     WebAppManager::instance()->notifyMemoryPressure(level);
 }
 
-bool WebAppManagerService::isEnyoApp(const QString& appId)
+bool WebAppManagerService::isEnyoApp(const std::string& appId)
 {
     return WebAppManager::instance()->isEnyoApp(appId);
 }

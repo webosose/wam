@@ -22,12 +22,9 @@
 #include <unordered_map>
 #include <vector>
 
-#include <QJsonObject>
-#include <QList>
-#include <QMap>
-#include <QString>
-
-#include <json/json.h>
+namespace Json {
+class Value;
+};
 
 class ApplicationDescription;
 class WebPageBase;
@@ -40,7 +37,7 @@ public:
 
     uint32_t getWebProcessProxyID(const ApplicationDescription* desc) const;
     uint32_t getWebProcessProxyID(uint32_t pid) const;
-    virtual QString getWebProcessMemSize(uint32_t pid) const; //change name from webProcessSize(uint32_t pid)
+    virtual std::string getWebProcessMemSize(uint32_t pid) const; //change name from webProcessSize(uint32_t pid)
     void killWebProcess(uint32_t pid);
     void requestKillWebProcess(uint32_t pid);
     bool webProcessInfoMapReady();
@@ -48,9 +45,9 @@ public:
     void readWebProcessPolicy(); //chane name from setWebProcessEnvironment()
     std::string getProcessKey(const ApplicationDescription* desc) const; //change name from getKey()
 
-    virtual QJsonObject getWebProcessProfiling() = 0;
+    virtual Json::Value getWebProcessProfiling() = 0;
     virtual uint32_t getWebProcessPID(const WebAppBase* app) const = 0;
-    virtual void deleteStorageData(const QString& identifier) = 0;
+    virtual void deleteStorageData(const std::string& identifier) = 0;
     virtual uint32_t getInitialWebViewProxyID() const = 0;
     virtual void clearBrowsingData(const int removeBrowsingDataMask) = 0;
     virtual int maskForBrowsingDataType(const char* type) = 0;
@@ -59,7 +56,7 @@ protected:
     std::list<const WebAppBase*> runningApps();
     std::list<const WebAppBase*> runningApps(uint32_t pid);
     WebAppBase* findAppById(const std::string& appId);
-    WebAppBase* findAppByInstanceId(const QString& instanceId);
+    WebAppBase* findAppByInstanceId(const std::string& instanceId);
 
 protected:
     class WebProcessInfo {

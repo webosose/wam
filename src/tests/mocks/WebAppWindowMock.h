@@ -51,7 +51,7 @@ class WebAppWindowMock : public WebAppWindow {
   MOCK_METHOD(void, hide, (), (override));
   MOCK_METHOD(void, show, (), (override));
   MOCK_METHOD(void, platformBack, (), (override));
-  MOCK_METHOD(void, setCursor, (const QString&, int, int), (override));
+  MOCK_METHOD(void, setCursor, (const std::string&, int, int), (override));
   MOCK_METHOD(void, attachWebContents, (void*), (override));
   MOCK_METHOD(bool, event, (WebOSEvent*), (override));
 };

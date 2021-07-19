@@ -16,6 +16,7 @@
 
 #include "ApplicationDescription.h"
 #include "LogManager.h"
+#include "Utils.h"
 #include "WebAppWayland.h"
 #include "WebAppWaylandWindow.h"
 
@@ -67,12 +68,12 @@ WebAppWaylandWindow::WebAppWaylandWindow()
     , m_xinputActivated(false)
     , m_lastMouseEvent(WebOSMouseEvent(WebOSEvent::None, -1., -1.))
 {
-    m_cursorEnabled = (qgetenv("ENABLE_CURSOR_BY_DEFAULT") == "1") ? true : false;;
+    m_cursorEnabled = getEnvVar("ENABLE_CURSOR_BY_DEFAULT") == "1";
 }
 
 void WebAppWaylandWindow::hide()
 {
-    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())), "WebAppWaylandWindow::hide()");
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", m_webApp->appId().c_str()), PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()), "WebAppWaylandWindow::hide()");
     WebAppWindowBase::Hide();
 }
 
@@ -83,20 +84,20 @@ void WebAppWaylandWindow::show()
 
 void WebAppWaylandWindow::platformBack()
 {
-    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())), "WebAppWaylandWindow::platformBack(); generate RECENT key");
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", m_webApp->appId().c_str()), PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()), "WebAppWaylandWindow::platformBack(); generate RECENT key");
 }
 
-void WebAppWaylandWindow::setCursor(const QString & cursorArg, int hotspot_x, int hotspot_y)
+void WebAppWaylandWindow::setCursor(const std::string& cursorArg, int hotspot_x, int hotspot_y)
 {
-    const std::string& arg = cursorArg.toStdString();
+    const std::string& arg = cursorArg;
     webos::CustomCursorType type = webos::CUSTOM_CURSOR_NOT_USE;
     if (arg.empty() || arg != "default")
-        LOG_DEBUG("[%s] %s; arg: %s; Restore Cursor to webos::CUSTOM_CURSOR_NOT_USE", qPrintable(m_webApp->appId()), __PRETTY_FUNCTION__, arg.c_str());
+        LOG_DEBUG("[%s] %s; arg: %s; Restore Cursor to webos::CUSTOM_CURSOR_NOT_USE", m_webApp->appId().c_str(), __PRETTY_FUNCTION__, arg.c_str());
     else if (arg != "blank") {
-        LOG_DEBUG("[%s] %s; arg: %s; Set Cursor to webos::CUSTOM_CURSOR_BLANK", qPrintable(m_webApp->appId()), __PRETTY_FUNCTION__, arg.c_str());
+        LOG_DEBUG("[%s] %s; arg: %s; Set Cursor to webos::CUSTOM_CURSOR_BLANK", m_webApp->appId().c_str(), __PRETTY_FUNCTION__, arg.c_str());
         type = webos::CUSTOM_CURSOR_BLANK;
     } else {
-        LOG_DEBUG("[%s] %s; Custom Cursor file path : %s, hotspot_x : %d, hotspot_y : %d", __PRETTY_FUNCTION__, qPrintable(m_webApp->appId()), arg.c_str(), hotspot_x, hotspot_y);
+        LOG_DEBUG("[%s] %s; Custom Cursor file path : %s, hotspot_x : %d, hotspot_y : %d", __PRETTY_FUNCTION__, m_webApp->appId().c_str(), arg.c_str(), hotspot_x, hotspot_y);
         type = webos::CUSTOM_CURSOR_PATH;
     }
 
@@ -125,12 +126,12 @@ bool WebAppWaylandWindow::event(WebOSEvent* event)
     switch (event->GetType())
     {
         case WebOSEvent::Close:
-            LOG_INFO(MSGID_WINDOW_CLOSED, 2, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())), "");
+            LOG_INFO(MSGID_WINDOW_CLOSED, 2, PMLOGKS("APP_ID", m_webApp->appId().c_str()), PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()), "");
             m_webApp->doClose();
             return true;
         case WebOSEvent::WindowStateChange:
             if (GetWindowHostState() == webos::NATIVE_WINDOW_MINIMIZED) {
-                LOG_INFO(MSGID_WINDOW_STATECHANGE, 2, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())), "WebOSEvent::WindowStateChange; Minimize; m_lastMouseEvent's type : %s", m_lastMouseEvent.GetType() == WebOSEvent::MouseButtonPress ? "Press; Generate MouseButtonRelease event" : "Release");
+                LOG_INFO(MSGID_WINDOW_STATECHANGE, 2, PMLOGKS("APP_ID", m_webApp->appId().c_str()), PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()), "WebOSEvent::WindowStateChange; Minimize; m_lastMouseEvent's type : %s", m_lastMouseEvent.GetType() == WebOSEvent::MouseButtonPress ? "Press; Generate MouseButtonRelease event" : "Release");
                 if (m_lastMouseEvent.GetType() == WebOSEvent::MouseButtonPress) {
                     m_lastMouseEvent.SetType(WebOSEvent::MouseButtonRelease);
                     m_webApp->forwardWebOSEvent(&m_lastMouseEvent);
@@ -174,12 +175,12 @@ bool WebAppWaylandWindow::event(WebOSEvent* event)
             m_webApp->focus();
             LOG_INFO_WITH_CLOCK(MSGID_WINDOW_FOCUSIN, 4,
                     PMLOGKS("PerfType", "AppLaunch"),
-                    PMLOGKS("PerfGroup", qPrintable(m_webApp->appId())),
-                    PMLOGKS("APP_ID", qPrintable(m_webApp->appId())),
-                    PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())),"");
+                    PMLOGKS("PerfGroup", m_webApp->appId().c_str()),
+                    PMLOGKS("APP_ID", m_webApp->appId().c_str()),
+                    PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()),"");
             break;
         case WebOSEvent::FocusOut:
-            LOG_INFO(MSGID_WINDOW_FOCUSOUT, 2, PMLOGKS("APP_ID", qPrintable(m_webApp->appId())), PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())), "m_lastMouseEvent's type : %s", m_lastMouseEvent.GetType() == WebOSEvent::MouseButtonPress ? "Press; Generate MouseButtonRelease event" : "Release");
+            LOG_INFO(MSGID_WINDOW_FOCUSOUT, 2, PMLOGKS("APP_ID", m_webApp->appId().c_str()), PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()), "m_lastMouseEvent's type : %s", m_lastMouseEvent.GetType() == WebOSEvent::MouseButtonPress ? "Press; Generate MouseButtonRelease event" : "Release");
 
             // Cherry-pick http://wall.lge.com:8110/#/c/89417/ partially.
             // The FocusAboutToChange event is specific to Qt and it is for the
@@ -223,17 +224,18 @@ bool WebAppWaylandWindow::onCursorVisibileChangeEvent(WebOSEvent* e)
 
 unsigned int WebAppWaylandWindow::CheckKeyFilterTable(unsigned keycode, unsigned* modifier)
 {
-    QMap<int, QPair<int, int>> table = m_webApp->getAppDescription()->keyFilterTable();
+    auto table = m_webApp->getAppDescription()->keyFilterTable();
 
     if (table.empty())
         return 0;
 
-    if (!table.contains(keycode))
+    auto found = table.find(keycode);
+    if (found == table.end())
         return 0;
 
-    *modifier = table[keycode].second;
+    *modifier = found->second.second;
 
-    return table[keycode].first;
+    return found->second.first;
 }
 
 void WebAppWaylandWindow::logEventDebugging(WebOSEvent* event)
@@ -243,15 +245,15 @@ void WebAppWaylandWindow::logEventDebugging(WebOSEvent* event)
            if (m_cursorEnabled) {
                // log all mouse move events
                LOG_INFO(MSGID_MOUSE_MOVE_EVENT, 4,
-                    PMLOGKS("APP_ID", qPrintable(m_webApp->appId())),
-                    PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())),
+                    PMLOGKS("APP_ID", m_webApp->appId().c_str()),
+                    PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()),
                     PMLOGKFV("X", "%.f", static_cast<WebOSMouseEvent*>(event)->GetX()),
                     PMLOGKFV("Y", "%.f", static_cast<WebOSMouseEvent*>(event)->GetY()), "");
             }
             else {
                 LOG_INFO(MSGID_MOUSE_MOVE_EVENT, 2,
-                    PMLOGKS("APP_ID", qPrintable(m_webApp->appId())),
-                    PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())),
+                    PMLOGKS("APP_ID", m_webApp->appId().c_str()),
+                    PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()),
                     "Mouse event should be Disabled by blank cursor");
             }
         }
@@ -261,16 +263,16 @@ void WebAppWaylandWindow::logEventDebugging(WebOSEvent* event)
         if (event->GetType() == WebOSEvent::KeyPress || event->GetType() == WebOSEvent::KeyRelease) {
             // remote key event
             LOG_INFO(MSGID_KEY_EVENT, 4,
-                PMLOGKS("APP_ID", qPrintable(m_webApp->appId())),
-                PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())),
+                PMLOGKS("APP_ID", m_webApp->appId().c_str()),
+                PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()),
                 PMLOGKFV("VALUE_HEX", "%x", static_cast<WebOSKeyEvent*>(event)->GetCode()),
                 PMLOGKS("STATUS", event->GetType() == WebOSEvent::KeyPress ? "KeyPress" : "KeyRelease"), "");
         }
         else if (event->GetType() == WebOSEvent::MouseButtonPress || event->GetType() == WebOSEvent::MouseButtonRelease) {
             if (!m_cursorEnabled) {
                 LOG_INFO(MSGID_MOUSE_BUTTON_EVENT, 2,
-                    PMLOGKS("APP_ID", qPrintable(m_webApp->appId())),
-                    PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())),
+                    PMLOGKS("APP_ID", m_webApp->appId().c_str()),
+                    PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()),
                     "Mouse event should be Disabled by blank cursor");
             }
             else {
@@ -280,8 +282,8 @@ void WebAppWaylandWindow::logEventDebugging(WebOSEvent* event)
                 if (height)
                     scale = (float)DisplayHeight() / m_webApp->getAppDescription()->heightOverride();
                 LOG_INFO(MSGID_MOUSE_BUTTON_EVENT, 6,
-                    PMLOGKS("APP_ID", qPrintable(m_webApp->appId())),
-                    PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())),
+                    PMLOGKS("APP_ID", m_webApp->appId().c_str()),
+                    PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()),
                     PMLOGKFV("VALUE", "%d", (int)static_cast<WebOSMouseEvent*>(event)->GetButton()),
                     PMLOGKS("STATUS", event->GetType() == WebOSEvent::MouseButtonPress ? "MouseButtonPress" : "MouseButtonRelease"),
                     PMLOGKFV("X", "%.f", static_cast<WebOSMouseEvent*>(event)->GetX() * scale),
@@ -290,8 +292,8 @@ void WebAppWaylandWindow::logEventDebugging(WebOSEvent* event)
         }
         else if (event->GetType() == WebOSEvent::InputPanelVisible) {
             LOG_INFO(MSGID_VKB_EVENT, 4,
-                PMLOGKS("APP_ID", qPrintable(m_webApp->appId())),
-                PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())),
+                PMLOGKS("APP_ID", m_webApp->appId().c_str()),
+                PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()),
                 PMLOGKS("STATUS", "InputPanelVisible"),
                 PMLOGKS("Visible", static_cast<WebOSVirtualKeyboardEvent*>(event)->GetVisible() == true ? "true" : "false"), "");
         }
@@ -299,8 +301,8 @@ void WebAppWaylandWindow::logEventDebugging(WebOSEvent* event)
             // log all window event except mouseMove
             // to print mouseMove event, set mouseMove : true
             LOG_INFO(MSGID_WINDOW_EVENT, 3,
-                PMLOGKS("APP_ID", qPrintable(m_webApp->appId())),
-                PMLOGKS("INSTANCE_ID", qPrintable(m_webApp->instanceId())),
+                PMLOGKS("APP_ID", m_webApp->appId().c_str()),
+                PMLOGKS("INSTANCE_ID", m_webApp->instanceId().c_str()),
                 PMLOGKFV("TYPE", "%d", event->GetType()), "");
         }
     }

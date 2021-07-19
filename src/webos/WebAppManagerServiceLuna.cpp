@@ -28,8 +28,8 @@
 #include "webos/webview_base.h"
 
 // just to save some typing, the template filled out with the name of this class
-#define QCB(FUNC) bus_callback_qjson<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>
-#define QCB_subscription(FUNC) bus_subscription_callback_qjson<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>
+#define QCB(FUNC) bus_callback_json<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>
+#define QCB_subscription(FUNC) bus_subscription_callback_json<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>
 #define LS2_METHOD_ENTRY(FUNC) {#FUNC, QCB(FUNC)}
 #define LS2_SUBSCRIPTION_ENTRY(FUNC) {#FUNC, QCB_subscription(FUNC)}
 
@@ -78,9 +78,8 @@ bool WebAppManagerServiceLuna::startService()
     return PalmServiceBase::startService();
 }
 
-QJsonObject WebAppManagerServiceLuna::launchApp(QJsonObject request)
+Json::Value WebAppManagerServiceLuna::launchApp(const Json::Value& requestJson)
 {
-    Json::Value requestJson = qtless::JsonHelper::jsonCppFromQjson(request);
     logJsonTruncated(__func__, requestJson);
     int errCode;
     std::string errMsg;
@@ -95,7 +94,7 @@ QJsonObject WebAppManagerServiceLuna::launchApp(QJsonObject request)
         reply["returnValue"] = false;
         reply["errorCode"] = ERR_CODE_LAUNCHAPP_MISS_PARAM;
         reply["errorText"] = err_missParam;
-        return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+        return reply;
     }
 
     Json::Value jsonParams = requestJson["parameters"];
@@ -117,7 +116,7 @@ QJsonObject WebAppManagerServiceLuna::launchApp(QJsonObject request)
         reply["returnValue"] = false;
         reply["errorCode"] = ERR_CODE_LAUNCHAPP_MISS_PARAM;
         reply["errorText"] = err_missParam;
-        return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+        return reply;
     }
     jsonParams["instanceId"] = instanceId;
 
@@ -147,7 +146,7 @@ QJsonObject WebAppManagerServiceLuna::launchApp(QJsonObject request)
         reply["appId"] = requestJson["appDesc"]["id"].asString();
         reply["instanceId"] = instanceId;
     }
-    return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+    return reply;
 }
 
 bool WebAppManagerServiceLuna::isValidInstanceId(const std::string& instanceId)
@@ -155,9 +154,8 @@ bool WebAppManagerServiceLuna::isValidInstanceId(const std::string& instanceId)
     return instanceId.find_first_not_of("\f\n\r\v") != std::string::npos;
 }
 
-QJsonObject WebAppManagerServiceLuna::killApp(QJsonObject request)
+Json::Value WebAppManagerServiceLuna::killApp(const Json::Value& requestJson)
 {
-    Json::Value requestJson = qtless::JsonHelper::jsonCppFromQjson(request);
     logJsonTruncated(__func__, requestJson);
     Json::Value reply;
 
@@ -168,7 +166,7 @@ QJsonObject WebAppManagerServiceLuna::killApp(QJsonObject request)
         reply["returnValue"] = false;
         reply["errorCode"] = ERR_CODE_KILL_APP_INVALID_PARAM;
         reply["errorText"] = err_invalidParam;
-        return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+        return reply;
     }
 
     bool instances;
@@ -193,12 +191,11 @@ QJsonObject WebAppManagerServiceLuna::killApp(QJsonObject request)
         reply["errorCode"] = ERR_CODE_NO_RUNNING_APP;
         reply["errorText"] = err_noRunningApp;
     }
-    return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+    return reply;
 }
 
-QJsonObject WebAppManagerServiceLuna::pauseApp(QJsonObject request)
+Json::Value WebAppManagerServiceLuna::pauseApp(const Json::Value& requestJson)
 {
-    Json::Value requestJson = qtless::JsonHelper::jsonCppFromQjson(request);
     logJsonTruncated(__func__, requestJson);
     Json::Value reply;
 
@@ -207,7 +204,7 @@ QJsonObject WebAppManagerServiceLuna::pauseApp(QJsonObject request)
         reply["returnValue"] = false;
         reply["errorCode"] = ERR_CODE_PAUSE_APP_INVALID_PARAM;
         reply["errorText"] = err_invalidParam;
-        return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+        return reply;
     }
 
     std::string id = requestJson["instanceId"].asString();
@@ -226,12 +223,11 @@ QJsonObject WebAppManagerServiceLuna::pauseApp(QJsonObject request)
         reply["errorCode"] = ERR_CODE_NO_RUNNING_APP;
         reply["errorText"] = err_noRunningApp;
     }
-    return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+    return reply;
 }
 
-QJsonObject WebAppManagerServiceLuna::setInspectorEnable(QJsonObject request)
+Json::Value WebAppManagerServiceLuna::setInspectorEnable(const Json::Value& requestJson)
 {
-    Json::Value requestJson = qtless::JsonHelper::jsonCppFromQjson(request);
     logJsonTruncated(__func__, requestJson);
     LOG_DEBUG("WebAppManagerService::setInspectorEnable");
     Json::Value reply;
@@ -240,24 +236,22 @@ QJsonObject WebAppManagerServiceLuna::setInspectorEnable(QJsonObject request)
     LOG_DEBUG("errorMessage : %s", errorMessage.c_str());
     reply["errorMessage"] = errorMessage;
     reply["returnValue"] = false;
-    return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+    return reply;
 }
 
 
-QJsonObject WebAppManagerServiceLuna::closeAllApps(QJsonObject request)
+Json::Value WebAppManagerServiceLuna::closeAllApps(const Json::Value& requestJson)
 {
-    Json::Value requestJson = qtless::JsonHelper::jsonCppFromQjson(request);
     logJsonTruncated(__func__, requestJson);
     bool val = WebAppManagerService::onCloseAllApps();
 
     Json::Value reply;
     reply["returnValue"] = val;
-    return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+    return reply;
 }
 
-QJsonObject WebAppManagerServiceLuna::logControl(QJsonObject request)
+Json::Value WebAppManagerServiceLuna::logControl(const Json::Value& requestJson)
 {
-    Json::Value requestJson = qtless::JsonHelper::jsonCppFromQjson(request);
     logJsonTruncated(__func__, requestJson);
 
     if (!requestJson.isObject()
@@ -267,16 +261,15 @@ QJsonObject WebAppManagerServiceLuna::logControl(QJsonObject request)
         reply["returnValue"] = false;
         reply["errorCode"] = ERR_CODE_LOG_CONTROL_INVALID_PARAM;
         reply["errorText"] = err_invalidParam;
-        return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+        return reply;
     }
 
     return WebAppManagerService::onLogControl(requestJson["keys"].asString(),
                                               requestJson["value"].asString());
 }
 
-QJsonObject WebAppManagerServiceLuna::discardCodeCache(QJsonObject request)
+Json::Value WebAppManagerServiceLuna::discardCodeCache(const Json::Value& requestJson)
 {
-    Json::Value requestJson = qtless::JsonHelper::jsonCppFromQjson(request);
     logJsonTruncated(__func__, requestJson);
     Json::Value reply;
     
@@ -285,7 +278,7 @@ QJsonObject WebAppManagerServiceLuna::discardCodeCache(QJsonObject request)
         reply["returnValue"] = false;
         reply["errorCode"] = ERR_CODE_DISCARD_CODE_CACHE_INVALID_PARAM;
         reply["errorText"] = err_invalidParam;
-        return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+        return reply;
     }
 
     bool forcedClearCache = false;
@@ -294,7 +287,7 @@ QJsonObject WebAppManagerServiceLuna::discardCodeCache(QJsonObject request)
 
     if (!WebAppManagerService::isDiscardCodeCacheRequired()) {
         reply["returnValue"] = true;
-        return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+        return reply;
     }
 
     if (requestJson.isMember("force"))
@@ -310,12 +303,12 @@ QJsonObject WebAppManagerServiceLuna::discardCodeCache(QJsonObject request)
 
     if (running.size() != 0 && !forcedClearCache) {
         reply["returnValue"] = false;
-        return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+        return reply;
     }
 
     if (!WebAppManagerService::onCloseAllApps(pid)) {
         reply["returnValue"] = false;
-        return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+        return reply;
     }
 
     m_clearedCache = true;
@@ -323,20 +316,17 @@ QJsonObject WebAppManagerServiceLuna::discardCodeCache(QJsonObject request)
     if (forcedClearCache)
         WebAppManagerService::onPurgeSurfacePool(pid);
     reply["returnValue"] = true;
-    return qtless::JsonHelper::qjsonFromJsonCpp(reply);
-}
-
-QJsonObject WebAppManagerServiceLuna::getWebProcessSize(QJsonObject request)
-{
-    Json::Value requestJson = qtless::JsonHelper::jsonCppFromQjson(request);
-    logJsonTruncated(__func__, requestJson);
-    QJsonObject reply = WebAppManagerService::getWebProcessProfiling();
     return reply;
 }
 
-QJsonObject WebAppManagerServiceLuna::listRunningApps(QJsonObject request, bool subscribed)
+Json::Value WebAppManagerServiceLuna::getWebProcessSize(const Json::Value& requestJson)
 {
-    Json::Value requestJson = qtless::JsonHelper::jsonCppFromQjson(request);
+    logJsonTruncated(__func__, requestJson);
+    return WebAppManagerService::getWebProcessProfiling();
+}
+
+Json::Value WebAppManagerServiceLuna::listRunningApps(const Json::Value& requestJson, bool subscribed)
+{
     logJsonTruncated(__func__, requestJson);
     bool includeSysApps = requestJson["includeSysApps"] == true;
 
@@ -346,19 +336,18 @@ QJsonObject WebAppManagerServiceLuna::listRunningApps(QJsonObject request, bool 
     Json::Value runningApps;
     for (auto it = apps.begin(); it != apps.end(); ++it) {
         Json::Value app;
-        app["id"] = it->appId.toStdString();
-        app["instanceId"] = it->instanceId.toStdString();
+        app["id"] = it->appId;
+        app["instanceId"] = it->instanceId;
         app["webprocessid"] = qtless::StringHelper::intToStr(it->pid);
         runningApps.append(app);
     }
     reply["running"] = runningApps;
     reply["returnValue"] = true;
-    return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+    return reply;
 }
 
-QJsonObject WebAppManagerServiceLuna::clearBrowsingData(QJsonObject request)
+Json::Value WebAppManagerServiceLuna::clearBrowsingData(const Json::Value& requestJson)
 {
-    Json::Value requestJson = qtless::JsonHelper::jsonCppFromQjson(request);
     logJsonTruncated(__func__, requestJson);
     Json::Value reply;
     
@@ -367,7 +356,7 @@ QJsonObject WebAppManagerServiceLuna::clearBrowsingData(QJsonObject request)
         reply["returnValue"] = false;
         reply["errorCode"] = ERR_CODE_CLEAR_BROWSING_DATA_INVALID_PARAM;
         reply["errorText"] = err_invalidParam;
-        return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+        return reply;
     }
 
     Json::Value value = requestJson["types"];
@@ -424,7 +413,7 @@ QJsonObject WebAppManagerServiceLuna::clearBrowsingData(QJsonObject request)
         WebAppManagerService::onClearBrowsingData(removeBrowsingDataMask);
 
     reply["returnValue"] = returnValue;
-    return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+    return reply;
 }
 
 void WebAppManagerServiceLuna::didConnect()
@@ -433,34 +422,33 @@ void WebAppManagerServiceLuna::didConnect()
     params["subscribe"] = true;
 
     params["serviceName"] = std::string("com.webos.settingsservice");
-    if (!GET_LS2_SERVER_STATUS(systemServiceConnectCallback, qtless::JsonHelper::qjsonFromJsonCpp(params))) {
+    if (!GET_LS2_SERVER_STATUS(systemServiceConnectCallback, params)) {
         LOG_WARNING(MSGID_SERVICE_CONNECT_FAIL, 0, "Failed to connect to settingsservice");
     }
 
     params["serviceName"] = std::string("com.webos.memorymanager");
-    if (!GET_LS2_SERVER_STATUS(memoryManagerConnectCallback, qtless::JsonHelper::qjsonFromJsonCpp(params))) {
+    if (!GET_LS2_SERVER_STATUS(memoryManagerConnectCallback, params)) {
         LOG_WARNING(MSGID_MEMORY_CONNECT_FAIL, 0, "Failed to connect to memory manager");
     }
 
     params["serviceName"] = std::string("com.webos.applicationManager");
-    if (!GET_LS2_SERVER_STATUS(applicationManagerConnectCallback, qtless::JsonHelper::qjsonFromJsonCpp(params))) {
+    if (!GET_LS2_SERVER_STATUS(applicationManagerConnectCallback, params)) {
         LOG_WARNING(MSGID_APPMANAGER_CONNECT_FAIL, 0, "Failed to connect to application manager");
     }
 
     params["serviceName"] = std::string("com.webos.bootManager");
-    if (!GET_LS2_SERVER_STATUS(bootdConnectCallback, qtless::JsonHelper::qjsonFromJsonCpp(params))) {
+    if (!GET_LS2_SERVER_STATUS(bootdConnectCallback, params)) {
         LOG_WARNING(MSGID_BOOTD_CONNECT_FAIL, 0, "Failed to connect to bootd");
     }
 
     params["serviceName"] = std::string("com.webos.service.connectionmanager");
-    if (!GET_LS2_SERVER_STATUS(networkConnectionStatusCallback, qtless::JsonHelper::qjsonFromJsonCpp(params))) {
+    if (!GET_LS2_SERVER_STATUS(networkConnectionStatusCallback, params)) {
         LOG_WARNING(MSGID_NETWORK_CONNECT_FAIL, 0, "Failed to connect to connectionmanager");
     }
 }
 
-void WebAppManagerServiceLuna::systemServiceConnectCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::systemServiceConnectCallback(const Json::Value& replyJson)
 {
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
     if (!replyJson.isObject()) {
         LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
         return;
@@ -473,14 +461,12 @@ void WebAppManagerServiceLuna::systemServiceConnectCallback(QJsonObject reply)
         localeList.append(std::string("localeInfo"));
         localeParams["keys"] = localeList;
         LS2_CALL(getSystemLocalePreferencesCallback,
-            "luna://com.webos.settingsservice/getSystemSettings", qtless::JsonHelper::qjsonFromJsonCpp(localeParams));
+            "luna://com.webos.settingsservice/getSystemSettings", localeParams);
     }
 }
 
-void WebAppManagerServiceLuna::getSystemLocalePreferencesCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::getSystemLocalePreferencesCallback(const Json::Value& replyJson)
 {
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
-
     if (!replyJson.isObject() || !replyJson["settings"].isObject()) {
         LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
         return;
@@ -509,16 +495,14 @@ void WebAppManagerServiceLuna::getSystemLocalePreferencesCallback(QJsonObject re
     if (language.empty())
         return;
 
-    if (language.compare(WebAppManagerService::getSystemLanguage().toStdString()) == 0)
+    if (language.compare(WebAppManagerService::getSystemLanguage()) == 0)
         return;
 
     WebAppManagerService::setSystemLanguage(language.c_str());
 }
 
-void WebAppManagerServiceLuna::memoryManagerConnectCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::memoryManagerConnectCallback(const Json::Value& replyJson)
 {
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
-
     if (!replyJson.isObject()) {
         LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
         return;
@@ -530,8 +514,7 @@ void WebAppManagerServiceLuna::memoryManagerConnectCallback(QJsonObject reply)
         closeAppObj["appType"] = "web";
 
         if (!call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::getCloseAppIdCallback>(
-                "luna://com.webos.memorymanager/getCloseAppId",
-                qtless::JsonHelper::qjsonFromJsonCpp(closeAppObj), this)) {
+                "luna://com.webos.memorymanager/getCloseAppId", closeAppObj, this)) {
             LOG_WARNING(MSGID_MEM_MGR_API_CALL_FAIL, 0, "Failed to get close application identifier");
         }
 
@@ -540,17 +523,14 @@ void WebAppManagerServiceLuna::memoryManagerConnectCallback(QJsonObject reply)
         thresholdChanged["category"] = "/com/webos/memory";
         thresholdChanged["method"] = "thresholdChanged";
         if (!call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::thresholdChangedCallback>(
-                "luna://com.palm.bus/signal/addmatch",
-                qtless::JsonHelper::qjsonFromJsonCpp(thresholdChanged), this)) {
+                "luna://com.palm.bus/signal/addmatch", thresholdChanged, this)) {
             LOG_WARNING(MSGID_SIGNAL_REGISTRATION_FAIL, 0, "Failed to register a client for thresholdChanged");
         }
     }
 }
 
-void WebAppManagerServiceLuna::getCloseAppIdCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::getCloseAppIdCallback(const Json::Value& replyJson)
 {
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
-
     if (!replyJson.isObject() || !replyJson["pid"].isUInt() || !replyJson["instanceId"].isString()) {
         LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
         return;
@@ -563,10 +543,8 @@ void WebAppManagerServiceLuna::getCloseAppIdCallback(QJsonObject reply)
         WebAppManagerService::setForceCloseApp(appId.c_str(), instanceId.c_str());
 }
 
-void WebAppManagerServiceLuna::thresholdChangedCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::thresholdChangedCallback(const Json::Value& replyJson)
 {
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
-
     if (!replyJson.isObject() || !replyJson["current"].isString()) {
         LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
         return;
@@ -589,10 +567,8 @@ void WebAppManagerServiceLuna::thresholdChangedCallback(QJsonObject reply)
     WebAppManagerService::notifyMemoryPressure(level);
 }
 
-void WebAppManagerServiceLuna::applicationManagerConnectCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::applicationManagerConnectCallback(const Json::Value& replyJson)
 {
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
-
     if (!replyJson.isObject()) {
         LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
         return;
@@ -603,23 +579,20 @@ void WebAppManagerServiceLuna::applicationManagerConnectCallback(QJsonObject rep
         params["subscribe"] = true;
 
         if (!call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::getAppStatusCallback>(
-                "luna://com.webos.applicationManager/listApps",
-                qtless::JsonHelper::qjsonFromJsonCpp(params), this)) {
+                "luna://com.webos.applicationManager/listApps", params, this)) {
             LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "Failed to get an application list");
         }
 
         params["extraInfo"] = true;
         if (!call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::getForegroundAppInfoCallback>(
-                "luna://com.webos.applicationManager/getForegroundAppInfo",
-                qtless::JsonHelper::qjsonFromJsonCpp(params), this)) {
+                "luna://com.webos.applicationManager/getForegroundAppInfo", params, this)) {
             LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "Failed to get foreground application Information");
         }
     }
 }
 
-void WebAppManagerServiceLuna::getAppStatusCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::getAppStatusCallback(const Json::Value& replyJson)
 {
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
     if (!replyJson.isObject() || !replyJson["app"].isObject()
        || !replyJson["change"].isString()) {
         LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
@@ -651,9 +624,8 @@ void WebAppManagerServiceLuna::getAppStatusCallback(QJsonObject reply)
 }
 
 
-void WebAppManagerServiceLuna::getForegroundAppInfoCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::getForegroundAppInfoCallback(const Json::Value& replyJson)
 {
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
     if (!replyJson.isObject()) {
         LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
         return;
@@ -671,9 +643,8 @@ void WebAppManagerServiceLuna::getForegroundAppInfoCallback(QJsonObject reply)
     }
 }
 
-void WebAppManagerServiceLuna::bootdConnectCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::bootdConnectCallback(const Json::Value& replyJson)
 {
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
     if (!replyJson.isObject()) {
         LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
         return;
@@ -682,15 +653,14 @@ void WebAppManagerServiceLuna::bootdConnectCallback(QJsonObject reply)
     if (replyJson["connected"] == true) {
         Json::Value subscribe;
         subscribe["subscribe"] = true;
-        if (!LS2_CALL(getBootStatusCallback, "luna://com.webos.bootManager/getBootStatus", qtless::JsonHelper::qjsonFromJsonCpp(subscribe))) {
+        if (!LS2_CALL(getBootStatusCallback, "luna://com.webos.bootManager/getBootStatus", subscribe)) {
             LOG_WARNING(MSGID_BOOTD_SUBSCRIBE_FAIL, 0, "Failed to subscribe to bootManager");
         }
     }
 }
 
-void WebAppManagerServiceLuna::getBootStatusCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::getBootStatusCallback(const Json::Value& replyJson)
 {
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
     if (!replyJson.isObject() || !replyJson["signals"].isObject()) {
         LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
         return;
@@ -704,25 +674,24 @@ void WebAppManagerServiceLuna::closeApp(const std::string& id)
     Json::Value json;
     json["instanceId"] = id;
 
-    if (!LS2_CALL(closeAppCallback, "luna://com.webos.applicationManager/close", qtless::JsonHelper::qjsonFromJsonCpp(json)))
+    if (!LS2_CALL(closeAppCallback, "luna://com.webos.applicationManager/close", json))
         LOG_WARNING(MSGID_CLOSE_CALL_FAIL, 0, "Failed to send closeByAppId command to SAM");
 }
 
-void WebAppManagerServiceLuna::closeAppCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::closeAppCallback(const Json::Value& reply)
 {
     // TODO: check reply and close app again.
 }
 
-QJsonObject WebAppManagerServiceLuna::webProcessCreated(QJsonObject request, bool subscribed)
+Json::Value WebAppManagerServiceLuna::webProcessCreated(const Json::Value& requestJson, bool subscribed)
 {
-    Json::Value requestJson = qtless::JsonHelper::jsonCppFromQjson(request);
     Json::Value reply;
 
     if (!requestJson.isObject()) {
         reply["returnValue"] = false;
         reply["errorCode"] = ERR_CODE_WEB_PROCESS_CREATED_INVALID_PARAM;
         reply["errorText"] = err_invalidParam;
-        return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+        return reply;
     }
 
     std::string appId = requestJson["appId"].isString() ? requestJson["appId"].asString() : "";
@@ -748,29 +717,27 @@ QJsonObject WebAppManagerServiceLuna::webProcessCreated(QJsonObject request, boo
        reply["errorText"] = "parameter error";
     }
 
-    return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+    return reply;
 }
 
-void WebAppManagerServiceLuna::networkConnectionStatusCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::networkConnectionStatusCallback(const Json::Value& reply)
 {
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
-
-    if (!replyJson.isObject()) {
+    if (!reply.isObject()) {
         LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
         return;
     }
 
-    if (replyJson["connected"] == true) {
+    if (reply["connected"] == true) {
         LOG_DEBUG("connectionmanager is connected");
         Json::Value subscribe;
         subscribe["subscribe"] = true;
-        if (!LS2_CALL(getNetworkConnectionStatusCallback, "luna://com.palm.connectionmanager/getStatus", qtless::JsonHelper::qjsonFromJsonCpp(subscribe))) {
+        if (!LS2_CALL(getNetworkConnectionStatusCallback, "luna://com.palm.connectionmanager/getStatus", subscribe)) {
             LOG_WARNING(MSGID_LS2_CALL_FAIL, 0, "Fail to subscribe to connection manager");
         }
     }
 }
 
-void WebAppManagerServiceLuna::getNetworkConnectionStatusCallback(QJsonObject reply)
+void WebAppManagerServiceLuna::getNetworkConnectionStatusCallback(const Json::Value& reply)
 {
     // luna-send -f -n 1 luna://com.webos.service.connectionmanager/getstatus '{"subscribe": true}'
     WebAppManagerService::updateNetworkStatus(reply);

@@ -18,9 +18,11 @@
 #define WEBAPPFACTORYMANAGER_H
 
 #include <memory>
+#include <string>
 
-#include <QString>
-#include <QUrl>
+namespace wam {
+    class Url;
+}
 
 class ApplicationDescription;
 class WebAppBase;
@@ -31,9 +33,9 @@ public:
     WebAppFactoryManager() = default;
     virtual ~WebAppFactoryManager() = default;
 
-    virtual WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "") = 0;
-    virtual WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "") = 0;
-    virtual WebPageBase* createWebPage(QString winType, QUrl url, std::shared_ptr<ApplicationDescription> desc, QString appType = "", QString launchParams = "") = 0;
+    virtual WebAppBase* createWebApp(const std::string& winType, std::shared_ptr<ApplicationDescription> desc = nullptr, const std::string& appType = {}) = 0;
+    virtual WebAppBase* createWebApp(const std::string& winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr, const std::string& appType = {}) = 0;
+    virtual WebPageBase* createWebPage(const std::string& winType, const wam::Url& url, std::shared_ptr<ApplicationDescription> desc, const std::string& appType = {}, const std::string& launchParams = {}) = 0;
 };
 
 #endif /* WEBAPPFACTORYMANAGER_H */

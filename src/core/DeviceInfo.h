@@ -17,8 +17,8 @@
 #ifndef DEVICEINFO_H
 #define DEVICEINFO_H
 
-#include <map>
-#include <QString>
+#include <string>
+#include <unordered_map>
 
 class DeviceInfo {
 public:
@@ -33,14 +33,14 @@ public:
     virtual bool getDisplayHeight(int& value);
     virtual void setDisplayHeight(int value);
 
-    virtual bool getSystemLanguage(QString& value);
-    virtual void setSystemLanguage(QString value);
+    virtual bool getSystemLanguage(std::string& value);
+    virtual void setSystemLanguage(const std::string& value);
 
-    virtual bool getDeviceInfo(QString name, QString& value);
-    virtual void setDeviceInfo(QString name, QString value);
+    virtual bool getDeviceInfo(const std::string& name, std::string& value);
+    virtual void setDeviceInfo(const std::string& name, const std::string& value);
 
 private:
-    std::map<std::string, std::string> m_deviceInfo;
+    std::unordered_map<std::string, std::string> m_deviceInfo;
 };
 
 #endif /* DEVICEINFO_H */

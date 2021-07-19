@@ -19,10 +19,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QString>
-
 #include "ApplicationDescription.h"
 #include "PlatformModuleFactoryImpl.h"
 #include "WebAppManager.h"
@@ -163,7 +159,7 @@ TEST_F(WebPageBlinkTestSuite, CheckWebViewInitializeCall)
 
     EXPECT_CALL(*factory->webView, Initialize("com.webos.app.test.webrtc0", "/usr/palm/applications/com.webos.app.test.webrtc", "default", "", "", false));
 
-    WebPageBlink webPage(QUrl(description->entryPoint().c_str()), description, params.c_str(), std::move(factory));
+    WebPageBlink webPage(wam::Url(description->entryPoint()), description, params.c_str(), std::move(factory));
     webPage.init();
 }
 
@@ -171,7 +167,7 @@ TEST_F(WebPageBlinkTestSuite, CheckWebViewLoad)
 {
     EXPECT_CALL(*factory->webView, LoadUrl("file:///usr/palm/applications/com.webos.app.test.webrtc/index.html"));
 
-    WebPageBlink webPage(QUrl(description->entryPoint().c_str()), description, params.c_str(), std::move(factory));
+    WebPageBlink webPage(wam::Url(description->entryPoint()), description, params.c_str(), std::move(factory));
     webPage.init();
     webPage.load();
 }
@@ -187,7 +183,7 @@ TEST_F(WebPageBlinkTestSuite, AddCustomPluginDir)
     EXPECT_CALL(*factory->webView, AddCustomPluginDir(path));
     EXPECT_CALL(*factory->webView, AddAvailablePluginDir(path));
 
-    WebPageBlink webPage(QUrl(description->entryPoint().c_str()), description, params.c_str(), std::move(factory));
+    WebPageBlink webPage(wam::Url(description->entryPoint()), description, params.c_str(), std::move(factory));
     webPage.init();
 
     result = remove(path);
@@ -209,7 +205,7 @@ TEST_F(WebPageBlinkTestSuite, PriviledgetPluginPath)
 
     EXPECT_CALL(*factory->webView, AddAvailablePluginDir(testValue));
 
-    WebPageBlink webPage(QUrl(description->entryPoint().c_str()), description, params.c_str(), std::move(factory));
+    WebPageBlink webPage(wam::Url(description->entryPoint()), description, params.c_str(), std::move(factory));
     webPage.init();
 
     if (!actualValue) {
@@ -221,7 +217,7 @@ TEST_F(WebPageBlinkTestSuite, PriviledgetPluginPath)
 TEST_F(WebPageBlinkTestSuite, SetMediaCodecCapability)
 {
     EXPECT_CALL(*factory->webView, SetMediaCodecCapability(HasSubstr("LICENSE  Copyright (c) 2018-2019 LG Electronics, Inc")));
-    WebPageBlink webPage(QUrl(description->entryPoint().c_str()), description, params.c_str(), std::move(factory));
+    WebPageBlink webPage(wam::Url(description->entryPoint()), description, params.c_str(), std::move(factory));
     webPage.init();
 }
 
@@ -239,7 +235,7 @@ TEST_F(WebPageBlinkTestSuite, addUserScript)
     ASSERT_TRUE(WebAppManager::instance()->config()->isDevModeEnabled()) << "Devmode should be enabled for this test";
 
     EXPECT_CALL(*factory->webView, addUserScript(HasSubstr("@class Telluriumnub")));
-    WebPageBlink webPage(QUrl(description->entryPoint().c_str()), description, params.c_str(), std::move(factory));
+    WebPageBlink webPage(wam::Url(description->entryPoint()), description, params.c_str(), std::move(factory));
     webPage.init();
 
     if (!actualValue) {

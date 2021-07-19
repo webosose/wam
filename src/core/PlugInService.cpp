@@ -25,7 +25,7 @@ WebAppBase* PlugInService::findAppById(const std::string& appId)
 
 WebAppBase* PlugInService::findAppByInstanceId(const std::string& instanceId)
 {
-    return WebAppManager::instance()->findAppByInstanceId(QString::fromStdString(instanceId));
+    return WebAppManager::instance()->findAppByInstanceId(instanceId);
 }
 
 std::string PlugInService::getActiveInstanceId()

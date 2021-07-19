@@ -17,10 +17,10 @@
 #include <gtest/gtest.h>
 #include <gmock/gmock.h>
 
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <json/json.h>
 
 #include "BaseMockInitializer.h"
+#include "JsonHelper.h"
 #include "WebAppManagerServiceLuna.h"
 #include "webos/webview_profile.h"
 
@@ -30,16 +30,16 @@ TEST(ClearBrowsingData, invalidValue) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    ASSERT_TRUE(reply.contains("errorText"));
-    ASSERT_TRUE(reply.contains("errorCode"));
-    EXPECT_FALSE(reply["returnValue"].toBool());
-    EXPECT_EQ(ERR_CODE_CLEAR_DATA_BRAWSING_INVALID_VALUE, reply["errorCode"].toInt());
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    ASSERT_TRUE(reply.isMember("errorText"));
+    ASSERT_TRUE(reply.isMember("errorCode"));
+    EXPECT_FALSE(reply["returnValue"].asBool());
+    EXPECT_EQ(ERR_CODE_CLEAR_DATA_BRAWSING_INVALID_VALUE, reply["errorCode"].asInt());
 }
 
 TEST(ClearBrowsingData, emptyArray) {
@@ -48,16 +48,16 @@ TEST(ClearBrowsingData, emptyArray) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    ASSERT_TRUE(reply.contains("errorText"));
-    ASSERT_TRUE(reply.contains("errorCode"));
-    EXPECT_FALSE(reply["returnValue"].toBool());
-    EXPECT_EQ(ERR_CODE_CLEAR_DATA_BRAWSING_EMPTY_ARRAY, reply["errorCode"].toInt());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    ASSERT_TRUE(reply.isMember("errorText"));
+    ASSERT_TRUE(reply.isMember("errorCode"));
+    EXPECT_FALSE(reply["returnValue"].asBool());
+    EXPECT_EQ(ERR_CODE_CLEAR_DATA_BRAWSING_EMPTY_ARRAY, reply["errorCode"].asInt());
 }
 
 TEST(ClearBrowsingData, unknownData) {
@@ -66,16 +66,16 @@ TEST(ClearBrowsingData, unknownData) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    ASSERT_TRUE(reply.contains("errorText"));
-    ASSERT_TRUE(reply.contains("errorCode"));
-    EXPECT_FALSE(reply["returnValue"].toBool());
-    EXPECT_EQ(ERR_CODE_CLEAR_DATA_BRAWSING_UNKNOWN_DATA, reply["errorCode"].toInt());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    ASSERT_TRUE(reply.isMember("errorText"));
+    ASSERT_TRUE(reply.isMember("errorCode"));
+    EXPECT_FALSE(reply["returnValue"].asBool());
+    EXPECT_EQ(ERR_CODE_CLEAR_DATA_BRAWSING_UNKNOWN_DATA, reply["errorCode"].asInt());
 }
 
 TEST(ClearBrowsingData, all) {
@@ -84,13 +84,13 @@ TEST(ClearBrowsingData, all) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(ClearBrowsingData, appcache) {
@@ -99,13 +99,13 @@ TEST(ClearBrowsingData, appcache) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(ClearBrowsingData, cache) {
@@ -114,13 +114,13 @@ TEST(ClearBrowsingData, cache) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(ClearBrowsingData, codecache) {
@@ -129,13 +129,13 @@ TEST(ClearBrowsingData, codecache) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(ClearBrowsingData, cookies) {
@@ -144,13 +144,13 @@ TEST(ClearBrowsingData, cookies) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(ClearBrowsingData, fileSystems) {
@@ -159,13 +159,13 @@ TEST(ClearBrowsingData, fileSystems) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(ClearBrowsingData, localStorage) {
@@ -174,13 +174,13 @@ TEST(ClearBrowsingData, localStorage) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(ClearBrowsingData, channelIDs) {
@@ -189,13 +189,13 @@ TEST(ClearBrowsingData, channelIDs) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(ClearBrowsingData, serviceWorkers) {
@@ -204,13 +204,13 @@ TEST(ClearBrowsingData, serviceWorkers) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(ClearBrowsingData, cacheStorage) {
@@ -219,13 +219,13 @@ TEST(ClearBrowsingData, cacheStorage) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(ClearBrowsingData, webSQL) {
@@ -234,11 +234,11 @@ TEST(ClearBrowsingData, webSQL) {
     })";
 
     BaseMockInitializer<> mockInitializer;
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameter).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(doc.object());
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }

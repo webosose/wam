@@ -24,10 +24,6 @@
 #include <unordered_map>
 #include <vector>
 
-#include <QJsonObject>
-#include <QMultiMap>
-#include <QString>
-
 #include "webos/webview_base.h"
 
 class ApplicationDescription;
@@ -41,9 +37,13 @@ class WebAppManagerConfig;
 class WebAppBase;
 class WebPageBase;
 
+namespace Json {
+class Value;
+};
+
 class ApplicationInfo {
 public:
-    ApplicationInfo(const QString& inInstanceId, const QString& inAppId, const uint32_t& inPid)
+    ApplicationInfo(const std::string& inInstanceId, const std::string& inAppId, const uint32_t& inPid)
         : instanceId(inInstanceId)
         , appId(inAppId)
         , pid(inPid)
@@ -51,8 +51,8 @@ public:
     }
     ~ApplicationInfo() {}
 
-    QString instanceId;
-    QString appId;
+    std::string instanceId;
+    std::string appId;
     uint32_t pid;
 };
 
@@ -64,9 +64,9 @@ public:
 
     static WebAppManager* instance();
 
-    bool getSystemLanguage(QString& value);
-    bool getDeviceInfo(QString name, QString& value);
-    void broadcastWebAppMessage(WebAppMessageType type, const QString& message);
+    bool getSystemLanguage(std::string& value);
+    bool getDeviceInfo(const std::string& name, std::string& value);
+    void broadcastWebAppMessage(WebAppMessageType type, const std::string& message);
 
     WebProcessManager* getWebProcessManager() { return m_webProcessManager.get(); }
 
@@ -79,9 +79,9 @@ public:
 
     std::list<const WebAppBase*> runningApps();
     std::list<const WebAppBase*> runningApps(uint32_t pid);
-    WebAppBase* findAppById(const QString& appId);
-    std::list<WebAppBase*> findAppsById(const QString& appId);
-    WebAppBase* findAppByInstanceId(const QString& instanceId);
+    WebAppBase* findAppById(const std::string& appId);
+    std::list<WebAppBase*> findAppsById(const std::string& appId);
+    WebAppBase* findAppByInstanceId(const std::string& instanceId);
 
     std::string launch(const std::string& appDescString,
         const std::string& params,
@@ -91,12 +91,12 @@ public:
 
     std::vector<ApplicationInfo> list(bool includeSystemApps = false);
 
-    QJsonObject getWebProcessProfiling();
+    Json::Value getWebProcessProfiling();
     int currentUiWidth();
     int currentUiHeight();
     void setUiSize(int width, int height);
 
-    void setActiveInstanceId(QString id) { m_activeInstanceId = id.toStdString(); }
+    void setActiveInstanceId(const std::string& id) { m_activeInstanceId = id; }
     const std::string getActiveInstanceId() { return m_activeInstanceId; }
 
     void onGlobalProperties(int key);
@@ -105,47 +105,47 @@ public:
     bool onKillApp(const std::string& appId, const std::string& instanceId, bool force = false);
     bool onPauseApp(const std::string& instanceId);
     bool isDiscardCodeCacheRequired();
-    bool setInspectorEnable(QString& appId);
+    bool setInspectorEnable(const std::string& appId);
     void discardCodeCache(uint32_t pid);
 
-    void setSystemLanguage(QString value);
-    void setDeviceInfo(QString name, QString value);
+    void setSystemLanguage(const std::string& value);
+    void setDeviceInfo(const std::string& name, const std::string& value);
     WebAppManagerConfig* config() { return m_webAppManagerConfig.get(); }
 
     const std::string windowTypeFromString(const std::string& str);
 
     bool closeAllApps(uint32_t pid = 0);
-    void setForceCloseApp(const QString& appId, const QString& instanceId);
+    void setForceCloseApp(const std::string& appId, const std::string& instanceId);
     void requestKillWebProcess(uint32_t pid);
 
     int getSuspendDelay() { return m_suspendDelay; }
     int getMaxCustomSuspendDelay() const { return m_maxCustomSuspendDelay; }
-    void deleteStorageData(const QString& identifier);
-    void killCustomPluginProcess(const QString& basePath);
-    bool processCrashed(QString appId, QString instanceId);
+    void deleteStorageData(const std::string& identifier);
+    void killCustomPluginProcess(const std::string& basePath);
+    bool processCrashed(const std::string& appId, const std::string& instanceId);
 
     void closeAppInternal(WebAppBase* app, bool ignoreCleanResource = false);
     void forceCloseAppInternal(WebAppBase* app);
 
     void webPageAdded(WebPageBase* page);
     void webPageRemoved(WebPageBase* page);
-    void removeWebAppFromWebProcessInfoMap(QString appId);
+    void removeWebAppFromWebProcessInfoMap(const std::string& appId);
 
     void appDeleted(WebAppBase* app);
     void postRunningAppList();
     std::string generateInstanceId();
-    void removeClosingAppList(const QString& instanceId);
+    void removeClosingAppList(const std::string& instanceId);
 
     bool isAccessibilityEnabled() { return m_isAccessibilityEnabled; }
     void setAccessibilityEnabled(bool enabled);
-    void postWebProcessCreated(const QString& appId, const QString& instanceId, uint32_t pid);
-    uint32_t getWebProcessId(const QString& appId, const QString& instanceId);
-    void sendEventToAllAppsAndAllFrames(const QString& jsscript);
-    void serviceCall(const QString& url, const QString& payload, const QString& appId);
-    void updateNetworkStatus(const QJsonObject& object);
+    void postWebProcessCreated(const std::string& appId, const std::string& instanceId, uint32_t pid);
+    uint32_t getWebProcessId(const std::string& appId, const std::string& instanceId);
+    void sendEventToAllAppsAndAllFrames(const std::string& jsscript);
+    void serviceCall(const std::string& url, const std::string& payload, const std::string& appId);
+    void updateNetworkStatus(const Json::Value& object);
     void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level);
 
-    bool isEnyoApp(const QString& appId);
+    bool isEnyoApp(const std::string& appId);
 
     void closeApp(const std::string& appId);
 

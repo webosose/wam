@@ -17,11 +17,17 @@
 #ifndef WEBAPPMANAGERSERVICE_H
 #define WEBAPPMANAGERSERVICE_H
 
-#include <QJsonObject>
+#include <list>
+#include <string>
+#include <vector>
 
 #include "WebAppManager.h"
 
 #include "webos/webview_base.h"
+
+namespace Json {
+class Value;
+};
 
 enum ErrorCode {
     ERR_CODE_LAUNCHAPP_MISS_PARAM = 1000,
@@ -60,17 +66,17 @@ public:
 
     virtual bool startService() = 0;
     // methods published to the bus
-    virtual QJsonObject launchApp(QJsonObject request) = 0;
-    virtual QJsonObject killApp(QJsonObject request) = 0;
-    virtual QJsonObject pauseApp(QJsonObject request) = 0;
-    virtual QJsonObject logControl(QJsonObject request) = 0;
-    virtual QJsonObject setInspectorEnable(QJsonObject request) = 0;
-    virtual QJsonObject closeAllApps(QJsonObject request) = 0;
-    virtual QJsonObject discardCodeCache(QJsonObject request) = 0;
-    virtual QJsonObject listRunningApps(QJsonObject request, bool subscribed) = 0;
-    virtual QJsonObject getWebProcessSize(QJsonObject request) = 0;
-    virtual QJsonObject clearBrowsingData(QJsonObject request) = 0;
-    virtual QJsonObject webProcessCreated(QJsonObject request, bool subscribed) = 0;
+    virtual Json::Value launchApp(const Json::Value& request) = 0;
+    virtual Json::Value killApp(const Json::Value& request) = 0;
+    virtual Json::Value pauseApp(const Json::Value& request) = 0;
+    virtual Json::Value logControl(const Json::Value& request) = 0;
+    virtual Json::Value setInspectorEnable(const Json::Value& request) = 0;
+    virtual Json::Value closeAllApps(const Json::Value& request) = 0;
+    virtual Json::Value discardCodeCache(const Json::Value& request) = 0;
+    virtual Json::Value listRunningApps(const Json::Value& request, bool subscribed) = 0;
+    virtual Json::Value getWebProcessSize(const Json::Value& request) = 0;
+    virtual Json::Value clearBrowsingData(const Json::Value& request) = 0;
+    virtual Json::Value webProcessCreated(const Json::Value& request, bool subscribed) = 0;
 
 protected:
     std::string onLaunch(const std::string& appDescString,
@@ -81,35 +87,35 @@ protected:
 
     bool onKillApp(const std::string& appId, const std::string& instanceId, bool force = false);
     bool onPauseApp(const std::string& instanceId);
-    QJsonObject onLogControl(const std::string& keys, const std::string& value);
+    Json::Value onLogControl(const std::string& keys, const std::string& value);
     bool onCloseAllApps(uint32_t pid = 0);
     bool isDiscardCodeCacheRequired();
     void onDiscardCodeCache(uint32_t pid);
     bool onPurgeSurfacePool(uint32_t pid);
-    QJsonObject getWebProcessProfiling();
+    Json::Value getWebProcessProfiling();
     int maskForBrowsingDataType(const char* type);
     void onClearBrowsingData(const int removeBrowsingDataMask);
     void onAppInstalled(const std::string& app_id);
     void onAppRemoved(const std::string& app_id);
 
-    void setDeviceInfo(const QString& name, const QString& value);
+    void setDeviceInfo(const std::string& name, const std::string& value);
     void setUiSize(int width, int height);
-    void setSystemLanguage(const QString& language);
-    QString getSystemLanguage();
-    void setForceCloseApp(const QString& appId, const QString& instanceId);
-    void deleteStorageData(const QString& identifier);
-    void killCustomPluginProcess(const QString& appBasePath);
+    void setSystemLanguage(const std::string& language);
+    std::string getSystemLanguage();
+    void setForceCloseApp(const std::string& appId, const std::string& instanceId);
+    void deleteStorageData(const std::string& identifier);
+    void killCustomPluginProcess(const std::string& appBasePath);
     void requestKillWebProcess(uint32_t pid);
-    void updateNetworkStatus(const QJsonObject& object);
+    void updateNetworkStatus(const Json::Value& object);
     void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level);
     void setAccessibilityEnabled(bool enable);
-    uint32_t getWebProcessId(const QString& appId, const QString& instanceId);
+    uint32_t getWebProcessId(const std::string& appId, const std::string& instanceId);
 
     std::list<const WebAppBase*> runningApps();
     std::list<const WebAppBase*> runningApps(uint32_t pid);
     std::vector<ApplicationInfo> list(bool includeSystemApps = false);
 
-    bool isEnyoApp(const QString& apppId);
+    bool isEnyoApp(const std::string& apppId);
 };
 
 #endif // WEBAPPMANAGERSERVICE_H

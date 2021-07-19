@@ -19,9 +19,6 @@
 
 #include <string>
 
-// TODO: remove header when QT less implementation will be completed.
-#include <QJsonObject>
-
 namespace Json {
 class Value;
 };
@@ -30,10 +27,6 @@ namespace util {
 
 bool JsonValueFromString(const std::string& str, Json::Value& value);
 std::string StringFromJsonValue(const Json::Value& value);
-
-// TODO: remove this methods when QT less implementation will be completed.
-QJsonObject QJsonObjectFromJsonValue(const Json::Value& value);
-bool JsonValueFromQJsonObject(const QJsonObject& object, Json::Value& value);
 
 }  // namespace util
 

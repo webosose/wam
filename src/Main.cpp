@@ -14,9 +14,6 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <QtGlobal>
-#include <QString>
-
 #include <assert.h>
 #include <grp.h>
 #include <pwd.h>
@@ -24,49 +21,20 @@
 
 #include "LogManager.h"
 #include "PlatformModuleFactoryImpl.h"
+#include "Utils.h"
 #include "WebAppManager.h"
 #include "WebAppManagerServiceLuna.h"
 #include <webos/app/webos_main.h>
 
-namespace
-{
-    void qMessageHandler(const QtMsgType type, const QMessageLogContext &context,
-                         const QString &msg)
-    {
-        const char* function = context.function;
-        QByteArray utf8 = msg.toUtf8();
-        char* userMessage = utf8.data();
-        switch (type) {
-            case QtDebugMsg:
-                LOG_DEBUG("%s, %s", function, userMessage);
-                break;
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-            case QtInfoMsg:
-                LOG_INFO(MSGID_QINFO, 0, "%s, %s", function, userMessage);
-                break;
-#endif
-            case QtWarningMsg:
-                LOG_WARNING(MSGID_QWARNING, 0, "%s, %s", function, userMessage);
-                break;
-            case QtCriticalMsg:
-                LOG_ERROR(MSGID_QCRITICAL, 0, "%s, %s", function, userMessage);
-                break;
-            case QtFatalMsg:
-                LOG_CRITICAL(MSGID_QFATAL, 0, "%s, %s", function, userMessage);
-                break;
-        }
-    }
-}
-
 static void changeUserIDGroupID()
 {
-    char *uid, *gid;
-    uid = getenv("WAM_UID");
-    gid = getenv("WAM_GID");
+    std::string uid, gid;
+    uid = getEnvVar("WAM_UID");
+    gid = getEnvVar("WAM_GID");
 
-    if (uid && gid) {
-        struct passwd *pwd = getpwnam(uid);
-        struct group *grp = getgrnam(gid);
+    if (uid.size() && gid.size()) {
+        struct passwd *pwd = getpwnam(uid.c_str());
+        struct group *grp = getgrnam(gid.c_str());
 
         assert(pwd);
         assert(grp);
@@ -75,7 +43,7 @@ static void changeUserIDGroupID()
         if (grp) {
             ret = setgid(grp->gr_gid);
             assert(ret == 0);
-            ret = initgroups(uid, grp->gr_gid);
+            ret = initgroups(uid.c_str(), grp->gr_gid);
             assert(ret == 0);
         }
 
@@ -89,9 +57,6 @@ static void changeUserIDGroupID()
 
 static void startWebAppManager()
 {
-    // FIXME: Remove this when we don't use qDebug, qWarning any more.
-    qInstallMessageHandler(qMessageHandler);
-
     changeUserIDGroupID();
 
     WebAppManagerServiceLuna* webAppManagerServiceLuna = WebAppManagerServiceLuna::instance();

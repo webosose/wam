@@ -20,8 +20,6 @@
 #include <string>
 #include <vector>
 
-#include <QString>
-
 #include "webos/webapp_window_base.h"
 
 class WebAppWayland;
@@ -59,7 +57,7 @@ class WebAppWindow {
   virtual void hide() = 0;
   virtual void show() = 0;
   virtual void platformBack() = 0;
-  virtual void setCursor(const QString& cursorArg,
+  virtual void setCursor(const std::string& cursorArg,
                          int hotspot_x,
                          int hotspot_y) = 0;
   virtual void attachWebContents(void* webContents) = 0;

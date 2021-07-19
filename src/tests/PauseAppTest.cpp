@@ -16,11 +16,10 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <json/json.h>
 
 #include "BaseMockInitializer.h"
+#include "JsonHelper.h"
 #include "WebAppManagerService.h"
 #include "WebAppManagerServiceLuna.h"
 #include "WebViewMockImpl.h"
@@ -85,16 +84,18 @@ constexpr char kLaunchAppJsonBody[] = R"({
 }  // namespace
 
 TEST(PauseAppTest, AppNotExist) {
-  const QJsonObject request{{"instanceId", kInstanceId}, {"appId", kAppId}};
-  const QJsonObject reply =
-      WebAppManagerServiceLuna::instance()->pauseApp(request);
+  Json::Value request;
+  request["instanceId"] = kInstanceId;
+  request["appId"] = kAppId;
+  const auto reply = WebAppManagerServiceLuna::instance()->pauseApp(request);
 
-  EXPECT_FALSE(reply.contains("instanceId"));
-  EXPECT_FALSE(reply.contains("appId"));
-  EXPECT_TRUE(reply.contains("returnValue"));
-  EXPECT_FALSE(reply["returnValue"].toBool());
-  EXPECT_TRUE(reply.contains("errorText"));
-  EXPECT_EQ(reply["errorText"].toString().toStdString(), err_noRunningApp);
+  ASSERT_TRUE(reply.isObject());
+  EXPECT_TRUE(reply["instanceId"].isNull());
+  EXPECT_TRUE(reply["appId"].isNull());
+  EXPECT_TRUE(reply.isMember("returnValue"));
+  EXPECT_FALSE(reply["returnValue"].asBool());
+  EXPECT_TRUE(reply.isMember("errorText"));
+  EXPECT_EQ(reply["errorText"].asString(), err_noRunningApp);
 }
 
 TEST(PauseAppTest, PauseApp) {
@@ -104,26 +105,27 @@ TEST(PauseAppTest, PauseApp) {
 
   EXPECT_CALL(*mock_initializer.GetWebAppWindowMock(), hide()).Times(1);
 
-  QJsonParseError parse_error;
-  QJsonDocument doc = QJsonDocument::fromJson(
-      QString::fromUtf8(kLaunchAppJsonBody).toUtf8(), &parse_error);
-  ASSERT_EQ(parse_error.error, QJsonParseError::NoError);
+  Json::Value launch_request;
+  ASSERT_TRUE(util::JsonValueFromString(kLaunchAppJsonBody, launch_request));
   WebAppManagerServiceLuna* luna_service = WebAppManagerServiceLuna::instance();
-  const QJsonObject result = luna_service->launchApp(doc.object());
+  const auto result = luna_service->launchApp(launch_request);
 
-  ASSERT_TRUE(result.contains("returnValue"));
-  ASSERT_TRUE(result["returnValue"].toBool());
+  ASSERT_TRUE(result.isObject());
+  ASSERT_TRUE(result.isMember("returnValue"));
+  ASSERT_TRUE(result["returnValue"].asBool());
 
-  const QJsonObject request{{"instanceId", kInstanceId}, {"appId", kAppId}};
-  const QJsonObject reply =
-      WebAppManagerServiceLuna::instance()->pauseApp(request);
+  Json::Value pause_request;
+  pause_request["instanceId"] = kInstanceId;
+  pause_request["appId"] = kAppId;
+  const auto reply =
+      WebAppManagerServiceLuna::instance()->pauseApp(pause_request);
 
-  EXPECT_FALSE(reply.contains("errorText"));
-  EXPECT_TRUE(reply.contains("instanceId"));
-  EXPECT_STREQ(reply["instanceId"].toString().toStdString().c_str(),
-               kInstanceId);
-  EXPECT_TRUE(reply.contains("appId"));
-  EXPECT_STREQ(kAppId, reply["appId"].toString().toStdString().c_str());
-  EXPECT_TRUE(reply.contains("returnValue"));
-  EXPECT_TRUE(reply["returnValue"].toBool());
+  ASSERT_TRUE(reply.isObject());
+  EXPECT_TRUE(reply["errorText"].isNull());
+  EXPECT_TRUE(reply.isMember("instanceId"));
+  EXPECT_STREQ(reply["instanceId"].asString().c_str(), kInstanceId);
+  EXPECT_TRUE(reply.isMember("appId"));
+  EXPECT_STREQ(kAppId, reply["appId"].asString().c_str());
+  EXPECT_TRUE(reply.isMember("returnValue"));
+  EXPECT_TRUE(reply["returnValue"].asBool());
 }

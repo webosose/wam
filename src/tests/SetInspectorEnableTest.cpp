@@ -16,12 +16,10 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <json/json.h>
 
 #include "BaseMockInitializer.h"
+#include "JsonHelper.h"
 #include "WebAppManagerServiceLuna.h"
 
 namespace {
@@ -83,23 +81,22 @@ constexpr char kLaunchAppJsonBody[] = R"({
 
 TEST(SetInspectorEnableTest, checkLunaRequestIsDummy)
 {
-    constexpr char expectedResponse[] = "{\n    \"returnValue\": true\n}\n";
-
     BaseMockInitializer<> mockInitializer;
 
     WebAppManagerServiceLuna* lunaService = WebAppManagerServiceLuna::instance();
-    const QJsonObject request {};
-    const QJsonObject response = lunaService->setInspectorEnable(request);
-    std::string responseStr = QJsonDocument(response).toJson().toStdString();
+    const Json::Value request(Json::objectValue);
+    const Json::Value response = lunaService->setInspectorEnable(request);
 
-    ASSERT_STREQ(expectedResponse, responseStr.c_str());
+    ASSERT_TRUE(response.isObject());
+    ASSERT_TRUE(response.isMember("returnValue"));
+    ASSERT_TRUE(response["returnValue"].asBool());
 }
 
 TEST(SetInspectorEnableTest, checkCaseNoApplications)
 {
     BaseMockInitializer<> mockInitializer;
 
-    QString appId(kApplicationId);
+    std::string appId(kApplicationId);
     EXPECT_FALSE(WebAppManager::instance()->setInspectorEnable(appId));
 }
 
@@ -107,17 +104,16 @@ TEST(SetInspectorEnableTest, checkCaseApplicationNotExists)
 {
     BaseMockInitializer<> mockInitializer;
 
-    QJsonParseError parseError;
-    QJsonDocument requestLaunch = QJsonDocument::fromJson(
-        QString::fromUtf8(kLaunchAppJsonBody).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value requestLaunch;
+    ASSERT_TRUE(util::JsonValueFromString(kLaunchAppJsonBody, requestLaunch));
     WebAppManagerServiceLuna* lunaService = WebAppManagerServiceLuna::instance();
-    const QJsonObject responseLaunch = lunaService->launchApp(requestLaunch.object());
+    const auto responseLaunch = lunaService->launchApp(requestLaunch);
 
-    ASSERT_TRUE(responseLaunch.contains("returnValue"));
-    ASSERT_TRUE(responseLaunch["returnValue"].toBool());
+    ASSERT_TRUE(responseLaunch.isObject());
+    ASSERT_TRUE(responseLaunch.isMember("returnValue"));
+    ASSERT_TRUE(responseLaunch["returnValue"].asBool());
 
-    QString appId("NotExistingAppId");
+    std::string appId("NotExistingAppId");
     EXPECT_FALSE(WebAppManager::instance()->setInspectorEnable(appId));
 }
 
@@ -125,16 +121,15 @@ TEST(SetInspectorEnableTest, checkCaseApplicationExists)
 {
     BaseMockInitializer<> mockInitializer;
 
-    QJsonParseError parseError;
-    QJsonDocument requestLaunch = QJsonDocument::fromJson(
-        QString::fromUtf8(kLaunchAppJsonBody).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value requestLaunch;
+    ASSERT_TRUE(util::JsonValueFromString(kLaunchAppJsonBody, requestLaunch));
     WebAppManagerServiceLuna* lunaService = WebAppManagerServiceLuna::instance();
-    const QJsonObject responseLaunch = lunaService->launchApp(requestLaunch.object());
+    const auto responseLaunch = lunaService->launchApp(requestLaunch);
 
-    ASSERT_TRUE(responseLaunch.contains("returnValue"));
-    ASSERT_TRUE(responseLaunch["returnValue"].toBool());
+    ASSERT_TRUE(responseLaunch.isObject());
+    ASSERT_TRUE(responseLaunch.isMember("returnValue"));
+    ASSERT_TRUE(responseLaunch["returnValue"].asBool());
 
-    QString appId(kApplicationId);
+    std::string appId(kApplicationId);
     EXPECT_TRUE(WebAppManager::instance()->setInspectorEnable(appId));
 }

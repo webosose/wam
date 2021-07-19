@@ -22,9 +22,8 @@
 #include <signal.h>
 #include <string>
 
-#include <QFile>
-#include <QJsonArray>
-#include <QJsonDocument>
+#include <glib.h>
+#include <json/json.h>
 
 #include "ApplicationDescription.h"
 #include "LogManager.h"
@@ -34,8 +33,6 @@
 #include "WebAppManagerConfig.h"
 #include "WebAppManagerUtils.h"
 #include "WebPageBase.h"
-
-#include <glib.h>
 
 WebProcessManager::WebProcessManager()
     : m_maximumNumberOfProcesses(1)
@@ -55,12 +52,12 @@ std::list<const WebAppBase*> WebProcessManager::runningApps(uint32_t pid)
 
 WebAppBase* WebProcessManager::findAppById(const std::string& appId)
 {
-    return WebAppManager::instance()->findAppById(QString::fromStdString(appId));
+    return WebAppManager::instance()->findAppById(appId);
 }
 
-WebAppBase* WebProcessManager::findAppByInstanceId(const QString& appId)
+WebAppBase* WebProcessManager::findAppByInstanceId(const std::string& instanceId)
 {
-    return WebAppManager::instance()->findAppByInstanceId(appId);
+    return WebAppManager::instance()->findAppByInstanceId(instanceId);
 }
 
 bool WebProcessManager::webProcessInfoMapReady()
@@ -101,7 +98,7 @@ uint32_t WebProcessManager::getWebProcessProxyID(uint32_t pid) const
     return 0;
 }
 
-QString WebProcessManager::getWebProcessMemSize(uint32_t pid) const
+std::string WebProcessManager::getWebProcessMemSize(uint32_t pid) const
 {
     std::string path = "/proc/" + std::to_string(pid) + "/status";
     std::ifstream in(path);
@@ -121,7 +118,7 @@ QString WebProcessManager::getWebProcessMemSize(uint32_t pid) const
 void WebProcessManager::readWebProcessPolicy()
 {
     Json::Value webProcessEnvironment;
-    std::string configPath = WebAppManager::instance()->config()->getWebProcessConfigPath().toStdString();
+    std::string configPath = WebAppManager::instance()->config()->getWebProcessConfigPath();
     bool config = fileToJson(configPath, webProcessEnvironment);
 
     if (!config || webProcessEnvironment.isNull()) {

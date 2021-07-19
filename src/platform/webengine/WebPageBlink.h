@@ -21,13 +21,15 @@
 #include <string>
 #include <vector>
 
-#include <QtCore/QUrl>
-
 #include "Timer.h"
 #include "WebPageBase.h"
 #include "WebPageBlinkDelegate.h"
 
 #include "webos/webview_base.h"
+
+namespace wam {
+    class Url;
+}
 
 class WebAppBase;
 class WebView;
@@ -37,11 +39,11 @@ class WebViewFactory;
 
 class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
 public:
-    WebPageBlink(const QUrl& url,
+    WebPageBlink(const wam::Url& url,
                  std::shared_ptr<ApplicationDescription> desc,
-                 const QString& launchParams,
+                 const std::string& launchParams,
                  std::unique_ptr<WebViewFactory> factory);
-    WebPageBlink(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const QString& launchParams);
+    WebPageBlink(const wam::Url& url, std::shared_ptr<ApplicationDescription> desc, const std::string& launchParams);
     ~WebPageBlink() override;
 
     void setObserver(WebPageBlinkObserver* observer);
@@ -49,27 +51,27 @@ public:
     // WebPageBase
     void init() override;
     void* getWebContents() override;
-    void setLaunchParams(const QString& params) override;
+    void setLaunchParams(const std::string& params) override;
     void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level) override;
-    QUrl url() const override;
+    wam::Url url() const override;
     void loadUrl(const std::string& url) override;
     int progress() const override;
     bool hasBeenShown() const override;
     void setPageProperties() override;
-    void setPreferredLanguages(const QString& language) override;
-    void setDefaultFont(const QString& font) override;
+    void setPreferredLanguages(const std::string& language) override;
+    void setDefaultFont(const std::string& font) override;
     void reloadDefaultPage() override;
     void reload() override;
     void setVisibilityState(WebPageVisibilityState visibilityState) override;
     void setFocus(bool focus) override;
-    QString title() override;
+    std::string title() override;
     bool canGoBack() override;
     void closeVkb() override;
     bool isInputMethodActive() const override;
     void keyboardVisibilityChanged(bool visible) override;
-    void handleDeviceInfoChanged(const QString& deviceInfo) override;
-    void evaluateJavaScript(const QString& jsCode) override;
-    void evaluateJavaScriptInAllFrames(const QString& jsCode, const char* method = "") override;
+    void handleDeviceInfoChanged(const std::string& deviceInfo) override;
+    void evaluateJavaScript(const std::string& jsCode) override;
+    void evaluateJavaScriptInAllFrames(const std::string& jsCode, const char* method = "") override;
     uint32_t getWebProcessProxyID() override;
     uint32_t getWebProcessPID() const override { return renderProcessPid(); }
     void createPalmSystem(WebAppBase* app) override;
@@ -86,7 +88,7 @@ public:
     void reloadExtensionData() override;
     void updateIsLoadErrorPageFinish() override;
     void updateDatabaseIdentifier() override;
-    void deleteWebStorages(const QString& identfier) override;
+    void deleteWebStorages(const std::string& identfier) override;
     void setInspectorEnable() override;
     void setKeepAliveWebApp(bool keepAlive) override;
 
@@ -121,12 +123,12 @@ public:
     void navigationHistoryChanged() override;
     void didErrorPageLoadedFromNetErrorHelper() override;
 
-    void updateExtensionData(const QString& key, const QString& value);
-    void setLoadErrorPolicy(const QString& policy);
-    void setTrustLevel(const QString& trustLevel) { m_trustLevel = trustLevel.toStdString(); }
-    QString trustLevel() const { return  QString::fromStdString(m_trustLevel); }
-    QString defaultTrustLevel() const;
-    QString escapeData(const QString& value);
+    void updateExtensionData(const std::string& key, const std::string& value);
+    void setLoadErrorPolicy(const std::string& policy);
+    void setTrustLevel(const std::string& trustLevel) { m_trustLevel = trustLevel; }
+    std::string trustLevel() const { return m_trustLevel; }
+    std::string defaultTrustLevel() const;
+    std::string escapeData(const std::string& value);
     int renderProcessPid() const;
     static void setFileAccessBlocked(bool blocked);
     void updateBoardType();
@@ -150,7 +152,6 @@ public:
     void setAudioGuidanceOn(bool on) override;
     void updateBackHistoryAPIDisabled();
 
-
 protected:
     WebView* pageView() const;
 
@@ -159,8 +160,8 @@ protected:
     virtual void loadErrorPage(int errorCode);
     virtual WebView* createPageView();
     virtual void setupStaticUserScripts();
-    virtual void addUserScript(const QString& script);
-    virtual void addUserScriptUrl(const QUrl& url);
+    virtual void addUserScript(const std::string& script);
+    virtual void addUserScriptUrl(const wam::Url& url);
     virtual void recreateWebView();
     virtual void setVisible(bool visible);
     virtual bool shouldStopJSOnSuspend() const { return true; }
@@ -189,7 +190,7 @@ private:
     bool m_hasBeenShown;
     OneShotTimer<WebPageBlink> m_domSuspendTimer;
     std::string m_customPluginPath;
-    qreal m_vkbHeight;
+    double m_vkbHeight;
     bool m_vkbWasOverlap;
     bool m_hasCloseCallback;
     OneShotTimer<WebPageBlink> m_closeCallbackTimer;

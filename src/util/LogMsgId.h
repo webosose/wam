@@ -17,8 +17,6 @@
 #ifndef LOGMSGID_H
 #define LOGMSGID_H
 
-#include <qglobal.h>
-
 // clang-format off
 // Logging Message IDs
 
@@ -86,6 +84,7 @@
 #define MSGID_BAD_WINDOW_TYPE           "BAD_WINDOW_TYPE" /** Somehow got an unsupported window type */
 #define MSGID_SETTING_SERVICE            "SETTING_SERVICE" /** Received a notification from setting service */
 #define MSGID_RECEIVED_INVALID_SETTINGS "RECEIVED_INVALID_SETTINGS" /** Received invalid value from systemservice */
+#define MSGID_APP_LAUNCH                "APP_LAUNCH" /** Sent when we get a request to launch an app */
 #define MSGID_APP_RELAUNCH              "APP_RELAUNCH" /** Sent when we get a request to launch an app that is already running */
 #define MSGID_SERVICE_CONNECT_FAIL      "SERVICE_CONNECT_FAIL" /* Failed to connect to settingsservice */
 #define MSGID_DISPLAY_CONNECT_FAIL      "DISPLAY_CONNECT_FAIL" /* Failed to connect to display manager */
@@ -104,14 +103,6 @@
 
 #define MSGID_ERROR_ERROR               "ERROR_PAGE_ERROR" /** Error loop -- failed to load error page! */
 #define MSGID_CLOSE_CALL_FAIL           "CLOSE_CALL_FAIL" /** Failed to send closeByAppId call to sam */
-
-// Qt logging handler
-#if (QT_VERSION >= QT_VERSION_CHECK(5, 5, 0))
-#define MSGID_QINFO                     "QINFO" /** A message from qInfo() */
-#endif
-#define MSGID_QWARNING                  "QWARNING" /** A message from qWarning() */
-#define MSGID_QCRITICAL                 "QCRITICAL" /** A message from qCritical() */
-#define MSGID_QFATAL                    "QFATAL" /** a message from qFatal() */
 
 #define MSGID_LOCALEINFO_READ_FAIL      "LOCALEINFO_FILE_READ_FAIL" /** Fail to read locale info from /var/luna/preferences/localInfo */
 
@@ -155,6 +146,7 @@
 #define MSGID_NOTIFY_MEMORY_STATE            "NOTIFY_MEMORY_STATE" /** Send memory state*/
 
 #define MSGID_TYPE_ERROR                  "DATA_TYPE_ERROR" /** Use a invalid data type **/
+#define MSGID_FILE_ERROR                  "FILE_ERROR" /** Use a not existing file **/
 
 // clang-format on
 

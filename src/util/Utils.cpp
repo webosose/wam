@@ -161,6 +161,11 @@ bool strToInt(const std::string str, int32_t& value)
     return true;
 }
 
+int strToIntWithDefault(const std::string& str, int32_t defaultValue) {
+  int32_t convertedValue;
+  return strToInt(str, convertedValue) ? convertedValue : defaultValue;
+}
+
 void replaceAll(std::string& source, const std::string& what, const std::string& with)
 {
     for (size_t pos = 0; std::string::npos != (pos = source.find(what, pos)); pos += with.length())

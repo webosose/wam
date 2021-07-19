@@ -23,6 +23,7 @@
 #include "WebAppWindowFactory.h"
 #include "WebPageBlink.h"
 #include "WebViewFactory.h"
+#include "util/Url.h"
 
 WebAppFactoryManagerMock::WebAppFactoryManagerMock()
     : m_viewFactory(nullptr)
@@ -32,7 +33,7 @@ WebAppFactoryManagerMock::WebAppFactoryManagerMock()
 
 WebAppFactoryManagerMock::~WebAppFactoryManagerMock() = default;
 
-WebAppBase* WebAppFactoryManagerMock::createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc, QString appType)
+WebAppBase* WebAppFactoryManagerMock::createWebApp(const std::string& winType, std::shared_ptr<ApplicationDescription> desc, const std::string& appType)
 {
     if (m_windowFactory)
         return new WebAppWayland(winType, std::unique_ptr<WebAppWindowFactory>(m_windowFactory), desc->widthOverride(), desc->heightOverride(), desc->getDisplayAffinity(), desc->locationHint());
@@ -41,12 +42,12 @@ WebAppBase* WebAppFactoryManagerMock::createWebApp(QString winType, std::shared_
     return nullptr;
 }
 
-WebAppBase* WebAppFactoryManagerMock::createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc, QString appType)
+WebAppBase* WebAppFactoryManagerMock::createWebApp(const std::string& winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc, const std::string& appType)
 {
     return createWebApp(winType, desc, appType);
 }
 
-WebPageBase* WebAppFactoryManagerMock::createWebPage(QString winType, QUrl url, std::shared_ptr<ApplicationDescription> desc, QString appType, QString launchParams)
+WebPageBase* WebAppFactoryManagerMock::createWebPage(const std::string& winType, const wam::Url& url, std::shared_ptr<ApplicationDescription> desc, const std::string& appType, const std::string& launchParams)
 {
     if (!m_viewFactory) {
         std::cerr << "Missing ViewFactory pointer. Method setWebViewFactory should be called prior to createWebPage" << std::endl;

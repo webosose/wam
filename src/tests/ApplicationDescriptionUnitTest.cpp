@@ -328,7 +328,7 @@ TEST_F(ApplicationDescriptionTest, checkGetWindowGroupInfo)
     const ApplicationDescription::WindowGroupInfo groupInfo =
         m_applicationDescription.get()->getWindowGroupInfo();
 
-    EXPECT_STREQ("Window group name", groupInfo.name.toStdString().c_str());
+    EXPECT_STREQ("Window group name", groupInfo.name.c_str());
     EXPECT_TRUE(groupInfo.isOwner);
 }
 
@@ -337,8 +337,8 @@ TEST_F(ApplicationDescriptionTest, checkGetWindowClientInfo)
     const ApplicationDescription::WindowClientInfo clientInfo =
         m_applicationDescription.get()->getWindowClientInfo();
 
-    EXPECT_STREQ("Client layer name", clientInfo.layer.toStdString().c_str());
-    EXPECT_STREQ("Client layer hint", clientInfo.hint.toStdString().c_str());
+    EXPECT_STREQ("Client layer name", clientInfo.layer.c_str());
+    EXPECT_STREQ("Client layer hint", clientInfo.hint.c_str());
 }
 
 TEST_F(ApplicationDescriptionTest, checkGetWindowOwnertInfo)
@@ -349,37 +349,28 @@ TEST_F(ApplicationDescriptionTest, checkGetWindowOwnertInfo)
     EXPECT_FALSE(ownerInfo.allowAnonymous);
     ASSERT_EQ(1, ownerInfo.layers.size());
     auto layer = ownerInfo.layers.begin();
-    EXPECT_STREQ("Owner layer name", layer.key().toStdString().c_str());
-    EXPECT_EQ(111, layer.value());
+    EXPECT_STREQ("Owner layer name", layer->first.c_str());
+    EXPECT_EQ(111, layer->second);
 }
 
 TEST_F(ApplicationDescriptionTest, checkGetSupportedEnyoBundleVersions)
 {
-    std::vector<std::string> expectedVersions = {
+    std::set<std::string> expectedVersions = {
         "Version 1.0.1",
         "Version 2.0.1",
         "Version 3.0.1"};
-    const QStringList actualVersions = m_applicationDescription.get()->supportedEnyoBundleVersions();
+    const auto actualVersions = m_applicationDescription.get()->supportedEnyoBundleVersions();
 
-    ASSERT_EQ(expectedVersions.size(), actualVersions.size());
-    for (size_t i = 0; i < expectedVersions.size(); i++)
-        EXPECT_STREQ(expectedVersions[i].c_str(),
-                     actualVersions[i].toStdString().c_str());
+    EXPECT_EQ(expectedVersions, actualVersions);
 }
 
 TEST_F(ApplicationDescriptionTest, checkGetKeyFilterTable)
 {
-    std::map<int, std::pair<int, int>> expectedTable = {
+    std::unordered_map<int, std::pair<int, int>> expectedTable = {
         {1, {2, 3}},
         {4, {5, 6}},
         {7, {8, 9}}};
-    const QMap<int, QPair<int, int>> actualTable = m_applicationDescription.get()->keyFilterTable();
+    const auto actualTable = m_applicationDescription.get()->keyFilterTable();
 
-    ASSERT_EQ(expectedTable.size(), actualTable.size());
-    for (const auto &expectedRow : expectedTable)
-    {
-        QPair<int, int> actualRow = actualTable[expectedRow.first];
-        EXPECT_EQ(expectedRow.second.first, actualRow.first);
-        EXPECT_EQ(expectedRow.second.second, actualRow.second);
-    }
+    EXPECT_EQ(expectedTable, actualTable);
 }

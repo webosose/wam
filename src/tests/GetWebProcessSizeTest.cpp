@@ -16,14 +16,13 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
-
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <json/json.h>
 
 #include "BaseMockInitializer.h"
 #include "BlinkWebProcessManagerMock.h"
+#include "JsonHelper.h"
 #include "PlatformModuleFactoryImplMock.h"
+#include "Utils.h"
 #include "WebAppManagerServiceLuna.h"
 #include "WebViewMock.h"
 
@@ -92,16 +91,16 @@ TEST(GetWebProcessSizeTest, checkCaseProcessNotExists)
 {
     BaseMockInitializer<> mockInitializer;
 
-    const QJsonObject requestProcessSize {};
+    const Json::Value requestProcessSize(Json::objectValue);
     WebAppManagerServiceLuna* lunaService = WebAppManagerServiceLuna::instance();
-    const QJsonObject responseProcessSize = lunaService->getWebProcessSize(requestProcessSize);
+    const auto responseProcessSize = lunaService->getWebProcessSize(requestProcessSize);
 
-    ASSERT_TRUE(responseProcessSize.contains("returnValue"));
-    ASSERT_TRUE(responseProcessSize["returnValue"].toBool());
-    ASSERT_TRUE(responseProcessSize.contains("WebProcesses"));
+    ASSERT_TRUE(responseProcessSize.isObject());
+    ASSERT_TRUE(responseProcessSize.isMember("returnValue"));
+    ASSERT_TRUE(responseProcessSize["returnValue"].asBool());
     ASSERT_TRUE(responseProcessSize["WebProcesses"].isArray());
 
-    QJsonArray processes = responseProcessSize["WebProcesses"].toArray();
+    auto processes = responseProcessSize["WebProcesses"];
     ASSERT_EQ(processes.size(), 0);
 }
 
@@ -110,15 +109,14 @@ TEST(GetWebProcessSizeTest, checkCaseProcessExists)
     BaseMockInitializer<NiceWebViewMock, NiceWebAppWindowMock,
                         PlatformModuleFactoryImplMock> mockInitializer;
 
-    QJsonParseError parseError;
-    QJsonDocument requestLaunch = QJsonDocument::fromJson(
-        QString::fromUtf8(kLaunchAppJsonBody).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value requestLaunch;
+    ASSERT_TRUE(util::JsonValueFromString(kLaunchAppJsonBody, requestLaunch));
     WebAppManagerServiceLuna* lunaService = WebAppManagerServiceLuna::instance();
-    const QJsonObject responseLaunch = lunaService->launchApp(requestLaunch.object());
+    const auto responseLaunch = lunaService->launchApp(requestLaunch);
 
-    ASSERT_TRUE(responseLaunch.contains("returnValue"));
-    ASSERT_TRUE(responseLaunch["returnValue"].toBool());
+    ASSERT_TRUE(responseLaunch.isObject());
+    ASSERT_TRUE(responseLaunch.isMember("returnValue"));
+    ASSERT_TRUE(responseLaunch["returnValue"].asBool());
 
     BlinkWebProcessManagerMock* procManager = static_cast<BlinkWebProcessManagerMock*>(
         WebAppManager::instance()->getWebProcessManager());
@@ -127,39 +125,40 @@ TEST(GetWebProcessSizeTest, checkCaseProcessExists)
     EXPECT_CALL(*procManager, getWebProcessMemSize(kProcessId))
         .WillRepeatedly(testing::Return(kProcessMemSize));
 
-    const QJsonObject requestProcessSize {};
-    const QJsonObject responseProcessSize = lunaService->getWebProcessSize(requestProcessSize);
+    const Json::Value requestProcessSize(Json::objectValue);
+    const auto responseProcessSize = lunaService->getWebProcessSize(requestProcessSize);
 
-    ASSERT_TRUE(responseProcessSize.contains("returnValue"));
-    ASSERT_TRUE(responseProcessSize["returnValue"].toBool());
-    ASSERT_TRUE(responseProcessSize.contains("WebProcesses"));
+    ASSERT_TRUE(responseProcessSize.isObject());
+    ASSERT_TRUE(responseProcessSize.isMember("returnValue"));
+    ASSERT_TRUE(responseProcessSize["returnValue"].asBool());
     ASSERT_TRUE(responseProcessSize["WebProcesses"].isArray());
 
-    QJsonArray processes = responseProcessSize["WebProcesses"].toArray();
+    auto processes = responseProcessSize["WebProcesses"];
     ASSERT_TRUE(processes.size() > 0);
     int processPosition = -1;
-    for (int i = 0; i < processes.size(); i++) {
+    for (unsigned int i = 0; i < processes.size(); i++) {
         ASSERT_TRUE(processes[i].isObject());
-        QJsonObject process = processes[i].toObject();
-        ASSERT_TRUE(process.contains("pid"));
+        auto process = processes[i];
+        ASSERT_TRUE(process.isMember("pid"));
         ASSERT_TRUE(process["pid"].isString());
-        if (process["pid"].toString().toInt() == kProcessId) {
+        int pid = 0;
+        strToInt(process["pid"].asString(), pid);
+        if (pid == kProcessId) {
             processPosition = i;
-            ASSERT_TRUE(process.contains("webProcessSize"));
-            ASSERT_STREQ(process["webProcessSize"].toString().toStdString().c_str(), kProcessMemSize);
+            ASSERT_TRUE(process.isMember("webProcessSize"));
+            ASSERT_STREQ(process["webProcessSize"].asString().c_str(), kProcessMemSize);
 
-            ASSERT_TRUE(process.contains("runningApps"));
             ASSERT_TRUE(process["runningApps"].isArray());
 
-            QJsonArray runningApps = process["runningApps"].toArray();
+            auto runningApps = process["runningApps"];
             ASSERT_EQ(runningApps.size(), 1);
             ASSERT_TRUE(runningApps[0].isObject());
 
-            QJsonObject application = runningApps[0].toObject();
-            ASSERT_TRUE(application.contains("id"));
-            ASSERT_TRUE(application.contains("instanceId"));
-            ASSERT_STREQ(application["id"].toString().toStdString().c_str(), kApplicationId);
-            ASSERT_STREQ(application["instanceId"].toString().toStdString().c_str(), kInstanceId);
+            auto application = runningApps[0];
+            ASSERT_TRUE(application.isMember("id"));
+            ASSERT_TRUE(application.isMember("instanceId"));
+            ASSERT_STREQ(application["id"].asString().c_str(), kApplicationId);
+            ASSERT_STREQ(application["instanceId"].asString().c_str(), kInstanceId);
         }
     }
 

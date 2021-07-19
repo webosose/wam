@@ -16,6 +16,8 @@
 
 #include "WebAppManagerServiceLunaImpl.h"
 
+#include "json/json.h"
+
 #include "LogManager.h"
 #include "QtLessTemporaryHelpers.h"
 
@@ -27,13 +29,11 @@ WebAppManagerServiceLuna* WebAppManagerServiceLuna::instance()
     return service;
 }
 
-void WebAppManagerServiceLunaImpl::systemServiceConnectCallback(QJsonObject reply)
+void WebAppManagerServiceLunaImpl::systemServiceConnectCallback(const Json::Value& reply)
 {
     WebAppManagerServiceLuna::systemServiceConnectCallback(reply);
 
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
-
-    if (replyJson.isObject() && replyJson.isMember("connected")) {
+    if (reply.isObject() && reply.isMember("connected")) {
         Json::Value optionParams;
         optionParams["subscribe"] = true;
         optionParams["category"] = "option";
@@ -43,19 +43,18 @@ void WebAppManagerServiceLunaImpl::systemServiceConnectCallback(QJsonObject repl
         optionList.append("audioGuidance");
         optionList.append("screenRotation");
         optionParams["keys"] = optionList;
-        LS2_CALL(getSystemOptionCallback, "luna://com.webos.settingsservice/getSystemSettings", qtless::JsonHelper::qjsonFromJsonCpp(optionParams));
+        LS2_CALL(getSystemOptionCallback, "luna://com.webos.settingsservice/getSystemSettings", optionParams);
     }
 }
 
-QJsonObject WebAppManagerServiceLunaImpl::setInspectorEnable(QJsonObject request)
+Json::Value WebAppManagerServiceLunaImpl::setInspectorEnable(const Json::Value& request)
 {
     Json::Value reply = qtless::JsonHelper::jsonCppFromString(R"({"returnValue": true})");
-    return qtless::JsonHelper::qjsonFromJsonCpp(reply);
+    return reply;
 }
 
-void WebAppManagerServiceLunaImpl::getSystemOptionCallback(QJsonObject reply)
+void WebAppManagerServiceLunaImpl::getSystemOptionCallback(const Json::Value& replyJson)
 {
-    Json::Value replyJson = qtless::JsonHelper::jsonCppFromQjson(reply);
     Json::Value settings = replyJson["settings"];
     //The settings is empty when service is crashed
     //The right value will be notified again when service is restarted

@@ -21,9 +21,6 @@
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
 
-#include <QJsonDocument>
-#include <QVariant>
-
 #include "ApplicationDescription.h"
 #include "PluginLibWrapper.h"
 #include "PluginLibWrapperMock.h"
@@ -91,11 +88,12 @@ TEST(PluginLoadTest, DefaultWebApp) {
   WebAppFactoryInterfaceMock factory_interface_mock;
   WebAppBaseMock app_base_mock;
   EXPECT_CALL(factory_interface_mock,
-              createWebApp(QString("_WEBOS_WINDOW_TYPE_CARD"), testing::_))
+              createWebApp(std::string("_WEBOS_WINDOW_TYPE_CARD"), testing::_))
       .Times(1)
-      .WillRepeatedly([&](QString, std::shared_ptr<ApplicationDescription>) {
-        return &app_base_mock;
-      });
+      .WillRepeatedly(
+          [&](const std::string&, std::shared_ptr<ApplicationDescription>) {
+            return &app_base_mock;
+          });
   EXPECT_CALL(*lib_wrapper, GetCreateInstanceFunction(fake_handle))
       .Times(1)
       .WillRepeatedly([&](void* handle) {
@@ -129,11 +127,12 @@ TEST(PluginLoadTest, CustomWebApp) {
   WebAppFactoryInterfaceMock factory_interface_mock;
   WebAppBaseMock app_base_mock;
   EXPECT_CALL(factory_interface_mock,
-              createWebApp(QString("_WEBOS_WINDOW_TYPE_CARD"), testing::_))
+              createWebApp(std::string("_WEBOS_WINDOW_TYPE_CARD"), testing::_))
       .Times(1)
-      .WillRepeatedly([&](QString, std::shared_ptr<ApplicationDescription>) {
-        return &app_base_mock;
-      });
+      .WillRepeatedly(
+          [&](const std::string&, std::shared_ptr<ApplicationDescription>) {
+            return &app_base_mock;
+          });
   EXPECT_CALL(*lib_wrapper, GetCreateInstanceFunction(fake_handle))
       .Times(1)
       .WillRepeatedly([&](void* handle) {
@@ -181,5 +180,5 @@ TEST(PluginLoadTest, LoadTestPlugin) {
   WebAppBase* app_base =
       factory_manager->createWebApp("", nullptr, "testplugin");
   ASSERT_NE(app_base, nullptr);
-  EXPECT_EQ(app_base->appId().toStdString(), "pluginTestID");
+  EXPECT_EQ(app_base->appId(), "pluginTestID");
 }

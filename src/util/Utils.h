@@ -30,6 +30,7 @@ std::string uriToLocal(const std::string& uri);
 std::string localToUri(const std::string& uri);
 
 bool strToInt(const std::string str, int32_t& value);
+int32_t strToIntWithDefault(const std::string& str, int32_t defaultValue);
 
 void replaceAll(std::string& source, const std::string& what, const std::string& with);
 std::string getEnvVar(const char* env);

@@ -29,41 +29,38 @@ void ServiceSenderLuna::postlistRunningApps(std::vector<ApplicationInfo> &apps)
     Json::Value runningApps;
     for (auto it = apps.begin(); it != apps.end(); ++it) {
         Json::Value app;
-        app["id"] = it->appId.toStdString();
-        app["instanceid"] = it->instanceId.toStdString();
-        app["webprocessid"] = qtless::StringHelper::intToStr(it->pid);
+        app["id"] = it->appId;
+        app["instanceid"] = it->instanceId;
+        app["webprocessid"] = std::to_string(it->pid);
         runningApps.append(app);
     }
     reply["running"] = runningApps;
     reply["returnValue"] = true;
 
-    WebAppManagerServiceLuna::instance()->postSubscription("listRunningApps", qtless::JsonHelper::qjsonFromJsonCpp(reply));
+    WebAppManagerServiceLuna::instance()->postSubscription("listRunningApps", reply);
 }
 
-void ServiceSenderLuna::postWebProcessCreated(const QString& appId, const QString& instanceId, uint32_t pid)
+void ServiceSenderLuna::postWebProcessCreated(const std::string& appId, const std::string& instanceId, uint32_t pid)
 {
     Json::Value reply;
-    reply["id"] = appId.toStdString();
-    reply["instanceid"] = instanceId.toStdString();
+    reply["id"] = appId;
+    reply["instanceid"] = instanceId;
     reply["webprocessid"] = (int)pid;
     reply["returnValue"] = true;
 
-    WebAppManagerServiceLuna::instance()->postSubscription("webProcessCreated", qtless::JsonHelper::qjsonFromJsonCpp(reply));
+    WebAppManagerServiceLuna::instance()->postSubscription("webProcessCreated", reply);
 }
 
-void ServiceSenderLuna::serviceCall(const QString& url, const QString& payload, const QString& appId)
+void ServiceSenderLuna::serviceCall(const std::string& url, const std::string& payload, const std::string& appId)
 {
-    std::string strUrl = url.toStdString();
-    std::string strPayload = payload.toStdString();
-    std::string strAppId = appId.toStdString();
-    Json::Value jsonPayload = qtless::JsonHelper::jsonCppFromString(strPayload);
+    Json::Value jsonPayload = qtless::JsonHelper::jsonCppFromString(payload);
 
     bool ret = WebAppManagerServiceLuna::instance()->call(
-        strUrl.c_str(),
-        qtless::JsonHelper::qjsonFromJsonCpp(jsonPayload),
-        strAppId.c_str());
+        url.c_str(),
+        jsonPayload,
+        appId.c_str());
     if (!ret) {
-        LOG_WARNING(MSGID_SERVICE_CALL_FAIL, 2, PMLOGKS("APP_ID", strAppId.c_str()), PMLOGKS("URL", strUrl.c_str()), "ServiceSenderLuna::serviceCall; callPrivate() return false");
+        LOG_WARNING(MSGID_SERVICE_CALL_FAIL, 2, PMLOGKS("APP_ID", appId.c_str()), PMLOGKS("URL", url.c_str()), "ServiceSenderLuna::serviceCall; callPrivate() return false");
     }
 }
 

@@ -23,9 +23,8 @@
 #include <json/json.h>
 #include <luna-service2/lunaservice.h>
 
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QObject>
+#include "JsonHelper.h"
+#include "LogManager.h"
 
 class LSHandle;
 class LSMessage;
@@ -51,12 +50,12 @@ public:
 /*
  * This class allows us to call into LS2 and have the reply be forwarded to a
  * Qt slot or Q_INVOKABLE function of some object of the signature
- * QJsonObject handlerFunc(QJsonObject payload)
+ * Json::Value handlerFunc(Json::Value payload)
  *
  * */
 class LSCallbackHandler {
 public:
-    LSCallbackHandler(std::function<QJsonObject(const QJsonObject&)>& func)
+    LSCallbackHandler(std::function<Json::Value(const Json::Value&)>& func)
         : m_func(func)
     {
     }
@@ -64,7 +63,7 @@ public:
     virtual ~LSCallbackHandler() {}
 
 protected:
-    QJsonObject called(QJsonObject payload)
+    Json::Value called(Json::Value payload)
     {
         return m_func(payload);
     }
@@ -79,18 +78,24 @@ protected:
             return true;
         }
 
-        QJsonObject request = QJsonDocument::fromJson(LSMessageGetPayload(message)).object();
-        QJsonObject reply;
+        Json::Value request;
+        if (!util::JsonValueFromString(LSMessageGetPayload(message), request)) {
+            if (!LSMessageReply(handle, message, "{\"returnValue\": false}", &lsError))
+                return false;
+            return true;
+        }
+
+        Json::Value reply;
 
         reply = static_cast<LSCallbackHandler*>(user_data)->called(request);
 
-        if (!reply.isEmpty())
-            return LSMessageReply(handle, message, QJsonDocument(reply).toJson().data(), &lsError);
+        if (!reply.isNull())
+            return LSMessageReply(handle, message, util::StringFromJsonValue(reply).c_str(), &lsError);
         else
             return true;
     }
 
-    std::function<QJsonObject(const QJsonObject&)> m_func;
+    std::function<Json::Value(const Json::Value&)> m_func;
 };
 
 /**
@@ -100,7 +105,7 @@ class LSCalloutContext : public LSCallbackHandler {
     friend class PalmServiceBase;
 
 public:
-    LSCalloutContext(std::function<QJsonObject(const QJsonObject&)> func)
+    LSCalloutContext(std::function<Json::Value(const Json::Value&)> func)
         : LSCallbackHandler(func)
         , m_service(0)
         , m_token(LSMESSAGE_TOKEN_INVALID){};
@@ -118,19 +123,19 @@ private:
 };
 
 /**
- * a function template that wraps a given function expecting and returning QJsonDocuments
+ * a function template that wraps a given function expecting and returning Json::Value
  * in a static function that is compatible with the LunaService callback signature.
  * usage:
  *
  * static LSMethod WebAppManagerService::s_methods[] = {
- *     {"launchUrl", bus_callback_qjson<WebAppManagerService, &WebAppManagerService::launchUrl>},
+ *     {"launchUrl", bus_callback_json<WebAppManagerService, &WebAppManagerService::launchUrl>},
  *     { 0, 0 }
  * };
  *
  * */
 
-template <class CLASS, QJsonObject (CLASS::*FUNCTION)(QJsonObject)>
-static bool bus_callback_qjson(LSHandle* handle, LSMessage* message, void* user_data)
+template <class CLASS, Json::Value (CLASS::*FUNCTION)(const Json::Value&)>
+static bool bus_callback_json(LSHandle* handle, LSMessage* message, void* user_data)
 {
     LSErrorSafe lsError;
 
@@ -140,19 +145,23 @@ static bool bus_callback_qjson(LSHandle* handle, LSMessage* message, void* user_
         return true;
     }
 
-    QJsonObject request = QJsonDocument::fromJson(LSMessageGetPayload(message)).object();
-    QJsonObject reply;
+    Json::Value request;
+    if (!util::JsonValueFromString(LSMessageGetPayload(message), request)) {
+        LOG_WARNING(MSGID_LUNA_API, 0, "Failed to parse request message.");
+        return false;
+    }
+    Json::Value reply;
 
     reply = (static_cast<CLASS*>(user_data)->*FUNCTION)(request);
 
-    if (!LSMessageReply(handle, message, QJsonDocument(reply).toJson().data(), &lsError))
+    if (!LSMessageReply(handle, message, util::StringFromJsonValue(reply).c_str(), &lsError))
         return false;
 
     return true;
 };
 
-template <class CLASS, QJsonObject (CLASS::*FUNCTION)(QJsonObject, bool subscribed)>
-static bool bus_subscription_callback_qjson(LSHandle* handle, LSMessage* message, void* user_data)
+template <class CLASS, Json::Value (CLASS::*FUNCTION)(const Json::Value&, bool subscribed)>
+static bool bus_subscription_callback_json(LSHandle* handle, LSMessage* message, void* user_data)
 {
     LSErrorSafe lsError;
 
@@ -168,15 +177,19 @@ static bool bus_subscription_callback_qjson(LSHandle* handle, LSMessage* message
             return false;
     }
 
-    QJsonObject request = QJsonDocument::fromJson(LSMessageGetPayload(message)).object();
-    QJsonObject reply;
+    Json::Value request;
+    if (!util::JsonValueFromString(LSMessageGetPayload(message), request)) {
+        LOG_WARNING(MSGID_LUNA_API, 0, "Failed to parse request message.");
+        return false;
+    }
+    Json::Value reply;
 
     reply = (static_cast<CLASS*>(user_data)->*FUNCTION)(request, subscribed);
 
     if (subscribed)
         reply["subscribed"] = true;
 
-    if (!LSMessageReply(handle, message, QJsonDocument(reply).toJson().data(), &lsError))
+    if (!LSMessageReply(handle, message, util::StringFromJsonValue(reply).c_str(), &lsError))
         return false;
 
     return true;
@@ -185,12 +198,13 @@ static bool bus_subscription_callback_qjson(LSHandle* handle, LSMessage* message
 /*
  * same as above, but for a void function handling the reply
  */
-template <class CLASS, void (CLASS::*FUNCTION)(QJsonObject)>
-static bool bus_callback_qjson(LSHandle* handle, LSMessage* message, void* user_data)
+template <class CLASS, void (CLASS::*FUNCTION)(const Json::Value&)>
+static bool bus_callback_json(LSHandle* handle, LSMessage* message, void* user_data)
 {
-    QJsonObject reply;
+    Json::Value reply;
     if (message) {
-        reply = QJsonDocument::fromJson(LSMessageGetPayload(message)).object();
+        if (!util::JsonValueFromString(LSMessageGetPayload(message), reply))
+            LOG_WARNING(MSGID_LUNA_API, 0, "Failed to parse reply message.");
     }
 
     (static_cast<CLASS*>(user_data)->*FUNCTION)(reply);
@@ -211,7 +225,7 @@ public:
  *  and applicationId
  **/
     inline bool call(const char* what,
-        QJsonObject parameters,
+        Json::Value parameters,
         const char* applicationId = 0,
         LSCalloutContext* context = 0)
     {
@@ -221,14 +235,14 @@ public:
     /*
  * methods to post subscription updates TODO make subscriptions represented through objects
  **/
-    bool postSubscription(const char* subscription, QJsonObject reply)
+    bool postSubscription(const char* subscription, Json::Value reply)
     {
         LSErrorSafe lsError;
         return LSSubscriptionPost(
             m_serviceHandle,
             category(),
             subscription,
-            QJsonDocument(reply).toJson().data(),
+            util::StringFromJsonValue(reply).c_str(),
             &lsError);
     }
 
@@ -242,27 +256,27 @@ protected:
      * individual callback handlers. Using these template, we create a new static callback function
      * for each HANDLER_CLASS::CALLBACK_METHOD to forward the call to.
      * */
-    template <class HANDLER_CLASS, void (HANDLER_CLASS::*CALLBACK_METHOD)(QJsonObject)>
+    template <class HANDLER_CLASS, void (HANDLER_CLASS::*CALLBACK_METHOD)(const Json::Value&)>
     bool call(const char* what,
-        QJsonObject parameters,
+        Json::Value parameters,
         HANDLER_CLASS* callback_receiver)
     {
         LSErrorSafe lsError;
         bool err = false;
-        if (parameters.value("subscribe").toBool() || parameters.value("watch").toBool()) {
+        if (parameters.isObject() && (parameters["subscribe"].asBool() || parameters["watch"].asBool())) {
             err = LSCall(m_serviceHandle, what,
-                QJsonDocument(parameters).toJson().data(),
-                bus_callback_qjson<HANDLER_CLASS, CALLBACK_METHOD>,
+                util::StringFromJsonValue(parameters).c_str(),
+                bus_callback_json<HANDLER_CLASS, CALLBACK_METHOD>,
                 callback_receiver, NULL, &lsError);
         } else {
             err = LSCallOneReply(m_serviceHandle,
                 what,
-                QJsonDocument(parameters).toJson().data(),
-                bus_callback_qjson<HANDLER_CLASS, CALLBACK_METHOD>,
+                util::StringFromJsonValue(parameters).c_str(),
+                bus_callback_json<HANDLER_CLASS, CALLBACK_METHOD>,
                 callback_receiver, NULL, &lsError);
         }
         if (!err) {
-            qWarning("Failed to call in %s Service: %s", serviceName(), lsError.message);
+            LOG_WARNING(MSGID_LUNA_API, 0, "Failed to call in %s Service: %s", serviceName(), lsError.message);
             return false;
         }
         return true;
@@ -281,7 +295,7 @@ private:
 
     bool call(LSHandle* service,
         const char* what,
-        QJsonObject qParameters,
+        Json::Value qParameters,
         const char* applicationId,
         LSCalloutContext* context);
     std::string m_serviceName;

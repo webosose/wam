@@ -18,9 +18,7 @@
 #define WEBAPPBASE_H
 
 #include <memory>
-
-#include <QObject>
-#include <QString>
+#include <string>
 
 #include "WebAppManager.h"
 #include "WebPageObserver.h"
@@ -28,6 +26,10 @@
 class ApplicationDescription;
 class WebAppBasePrivate;
 class WebPageBase;
+
+namespace Json {
+class Value;
+};
 
 class WebAppBase : public WebPageObserver {
 public:
@@ -55,21 +57,21 @@ public:
     virtual void onStageDeactivated() = 0;
     virtual void startLaunchTimer() {}
     virtual void setHiddenWindow(bool hidden);
-    virtual void configureWindow(QString& type) = 0;
+    virtual void configureWindow(const std::string& type) = 0;
     virtual void setKeepAlive(bool keepAlive);
     virtual bool isWindowed() const;
-    virtual void relaunch(const QString& args, const QString& launchingAppId);
-    virtual void setWindowProperty(const QString& name, const QVariant& value) = 0;
+    virtual void relaunch(const std::string& args, const std::string& launchingAppId);
+    virtual void setWindowProperty(const std::string& name, const std::string& value) = 0;
     virtual void platformBack() = 0;
-    virtual void setCursor(const QString& cursorArg, int hotspot_x, int hotspot_y) = 0;
-    virtual void setInputRegion(const QJsonDocument& jsonDoc) = 0;
-    virtual void setKeyMask(const QJsonDocument& jsonDoc) = 0;
+    virtual void setCursor(const std::string& cursorArg, int hotspot_x, int hotspot_y) = 0;
+    virtual void setInputRegion(const Json::Value& jsonDoc) = 0;
+    virtual void setKeyMask(const Json::Value& jsonDoc) = 0;
     virtual void hide(bool forcedHide = false) = 0;
     virtual void focus() = 0;
     virtual void unfocus() = 0;
     virtual void setOpacity(float opacity) = 0;
     virtual void setAppDescription(std::shared_ptr<ApplicationDescription>);
-    virtual void setPreferredLanguages(QString language);
+    virtual void setPreferredLanguages(const std::string& language);
     virtual void stagePreparing();
     virtual void stageReady();
     virtual void raise() = 0;
@@ -80,7 +82,7 @@ public:
     virtual void doClose() = 0;
     virtual void setUseVirtualKeyboard(const bool enable) = 0;
     virtual bool isKeyboardVisible() { return false; }
-    static void onCursorVisibilityChanged(const QString& jsscript);
+    static void onCursorVisibilityChanged(const std::string& jsscript);
     virtual bool hideWindow() = 0;
 
     bool getCrashState();
@@ -90,18 +92,18 @@ public:
     void setForceClose();
     bool forceClose();
     WebPageBase* page() const;
-    void handleWebAppMessage(WebAppManager::WebAppMessageType type, const QString& message);
-    void setAppId(const QString& appId);
-    void setLaunchingAppId(const QString& appId);
-    QString appId() const;
-    QString launchingAppId() const;
-    void setInstanceId(const QString& instanceId);
-    QString instanceId() const;
-    QString url() const;
+    void handleWebAppMessage(WebAppManager::WebAppMessageType type, const std::string& message);
+    void setAppId(const std::string& appId);
+    void setLaunchingAppId(const std::string& appId);
+    std::string appId() const;
+    std::string launchingAppId() const;
+    void setInstanceId(const std::string& instanceId);
+    std::string instanceId() const;
+    std::string url() const;
 
     ApplicationDescription* getAppDescription() const;
 
-    void setAppProperties(QString properties);
+    void setAppProperties(const std::string& properties);
 
     void setNeedReload(bool status) { m_needReload = status; }
     bool needReload() { return m_needReload; }
@@ -114,9 +116,9 @@ public:
     void dispatchUnload();
 
     void setUseAccessibility(bool enabled);
-    void serviceCall(const QString& url, const QString& payload, const QString& appId);
+    void serviceCall(const std::string& url, const std::string& payload, const std::string& appId);
 
-    void setPreloadState(QString properties);
+    void setPreloadState(const std::string& properties);
     void clearPreloadState();
     PreloadState preloadState() { return m_preloadState; }
 
@@ -130,7 +132,7 @@ protected:
     virtual void showWindow();
 
     void setUiSize(int width, int height);
-    void setActiveInstanceId(QString id);
+    void setActiveInstanceId(const std::string& id);
     void forceCloseAppInternal();
     void closeAppInternal();
     void closeWebApp();
@@ -146,8 +148,8 @@ protected:
 protected:
     PreloadState m_preloadState;
     bool m_addedToWindowMgr;
-    QString m_inProgressRelaunchParams;
-    QString m_inProgressRelaunchLaunchingAppId;
+    std::string m_inProgressRelaunchParams;
+    std::string m_inProgressRelaunchLaunchingAppId;
     float m_scaleFactor;
 
 private:

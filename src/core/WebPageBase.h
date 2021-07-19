@@ -20,10 +20,9 @@
 #include <memory>
 #include <string>
 
-#include <QtCore/QString>
-#include <QtCore/QUrl>
-
 #include "ObserverList.h"
+#include "util/Url.h"
+
 #include "webos/webview_base.h"
 
 class ApplicationDescription;
@@ -50,39 +49,39 @@ public:
     };
 
     WebPageBase();
-    WebPageBase(const QUrl& url, std::shared_ptr<ApplicationDescription> desc, const QString& params);
+    WebPageBase(const wam::Url& url, std::shared_ptr<ApplicationDescription> desc, const std::string& params);
     virtual ~WebPageBase();
 
     // WebPageBase
     virtual void init() = 0;
     virtual void* getWebContents() = 0;
-    virtual void setLaunchParams(const QString& params);
+    virtual void setLaunchParams(const std::string& params);
     virtual void notifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level) {}
 
-    virtual QString getIdentifier() const;
-    virtual QUrl url() const = 0; /* return current url */
-    virtual QUrl defaultUrl() const { return m_defaultUrl; } /* return default url */
-    virtual void setDefaultUrl(QUrl url) { m_defaultUrl = url; } /* just set default url */
+    virtual std::string getIdentifier() const;
+    virtual wam::Url url() const = 0; /* return current url */
+    virtual wam::Url defaultUrl() const { return m_defaultUrl; } /* return default url */
+    virtual void setDefaultUrl(wam::Url url) { m_defaultUrl = url; } /* just set default url */
     virtual void loadUrl(const std::string& url) = 0;
     virtual int progress() const = 0;
     virtual bool hasBeenShown() const = 0;
     virtual void setPageProperties() = 0;
-    virtual void setPreferredLanguages(const QString& language) = 0;
-    virtual QString defaultFont();
-    virtual void setDefaultFont(const QString& font) = 0;
+    virtual void setPreferredLanguages(const std::string& language) = 0;
+    virtual std::string defaultFont();
+    virtual void setDefaultFont(const std::string& font) = 0;
     virtual void cleanResources();
     virtual void reloadDefaultPage() = 0;
     virtual void reload() = 0;
     virtual void setVisibilityState(WebPageVisibilityState visibilityState) = 0;
     virtual void setFocus(bool focus) = 0;
-    virtual QString title() = 0;
+    virtual std::string title() = 0;
     virtual bool canGoBack() = 0;
     virtual void closeVkb() = 0;
     virtual void keyboardVisibilityChanged(bool visible) {}
-    virtual void handleDeviceInfoChanged(const QString& deviceInfo) = 0;
-    virtual bool relaunch(const QString& args, const QString& launchingAppId);
-    virtual void evaluateJavaScript(const QString& jsCode) = 0;
-    virtual void evaluateJavaScriptInAllFrames(const QString& jsCode, const char* method = "") = 0;
+    virtual void handleDeviceInfoChanged(const std::string& deviceInfo) = 0;
+    virtual bool relaunch(const std::string& args, const std::string& launchingAppId);
+    virtual void evaluateJavaScript(const std::string& jsCode) = 0;
+    virtual void evaluateJavaScriptInAllFrames(const std::string& jsCode, const char* method = "") = 0;
     virtual uint32_t getWebProcessProxyID() = 0;
     virtual uint32_t getWebProcessPID() const = 0;
     virtual void createPalmSystem(WebAppBase* app) = 0;
@@ -103,7 +102,7 @@ public:
     virtual bool isLoadErrorPageStart() { return m_isLoadErrorPageStart; }
     virtual void updateIsLoadErrorPageFinish();
     virtual void updateDatabaseIdentifier() {}
-    virtual void deleteWebStorages(const QString& identifier) {}
+    virtual void deleteWebStorages(const std::string& identifier) {}
     virtual void setInspectorEnable() {}
     virtual void setKeepAliveWebApp(bool keepAlive) {}
     virtual void setContentsScale() {}
@@ -112,19 +111,19 @@ public:
     virtual void setAudioGuidanceOn(bool on) {}
     virtual bool isInputMethodActive() const { return false; }
 
-    QString launchParams() const;
+    std::string launchParams() const;
     void setApplicationDescription(std::shared_ptr<ApplicationDescription> desc);
     void load();
     void setEnableBackgroundRun(bool enable) { m_enableBackgroundRun = enable; }
-    void sendLocaleChangeEvent(const QString& language);
+    void sendLocaleChangeEvent(const std::string& language);
     void setCleaningResources(bool cleaningResources) { m_cleaningResources = cleaningResources; }
     bool cleaningResources() const { return m_cleaningResources; }
-    bool doHostedWebAppRelaunch(const QString& launchParams);
+    bool doHostedWebAppRelaunch(const std::string& launchParams);
     void sendRelaunchEvent();
-    void setAppId(const QString& appId) { m_appId = appId; }
-    const QString& appId() const { return m_appId; }
-    void setInstanceId(const QString& instanceId) { m_instanceId = instanceId; }
-    const QString& instanceId() const { return m_instanceId; }
+    void setAppId(const std::string& appId) { m_appId = appId; }
+    const std::string& appId() const { return m_appId; }
+    void setInstanceId(const std::string& instanceId) { m_instanceId = instanceId; }
+    const std::string& instanceId() const { return m_instanceId; }
     ApplicationDescription* getAppDescription() { return m_appDesc.get(); }
 
     void setClosing(bool status) { m_isClosing = status; }
@@ -136,7 +135,7 @@ public:
     void addObserver(WebPageObserver* observer);
     void removeObserver(WebPageObserver* observer);
 
-    virtual QString getIdentifierForSecurityOrigin() const;
+    virtual std::string getIdentifierForSecurityOrigin() const;
 
     virtual void activateRendererCompositor() { }
     virtual void deactivateRendererCompositor() { }
@@ -148,8 +147,8 @@ protected:
     virtual void cleanResourcesFinished();
     virtual void handleForceDeleteWebPage();
     virtual void loadDefaultUrl() = 0;
-    virtual void addUserScript(const QString& script) = 0;
-    virtual void addUserScriptUrl(const QUrl& url) = 0;
+    virtual void addUserScript(const std::string& script) = 0;
+    virtual void addUserScriptUrl(const wam::Url& url) = 0;
     virtual int suspendDelay();
     virtual bool hasLoadErrorPolicy(bool isHttpResponseError, int errorCode);
     virtual void loadErrorPage(int errorCode) = 0;
@@ -160,8 +159,8 @@ protected:
     void handleLoadStarted();
     void handleLoadFinished();
     void handleLoadFailed(int errorCode);
-    bool getDeviceInfo(QString name, QString& value);
-    bool getSystemLanguage(QString& value);
+    bool getDeviceInfo(const std::string& name, std::string& value);
+    bool getSystemLanguage(std::string& value);
     int currentUiWidth();
     int currentUiHeight();
     WebProcessManager* getWebProcessManager();
@@ -169,25 +168,25 @@ protected:
     bool processCrashed();
 
     virtual int maxCustomSuspendDelay();
-    QString telluriumNubPath();
+    std::string telluriumNubPath();
 
-    void applyPolicyForUrlResponse(bool isMainFrame, const QString& url, int statusCode);
+    void applyPolicyForUrlResponse(bool isMainFrame, const std::string& url, int statusCode);
     void postRunningAppList();
     void postWebProcessCreated(uint32_t pid);
     bool isAccessibilityEnabled() const;
 
     std::shared_ptr<ApplicationDescription> m_appDesc;
-    QString m_appId;
-    QString m_instanceId;
+    std::string m_appId;
+    std::string m_instanceId;
     bool m_suspendAtLoad;
     bool m_isClosing;
     bool m_isLoadErrorPageFinish;
     bool m_isLoadErrorPageStart;
     bool m_didErrorPageLoadedFromNetErrorHelper;
     bool m_enableBackgroundRun;
-    QUrl m_defaultUrl;
-    QString m_launchParams;
-    QString m_loadErrorPolicy;
+    wam::Url m_defaultUrl;
+    std::string m_launchParams;
+    std::string m_loadErrorPolicy;
     ObserverList<WebPageObserver> m_observers;
 
 private:

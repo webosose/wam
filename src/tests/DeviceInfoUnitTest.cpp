@@ -29,31 +29,31 @@ public:
 TEST_F(DeviceInfoTest, checkAsciStringDeviceInfo)
 {
     const char *expectedValue = "ASCII String";
-    QString actualValue;
+    std::string actualValue;
 
     m_deviceInfo.setDeviceInfo("SimpleString", expectedValue);
     ASSERT_TRUE(m_deviceInfo.getDeviceInfo("SimpleString", actualValue));
-    EXPECT_STREQ(expectedValue, actualValue.toStdString().c_str());
+    EXPECT_STREQ(expectedValue, actualValue.c_str());
 }
 
 TEST_F(DeviceInfoTest, checkNotAsciStringDeviceInfo)
 {
     const char *expectedValue = "String with not ASCII symbols (föö)";
-    QString actualValue;
+    std::string actualValue;
 
     m_deviceInfo.setDeviceInfo("ComplexString", expectedValue);
     ASSERT_TRUE(m_deviceInfo.getDeviceInfo("ComplexString", actualValue));
-    EXPECT_STREQ(expectedValue, actualValue.toStdString().c_str());
+    EXPECT_STREQ(expectedValue, actualValue.c_str());
 }
 
 TEST_F(DeviceInfoTest, checkSystemLanguage)
 {
     const char *expectedValue = "ENG";
-    QString actualValue;
+    std::string actualValue;
 
     m_deviceInfo.setSystemLanguage(expectedValue);
     ASSERT_TRUE(m_deviceInfo.getSystemLanguage(actualValue));
-    EXPECT_STREQ(expectedValue, actualValue.toStdString().c_str());
+    EXPECT_STREQ(expectedValue, actualValue.c_str());
 }
 
 TEST_F(DeviceInfoTest, checkDisplayWidth)

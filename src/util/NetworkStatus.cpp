@@ -52,13 +52,6 @@ void NetworkStatus::fromJsonObject(const Json::Value& object)
     m_savedDate = util::trim(ctime(&raw_time));
 }
 
-//TODO: remove this method when QT less implementation will be completed.
-void NetworkStatus::fromJsonObject(const QJsonObject& object) {
-    Json::Value value;
-    if (util::JsonValueFromQJsonObject(object, value))
-        fromJsonObject(value);
-}
-
 void NetworkStatus::Information::fromJsonObject(const Json::Value& info)
 {
     if (!info.isObject())

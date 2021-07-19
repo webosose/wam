@@ -97,11 +97,10 @@ bool PalmServiceBase::stopService()
 bool PalmServiceBase::call(
         LSHandle* handle,
         const char* what,
-        QJsonObject qParameters,
+        Json::Value parameters,
         const char* applicationId = 0,
         LSCalloutContext* context = 0)
 {
-    Json::Value parameters = qtless::JsonHelper::jsonCppFromQjson(qParameters);
     std::string parametersAsString = qtless::JsonHelper::jsonCppToString(parameters);
     if (!parameters.isObject()) {
         LOG_WARNING(MSGID_LS2_CALL_FAIL, 2,

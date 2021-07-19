@@ -16,6 +16,8 @@
 
 #include "WebAppFactoryLuna.h"
 
+#include <string>
+
 #include "WebAppWaylandWebOS.h"
 #include "WebPageBase.h"
 #include "WebAppBase.h"
@@ -24,8 +26,7 @@
 #include "WindowTypes.h"
 #include "LogManager.h"
 #include "PluginInterface.h"
-
-#include <QString>
+#include "util/Url.h"
 
 const char* kPluginApplicationType = "default";
 
@@ -37,7 +38,7 @@ void DeleteInstance(WebAppFactoryInterface* interface) {
   delete interface;
 }
 
-WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc)
+WebAppBase* WebAppFactoryLuna::createWebApp(const std::string& winType, std::shared_ptr<ApplicationDescription> desc)
 {
     WebAppBase* app = nullptr;
 
@@ -47,17 +48,17 @@ WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, std::shared_ptr<App
         app = new WebAppWayland(winType, 0, 0, desc->getDisplayAffinity());
     } else {
         LOG_WARNING(MSGID_BAD_WINDOW_TYPE, 1,
-                    PMLOGKS("WINDOW_TYPE", qPrintable(winType)), "");
+                    PMLOGKS("WINDOW_TYPE", winType.c_str()), "");
     }
     return app;
 }
 
-WebAppBase* WebAppFactoryLuna::createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc)
+WebAppBase* WebAppFactoryLuna::createWebApp(const std::string& winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc)
 {
     return createWebApp(winType, desc);
 }
 
-WebPageBase* WebAppFactoryLuna::createWebPage(QUrl url, std::shared_ptr<ApplicationDescription> desc, QString launchParams)
+WebPageBase* WebAppFactoryLuna::createWebPage(const wam::Url& url, std::shared_ptr<ApplicationDescription> desc, const std::string& launchParams)
 {
     return new WebPageBlink(url, desc, launchParams);
 }

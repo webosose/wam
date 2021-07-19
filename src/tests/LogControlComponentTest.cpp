@@ -15,8 +15,9 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include <gtest/gtest.h>
-#include <QJsonDocument>
-#include <QJsonObject>
+#include <json/json.h>
+
+#include "JsonHelper.h"
 #include "WebAppManagerServiceLuna.h"
 
 TEST(LogControl, SetEventOn) {
@@ -25,18 +26,18 @@ TEST(LogControl, SetEventOn) {
         "value":"on"
     })";
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameters).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value reuest;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameters, reuest));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->logControl(doc.object());
+    const auto reply = WebAppManagerServiceLuna::instance()->logControl(reuest);
 
-    ASSERT_TRUE(reply.contains("event"));
-    ASSERT_TRUE(reply.contains("bundleMessage"));
-    ASSERT_TRUE(reply.contains("mouseMove"));
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["event"].toBool());
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("event"));
+    ASSERT_TRUE(reply.isMember("bundleMessage"));
+    ASSERT_TRUE(reply.isMember("mouseMove"));
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["event"].asBool());
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(LogControl, SetEventOff) {
@@ -45,18 +46,18 @@ TEST(LogControl, SetEventOff) {
         "value":"off"
     })";
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameters).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value reuest;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameters, reuest));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->logControl(doc.object());
+    const auto reply = WebAppManagerServiceLuna::instance()->logControl(reuest);
 
-    ASSERT_TRUE(reply.contains("event"));
-    ASSERT_TRUE(reply.contains("bundleMessage"));
-    ASSERT_TRUE(reply.contains("mouseMove"));
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_FALSE(reply["event"].toBool());
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("event"));
+    ASSERT_TRUE(reply.isMember("bundleMessage"));
+    ASSERT_TRUE(reply.isMember("mouseMove"));
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_FALSE(reply["event"].asBool());
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(LogControl, SetBundleMessageOn) {
@@ -65,18 +66,18 @@ TEST(LogControl, SetBundleMessageOn) {
         "value":"on"
     })";
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameters).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value reuest;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameters, reuest));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->logControl(doc.object());
+    const auto reply = WebAppManagerServiceLuna::instance()->logControl(reuest);
 
-    ASSERT_TRUE(reply.contains("event"));
-    ASSERT_TRUE(reply.contains("bundleMessage"));
-    ASSERT_TRUE(reply.contains("mouseMove"));
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["bundleMessage"].toBool());
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("event"));
+    ASSERT_TRUE(reply.isMember("bundleMessage"));
+    ASSERT_TRUE(reply.isMember("mouseMove"));
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["bundleMessage"].asBool());
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(LogControl, SetBundleMessageOff) {
@@ -85,18 +86,18 @@ TEST(LogControl, SetBundleMessageOff) {
         "value":"off"
     })";
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameters).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value reuest;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameters, reuest));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->logControl(doc.object());
+    const auto reply = WebAppManagerServiceLuna::instance()->logControl(reuest);
 
-    ASSERT_TRUE(reply.contains("event"));
-    ASSERT_TRUE(reply.contains("bundleMessage"));
-    ASSERT_TRUE(reply.contains("mouseMove"));
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_FALSE(reply["bundleMessage"].toBool());
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("event"));
+    ASSERT_TRUE(reply.isMember("bundleMessage"));
+    ASSERT_TRUE(reply.isMember("mouseMove"));
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_FALSE(reply["bundleMessage"].asBool());
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(LogControl, SetMouseMoveOn) {
@@ -105,18 +106,18 @@ TEST(LogControl, SetMouseMoveOn) {
         "value":"on"
     })";
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameters).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value reuest;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameters, reuest));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->logControl(doc.object());
+    const auto reply = WebAppManagerServiceLuna::instance()->logControl(reuest);
 
-    ASSERT_TRUE(reply.contains("event"));
-    ASSERT_TRUE(reply.contains("bundleMessage"));
-    ASSERT_TRUE(reply.contains("mouseMove"));
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_TRUE(reply["mouseMove"].toBool());
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("event"));
+    ASSERT_TRUE(reply.isMember("bundleMessage"));
+    ASSERT_TRUE(reply.isMember("mouseMove"));
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_TRUE(reply["mouseMove"].asBool());
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
 TEST(LogControl, SetMouseMoveOff) {
@@ -125,16 +126,16 @@ TEST(LogControl, SetMouseMoveOff) {
         "value":"off"
     })";
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(json_parameters).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value reuest;
+    ASSERT_TRUE(util::JsonValueFromString(json_parameters, reuest));
 
-    QJsonObject reply = WebAppManagerServiceLuna::instance()->logControl(doc.object());
+    const auto reply = WebAppManagerServiceLuna::instance()->logControl(reuest);
 
-    ASSERT_TRUE(reply.contains("event"));
-    ASSERT_TRUE(reply.contains("bundleMessage"));
-    ASSERT_TRUE(reply.contains("mouseMove"));
-    ASSERT_TRUE(reply.contains("returnValue"));
-    EXPECT_FALSE(reply["mouseMove"].toBool());
-    EXPECT_TRUE(reply["returnValue"].toBool());
+    ASSERT_TRUE(reply.isObject());
+    ASSERT_TRUE(reply.isMember("event"));
+    ASSERT_TRUE(reply.isMember("bundleMessage"));
+    ASSERT_TRUE(reply.isMember("mouseMove"));
+    ASSERT_TRUE(reply.isMember("returnValue"));
+    EXPECT_FALSE(reply["mouseMove"].asBool());
+    EXPECT_TRUE(reply["returnValue"].asBool());
 }

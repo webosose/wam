@@ -30,7 +30,7 @@ void DeleteInstance(WebAppFactoryInterface* interface) {
 }
 
 WebAppBase* TestPlugin::createWebApp(
-    QString winType,
+    const std::string& winType,
     std::shared_ptr<ApplicationDescription> desc) {
   WebAppBase* app = new WebAppBaseMock();
   app->setAppId("pluginTestID");
@@ -38,15 +38,15 @@ WebAppBase* TestPlugin::createWebApp(
 }
 
 WebAppBase* TestPlugin::createWebApp(
-    QString winType,
+    const std::string& winType,
     WebPageBase* page,
     std::shared_ptr<ApplicationDescription> desc) {
   return nullptr;
 }
 
 WebPageBase* TestPlugin::createWebPage(
-    QUrl url,
+    const wam::Url& url,
     std::shared_ptr<ApplicationDescription> desc,
-    QString launchParams) {
+    const std::string& launchParams) {
   return nullptr;
 }

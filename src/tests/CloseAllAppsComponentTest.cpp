@@ -18,10 +18,9 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <json/json.h>
 
-#include <QJsonDocument>
-#include <QJsonObject>
-
+#include "JsonHelper.h"
 #include "PlatformModuleFactoryImpl.h"
 #include "WebAppFactoryManagerMock.h"
 #include "WebAppManager.h"
@@ -230,18 +229,16 @@ void AttachContext(WebAppFactoryManagerMock* webAppFactory, AppTestContext* cont
     webAppFactory->setWebAppWindowFactory(webAppWindowFactory);
 }
 
-QJsonObject launchApp(const char* jsonBody)
+Json::Value launchApp(const char* jsonBody)
 {
     if (!jsonBody)
-        return QJsonObject();
+        return Json::Value();
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(jsonBody).toUtf8(), &parseError);
+    Json::Value request;
+    if (!util::JsonValueFromString(jsonBody, request))
+        return Json::Value();
 
-    if (QJsonParseError::NoError != parseError.error)
-        return QJsonObject();
-
-    return WebAppManagerServiceLuna::instance()->launchApp(doc.object());
+    return WebAppManagerServiceLuna::instance()->launchApp(request);
 }
 
 } // namespace
@@ -260,26 +257,28 @@ TEST(CloseAllApps, CloseAllApps)
     {
         AttachContext(webAppFactoryManager, &firstApp);
         const auto& result = launchApp(launchBareAppJsonBody);
-        ASSERT_TRUE(result.contains("returnValue"));
-        EXPECT_TRUE(result["returnValue"].toBool());
+        ASSERT_TRUE(result.isObject());
+        ASSERT_TRUE(result.isMember("returnValue"));
+        EXPECT_TRUE(result["returnValue"].asBool());
     }
 
     {
         AttachContext(webAppFactoryManager, &secondApp);
         const auto& result = launchApp(launchWebRTCAppJsonBody);
-        ASSERT_TRUE(result.contains("returnValue"));
-        EXPECT_TRUE(result["returnValue"].toBool());
+        ASSERT_TRUE(result.isObject());
+        ASSERT_TRUE(result.isMember("returnValue"));
+        EXPECT_TRUE(result["returnValue"].asBool());
     }
 
     EXPECT_EQ(WebAppManager::instance()->list().size(), 2);
 
     {
-        QJsonParseError parseError;
-        QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8("{}").toUtf8(), &parseError);
-        ASSERT_EQ(parseError.error, QJsonParseError::NoError);
-        const auto& result = WebAppManagerServiceLuna::instance()->closeAllApps(doc.object());
-        ASSERT_TRUE(result.contains("returnValue"));
-        EXPECT_TRUE(result["returnValue"].toBool());
+        Json::Value request;
+        ASSERT_TRUE(util::JsonValueFromString("{}", request));
+        const auto& result = WebAppManagerServiceLuna::instance()->closeAllApps(request);
+        ASSERT_TRUE(result.isObject());
+        ASSERT_TRUE(result.isMember("returnValue"));
+        EXPECT_TRUE(result["returnValue"].asBool());
     }
 
     EXPECT_FALSE(WebAppManager::instance()->list().size());

@@ -18,10 +18,9 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <json/json.h>
 
-#include <QJsonDocument>
-#include <QJsonObject>
-
+#include "JsonHelper.h"
 #include "PlatformModuleFactoryImpl.h"
 #include "WebAppFactoryManagerMock.h"
 #include "WebAppManager.h"
@@ -242,9 +241,8 @@ TEST_F(LaunchAppTestSuite, LaunchOnPrimaryDisplay)
     const uint32_t width = 888;
     const uint32_t height = 777;
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(launchBareAppJsonBody).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(launchBareAppJsonBody, request));
 
     EXPECT_CALL(*webAppWindow, DisplayWidth()).WillRepeatedly(Return(width));
     EXPECT_CALL(*webAppWindow, DisplayHeight()).WillRepeatedly(Return(height));
@@ -266,13 +264,14 @@ TEST_F(LaunchAppTestSuite, LaunchOnPrimaryDisplay)
     EXPECT_CALL(*webView, LoadUrl(_));
     EXPECT_CALL(*webView, LoadUrl(StrEq("file:///usr/palm/applications/bareapp/index.html")));
 
-    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(doc.object());
-    ASSERT_TRUE(result.contains("returnValue"));
-    ASSERT_TRUE(result.contains("instanceId"));
-    ASSERT_TRUE(result.contains("appId"));
-    EXPECT_TRUE(result["returnValue"].toBool());
-    EXPECT_STREQ(result["instanceId"].toString().toStdString().c_str(), instanceId);
-    EXPECT_STREQ(result["appId"].toString().toStdString().c_str(), appId);
+    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(request);
+    ASSERT_TRUE(result.isObject());
+    ASSERT_TRUE(result.isMember("returnValue"));
+    ASSERT_TRUE(result.isMember("instanceId"));
+    ASSERT_TRUE(result.isMember("appId"));
+    EXPECT_TRUE(result["returnValue"].asBool());
+    EXPECT_STREQ(result["instanceId"].asString().c_str(), instanceId);
+    EXPECT_STREQ(result["appId"].asString().c_str(), appId);
 }
 
 TEST_F(LaunchAppTestSuite, LaunchOnSecondaryDisplay)
@@ -280,9 +279,8 @@ TEST_F(LaunchAppTestSuite, LaunchOnSecondaryDisplay)
     constexpr char instanceId[] = "6817be08-1116-415b-9d05-31b0675745a60";
     constexpr char appId[] = "com.webos.app.test.webrtc";
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(launchWebRTCAppJsonBody).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(launchWebRTCAppJsonBody, request));
 
     EXPECT_CALL(*webAppWindow, SetWindowProperty(_, _)).Times(AnyNumber());
     EXPECT_CALL(*webAppWindow, SetWindowProperty("displayAffinity", "1")).Times(1);
@@ -290,33 +288,29 @@ TEST_F(LaunchAppTestSuite, LaunchOnSecondaryDisplay)
     EXPECT_CALL(*webView, Initialize("com.webos.app.test.webrtc1", "/usr/palm/applications/com.webos.app.test.webrtc", "default", "", "", false));
     EXPECT_CALL(*webView, SetAppId("com.webos.app.test.webrtc1"));
 
-    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(doc.object());
-    ASSERT_TRUE(result.contains("returnValue"));
-    ASSERT_TRUE(result.contains("instanceId"));
-    ASSERT_TRUE(result.contains("appId"));
-    EXPECT_TRUE(result["returnValue"].toBool());
-    EXPECT_STREQ(result["instanceId"].toString().toStdString().c_str(), instanceId);
-    EXPECT_STREQ(result["appId"].toString().toStdString().c_str(), appId);
+    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(request);
+    ASSERT_TRUE(result.isObject());
+    ASSERT_TRUE(result.isMember("returnValue"));
+    ASSERT_TRUE(result.isMember("instanceId"));
+    ASSERT_TRUE(result.isMember("appId"));
+    EXPECT_TRUE(result["returnValue"].asBool());
+    EXPECT_STREQ(result["instanceId"].asString().c_str(), instanceId);
+    EXPECT_STREQ(result["appId"].asString().c_str(), appId);
 }
 
 TEST_F(LaunchAppTestSuite, LaunchAppsWithParams)
 {
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(launchBareAppJsonBody).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
-
-    QJsonObject root = doc.object();
-    QJsonObject parameters = root["parameters"].toObject();
-    parameters["testParamField"] = "testParamValue";
-    root["parameters"] = parameters;
-    doc.setObject(root);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(launchBareAppJsonBody, request));
+    request["parameters"]["testParamField"] = "testParamValue";
 
     EXPECT_CALL(*webView, addUserScript(::testing::HasSubstr("\"testParamField\": \"testParamValue\"")));
 
-    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(doc.object());
-    ASSERT_TRUE(result.contains("returnValue"));
-    ASSERT_TRUE(result.contains("instanceId"));
-    ASSERT_TRUE(result.contains("appId"));
+    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(request);
+    ASSERT_TRUE(result.isObject());
+    ASSERT_TRUE(result.isMember("returnValue"));
+    ASSERT_TRUE(result.isMember("instanceId"));
+    ASSERT_TRUE(result.isMember("appId"));
 }
 
 TEST_F(LaunchAppTestSuite, LaunchAppsWithError)
@@ -354,18 +348,19 @@ TEST_F(LaunchAppTestSuite, LaunchAppsWithError)
         webViewDelegate->loadFinished(url);
     }));
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(localeInfo).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value request;
+    ASSERT_TRUE(util::JsonValueFromString(localeInfo, request));
 
-    WebAppManagerServiceLuna::instance()->getSystemLocalePreferencesCallback(doc.object());
+    WebAppManagerServiceLuna::instance()->getSystemLocalePreferencesCallback(request);
 
-    doc = QJsonDocument::fromJson(QString::fromUtf8(launchWebRTCAppJsonBody).toUtf8(), &parseError);
+    request.clear();
+    ASSERT_TRUE(util::JsonValueFromString(launchWebRTCAppJsonBody, request));
 
-    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(doc.object());
-    ASSERT_TRUE(result.contains("returnValue"));
-    ASSERT_TRUE(result.contains("instanceId"));
-    ASSERT_TRUE(result.contains("appId"));
+    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(request);
+    ASSERT_TRUE(result.isObject());
+    ASSERT_TRUE(result.isMember("returnValue"));
+    ASSERT_TRUE(result.isMember("instanceId"));
+    ASSERT_TRUE(result.isMember("appId"));
 
     if (!actualValue) {
         int result = unsetenv(varName);

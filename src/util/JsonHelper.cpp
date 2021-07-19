@@ -18,9 +18,6 @@
 
 #include <json/json.h>
 
-//TODO: remove header when QT less implementation will be completed.
-#include <QJsonDocument>
-
 namespace util {
 
 bool JsonValueFromString(const std::string& str, Json::Value& value) {
@@ -35,18 +32,6 @@ std::string StringFromJsonValue(const Json::Value& value) {
   builder["indentation"] = "    ";
   builder["enableYAMLCompatibility"] = true;
   return Json::writeString(builder, value);
-}
-
-// TODO: remove this methods when QT less implementation will be completed.
-QJsonObject QJsonObjectFromJsonValue(const Json::Value& value) {
-  std::string str = StringFromJsonValue(value);
-  return QJsonDocument::fromJson(str.c_str()).object();
-}
-
-bool JsonValueFromQJsonObject(const QJsonObject& object, Json::Value& value) {
-  QJsonDocument doc(object);
-  std::string json_string = doc.toJson(QJsonDocument::Compact).data();
-  return JsonValueFromString(json_string, value);
 }
 
 }  // namespace util

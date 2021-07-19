@@ -16,62 +16,64 @@
 
 #include "DeviceInfo.h"
 
-#include "QtLessTemporaryHelpers.h"
+#include "Utils.h"
 
 bool DeviceInfo::getDisplayWidth(int &value)
 {
     bool ret = false;
-    QString valueStr;
+    std::string valueStr;
 
     ret = getDeviceInfo("DisplayWidth", valueStr);
-    value = valueStr.toInt();
+    if (ret)
+        ret = strToInt(valueStr, value);
 
     return ret;
 }
 
 void DeviceInfo::setDisplayWidth(int value)
 {
-    m_deviceInfo.insert({"DisplayWidth", qtless::StringHelper::intToStr(value)});
+    m_deviceInfo.emplace("DisplayWidth", std::to_string(value));
 }
 
 bool DeviceInfo::getDisplayHeight(int &value)
 {
     bool ret = false;
-    QString valueStr;
+    std::string valueStr;
 
     ret = getDeviceInfo("DisplayHeight", valueStr);
-    value = valueStr.toInt();
+    if (ret)
+        ret = strToInt(valueStr, value);
 
     return ret;
 }
 
 void DeviceInfo::setDisplayHeight(int value)
 {
-    m_deviceInfo.insert({"DisplayHeight", qtless::StringHelper::intToStr(value)});
+    m_deviceInfo.emplace("DisplayHeight", std::to_string(value));
 }
 
-bool DeviceInfo::getSystemLanguage(QString &value)
+bool DeviceInfo::getSystemLanguage(std::string &value)
 {
     return getDeviceInfo("SystemLanguage", value);
 }
 
-void DeviceInfo::setSystemLanguage(QString value)
+void DeviceInfo::setSystemLanguage(const std::string& value)
 {
-    m_deviceInfo.insert({"SystemLanguage", value.toStdString()});
+    m_deviceInfo.emplace("SystemLanguage", value);
 }
 
-bool DeviceInfo::getDeviceInfo(QString name, QString &value)
+bool DeviceInfo::getDeviceInfo(const std::string& name, std::string &value)
 {
-    auto info = m_deviceInfo.find(name.toStdString());
+    auto info = m_deviceInfo.find(name);
     if (info != m_deviceInfo.end()) {
-        value = info->second.c_str();
+        value = info->second;
         return true;
     }
 
     return false;
 }
 
-void DeviceInfo::setDeviceInfo(QString name, QString value)
+void DeviceInfo::setDeviceInfo(const std::string& name, const std::string& value)
 {
-    m_deviceInfo.insert({name.toStdString(), value.toStdString()});
+    m_deviceInfo.emplace(name, value);
 }

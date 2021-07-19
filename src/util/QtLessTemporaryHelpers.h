@@ -29,13 +29,6 @@
 #include <sstream>
 
 #include <json/json.h>
-#include <QDebug>
-#include <QByteArray>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QString>
-#include <QStringList>
 
 namespace qtless {
 class FileHelper {
@@ -77,12 +70,6 @@ public:
         return Json::writeString(builder, cppJson);
     }
 
-    static QJsonObject qjsonFromJsonCpp(const Json::Value& cppJson)
-    {
-        std::string strJson = jsonCppToString(cppJson);
-        return QJsonDocument::fromJson(strJson.c_str()).object();
-    }
-
     static Json::Value jsonCppFromString(const std::string& strJson)
     {
         Json::Value result;
@@ -91,13 +78,6 @@ public:
         return result;
     }
 
-    static Json::Value jsonCppFromQjson(const QJsonObject& qJson)
-    {
-        QJsonDocument doc(qJson);
-        std::string strJson = doc.toJson(QJsonDocument::Compact).data();
-
-        return jsonCppFromString(strJson);
-    }
 }; // Class JsonHelper
 
 class StringHelper {

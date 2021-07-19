@@ -17,6 +17,7 @@
 #ifndef WEBAPPFACTORYMANAGERIMPL_H
 #define WEBAPPFACTORYMANAGERIMPL_H
 
+#include <functional>
 #include <memory>
 #include <string>
 #include <unordered_map>
@@ -39,11 +40,11 @@ public:
             bool load_plugin_on_demand,
             std::unique_ptr<PluginLibWrapper> lib_wrapper);
 
-    WebAppBase* createWebApp(QString winType, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "") override;
-    WebAppBase* createWebApp(QString winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr, QString appType = "") override;
-    WebPageBase* createWebPage(QString winType, QUrl url, std::shared_ptr<ApplicationDescription> desc, QString appType = "", QString launchParams = "") override;
+    WebAppBase* createWebApp(const std::string& winType, std::shared_ptr<ApplicationDescription> desc = nullptr, const std::string& appType = {}) override;
+    WebAppBase* createWebApp(const std::string& winType, WebPageBase* page, std::shared_ptr<ApplicationDescription> desc = nullptr, const std::string& appType = {}) override;
+    WebPageBase* createWebPage(const std::string& winType, const wam::Url& url, std::shared_ptr<ApplicationDescription> desc, const std::string& appType = {}, const std::string& launchParams = {}) override;
     WebAppFactoryInterface* getPluggable(const std::string& appType);
-    WebAppFactoryInterface* loadPluggable(const std::string& appType = "");
+    WebAppFactoryInterface* loadPluggable(const std::string& appType = {});
 
 private:
     WebAppFactoryManagerImpl();

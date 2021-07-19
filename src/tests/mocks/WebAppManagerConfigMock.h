@@ -17,6 +17,8 @@
 #ifndef WEBAPPMANAGERCONFIGMOCK_H
 #define WEBAPPMANAGERCONFIGMOCK_H
 
+#include <map>
+
 #include "WebAppManagerConfig.h"
 
 class WebAppManagerConfigMock : public WebAppManagerConfig {

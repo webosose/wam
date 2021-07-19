@@ -18,6 +18,7 @@
 #define WEBAPPWAYLAND_H
 
 #include <memory>
+#include <string>
 
 #include "DisplayId.h"
 #include "Timer.h"
@@ -25,11 +26,13 @@
 
 #include "WebPageBlinkObserver.h"
 
-#include <QtCore/QVariant>
-
 #include "webos/common/webos_constants.h"
 #include "webos/common/webos_event.h"
 #include "webos/webos_platform.h"
+
+namespace Json {
+class Value;
+};
 
 class ApplicationDescription;
 class WebAppWaylandWindow;
@@ -54,19 +57,19 @@ public:
 
 class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
 public:
-    WebAppWayland(QString type,
+    WebAppWayland(const std::string& type,
                   int width = 0, int height = 0,
                   int displayId = kUndefinedDisplayId,
-                  const std::string& location_hint = "");
-    WebAppWayland(QString type, WebAppWaylandWindow* window,
+                  const std::string& location_hint = {});
+    WebAppWayland(const std::string& type, WebAppWaylandWindow* window,
                   int width = 0, int height = 0,
                   int displayId = kUndefinedDisplayId,
-                  const std::string& location_hint = "");
+                  const std::string& location_hint = {});
 
-    WebAppWayland(QString type, std::unique_ptr<WebAppWindowFactory> factory,
+    WebAppWayland(const std::string& type, std::unique_ptr<WebAppWindowFactory> factory,
                   int width = 0, int height = 0,
                   int displayId = kUndefinedDisplayId,
-                  const std::string& location_hint = "");
+                  const std::string& location_hint = {});
 
     ~WebAppWayland() override;
 
@@ -82,14 +85,14 @@ public:
     bool isNormal() override;
     void onStageActivated() override;
     void onStageDeactivated() override;
-    void configureWindow(QString& type) override;
+    void configureWindow(const std::string& type) override;
     void setKeepAlive(bool keepAlive) override;
     bool isWindowed() const override { return true; }
-    void setWindowProperty(const QString& name, const QVariant& value) override;
+    void setWindowProperty(const std::string& name, const std::string& value) override;
     void platformBack() override;
-    void setCursor(const QString& cursorArg, int hotspot_x = -1, int hotspot_y = -1) override;
-    void setInputRegion(const QJsonDocument& jsonDoc) override;
-    void setKeyMask(const QJsonDocument& jsonDoc) override;
+    void setCursor(const std::string& cursorArg, int hotspot_x = -1, int hotspot_y = -1) override;
+    void setInputRegion(const Json::Value& value) override;
+    void setKeyMask(const Json::Value& value) override;
     void setOpacity(float opacity) override;
     void hide(bool forcedHide = false) override;
     void focus() override;
@@ -111,10 +114,10 @@ public:
     virtual void navigationHistoryChanged();
     virtual bool hideWindow();
 
-    QString getWindowType() const { return m_windowType; }
+    std::string getWindowType() const { return m_windowType; }
     bool cursorVisibility() { return InputManager::instance()->globalCursorVisibility(); }
     void startLaunchTimer();
-    void sendWebOSMouseEvent(const QString& eventName);
+    void sendWebOSMouseEvent(const std::string& eventName);
 
     void postEvent(WebOSEvent* ev);
     void onDelegateWindowFrameSwapped();
@@ -148,7 +151,7 @@ private:
     void init(int width, int height);
 
     WebAppWindow* m_appWindow;
-    QString m_windowType;
+    std::string m_windowType;
     int m_lastSwappedTime;
     bool m_didActivateStage = false;
 

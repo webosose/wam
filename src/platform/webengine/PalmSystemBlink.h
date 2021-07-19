@@ -20,9 +20,11 @@
 #include <string>
 #include <vector>
 
-#include <json/json.h>
-
 #include "PalmSystemWebOS.h"
+
+namespace Json {
+class Value;
+};
 
 class PalmSystemBlink : public PalmSystemWebOS {
 public:
@@ -32,9 +34,9 @@ public:
 
     // PalmSystemWebOS
     void setCountry() override;
-    void setLaunchParams(const QString& params) override;
+    void setLaunchParams(const std::string& params) override;
 
-    virtual void setLocale(const QString& params);
+    virtual void setLocale(const std::string& params);
     virtual double devicePixelRatio();
     void resetInitialized() { m_initialized = false; }
     bool isInitialized() { return m_initialized; }
@@ -42,11 +44,11 @@ public:
 protected:
     // PalmSystemWebOS
     Json::Value initialize();
-    QString identifier() const override;
-    void setLoadErrorPolicy(const QString& params) override;
+    std::string identifier() const override;
+    void setLoadErrorPolicy(const std::string& params) override;
 
     virtual std::string trustLevel() const;
-    virtual void onCloseNotify(const QString& params);
+    virtual void onCloseNotify(const std::string& params);
 
 private:
     bool m_initialized;

@@ -39,23 +39,23 @@ class WebAppBaseMock : public WebAppBase {
   void onStageDeactivated() override {}
   void startLaunchTimer() override {}
   void setHiddenWindow(bool hidden) override {}
-  void configureWindow(QString& type) override {}
+  void configureWindow(const std::string& type) override {}
   void setKeepAlive(bool keepAlive) override {}
   bool isWindowed() const override { return false; }
-  void relaunch(const QString& args, const QString& launchingAppId) override {}
-  void setWindowProperty(const QString& name, const QVariant& value) override {}
+  void relaunch(const std::string& args, const std::string& launchingAppId) override {}
+  void setWindowProperty(const std::string& name, const std::string& value) override {}
   void platformBack() override {}
-  void setCursor(const QString& cursorArg,
+  void setCursor(const std::string& cursorArg,
                  int hotspot_x,
                  int hotspot_y) override {}
-  void setInputRegion(const QJsonDocument& jsonDoc) override {}
-  void setKeyMask(const QJsonDocument& jsonDoc) override {}
+  void setInputRegion(const Json::Value& jsonDoc) override {}
+  void setKeyMask(const Json::Value& jsonDoc) override {}
   void hide(bool forcedHide = false) override {}
   void focus() override {}
   void unfocus() override {}
   void setOpacity(float opacity) override {}
   void setAppDescription(std::shared_ptr<ApplicationDescription>) override {}
-  void setPreferredLanguages(QString language) override {}
+  void setPreferredLanguages(const std::string& language) override {}
   void stagePreparing() override {}
   void stageReady() override {}
   void raise() override {}

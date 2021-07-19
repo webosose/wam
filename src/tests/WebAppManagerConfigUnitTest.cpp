@@ -124,52 +124,52 @@ TEST_F(WebAppManagerConfigTest, checkMaxCustomSuspendDelayTimeIfDefined)
 
 TEST_F(WebAppManagerConfigTest, checkWebAppFactoryPluginTypesIfNotDefined)
 {
-    EXPECT_STREQ("", m_configWithNoVariables.getWebAppFactoryPluginTypes().toStdString().c_str());
+    EXPECT_STREQ("", m_configWithNoVariables.getWebAppFactoryPluginTypes().c_str());
 }
 
 TEST_F(WebAppManagerConfigTest, checkWebAppFactoryPluginTypesIfDefined)
 {
-    EXPECT_STREQ("Some.types.definition.string", m_configWithSetVariables.getWebAppFactoryPluginTypes().toStdString().c_str());
+    EXPECT_STREQ("Some.types.definition.string", m_configWithSetVariables.getWebAppFactoryPluginTypes().c_str());
 }
 
 TEST_F(WebAppManagerConfigTest, checkWebAppFactoryPluginPathIfNotDefined)
 {
-    EXPECT_STREQ("/usr/lib/webappmanager/plugins", m_configWithNoVariables.getWebAppFactoryPluginPath().toStdString().c_str());
+    EXPECT_STREQ("/usr/lib/webappmanager/plugins", m_configWithNoVariables.getWebAppFactoryPluginPath().c_str());
 }
 
 TEST_F(WebAppManagerConfigTest, checkWebAppFactoryPluginPathIfDefined)
 {
-    EXPECT_STREQ("/usr/lib/webappmanager/alternate_plugins", m_configWithSetVariables.getWebAppFactoryPluginPath().toStdString().c_str());
+    EXPECT_STREQ("/usr/lib/webappmanager/alternate_plugins", m_configWithSetVariables.getWebAppFactoryPluginPath().c_str());
 }
 
 TEST_F(WebAppManagerConfigTest, checkWebProcessConfigPathIfNotDefined)
 {
-    EXPECT_STREQ("/etc/wam/com.webos.wam.json", m_configWithNoVariables.getWebProcessConfigPath().toStdString().c_str());
+    EXPECT_STREQ("/etc/wam/com.webos.wam.json", m_configWithNoVariables.getWebProcessConfigPath().c_str());
 }
 
 TEST_F(WebAppManagerConfigTest, checkWebProcessConfigPathIfDefined)
 {
-    EXPECT_STREQ("/etc/wam/com.webos.wam.extended.json", m_configWithSetVariables.getWebProcessConfigPath().toStdString().c_str());
+    EXPECT_STREQ("/etc/wam/com.webos.wam.extended.json", m_configWithSetVariables.getWebProcessConfigPath().c_str());
 }
 
 TEST_F(WebAppManagerConfigTest, checkErrorPageUrlIfNotDefined)
 {
-    EXPECT_STREQ("", m_configWithNoVariables.getErrorPageUrl().toStdString().c_str());
+    EXPECT_STREQ("", m_configWithNoVariables.getErrorPageUrl().c_str());
 }
 
 TEST_F(WebAppManagerConfigTest, checkErrorPageUrlIfDefined)
 {
-    EXPECT_STREQ("https://www.lg.com/uk/support", m_configWithSetVariables.getErrorPageUrl().toStdString().c_str());
+    EXPECT_STREQ("https://www.lg.com/uk/support", m_configWithSetVariables.getErrorPageUrl().c_str());
 }
 
 TEST_F(WebAppManagerConfigTest, checkUserScriptPathIfNotDefined)
 {
-    EXPECT_STREQ("webOSUserScripts/userScript.js", m_configWithNoVariables.getUserScriptPath().toStdString().c_str());
+    EXPECT_STREQ("webOSUserScripts/userScript.js", m_configWithNoVariables.getUserScriptPath().c_str());
 }
 
 TEST_F(WebAppManagerConfigTest, checkUserScriptPathIfDefined)
 {
-    EXPECT_STREQ("webOSUserScripts/userScriptModified.js", m_configWithSetVariables.getUserScriptPath().toStdString().c_str());
+    EXPECT_STREQ("webOSUserScripts/userScriptModified.js", m_configWithSetVariables.getUserScriptPath().c_str());
 }
 
 TEST_F(WebAppManagerConfigTest, checkNameIfNotDefined)

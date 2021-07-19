@@ -19,10 +19,9 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <json/json.h>
 
-#include <QJsonDocument>
-#include <QJsonObject>
-
+#include "JsonHelper.h"
 #include "PlatformModuleFactoryImpl.h"
 #include "WebAppFactoryManagerMock.h"
 #include "WebAppManager.h"
@@ -190,17 +189,16 @@ void PalmSystemBlinkTestSuite::SetUp()
         webViewDelegate->loadFinished(url);
     }));
 
-    QJsonParseError parseError;
+    Json::Value reuest;
+    ASSERT_TRUE(util::JsonValueFromString(localeInfo, reuest));
+    WebAppManagerServiceLuna::instance()->getSystemLocalePreferencesCallback(reuest);
 
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromUtf8(localeInfo).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
-    WebAppManagerServiceLuna::instance()->getSystemLocalePreferencesCallback(doc.object());
+    reuest.clear();
+    ASSERT_TRUE(util::JsonValueFromString(launchBareAppJsonBody, reuest));
+    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(reuest);
 
-    doc = QJsonDocument::fromJson(QString::fromUtf8(launchBareAppJsonBody).toUtf8(), &parseError);
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
-    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(doc.object());
-
-    ASSERT_TRUE(result.contains("instanceId"));
+    ASSERT_TRUE(result.isObject());
+    ASSERT_TRUE(result.isMember("instanceId"));
     ASSERT_TRUE(webViewDelegate);
     ASSERT_TRUE(webApp);
 }
@@ -215,21 +213,20 @@ TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_initialize)
     std::string returnValue;
     webViewDelegate->handleBrowserControlFunction("initialize", std::vector<std::string>(), &returnValue);
 
-    QJsonParseError parseError;
-    QJsonDocument doc = QJsonDocument::fromJson(QString::fromStdString(returnValue).toUtf8(), &parseError);
-    QJsonObject initValue = doc.object();
-    ASSERT_EQ(parseError.error, QJsonParseError::NoError);
+    Json::Value initValue;
+    ASSERT_TRUE(util::JsonValueFromString(returnValue, initValue));
 
-    ASSERT_TRUE(initValue.contains("folderPath"));
-    EXPECT_STREQ(initValue["folderPath"].toString().toStdString().c_str(), "/usr/palm/applications/bareapp");
-    ASSERT_TRUE(initValue.contains("identifier"));
-    EXPECT_STREQ(initValue["identifier"].toString().toStdString().c_str(), "bareapp");
-    ASSERT_TRUE(initValue.contains("trustLevel"));
-    EXPECT_STREQ(initValue["trustLevel"].toString().toStdString().c_str(), "default");
-    ASSERT_TRUE(initValue.contains("launchParams"));
-    EXPECT_TRUE(initValue["launchParams"].toString().contains("displayAffinity"));
-    ASSERT_TRUE(initValue.contains("locale"));
-    EXPECT_TRUE(initValue["locale"].toString().contains("en-US"));
+    ASSERT_TRUE(initValue.isObject());
+    ASSERT_TRUE(initValue.isMember("folderPath"));
+    EXPECT_STREQ(initValue["folderPath"].asString().c_str(), "/usr/palm/applications/bareapp");
+    ASSERT_TRUE(initValue.isMember("identifier"));
+    EXPECT_STREQ(initValue["identifier"].asString().c_str(), "bareapp");
+    ASSERT_TRUE(initValue.isMember("trustLevel"));
+    EXPECT_STREQ(initValue["trustLevel"].asString().c_str(), "default");
+    ASSERT_TRUE(initValue.isMember("launchParams"));
+    EXPECT_TRUE(initValue["launchParams"].asString().find("displayAffinity") != std::string::npos);
+    ASSERT_TRUE(initValue.isMember("locale"));
+    EXPECT_TRUE(initValue["locale"].asString().find("en-US") != std::string::npos);
 }
 
 TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_isKeyboardVisible)
@@ -285,7 +282,7 @@ TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_setCursor)
     params.emplace_back(std::to_string(1));
     params.emplace_back(std::to_string(2));
 
-    EXPECT_CALL(*webAppWindow, setCursor(Eq(QString::fromStdString("Cursor")), 1, 2));
+    EXPECT_CALL(*webAppWindow, setCursor(std::string("Cursor"), 1, 2));
 
     webViewDelegate->handleBrowserControlFunction("setCursor", params, &returnValue);
 }

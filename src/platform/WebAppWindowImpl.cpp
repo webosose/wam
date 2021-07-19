@@ -192,12 +192,12 @@ void WebAppWindowImpl::platformBack() {
     window_->platformBack();
 }
 
-void WebAppWindowImpl::setCursor(const QString& cursorArg,
+void WebAppWindowImpl::setCursor(const std::string& cursorArg,
                  int hotspot_x,
                  int hotspot_y) {
   LOG_INFO(MSGID_WAM_DEBUG, 0,
       ">>>>>>> WebAppWindowImpl::%s cursorArg:\"%s\" hotspot_x:\"%d\" hotspot_y:\"%d\"",
-      __func__, cursorArg.toStdString().c_str(), hotspot_x, hotspot_y);
+      __func__, cursorArg.c_str(), hotspot_x, hotspot_y);
   if (window_)
     window_->setCursor(cursorArg, hotspot_x, hotspot_y);
 }

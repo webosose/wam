@@ -22,15 +22,11 @@
 #include <sys/stat.h>
 
 #include "ApplicationDescription.h"
+#include "JsonHelper.h"
 #include "LogManager.h"
 #include "WebAppBase.h"
 #include "WebAppWayland.h"
 #include "WebPageBase.h"
-
-#include <QFile>
-#include <QtCore/QJsonObject>
-#include <QtCore/QJsonDocument>
-
 
 namespace {
 
@@ -47,14 +43,7 @@ bool doesPathExist(const std::string& path)
     return st.st_mode & S_IFDIR || st.st_mode & S_IFREG;
 }
 
-// TODO: Remove after finishing QTLess implementaion
-bool parseJson(const std::string& source, Json::Value& result)
-{
-    Json::CharReaderBuilder builder;
-    std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
-    return reader->parse(source.c_str(), source.c_str() + source.size(), &result, nullptr);
-}
-}
+}  // namespace
 
 PalmSystemWebOS::PalmSystemWebOS(WebAppBase* app)
     : m_app(static_cast<WebAppWayland*>(app))
@@ -62,17 +51,16 @@ PalmSystemWebOS::PalmSystemWebOS(WebAppBase* app)
 {
 }
 
-void PalmSystemWebOS::setLaunchParams(const QString& params)
+void PalmSystemWebOS::setLaunchParams(const std::string& params)
 {
-    std::string p = params.toStdString();
     Json::Value jsonDoc = Json::nullValue;
 
-    const bool result = parseJson(p, jsonDoc);
+    const bool result = util::JsonValueFromString(params, jsonDoc);
 
     if (!result || jsonDoc.isNull())
-        p.erase();
-
-    m_launchParams = p;
+        m_launchParams.erase();
+    else
+        m_launchParams = params;
 }
 
 bool PalmSystemWebOS::isActivated() const
@@ -106,14 +94,14 @@ void PalmSystemWebOS::activate()
 
     // ask compositor to raise window. Compositor should raise us, then
     // give us focus, so we shouldn't have to specifically request focus.
-    LOG_DEBUG("[%s] called webOSSystem.activate() from the app, call raise() to make full screen", qPrintable(m_app->appId()));
+    LOG_DEBUG("[%s] called webOSSystem.activate() from the app, call raise() to make full screen", m_app->appId().c_str());
 
     m_app->raise();
 }
 
 void PalmSystemWebOS::deactivate()
 {
-    LOG_DEBUG("[%s] called webOSSystem.deactivate() from the app, call goBackground() to go background", qPrintable(m_app->appId()));
+    LOG_DEBUG("[%s] called webOSSystem.deactivate() from the app, call goBackground() to go background", m_app->appId().c_str());
     m_app->goBackground();
 }
 
@@ -132,23 +120,33 @@ void PalmSystemWebOS::hide()
     m_app->hide();
 }
 
-void PalmSystemWebOS::setInputRegion(const QByteArray& params)
+void PalmSystemWebOS::setInputRegion(const std::string& params)
 {
     // this function is not related to windowGroup anymore
-    QJsonDocument jsonDoc = QJsonDocument::fromJson(params);
-    m_app->setInputRegion(jsonDoc);
+    Json::Value jsonDoc;
+    const bool result = util::JsonValueFromString(params, jsonDoc);
+    if (result)
+        m_app->setInputRegion(jsonDoc);
+    else
+        LOG_ERROR(MSGID_TYPE_ERROR, 0, "[%s] setInputRegion failed, params='%s'", m_app->appId().c_str(), params.c_str());
 }
 
-void PalmSystemWebOS::setGroupClientEnvironment(GroupClientCallKey callKey, const QByteArray& params)
+void PalmSystemWebOS::setGroupClientEnvironment(GroupClientCallKey callKey, const std::string& params)
 {
     ApplicationDescription* appDesc = m_app ? m_app->getAppDescription() : 0;
     if (appDesc) {
         ApplicationDescription::WindowGroupInfo groupInfo = appDesc->getWindowGroupInfo();
-        if (!groupInfo.name.isEmpty() && !groupInfo.isOwner) {
-            QJsonDocument jsonDoc = QJsonDocument::fromJson(params);
+        if (!groupInfo.name.empty() && !groupInfo.isOwner) {
             switch (callKey) {
                 case KeyMask:
-                    m_app->setKeyMask(jsonDoc);
+                {
+                    Json::Value jsonDoc;
+                    const bool result = util::JsonValueFromString(params, jsonDoc);
+                    if (result)
+                        m_app->setKeyMask(jsonDoc);
+                    else
+                        LOG_ERROR(MSGID_TYPE_ERROR, 0, "[%s] failed to get key mask from params='%s'", m_app->appId().c_str(), params.c_str());
+                }
                 break;
                 case FocusOwner:
                     m_app->focusOwner();
@@ -169,17 +167,17 @@ void PalmSystemWebOS::setKeepAlive(bool keep)
     m_app->setKeepAlive(keep);
 }
 
-void PalmSystemWebOS::pmLogInfoWithClock(const QVariant& msgid, const QVariant& perfType, const QVariant& perfGroup)
+void PalmSystemWebOS::pmLogInfoWithClock(const std::string& msgid, const std::string& perfType, const std::string& perfGroup)
 {
-    LOG_INFO_WITH_CLOCK(msgid.toByteArray().size() ? msgid.toByteArray().data() : NULL, 2,
-                       PMLOGKS("PerfType", perfType.toByteArray().size() ? perfType.toByteArray().data() : "empty"),
-                       PMLOGKS("PerfGroup", perfGroup.toByteArray().size() ? perfGroup.toByteArray().data() : "empty"), "");
+    LOG_INFO_WITH_CLOCK(msgid.size() ? msgid.c_str() : NULL, 2,
+                        PMLOGKS("PerfType", perfType.size() ? perfType.c_str() : "empty"),
+                        PMLOGKS("PerfGroup", perfGroup.size() ? perfGroup.c_str() : "empty"), "");
 }
 
-void PalmSystemWebOS::pmLogString(int32_t level, const QVariant& msgid, const QVariant& kvpairs, const QVariant& message)
+void PalmSystemWebOS::pmLogString(int32_t level, const std::string& msgid, const std::string& kvpairs, const std::string& message)
 {
-    LOG_STRING(level, msgid.toByteArray().size() ? msgid.toByteArray().data() : NULL,
-            kvpairs.toByteArray().size() ? kvpairs.toByteArray().data() : NULL, message.toByteArray().data());
+    LOG_STRING(level, msgid.size() ? msgid.c_str() : NULL,
+            kvpairs.size() ? kvpairs.c_str() : NULL, message.c_str());
 }
 
 bool PalmSystemWebOS::cursorVisibility()
@@ -187,7 +185,7 @@ bool PalmSystemWebOS::cursorVisibility()
     return m_app->cursorVisibility();
 }
 
-void PalmSystemWebOS::updateLaunchParams(const QString& launchParams)
+void PalmSystemWebOS::updateLaunchParams(const std::string& launchParams)
 {
     m_app->page()->setLaunchParams(launchParams);
 }
