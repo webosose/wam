@@ -450,7 +450,7 @@ void WebAppManagerServiceLuna::didConnect()
 void WebAppManagerServiceLuna::systemServiceConnectCallback(const Json::Value& replyJson)
 {
     if (!replyJson.isObject()) {
-        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
+        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", err_invalidParam.c_str());
         return;
     }
 
@@ -468,7 +468,7 @@ void WebAppManagerServiceLuna::systemServiceConnectCallback(const Json::Value& r
 void WebAppManagerServiceLuna::getSystemLocalePreferencesCallback(const Json::Value& replyJson)
 {
     if (!replyJson.isObject() || !replyJson["settings"].isObject()) {
-        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
+        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", err_invalidParam.c_str());
         return;
     }
 
@@ -504,7 +504,7 @@ void WebAppManagerServiceLuna::getSystemLocalePreferencesCallback(const Json::Va
 void WebAppManagerServiceLuna::memoryManagerConnectCallback(const Json::Value& replyJson)
 {
     if (!replyJson.isObject()) {
-        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
+        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", err_invalidParam.c_str());
         return;
     }
 
@@ -532,7 +532,7 @@ void WebAppManagerServiceLuna::memoryManagerConnectCallback(const Json::Value& r
 void WebAppManagerServiceLuna::getCloseAppIdCallback(const Json::Value& replyJson)
 {
     if (!replyJson.isObject() || !replyJson["pid"].isUInt() || !replyJson["instanceId"].isString()) {
-        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
+        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", err_invalidParam.c_str());
         return;
     }
 
@@ -546,7 +546,7 @@ void WebAppManagerServiceLuna::getCloseAppIdCallback(const Json::Value& replyJso
 void WebAppManagerServiceLuna::thresholdChangedCallback(const Json::Value& replyJson)
 {
     if (!replyJson.isObject() || !replyJson["current"].isString()) {
-        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
+        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", err_invalidParam.c_str());
         return;
     }
 
@@ -570,7 +570,7 @@ void WebAppManagerServiceLuna::thresholdChangedCallback(const Json::Value& reply
 void WebAppManagerServiceLuna::applicationManagerConnectCallback(const Json::Value& replyJson)
 {
     if (!replyJson.isObject()) {
-        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
+        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", err_invalidParam.c_str());
         return;
     }
 
@@ -595,7 +595,7 @@ void WebAppManagerServiceLuna::getAppStatusCallback(const Json::Value& replyJson
 {
     if (!replyJson.isObject() || !replyJson["app"].isObject()
        || !replyJson["change"].isString()) {
-        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
+        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", err_invalidParam.c_str());
         return;
     }
 
@@ -627,7 +627,7 @@ void WebAppManagerServiceLuna::getAppStatusCallback(const Json::Value& replyJson
 void WebAppManagerServiceLuna::getForegroundAppInfoCallback(const Json::Value& replyJson)
 {
     if (!replyJson.isObject()) {
-        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
+        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", err_invalidParam.c_str());
         return;
     }
 
@@ -646,7 +646,7 @@ void WebAppManagerServiceLuna::getForegroundAppInfoCallback(const Json::Value& r
 void WebAppManagerServiceLuna::bootdConnectCallback(const Json::Value& replyJson)
 {
     if (!replyJson.isObject()) {
-        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
+        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", err_invalidParam.c_str());
         return;
     }
 
@@ -662,7 +662,7 @@ void WebAppManagerServiceLuna::bootdConnectCallback(const Json::Value& replyJson
 void WebAppManagerServiceLuna::getBootStatusCallback(const Json::Value& replyJson)
 {
     if (!replyJson.isObject() || !replyJson["signals"].isObject()) {
-        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
+        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", err_invalidParam.c_str());
         return;
     }
 
@@ -723,7 +723,7 @@ Json::Value WebAppManagerServiceLuna::webProcessCreated(const Json::Value& reque
 void WebAppManagerServiceLuna::networkConnectionStatusCallback(const Json::Value& reply)
 {
     if (!reply.isObject()) {
-        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, err_invalidParam.c_str());
+        LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", err_invalidParam.c_str());
         return;
     }
 
