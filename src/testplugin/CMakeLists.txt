@@ -1,4 +1,4 @@
-# Copyright (c) 2013-2018 LG Electronics, Inc.
+# Copyright (c) 2021 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -14,23 +14,17 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-TEMPLATE = lib
+project(webappmgr-test-plugin VERSION 1.0.0 DESCRIPTION "WAM test plugin used to test the plugin loader.")
 
-include(common.pri)
-CONFIG += unversioned_libname
+set(SOURCES TestPlugin.cpp)
+set(HEADERS TestPlugin.h)
 
-SOURCES += \
-        WebAppFactoryLuna.cpp \
-        WebAppWaylandWebOS.cpp
+set(TEST_PLUGIN_INCLUDE_DIRS
+    ${CHROMIUM_SRC_DIR}
+    ${WAM_ROOT_SOURCE_DIR}/core
+    ${WAM_ROOT_SOURCE_DIR}/tests/mocks
+)
 
-HEADERS += \
-        WebAppFactoryLuna.h \
-        WebAppWaylandWebOS.h
-
-TARGET = webappmgr-default-plugin
-
-headers.files = $$HEADERS
-headers.path = $${PREFIX}/include/webappmanager
-target.path = $${PREFIX}/lib/webappmanager/plugins
-
-INSTALLS += target
+add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
+target_include_directories(${PROJECT_NAME} PRIVATE ${TEST_PLUGIN_INCLUDE_DIRS})
+install(TARGETS ${PROJECT_NAME} DESTINATION ${CMAKE_INSTALL_LIBEXECDIR}/tests/webappmanager/plugins)

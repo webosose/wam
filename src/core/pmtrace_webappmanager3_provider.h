@@ -18,7 +18,7 @@
 #define TRACEPOINT_PROVIDER pmtrace_webappmanager3
 
 #undef TRACEPOINT_INCLUDE_FILE
-#define TRACEPOINT_INCLUDE_FILE ./ pmtrace_webappmanager3_provider.h
+#define TRACEPOINT_INCLUDE_FILE pmtrace_webappmanager3_provider.h
 
 #ifdef __cplusplus
 extern "C" {

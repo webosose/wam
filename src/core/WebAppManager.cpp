@@ -17,7 +17,6 @@
 #include "WebAppManager.h"
 
 #include <algorithm>
-#include <assert.h>
 #include <sstream>
 #include <string>
 #include <unistd.h>
@@ -25,6 +24,7 @@
 #include <json/value.h>
 
 #include "ApplicationDescription.h"
+#include "BaseCheck.h"
 #include "DeviceInfo.h"
 #include "LogManager.h"
 #include "NetworkStatusManager.h"
@@ -358,7 +358,7 @@ void WebAppManager::removeClosingAppList(const std::string& instanceId)
 void WebAppManager::closeAppInternal(WebAppBase* app, bool ignoreCleanResource)
 {
     WebPageBase* page = app->page();
-    assert(page);
+    UTIL_ASSERT(page);
     if (page->isClosing()) {
         LOG_INFO(MSGID_CLOSE_APP_INTERNAL, 3, PMLOGKS("APP_ID", app->appId().c_str()), PMLOGKS("INSTANCE_ID", app->instanceId().c_str()), PMLOGKFV("PID", "%d", app->page()->getWebProcessPID()), "In Closing; return");
     }

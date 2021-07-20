@@ -14,11 +14,11 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include <assert.h>
 #include <grp.h>
 #include <pwd.h>
 #include <unistd.h>
 
+#include "BaseCheck.h"
 #include "LogManager.h"
 #include "PlatformModuleFactoryImpl.h"
 #include "Utils.h"
@@ -36,20 +36,20 @@ static void changeUserIDGroupID()
         struct passwd *pwd = getpwnam(uid.c_str());
         struct group *grp = getgrnam(gid.c_str());
 
-        assert(pwd);
-        assert(grp);
+        UTIL_ASSERT(pwd);
+        UTIL_ASSERT(grp);
 
         int ret = -1;
         if (grp) {
             ret = setgid(grp->gr_gid);
-            assert(ret == 0);
+            UTIL_ASSERT(ret == 0);
             ret = initgroups(uid.c_str(), grp->gr_gid);
-            assert(ret == 0);
+            UTIL_ASSERT(ret == 0);
         }
 
         if (pwd) {
             ret = setuid(pwd->pw_uid);
-            assert(ret == 0);
+            UTIL_ASSERT(ret == 0);
             setenv("HOME", pwd->pw_dir, 1);
         }
     }
@@ -60,9 +60,9 @@ static void startWebAppManager()
     changeUserIDGroupID();
 
     WebAppManagerServiceLuna* webAppManagerServiceLuna = WebAppManagerServiceLuna::instance();
-    assert(webAppManagerServiceLuna);
+    UTIL_ASSERT(webAppManagerServiceLuna);
     bool result = webAppManagerServiceLuna->startService();
-    assert(result);
+    UTIL_ASSERT(result);
     WebAppManager::instance()->setPlatformModules(std::unique_ptr<PlatformModuleFactoryImpl>(new PlatformModuleFactoryImpl()));
 }
 

@@ -1,4 +1,3 @@
-
 # Copyright (c) 2021 LG Electronics, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -15,26 +14,20 @@
 #
 # SPDX-License-Identifier: Apache-2.0
 
-include(common.pri)
+cmake_minimum_required(VERSION 3.13.0)
 
-PKGCONFIG += gmock_main gmock gtest
+project(WebAppMgr VERSION 1.0.0 LANGUAGES CXX)
 
-VPATH += \
-        ./src/tests \
-        ./src/tests/mocks \
+set(CMAKE_CXX_STANDARD 14)
+set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set(CMAKE_BUILD_TYPE Release)
 
-INCLUDEPATH += $$VPATH
+include(webOS/webOS)
+include(FindPkgConfig)
 
-SOURCES += $$files($$PWD/src/tests/*.cpp, true)
-message($$SOURCES)
+webos_modules_init(1 6 3)
+webos_component(1 0 2)
 
-HEADERS += $$files($$PWD/src/tests/*.h, true)
-message($$HEADERS)
+webos_build_system_bus_files(${CMAKE_SOURCE_DIR}/files/sysbus)
 
-target.path = $$WEBOS_INSTALL_TESTSDIR
-
-LIBS += -lWebAppMgr -lWebAppMgrCore
-
-TARGET = WebAppMgrUnitTest
-
-INSTALLS += target
+add_subdirectory(src)

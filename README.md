@@ -1,4 +1,5 @@
-# wam
+Summary
+-------
 This repository contains the source code of Web App Manager(WAM) component in webOS platform.
 
 Web App Manager is a component that manages the life-cycle of web apps. It provides an interface for launching and closing web apps.
