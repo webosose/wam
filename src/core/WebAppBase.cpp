@@ -18,7 +18,7 @@
 
 #include "ApplicationDescription.h"
 #include "LogManager.h"
-#include "TypeConverter.h"
+#include "Utils.h"
 #include "WebAppManager.h"
 #include "WebAppManagerConfig.h"
 #include "WebPageBase.h"
@@ -340,8 +340,7 @@ void WebAppBase::setAppDescription(std::shared_ptr<ApplicationDescription> appDe
 
 void WebAppBase::setAppProperties(const std::string& properties)
 {
-    Json::Value json;
-    stringToJson(properties, json);
+    Json::Value json = util::stringToJson(properties);
     bool keepAlive = false;
 
     if (json["keepAlive"].isBool() && json["keepAlive"].asBool()) {
@@ -355,8 +354,7 @@ void WebAppBase::setAppProperties(const std::string& properties)
 
 void WebAppBase::setPreloadState(const std::string& properties)
 {
-    Json::Value obj;
-    stringToJson(properties, obj);
+    Json::Value obj = util::stringToJson(properties);
 
     std::string preload = obj["preload"].asString();
 

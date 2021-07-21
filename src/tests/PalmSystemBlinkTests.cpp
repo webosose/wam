@@ -21,8 +21,8 @@
 #include <gtest/gtest.h>
 #include <json/json.h>
 
-#include "JsonHelper.h"
 #include "PlatformModuleFactoryImpl.h"
+#include "Utils.h"
 #include "WebAppFactoryManagerMock.h"
 #include "WebAppManager.h"
 #include "WebAppManagerServiceLuna.h"
@@ -190,11 +190,11 @@ void PalmSystemBlinkTestSuite::SetUp()
     }));
 
     Json::Value reuest;
-    ASSERT_TRUE(util::JsonValueFromString(localeInfo, reuest));
+    ASSERT_TRUE(util::stringToJson(localeInfo, reuest));
     WebAppManagerServiceLuna::instance()->getSystemLocalePreferencesCallback(reuest);
 
     reuest.clear();
-    ASSERT_TRUE(util::JsonValueFromString(launchBareAppJsonBody, reuest));
+    ASSERT_TRUE(util::stringToJson(launchBareAppJsonBody, reuest));
     const auto& result = WebAppManagerServiceLuna::instance()->launchApp(reuest);
 
     ASSERT_TRUE(result.isObject());
@@ -214,7 +214,7 @@ TEST_F(PalmSystemBlinkTestSuite, handleBrowserControlMessage_initialize)
     webViewDelegate->handleBrowserControlFunction("initialize", std::vector<std::string>(), &returnValue);
 
     Json::Value initValue;
-    ASSERT_TRUE(util::JsonValueFromString(returnValue, initValue));
+    ASSERT_TRUE(util::stringToJson(returnValue, initValue));
 
     ASSERT_TRUE(initValue.isObject());
     ASSERT_TRUE(initValue.isMember("folderPath"));

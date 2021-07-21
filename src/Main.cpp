@@ -29,8 +29,8 @@
 static void changeUserIDGroupID()
 {
     std::string uid, gid;
-    uid = getEnvVar("WAM_UID");
-    gid = getEnvVar("WAM_GID");
+    uid = util::getEnvVar("WAM_UID");
+    gid = util::getEnvVar("WAM_GID");
 
     if (uid.size() && gid.size()) {
         struct passwd *pwd = getpwnam(uid.c_str());

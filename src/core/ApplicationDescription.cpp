@@ -27,7 +27,7 @@
 #include <json/json.h>
 
 #include "LogManager.h"
-#include "TypeConverter.h"
+#include "Utils.h"
 
 bool ApplicationDescription::checkTrustLevel(std::string trustLevel)
 {
@@ -72,8 +72,7 @@ const ApplicationDescription::WindowGroupInfo ApplicationDescription::getWindowG
     ApplicationDescription::WindowGroupInfo info;
 
     if (!m_groupWindowDesc.empty()) {
-        Json::Value json;
-        stringToJson(m_groupWindowDesc, json);
+        Json::Value json = util::stringToJson(m_groupWindowDesc);
 
         if (json.isObject()) {
             auto name = json["name"];
@@ -94,8 +93,7 @@ const ApplicationDescription::WindowOwnerInfo ApplicationDescription::getWindowO
 {
     ApplicationDescription::WindowOwnerInfo info;
     if (!m_groupWindowDesc.empty()) {
-        Json::Value json;
-        stringToJson(m_groupWindowDesc, json);
+        Json::Value json = util::stringToJson(m_groupWindowDesc);
 
         auto ownerInfo = json["ownerInfo"];
         if (ownerInfo.isObject()) {
@@ -122,8 +120,7 @@ const ApplicationDescription::WindowClientInfo ApplicationDescription::getWindow
 {
     ApplicationDescription::WindowClientInfo info;
     if (!m_groupWindowDesc.empty()) {
-        Json::Value json;
-        stringToJson(m_groupWindowDesc, json);
+        Json::Value json = util::stringToJson(m_groupWindowDesc);
 
         auto clientInfo = json["clientInfo"];
         if (clientInfo.isObject()) {
@@ -141,8 +138,7 @@ const ApplicationDescription::WindowClientInfo ApplicationDescription::getWindow
 
 std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(const char* jsonStr)
 {
-    Json::Value jsonObj;
-    stringToJson(jsonStr, jsonObj);
+    Json::Value jsonObj = util::stringToJson(jsonStr);
     if (!jsonObj.isObject()) {
         LOG_WARNING(MSGID_APP_DESC_PARSE_FAIL, 1,
                     PMLOGKFV("JSON", "%s", jsonStr), "Failed to parse JSON string");
@@ -153,7 +149,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
 
     appDesc->m_transparency = jsonObj["transparent"].asBool();
     auto vendorExtension = jsonObj.get("vendorExtension", Json::Value(Json::objectValue));
-    jsonToString(vendorExtension, appDesc->m_vendorExtension);
+    appDesc->m_vendorExtension = util::jsonToString(vendorExtension);
     appDesc->m_trustLevel = jsonObj["trustLevel"].asString();
     appDesc->m_subType = jsonObj["subType"].asString();
     appDesc->m_deeplinkingParams = jsonObj["deeplinkingParams"].asString();
@@ -166,7 +162,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     appDesc->m_customPlugin = jsonObj["customPlugin"].asBool();
     appDesc->m_backHistoryAPIDisabled = jsonObj["disableBackHistoryAPI"].asBool();
     auto groupWindowDesc = jsonObj.get("windowGroup", Json::Value(Json::objectValue));
-    jsonToString(groupWindowDesc, appDesc->m_groupWindowDesc);
+    appDesc->m_groupWindowDesc = util::jsonToString(groupWindowDesc);
 
     auto supportedVersions = jsonObj["supportedEnyoBundleVersions"];
     if (supportedVersions.isArray()) {
@@ -196,7 +192,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     appDesc->m_disallowScrollingInMainFrame = disallowScrolling.isBool() && disallowScrolling.asBool();
 
     auto mediaExtension = jsonObj.get("mediaExtension", Json::Value(Json::objectValue));
-    jsonToString(mediaExtension, appDesc->m_mediaPreferences);
+    appDesc->m_mediaPreferences = util::jsonToString(mediaExtension);
 
     // Handle accessibility, supportsAudioGuidance
     auto accessibility = jsonObj["accessibility"];
@@ -226,10 +222,10 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::fromJsonString(c
     auto resolution = jsonObj["resolution"];
     if (resolution.isString()) {
         std::string overrideResolution = jsonObj["resolution"].asString();
-        auto resList = splitString(overrideResolution, 'x');
+        auto resList = util::splitString(overrideResolution, 'x');
         if(resList.size() == 2) {
-            stringToInt(resList.at(0), appDesc->m_widthOverride);
-            stringToInt(resList.at(1), appDesc->m_heightOverride);
+            util::strToInt(resList.at(0), appDesc->m_widthOverride);
+            util::strToInt(resList.at(1), appDesc->m_heightOverride);
         }
         if(appDesc->m_widthOverride < 0 || appDesc->m_heightOverride < 0) {
             appDesc->m_widthOverride = 0;

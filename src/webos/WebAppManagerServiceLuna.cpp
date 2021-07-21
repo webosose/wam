@@ -23,7 +23,7 @@
 #include <json/json.h>
 
 #include "LogManager.h"
-#include "QtLessTemporaryHelpers.h"
+#include "Utils.h"
 #include "webos/public/runtime.h"
 #include "webos/webview_base.h"
 
@@ -38,7 +38,7 @@
 
 static void logJsonTruncated(const char* funcName, const Json::Value& request)
 {
-    std::string requestBuffer = qtless::JsonHelper::jsonCppToString(request);
+    std::string requestBuffer = util::jsonToString(request);
     const size_t chunkSize = 255;
     const size_t chunksCount = requestBuffer.size() % chunkSize ? (requestBuffer.size() / chunkSize) + 1 : requestBuffer.size() / chunkSize;
     for (size_t i = 0, part = 1; i < requestBuffer.size(); i += chunkSize, part++) {
@@ -120,7 +120,7 @@ Json::Value WebAppManagerServiceLuna::launchApp(const Json::Value& requestJson)
     }
     jsonParams["instanceId"] = instanceId;
 
-    std::string strParams = qtless::JsonHelper::jsonCppToString(jsonParams);
+    std::string strParams = util::jsonToString(jsonParams);
 
     std::string appId = requestJson["appDesc"]["id"].asString();
     LOG_INFO_WITH_CLOCK(MSGID_APPLAUNCH_START, 4,
@@ -130,7 +130,7 @@ Json::Value WebAppManagerServiceLuna::launchApp(const Json::Value& requestJson)
                         PMLOGKS("INSTANCE_ID", instanceId.c_str()),
                         "params : %s", strParams.c_str());
 
-    std::string strAppDesc = qtless::JsonHelper::jsonCppToString(requestJson["appDesc"]);
+    std::string strAppDesc = util::jsonToString(requestJson["appDesc"]);
     instanceId = WebAppManagerService::onLaunch(
                     strAppDesc,
                     strParams,
@@ -338,7 +338,7 @@ Json::Value WebAppManagerServiceLuna::listRunningApps(const Json::Value& request
         Json::Value app;
         app["id"] = it->appId;
         app["instanceId"] = it->instanceId;
-        app["webprocessid"] = qtless::StringHelper::intToStr(it->pid);
+        app["webprocessid"] = std::to_string(it->pid);
         runningApps.append(app);
     }
     reply["running"] = runningApps;
@@ -478,7 +478,7 @@ void WebAppManagerServiceLuna::getSystemLocalePreferencesCallback(const Json::Va
     //The right value will be notified again when service is restarted
     if (!localeInfo.isObject() || localeInfo.empty()
        || !localeInfo["locales"].isObject() || !localeInfo["locales"]["UI"].isString()) {
-        std::string doc = qtless::JsonHelper::jsonCppToString(replyJson);
+        std::string doc = util::jsonToString(replyJson);
         LOG_WARNING(MSGID_RECEIVED_INVALID_SETTINGS, 1,
             PMLOGKFV("MSG", "%s", doc.c_str()),
             "");

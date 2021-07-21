@@ -30,7 +30,7 @@
 #include "NetworkStatusManager.h"
 #include "PlatformModuleFactory.h"
 #include "ServiceSender.h"
-#include "TypeConverter.h"
+#include "Utils.h"
 #include "WebAppBase.h"
 #include "WebAppFactoryManagerImpl.h"
 #include "WebAppManagerConfig.h"
@@ -175,8 +175,7 @@ void WebAppManager::onRelaunchApp(const std::string& instanceId, const std::stri
 
     // Do not relaunch when preload args is setted
     // luna-send -n 1 luna://com.webos.applicationManager/launch '{"id":<AppId> "preload":<PreloadState> }'
-    Json::Value json;
-    stringToJson(args, json);
+    Json::Value json = util::stringToJson(args);
 
     if (!json.isObject()) {
         LOG_WARNING(MSGID_APP_RELAUNCH, 0, "Failed to parse json args: '%s'", args.c_str());
@@ -647,8 +646,7 @@ std::string WebAppManager::launch(const std::string& appDescString, const std::s
     errMsg.erase();
 
     // Set displayAffinity (multi display support)
-    Json::Value json;
-    stringToJson(params, json);
+    Json::Value json = util::stringToJson(params);
 
     if (!json.isObject()) {
         LOG_WARNING(MSGID_APP_LAUNCH, 0, "Failed to parse params: '%s'", params.c_str());

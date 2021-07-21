@@ -18,9 +18,8 @@
 
 #include <json/json.h>
 
-#include "JsonHelper.h"
 #include "NetworkStatus.h"
-#include "StringUtils.h"
+#include "Utils.h"
 
 NetworkStatus::NetworkStatus()
     : m_isInternetConnectionAvailable(false)
@@ -49,7 +48,7 @@ void NetworkStatus::fromJsonObject(const Json::Value& object)
 
     time_t raw_time;
     time(&raw_time);
-    m_savedDate = util::trim(ctime(&raw_time));
+    m_savedDate = util::trimString(ctime(&raw_time));
 }
 
 void NetworkStatus::Information::fromJsonObject(const Json::Value& info)

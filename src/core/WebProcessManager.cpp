@@ -27,7 +27,7 @@
 
 #include "ApplicationDescription.h"
 #include "LogManager.h"
-#include "TypeConverter.h"
+#include "Utils.h"
 #include "WebAppBase.h"
 #include "WebAppManager.h"
 #include "WebAppManagerConfig.h"
@@ -109,7 +109,7 @@ std::string WebProcessManager::getWebProcessMemSize(uint32_t pid) const
     std::string line;
     while (std::getline(in, line)) {
         if(!line.find("VmRSS:", 0, 6)) {
-            return trimString(std::string(line, 6)).c_str();
+            return util::trimString(std::string(line, 6)).c_str();
         }
     }
     return {};
@@ -117,11 +117,10 @@ std::string WebProcessManager::getWebProcessMemSize(uint32_t pid) const
 
 void WebProcessManager::readWebProcessPolicy()
 {
-    Json::Value webProcessEnvironment;
     std::string configPath = WebAppManager::instance()->config()->getWebProcessConfigPath();
-    bool config = fileToJson(configPath, webProcessEnvironment);
+    Json::Value webProcessEnvironment = util::stringToJson(util::readFile(configPath));
 
-    if (!config || webProcessEnvironment.isNull()) {
+    if (webProcessEnvironment.isNull()) {
         LOG_ERROR(MSGID_WEBPROCESSENV_READ_FAIL, 1, PMLOGKS("PATH", configPath.c_str()), "JSON parsing failed");
         return;
     }
@@ -160,15 +159,13 @@ void WebProcessManager::setWebProcessCacheProperty(const Json::Value &object, co
     WebProcessInfo info = WebProcessInfo(0, 0);
     auto memoryCache = object["memoryCache"];
     if (memoryCache.isString()) {
-        int memCacheSize = 0;
-        stringToInt(memoryCache.asString(), memCacheSize);
+        int memCacheSize = util::strToIntWithDefault(memoryCache.asString(), 0);
         info.memoryCacheSize = memCacheSize;
     }
 
     auto codeCache = object["codeCache"];
     if (codeCache.isString()) {
-        int codeCacheInt = 0;
-        stringToInt(codeCache.asString(), codeCacheInt);
+        int codeCacheInt = util::strToIntWithDefault(codeCache.asString(), 0);
         info.codeCacheSize = codeCacheInt;
     }
 
@@ -194,14 +191,14 @@ std::string WebProcessManager::getProcessKey(const ApplicationDescription* desc)
         for (size_t i = 0; i < m_webProcessGroupAppIDList.size(); i++) {
             std::string appId = m_webProcessGroupAppIDList.at(i);
             if (appId.find('*') != std::string::npos) {
-                replaceSubstrings(appId, "*");
-                auto l = splitString(appId, ',');
+                util::replaceSubstr(appId, "*");
+                auto l = util::splitString(appId, ',');
                 idList.insert(idList.end(), l.begin(), l.end());
                 for (const auto& id : idList)
                     if (!desc->id().compare(0, id.size(), id))
                         key = m_webProcessGroupAppIDList.at(i);
             } else {
-                auto l = splitString(appId, ',');
+                auto l = util::splitString(appId, ',');
                 idList.insert(idList.end(), l.begin(), l.end());
                 for (const auto& id : idList)
                     if (id == desc->id())
@@ -213,7 +210,7 @@ std::string WebProcessManager::getProcessKey(const ApplicationDescription* desc)
 
         for (size_t i = 0; i < m_webProcessGroupTrustLevelList.size(); i++) {
             std::string trustLevel = m_webProcessGroupTrustLevelList.at(i);
-            auto l = splitString(trustLevel, ',');
+            auto l = util::splitString(trustLevel, ',');
             trustLevelList.insert(trustLevelList.end(), l.begin(), l.end());
             for (const auto& trust : trustLevelList) {
                 if (trust == desc->trustLevel()) {

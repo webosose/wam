@@ -23,7 +23,6 @@
 #include <lunaprefs.h>
 
 #include "LogManager.h"
-#include "QtLessTemporaryHelpers.h"
 #include "Utils.h"
 
 DeviceInfoImpl::DeviceInfoImpl()
@@ -43,12 +42,12 @@ DeviceInfoImpl::DeviceInfoImpl()
 
 void DeviceInfoImpl::initialize()
 {
-    std::string jsonString;
-    if (!qtless::FileHelper::tryGetFileEntry("/var/luna/preferences/localeInfo", jsonString)) {
+    const std::string& jsonString = util::readFile("/var/luna/preferences/localeInfo");
+    if (jsonString.empty()) {
         return;
     }
 
-    Json::Value localeJson = qtless::JsonHelper::jsonCppFromString(jsonString);
+    Json::Value localeJson = util::stringToJson(jsonString);
     if (!localeJson.isObject() || localeJson.empty()
        || !localeJson["localeInfo"].isObject()
        || !localeJson["localeInfo"]["locales"].isString()
@@ -93,8 +92,8 @@ void DeviceInfoImpl::initDisplayInfo()
     std::string hardwareScreenWidthStr;
     std::string hardwareScreenHeightStr;
     if (getDeviceInfo("HardwareScreenWidth", hardwareScreenWidthStr) && getDeviceInfo("HardwareScreenHeight", hardwareScreenHeightStr)) {
-        hardwareScreenWidth = strToIntWithDefault(hardwareScreenWidthStr, 0);
-        hardwareScreenHeight = strToIntWithDefault(hardwareScreenHeightStr, 0);
+        hardwareScreenWidth = util::strToIntWithDefault(hardwareScreenWidthStr, 0);
+        hardwareScreenHeight = util::strToIntWithDefault(hardwareScreenHeightStr, 0);
     } else {
         getDisplayWidth(hardwareScreenWidth);
         getDisplayHeight(hardwareScreenHeight);
@@ -130,9 +129,9 @@ void DeviceInfoImpl::initPlatformInfo()
     if (npos1 == std::string::npos || npos2 == std::string::npos) {
         m_platformVersionMajor = m_platformVersionMinor = m_platformVersionDot = -1;
     } else {
-        m_platformVersionMajor = strToIntWithDefault(platformVersion.substr(0, npos1), 0);
-        m_platformVersionMinor = strToIntWithDefault(platformVersion.substr(npos1 + 1, npos2), 0);
-        m_platformVersionDot = strToIntWithDefault(platformVersion.substr(npos2 + 1), 0);
+        m_platformVersionMajor = util::strToIntWithDefault(platformVersion.substr(0, npos1), 0);
+        m_platformVersionMinor = util::strToIntWithDefault(platformVersion.substr(npos1 + 1, npos2), 0);
+        m_platformVersionDot = util::strToIntWithDefault(platformVersion.substr(npos2 + 1), 0);
     }
 }
 

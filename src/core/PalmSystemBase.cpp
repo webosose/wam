@@ -18,7 +18,7 @@
 
 #include <json/json.h>
 
-#include "TypeConverter.h"
+#include "Utils.h"
 #include "WebAppManager.h"
 
 
@@ -38,11 +38,10 @@ std::string PalmSystemBase::country() const
     WebAppManager::instance()->getDeviceInfo("LocalCountry", q_localcountry);
     WebAppManager::instance()->getDeviceInfo("SmartServiceCountry", q_smartServiceCountry);
 
-    std::string country;
     Json::Value obj(Json::objectValue);
     obj["country"] = q_localcountry;
     obj["smartServiceCountry"] = q_smartServiceCountry;
-    jsonToString(obj, country);
+    std::string country = util::jsonToString(obj);
     return country;
 }
 

@@ -19,7 +19,7 @@
 #include "json/json.h"
 
 #include "LogManager.h"
-#include "QtLessTemporaryHelpers.h"
+#include "Utils.h"
 
 #define LS2_CALL(FUNC, SERVICE, PARAMS) call<WebAppManagerServiceLunaImpl, &WebAppManagerServiceLunaImpl::FUNC>(SERVICE, PARAMS, this)
 
@@ -49,8 +49,7 @@ void WebAppManagerServiceLunaImpl::systemServiceConnectCallback(const Json::Valu
 
 Json::Value WebAppManagerServiceLunaImpl::setInspectorEnable(const Json::Value& request)
 {
-    Json::Value reply = qtless::JsonHelper::jsonCppFromString(R"({"returnValue": true})");
-    return reply;
+    return util::stringToJson(R"({"returnValue": true})");
 }
 
 void WebAppManagerServiceLunaImpl::getSystemOptionCallback(const Json::Value& replyJson)
@@ -60,7 +59,7 @@ void WebAppManagerServiceLunaImpl::getSystemOptionCallback(const Json::Value& re
     //The right value will be notified again when service is restarted
     if (!replyJson.isObject() || !replyJson["settings"].isObject() || replyJson["settings"].empty()) {
         LOG_WARNING(MSGID_RECEIVED_INVALID_SETTINGS, 1,
-            PMLOGKFV("MSG", "%s", qtless::JsonHelper::jsonCppToString(replyJson).c_str()),
+            PMLOGKFV("MSG", "%s", util::jsonToString(replyJson).c_str()),
             "");
         return;
     }

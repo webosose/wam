@@ -19,7 +19,7 @@
 #include <json/json.h>
 
 #include "BaseMockInitializer.h"
-#include "JsonHelper.h"
+#include "Utils.h"
 #include "WebAppManagerService.h"
 #include "WebAppManagerServiceLuna.h"
 #include "WebViewMockImpl.h"
@@ -106,7 +106,7 @@ TEST(KillAppTest, KillApp) {
   mock_initializer.GetWebViewMock()->SetOnLoadURLActions();
 
   Json::Value launch_request;
-  ASSERT_TRUE(util::JsonValueFromString(kLaunchAppJsonBody, launch_request));
+  ASSERT_TRUE(util::stringToJson(kLaunchAppJsonBody, launch_request));
   WebAppManagerServiceLuna* luna_service = WebAppManagerServiceLuna::instance();
   const auto result = luna_service->launchApp(launch_request);
 
@@ -148,7 +148,7 @@ TEST(KillAppTest, ForceKillApp) {
   mock_initializer.GetWebViewMock()->SetOnLoadURLActions();
 
   Json::Value launch_request;
-  ASSERT_TRUE(util::JsonValueFromString(kLaunchAppJsonBody, launch_request));
+  ASSERT_TRUE(util::stringToJson(kLaunchAppJsonBody, launch_request));
   WebAppManagerServiceLuna* luna_service = WebAppManagerServiceLuna::instance();
   const auto result = luna_service->launchApp(launch_request);
 

@@ -19,7 +19,7 @@
 #include <json/json.h>
 
 #include "BaseMockInitializer.h"
-#include "JsonHelper.h"
+#include "Utils.h"
 #include "WebAppManagerServiceLuna.h"
 
 namespace {
@@ -105,7 +105,7 @@ TEST(SetInspectorEnableTest, checkCaseApplicationNotExists)
     BaseMockInitializer<> mockInitializer;
 
     Json::Value requestLaunch;
-    ASSERT_TRUE(util::JsonValueFromString(kLaunchAppJsonBody, requestLaunch));
+    ASSERT_TRUE(util::stringToJson(kLaunchAppJsonBody, requestLaunch));
     WebAppManagerServiceLuna* lunaService = WebAppManagerServiceLuna::instance();
     const auto responseLaunch = lunaService->launchApp(requestLaunch);
 
@@ -122,7 +122,7 @@ TEST(SetInspectorEnableTest, checkCaseApplicationExists)
     BaseMockInitializer<> mockInitializer;
 
     Json::Value requestLaunch;
-    ASSERT_TRUE(util::JsonValueFromString(kLaunchAppJsonBody, requestLaunch));
+    ASSERT_TRUE(util::stringToJson(kLaunchAppJsonBody, requestLaunch));
     WebAppManagerServiceLuna* lunaService = WebAppManagerServiceLuna::instance();
     const auto responseLaunch = lunaService->launchApp(requestLaunch);
 

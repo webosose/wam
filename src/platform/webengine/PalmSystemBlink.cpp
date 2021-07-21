@@ -91,7 +91,7 @@ std::string PalmSystemBlink::handleBrowserControlMessage(const std::string& comm
     } else if (command == "PmLogString") {
         if (arguments.size() > 3) {
             int32_t v1;
-            if (strToInt(arguments[0], v1))
+            if (util::strToInt(arguments[0], v1))
                 pmLogString(v1, arguments[1], arguments[2], arguments[3]);
         }
     } else if (command == "setWindowProperty") {
@@ -107,8 +107,8 @@ std::string PalmSystemBlink::handleBrowserControlMessage(const std::string& comm
         if (arguments.size() == 3) {
             std::string v1 = arguments[0];
             int32_t v2, v3;
-            const bool v2_conversion = strToInt(arguments[1], v2);
-            const bool v3_conversion = strToInt(arguments[2], v3);
+            const bool v2_conversion = util::strToInt(arguments[1], v2);
+            const bool v3_conversion = util::strToInt(arguments[2], v3);
             if (v2_conversion && v3_conversion)
                 m_app->setCursor(v1, v2, v3);
         }

@@ -20,8 +20,8 @@
 #include <gtest/gtest.h>
 #include <json/json.h>
 
-#include "JsonHelper.h"
 #include "PlatformModuleFactoryImpl.h"
+#include "Utils.h"
 #include "WebAppFactoryManagerMock.h"
 #include "WebAppManager.h"
 #include "WebAppManagerServiceLuna.h"
@@ -235,7 +235,7 @@ Json::Value launchApp(const char* jsonBody)
         return Json::Value();
 
     Json::Value request;
-    if (!util::JsonValueFromString(jsonBody, request))
+    if (!util::stringToJson(jsonBody, request))
         return Json::Value();
 
     return WebAppManagerServiceLuna::instance()->launchApp(request);
@@ -274,7 +274,7 @@ TEST(CloseAllApps, CloseAllApps)
 
     {
         Json::Value request;
-        ASSERT_TRUE(util::JsonValueFromString("{}", request));
+        ASSERT_TRUE(util::stringToJson("{}", request));
         const auto& result = WebAppManagerServiceLuna::instance()->closeAllApps(request);
         ASSERT_TRUE(result.isObject());
         ASSERT_TRUE(result.isMember("returnValue"));

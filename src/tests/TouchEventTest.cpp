@@ -20,8 +20,8 @@
 #include <gtest/gtest.h>
 #include <json/json.h>
 
-#include "JsonHelper.h"
 #include "PlatformModuleFactoryImpl.h"
+#include "Utils.h"
 #include "WebAppFactoryManagerMock.h"
 #include "WebAppManager.h"
 #include "WebAppManagerServiceLuna.h"
@@ -154,7 +154,7 @@ void TouchEventTestSuite::SetUp()
     }));
 
     Json::Value launch_request;
-    ASSERT_TRUE(util::JsonValueFromString(launchBareAppJsonBody, launch_request));
+    ASSERT_TRUE(util::stringToJson(launchBareAppJsonBody, launch_request));
     const auto& result = WebAppManagerServiceLuna::instance()->launchApp(launch_request);
 
     ASSERT_TRUE(result.isObject());

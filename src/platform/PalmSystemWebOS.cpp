@@ -22,28 +22,11 @@
 #include <sys/stat.h>
 
 #include "ApplicationDescription.h"
-#include "JsonHelper.h"
 #include "LogManager.h"
+#include "Utils.h"
 #include "WebAppBase.h"
 #include "WebAppWayland.h"
 #include "WebPageBase.h"
-
-namespace {
-
-// TODO: Move it after merge
-bool doesPathExist(const std::string& path)
-{
-    if (path.empty())
-        return false;
-
-    struct stat st;
-    if (stat(path.c_str(), &st))
-        return false;
-
-    return st.st_mode & S_IFDIR || st.st_mode & S_IFREG;
-}
-
-}  // namespace
 
 PalmSystemWebOS::PalmSystemWebOS(WebAppBase* app)
     : m_app(static_cast<WebAppWayland*>(app))
@@ -55,7 +38,7 @@ void PalmSystemWebOS::setLaunchParams(const std::string& params)
 {
     Json::Value jsonDoc = Json::nullValue;
 
-    const bool result = util::JsonValueFromString(params, jsonDoc);
+    const bool result = util::stringToJson(params, jsonDoc);
 
     if (!result || jsonDoc.isNull())
         m_launchParams.erase();
@@ -75,7 +58,7 @@ bool PalmSystemWebOS::isKeyboardVisible() const
 
 bool PalmSystemWebOS::isMinimal() const
 {
-    return doesPathExist("/var/luna/preferences/ran-firstuse");
+    return util::doesPathExist("/var/luna/preferences/ran-firstuse");
 }
 
 int PalmSystemWebOS::activityId() const
@@ -124,7 +107,7 @@ void PalmSystemWebOS::setInputRegion(const std::string& params)
 {
     // this function is not related to windowGroup anymore
     Json::Value jsonDoc;
-    const bool result = util::JsonValueFromString(params, jsonDoc);
+    const bool result = util::stringToJson(params, jsonDoc);
     if (result)
         m_app->setInputRegion(jsonDoc);
     else
@@ -141,7 +124,7 @@ void PalmSystemWebOS::setGroupClientEnvironment(GroupClientCallKey callKey, cons
                 case KeyMask:
                 {
                     Json::Value jsonDoc;
-                    const bool result = util::JsonValueFromString(params, jsonDoc);
+                    const bool result = util::stringToJson(params, jsonDoc);
                     if (result)
                         m_app->setKeyMask(jsonDoc);
                     else

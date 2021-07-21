@@ -21,7 +21,7 @@
 #include <json/json.h>
 
 #include "BaseMockInitializer.h"
-#include "JsonHelper.h"
+#include "Utils.h"
 #include "WebAppManagerService.h"
 #include "WebAppManagerServiceLuna.h"
 #include "WebViewMockImpl.h"
@@ -153,7 +153,7 @@ TEST(ListRunningAppsTest, IncludeSysApps) {
       .WillRepeatedly(testing::Return(pid));
 
   Json::Value bare_request;
-  ASSERT_TRUE(util::JsonValueFromString(launchBareAppJsonBody, bare_request));
+  ASSERT_TRUE(util::stringToJson(launchBareAppJsonBody, bare_request));
   WebAppManagerServiceLuna* luna_service = WebAppManagerServiceLuna::instance();
   auto result = luna_service->launchApp(bare_request);
 
@@ -163,7 +163,7 @@ TEST(ListRunningAppsTest, IncludeSysApps) {
 
   Json::Value webrtc_request;
   ASSERT_TRUE(
-      util::JsonValueFromString(launchWebRTCAppJsonBody, webrtc_request));
+      util::stringToJson(launchWebRTCAppJsonBody, webrtc_request));
   result = luna_service->launchApp(webrtc_request);
 
   ASSERT_TRUE(result.isObject());
@@ -213,7 +213,7 @@ TEST(ListRunningAppsTest, ExcludeSysApps) {
       .WillRepeatedly(testing::Return(pid));
 
   Json::Value bare_request;
-  ASSERT_TRUE(util::JsonValueFromString(launchBareAppJsonBody, bare_request));
+  ASSERT_TRUE(util::stringToJson(launchBareAppJsonBody, bare_request));
   WebAppManagerServiceLuna* luna_service = WebAppManagerServiceLuna::instance();
   auto result = luna_service->launchApp(bare_request);
 
@@ -223,7 +223,7 @@ TEST(ListRunningAppsTest, ExcludeSysApps) {
 
   Json::Value webrtc_request;
   ASSERT_TRUE(
-      util::JsonValueFromString(launchWebRTCAppJsonBody, webrtc_request));
+      util::stringToJson(launchWebRTCAppJsonBody, webrtc_request));
   result = luna_service->launchApp(webrtc_request);
 
   ASSERT_TRUE(result.isObject());

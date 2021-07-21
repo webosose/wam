@@ -22,7 +22,6 @@ SOURCES += \
         ApplicationDescription.cpp \
         BCP47.cpp \
         DeviceInfo.cpp \
-        JsonHelper.cpp \
         LogManager.cpp \
         NetworkStatus.cpp \
         NetworkStatusManager.cpp \
@@ -30,9 +29,7 @@ SOURCES += \
         PlugInService.cpp \
         PluginLibWrapper.cpp \
         PluginLoader.cpp \
-        StringUtils.cpp \
         Timer.cpp \
-        TypeConverter.cpp \
         Url.cpp \
         Utils.cpp \
         WebAppBase.cpp \
@@ -49,7 +46,6 @@ HEADERS += \
         ApplicationDescription.h \
         BCP47.h \
         DeviceInfo.h \
-        JsonHelper.h \
         LogManager.h \
         LogMsgId.h \
         NetworkStatus.h \
@@ -61,9 +57,7 @@ HEADERS += \
         PluginLibWrapper.h \
         PluginLoader.h \
         ServiceSender.h \
-        StringUtils.h \
         Timer.h \
-        TypeConverter.h \
         Url.h \
         Utils.h \
         WebAppBase.h \

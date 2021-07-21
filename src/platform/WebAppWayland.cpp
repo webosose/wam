@@ -189,7 +189,8 @@ void WebAppWayland::init(int width, int height)
       LOG_DEBUG("App window for display[%d]", m_displayId);
     }
 
-    int timeout = strToIntWithDefault(getEnvVar("LAUNCH_FINISH_ASSURE_TIMEOUT"), 0);
+    int timeout = util::strToIntWithDefault(util::getEnvVar("LAUNCH_FINISH_ASSURE_TIMEOUT"), 0);
+
     if (timeout != 0)
         kLaunchFinishAssureTimeoutMs = timeout;
 

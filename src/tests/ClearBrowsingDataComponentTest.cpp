@@ -20,7 +20,7 @@
 #include <json/json.h>
 
 #include "BaseMockInitializer.h"
-#include "JsonHelper.h"
+#include "Utils.h"
 #include "WebAppManagerServiceLuna.h"
 #include "webos/webview_profile.h"
 
@@ -32,7 +32,7 @@ TEST(ClearBrowsingData, invalidValue) {
     BaseMockInitializer<> mockInitializer;
 
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
     ASSERT_TRUE(reply.isMember("returnValue"));
@@ -49,7 +49,7 @@ TEST(ClearBrowsingData, emptyArray) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
@@ -67,7 +67,7 @@ TEST(ClearBrowsingData, unknownData) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
@@ -85,7 +85,7 @@ TEST(ClearBrowsingData, all) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
@@ -100,7 +100,7 @@ TEST(ClearBrowsingData, appcache) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
@@ -115,7 +115,7 @@ TEST(ClearBrowsingData, cache) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
@@ -130,7 +130,7 @@ TEST(ClearBrowsingData, codecache) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
@@ -145,7 +145,7 @@ TEST(ClearBrowsingData, cookies) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
@@ -160,7 +160,7 @@ TEST(ClearBrowsingData, fileSystems) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
@@ -175,7 +175,7 @@ TEST(ClearBrowsingData, localStorage) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
@@ -190,7 +190,7 @@ TEST(ClearBrowsingData, channelIDs) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
@@ -205,7 +205,7 @@ TEST(ClearBrowsingData, serviceWorkers) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
@@ -220,7 +220,7 @@ TEST(ClearBrowsingData, cacheStorage) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());
@@ -235,7 +235,7 @@ TEST(ClearBrowsingData, webSQL) {
 
     BaseMockInitializer<> mockInitializer;
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(json_parameter, request));
+    ASSERT_TRUE(util::stringToJson(json_parameter, request));
 
     const auto reply = WebAppManagerServiceLuna::instance()->clearBrowsingData(request);
     ASSERT_TRUE(reply.isObject());

@@ -24,7 +24,7 @@
 
 #include "ApplicationDescription.h"
 #include "LogManager.h"
-#include "TypeConverter.h"
+#include "Utils.h"
 #include "WebAppManager.h"
 #include "WebAppManagerConfig.h"
 #include "WebPageObserver.h"
@@ -64,8 +64,7 @@ WebPageBase::WebPageBase(const wam::Url& url, std::shared_ptr<ApplicationDescrip
     , m_cleaningResources(false)
     , m_isPreload(false)
 {
-    Json::Value json;
-    stringToJson(params, json);
+    Json::Value json = util::stringToJson(params);
     if (json.isObject()) {
         m_instanceId = json["instanceId"].asString();
     } else {
@@ -195,8 +194,7 @@ bool WebPageBase::doHostedWebAppRelaunch(const std::string& launchParams)
     To support backward compatibility, should cover the case not having "handledBy"
     */
     // check deeplinking relaunch condition
-    Json::Value obj;
-    stringToJson(launchParams, obj);
+    Json::Value obj = util::stringToJson(launchParams);
 
     if (url().Scheme() ==  "file"
         || m_defaultUrl.Scheme() != "file"
@@ -215,8 +213,7 @@ bool WebPageBase::doHostedWebAppRelaunch(const std::string& launchParams)
 
 bool WebPageBase::doDeeplinking(const std::string& launchParams)
 {
-    Json::Value obj;
-    stringToJson(launchParams, obj);
+    Json::Value obj = util::stringToJson(launchParams);
     if (!obj.isObject() || obj["contentTarget"].isNull())
         return false;
 

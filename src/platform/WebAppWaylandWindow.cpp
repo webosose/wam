@@ -68,7 +68,7 @@ WebAppWaylandWindow::WebAppWaylandWindow()
     , m_xinputActivated(false)
     , m_lastMouseEvent(WebOSMouseEvent(WebOSEvent::None, -1., -1.))
 {
-    m_cursorEnabled = getEnvVar("ENABLE_CURSOR_BY_DEFAULT") == "1";
+    m_cursorEnabled = util::getEnvVar("ENABLE_CURSOR_BY_DEFAULT") == "1";
 }
 
 void WebAppWaylandWindow::hide()

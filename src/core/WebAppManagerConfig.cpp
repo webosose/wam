@@ -18,7 +18,6 @@
 
 #include <unistd.h>
 
-#include "TypeConverter.h"
 #include "Utils.h"
 
 WebAppManagerConfig::WebAppManagerConfig()
@@ -37,7 +36,7 @@ WebAppManagerConfig::WebAppManagerConfig()
 
 std::string WebAppManagerConfig::wamGetEnv(const char *name)
 {
-    return getEnvVar(name);
+    return util::getEnvVar(name);
 }
 
 void WebAppManagerConfig::initConfiguration()
@@ -50,13 +49,11 @@ void WebAppManagerConfig::initConfiguration()
     }
 
     std::string suspendDelay = wamGetEnv("WAM_SUSPEND_DELAY_IN_MS");
-    int suspendDelayInt = 0;
-    stringToInt(suspendDelay, suspendDelayInt);
+    int suspendDelayInt = util::strToIntWithDefault(suspendDelay, 0);
     m_suspendDelayTime = std::max(suspendDelayInt, 1);
 
     std::string maxCustomSuspendDelay = wamGetEnv("MAX_CUSTOM_SUSPEND_DELAY_IN_MS");
-    int maxCustomSuspendDelayInt = 0;
-    stringToInt(maxCustomSuspendDelay, maxCustomSuspendDelayInt);
+    int maxCustomSuspendDelayInt = util::strToIntWithDefault(maxCustomSuspendDelay, 0);
     m_maxCustomSuspendDelayTime = std::max(maxCustomSuspendDelayInt, 0);
 
     m_webProcessConfigPath = wamGetEnv("WEBPROCESS_CONFIGURATION_PATH");

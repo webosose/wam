@@ -19,7 +19,7 @@
 #include <gtest/gtest.h>
 #include <json/json.h>
 
-#include "JsonHelper.h"
+#include "Utils.h"
 
 namespace {
 
@@ -28,37 +28,37 @@ const char* kTestJsonString =
 
 }  // namespace
 
-TEST(JsonValueFromString, CheckStrictMode) {
+TEST(StringToJson, CheckStrictMode) {
   std::string json_string = "5858h{igjmbn";
   Json::Value value;
-  EXPECT_FALSE(util::JsonValueFromString(json_string, value));
+  EXPECT_FALSE(util::stringToJson(json_string, value));
 }
 
-TEST(JsonValueFromString, ParseError) {
+TEST(StringToJson, ParseError) {
   std::string json_string = "abvgd";
   Json::Value value;
-  EXPECT_FALSE(util::JsonValueFromString(json_string, value));
+  EXPECT_FALSE(util::stringToJson(json_string, value));
   EXPECT_TRUE(value.isNull());
 }
 
-TEST(JsonValueFromString, ParseEmpty) {
+TEST(StringToJson, ParseEmpty) {
   std::string json_string = "";
   Json::Value value;
-  EXPECT_FALSE(util::JsonValueFromString(json_string, value));
+  EXPECT_FALSE(util::stringToJson(json_string, value));
   EXPECT_TRUE(value.isNull());
 }
 
-TEST(JsonValueFromString, ParseOk) {
+TEST(StringToJson, ParseOk) {
   Json::Value value;
-  ASSERT_TRUE(util::JsonValueFromString(kTestJsonString, value));
+  ASSERT_TRUE(util::stringToJson(kTestJsonString, value));
   ASSERT_TRUE(value.isObject());
   EXPECT_TRUE(value["returnValue"].asBool());
   EXPECT_STREQ(value["id"].asCString(), "bareapp");
 }
 
-TEST(StringFromJsonValue, StringFromJsonValue) {
+TEST(JsonToString, JsonToString) {
   Json::Value object;
   object["id"] = "bareapp";
   object["returnValue"] = true;
-  EXPECT_STREQ(util::StringFromJsonValue(object).c_str(), kTestJsonString);
+  EXPECT_STREQ(util::jsonToString(object).c_str(), kTestJsonString);
 }

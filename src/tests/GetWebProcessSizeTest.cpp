@@ -20,7 +20,6 @@
 
 #include "BaseMockInitializer.h"
 #include "BlinkWebProcessManagerMock.h"
-#include "JsonHelper.h"
 #include "PlatformModuleFactoryImplMock.h"
 #include "Utils.h"
 #include "WebAppManagerServiceLuna.h"
@@ -110,7 +109,7 @@ TEST(GetWebProcessSizeTest, checkCaseProcessExists)
                         PlatformModuleFactoryImplMock> mockInitializer;
 
     Json::Value requestLaunch;
-    ASSERT_TRUE(util::JsonValueFromString(kLaunchAppJsonBody, requestLaunch));
+    ASSERT_TRUE(util::stringToJson(kLaunchAppJsonBody, requestLaunch));
     WebAppManagerServiceLuna* lunaService = WebAppManagerServiceLuna::instance();
     const auto responseLaunch = lunaService->launchApp(requestLaunch);
 
@@ -141,8 +140,7 @@ TEST(GetWebProcessSizeTest, checkCaseProcessExists)
         auto process = processes[i];
         ASSERT_TRUE(process.isMember("pid"));
         ASSERT_TRUE(process["pid"].isString());
-        int pid = 0;
-        strToInt(process["pid"].asString(), pid);
+        int pid = util::strToIntWithDefault(process["pid"].asString(), 0);
         if (pid == kProcessId) {
             processPosition = i;
             ASSERT_TRUE(process.isMember("webProcessSize"));

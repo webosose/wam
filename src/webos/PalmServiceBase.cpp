@@ -17,7 +17,7 @@
 #include "PalmServiceBase.h"
 
 #include "LogManager.h"
-#include "QtLessTemporaryHelpers.h"
+#include "Utils.h"
 
 PalmServiceBase::PalmServiceBase()
     : m_serviceHandle(0)
@@ -101,7 +101,7 @@ bool PalmServiceBase::call(
         const char* applicationId = 0,
         LSCalloutContext* context = 0)
 {
-    std::string parametersAsString = qtless::JsonHelper::jsonCppToString(parameters);
+    std::string parametersAsString = util::jsonToString(parameters);
     if (!parameters.isObject()) {
         LOG_WARNING(MSGID_LS2_CALL_FAIL, 2,
             PMLOGKS("SERVICE", serviceName()),

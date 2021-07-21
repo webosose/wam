@@ -25,9 +25,9 @@
 #include "ApplicationDescription.h"
 #include "BlinkWebProcessManager.h"
 #include "BlinkWebView.h"
-#include "JsonHelper.h"
 #include "LogManager.h"
 #include "PalmSystemBlink.h"
+#include "Url.h"
 #include "Utils.h"
 #include "WebAppManagerConfig.h"
 #include "WebAppManagerTracer.h"
@@ -37,7 +37,6 @@
 #include "WebView.h"
 #include "WebViewFactory.h"
 #include "WebViewImpl.h"
-#include "util/Url.h"
 
 /**
  * Hide dirty implementation details from
@@ -121,7 +120,7 @@ void WebPageBlink::init()
     d->pageView->SetVisible(false);
     d->pageView->SetUserAgent(d->pageView->DefaultUserAgent() + " " + getWebAppManagerConfig()->getName());
 
-    const std::string& privileged_plugin_path = getEnvVar("PRIVILEGED_PLUGIN_PATH");
+    const std::string& privileged_plugin_path = util::getEnvVar("PRIVILEGED_PLUGIN_PATH");
     if(!privileged_plugin_path.empty()) {
         d->pageView->AddAvailablePluginDir(privileged_plugin_path);
     }
@@ -284,13 +283,13 @@ void WebPageBlink::reloadDefaultPage()
 
 std::vector<std::string> WebPageBlink::getErrorPagePath(const std::string& errorpage)
 {
-    const std::string& filepath = uriToLocal(errorpage);
+    const std::string& filepath = util::uriToLocal(errorpage);
     if (filepath.empty())
         return std::vector<std::string>();
     std::string language;
     getSystemLanguage(language);
 
-    return getErrorPagePaths(filepath, language);
+    return util::getErrorPagePaths(filepath, language);
 }
 
 void WebPageBlink::loadErrorPage(int errorCode)
@@ -319,13 +318,13 @@ void WebPageBlink::loadErrorPage(int errorCode)
 
 
         const auto& paths = getErrorPagePath(errorpage);
-        auto found = std::find_if(std::cbegin(paths), std::cend(paths), doesPathExist);
+        auto found = std::find_if(std::cbegin(paths), std::cend(paths), util::doesPathExist);
 
         // finally found something!
         if(found != paths.end()) {
             // re-create it as a proper URL, so WebKit can understand it
             m_isLoadErrorPageStart = true;
-            std::string errorUrl = localToUri(*found);
+            std::string errorUrl = util::localToUri(*found);
             if (errorUrl.empty()) {
                 LOG_ERROR(MSGID_ERROR_ERROR, 1, PMLOGKS("PATH", errorpage.c_str()), "Error during conversion %s to URI", found->c_str());
                 return;
@@ -387,7 +386,7 @@ void WebPageBlink::suspendWebPageAll()
     if (m_isSuspended || m_enableBackgroundRun)
         return;
 
-    if (!(getEnvVar("WAM_KEEP_RTC_CONNECTIONS_ON_SUSPEND") == "1")) {
+    if (!(util::getEnvVar("WAM_KEEP_RTC_CONNECTIONS_ON_SUSPEND") == "1")) {
         // On sending applications to background, disconnect RTC
         d->pageView->DropAllPeerConnections(webos::DROP_PEER_CONNECTION_REASON_PAGE_HIDDEN);
     }
@@ -520,10 +519,10 @@ void WebPageBlink::resumeWebPagePaintingAndJSExecution()
 std::string WebPageBlink::escapeData(const std::string& value)
 {
     std::string escapedValue = value;
-    replaceAll(escapedValue, "\\", "\\\\");
-    replaceAll(escapedValue, "'", "\\'");
-    replaceAll(escapedValue, "\n", "\\n");
-    replaceAll(escapedValue, "\r", "\\r");
+    util::replaceSubstr(escapedValue, "\\", "\\\\");
+    util::replaceSubstr(escapedValue, "'", "\\'");
+    util::replaceSubstr(escapedValue, "\n", "\\n");
+    util::replaceSubstr(escapedValue, "\r", "\\r");
     return escapedValue;
 }
 
@@ -707,7 +706,7 @@ void WebPageBlink::loadFailed(const std::string& url, int errCode, const std::st
     if (errDesc != "SSL_ERROR")
         return;
 
-    m_loadFailedHostname = getHostname(url);
+    m_loadFailedHostname = util::getHostname(url);
     handleLoadFailed(errCode);
 }
 
@@ -858,7 +857,7 @@ void WebPageBlink::addUserScriptUrl(const wam::Url& url)
     }
 
     const std::string& path = url.ToLocalFile();
-    const std::string& fileContent = readFile(path.c_str());
+    const std::string& fileContent = util::readFile(path);
 
     if (fileContent.empty()) {
         LOG_DEBUG("WebPageBlink: Couldn't open '%s' as user script due to error '%s'.", path.c_str(), strerror(errno));
@@ -937,7 +936,7 @@ void WebPageBlink::setCustomPluginIfNeeded()
     std::string customPluginPath = m_appDesc->folderPath();
     customPluginPath.append("/plugins");
 
-    if (!doesPathExist(customPluginPath.c_str()))
+    if (!util::doesPathExist(customPluginPath.c_str()))
         return;
     if (m_customPluginPath == customPluginPath)
         return;
@@ -1005,8 +1004,8 @@ void WebPageBlink::updateHardwareResolution()
     std::string hardwareWidth, hardwareHeight;
     getDeviceInfo("HardwareScreenWidth", hardwareWidth);
     getDeviceInfo("HardwareScreenHeight", hardwareHeight);
-    int width = strToIntWithDefault(hardwareWidth, 0);
-    int height = strToIntWithDefault(hardwareHeight, 0);
+    int width = util::strToIntWithDefault(hardwareWidth, 0);
+    int height = util::strToIntWithDefault(hardwareHeight, 0);
     d->pageView->SetHardwareResolution(width, height);
 }
 
@@ -1019,7 +1018,7 @@ void WebPageBlink::updateBoardType()
 
 void WebPageBlink::updateMediaCodecCapability()
 {
-    const std::string& fileContent = readFile("/etc/umediaserver/device_codec_capability_config.json");
+    const std::string& fileContent = util::readFile("/etc/umediaserver/device_codec_capability_config.json");
 
     if(!fileContent.empty())
         d->pageView->SetMediaCodecCapability(fileContent);
@@ -1041,8 +1040,8 @@ double WebPageBlink::devicePixelRatio()
     std::string hardwareWidth, hardwareHeight;
     if (getDeviceInfo("HardwareScreenWidth", hardwareWidth) &&
         getDeviceInfo("HardwareScreenHeight", hardwareHeight)) {
-        deviceWidth = strToIntWithDefault(hardwareWidth, 0);
-        deviceHeight = strToIntWithDefault(hardwareHeight, 0);
+        deviceWidth = util::strToIntWithDefault(hardwareWidth, 0);
+        deviceHeight = util::strToIntWithDefault(hardwareHeight, 0);
     } else {
         deviceWidth = currentUiWidth();
         deviceHeight = currentUiHeight();
@@ -1076,10 +1075,9 @@ void WebPageBlink::setSupportDolbyHDRContents()
     getDeviceInfo("supportDolbyHDRContents", supportDolbyHDRContents);
     LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", appId().c_str()), PMLOGKS("INSTANCE_ID", instanceId().c_str()), PMLOGKFV("PID", "%d", getWebProcessPID()), "supportDolbyHDRContents:%s", supportDolbyHDRContents.c_str());
 
-    Json::Value preferences;
-    util::JsonValueFromString(m_appDesc->mediaPreferences(), preferences);
+    Json::Value preferences = util::stringToJson(m_appDesc->mediaPreferences());
     preferences["supportDolbyHDR"] = supportDolbyHDRContents == "true";
-    m_appDesc->setMediaPreferences(util::StringFromJsonValue(preferences));
+    m_appDesc->setMediaPreferences(util::jsonToString(preferences));
 }
 
 void WebPageBlink::updateDatabaseIdentifier()

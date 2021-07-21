@@ -14,26 +14,26 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "StringUtils.h"
+#include "Utils.h"
 
 #include <gtest/gtest.h>
 
 TEST(StringUtils, TrimTest) {
   std::string test_string = " \f\n\r\t\v  test  \f\n\r\t\v ";
-  EXPECT_EQ(util::trim(test_string), "test");
+  EXPECT_EQ(util::trimString(test_string), "test");
 }
 
 TEST(StringUtils, TrimRightTest) {
   std::string test_string = "test  \f\n\r\t\v ";
-  EXPECT_EQ(util::trim(test_string), "test");
+  EXPECT_EQ(util::trimString(test_string), "test");
 }
 
 TEST(StringUtils, TrimLeftTest) {
   std::string test_string = " \f\n\r\t\v  test";
-  EXPECT_EQ(util::trim(test_string), "test");
+  EXPECT_EQ(util::trimString(test_string), "test");
 }
 
 TEST(StringUtils, NoTrimTest) {
   std::string test_string = "test";
-  EXPECT_EQ(util::trim(test_string), "test");
+  EXPECT_EQ(util::trimString(test_string), "test");
 }

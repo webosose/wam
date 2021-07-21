@@ -18,18 +18,22 @@
 
 #include <cstdlib>
 #include <fstream>
+#include <limits>
 #include <regex>
 #include <sstream>
 #include <string>
 #include <vector>
 
-#include <unistd.h>
-
+#include <boost/algorithm/string.hpp>
 #include <boost/filesystem.hpp>
 #include <glib.h>
+#include <json/json.h>
 #include <sys/stat.h>
+#include <unistd.h>
 
 #include "BCP47.h"
+
+namespace util {
 
 static std::string getString(const char* value)
 {
@@ -144,35 +148,93 @@ std::string localToUri(const std::string& uri)
     return getString(cpath);
 }
 
-bool strToInt(const std::string str, int32_t& value)
-{
-    char* endptr = nullptr;
-    errno = 0;
-    value = strtol(str.c_str(), &endptr, 10);
-    if (endptr == str) {
-        return false;
-    }
-    if ((value == LONG_MAX || value == LONG_MIN) && errno == ERANGE) {
-        return false;
-    }
-    if (errno) {
-        return false;
-    }
-    return true;
-}
-
-int strToIntWithDefault(const std::string& str, int32_t defaultValue) {
-  int32_t convertedValue;
-  return strToInt(str, convertedValue) ? convertedValue : defaultValue;
-}
-
-void replaceAll(std::string& source, const std::string& what, const std::string& with)
-{
-    for (size_t pos = 0; std::string::npos != (pos = source.find(what, pos)); pos += with.length())
-        source.replace(pos, what.length(), with);
-}
-
 std::string getEnvVar(const char* env)
 {
     return getString(getenv(env));
 }
+
+// STRING
+bool strToInt(const std::string str, int& num)
+{
+    char* endptr = nullptr;
+    errno = 0;
+    long value = strtol(str.c_str(), &endptr, 10);
+    if (endptr == str) {
+        return false;
+    }
+
+    if (value > std::numeric_limits<int>::max() ||
+        value < std::numeric_limits<int>::min() ||
+        errno == ERANGE) {
+        return false;
+    }
+
+    if (errno) {
+        return false;
+    }
+
+    num = value;
+    return true;
+}
+
+int strToIntWithDefault(const std::string& str, int defaultValue) {
+  int convertedValue;
+  return strToInt(str, convertedValue) ? convertedValue : defaultValue;
+}
+
+std::vector<std::string> splitString(const std::string &str, char delimiter)
+{
+    std::vector<std::string> resList;
+    std::stringstream ss(str);
+    std::string s;
+
+    while (std::getline(ss, s, delimiter)) {
+        resList.push_back(s);
+    }
+
+    return resList;
+}
+
+std::string trimString(const std::string& str)
+{
+    std::string trimmed(str);
+    boost::trim_right(trimmed);
+    boost::trim_left(trimmed);
+
+    return trimmed;
+}
+
+void replaceSubstr(std::string& in, const std::string& toSearch,
+                   const std::string& replaceStr /* ="" */)
+{
+    size_t pos = in.find(toSearch);
+    while (pos != std::string::npos) {
+        in.replace(pos, toSearch.size(), replaceStr);
+        pos = in.find(toSearch, pos + replaceStr.size());
+    }
+}
+
+
+// JSON
+bool stringToJson(const std::string& str, Json::Value& value) {
+  Json::CharReaderBuilder builder;
+  Json::CharReaderBuilder::strictMode(&builder.settings_);
+  std::unique_ptr<Json::CharReader> reader(builder.newCharReader());
+
+  return reader->parse(str.c_str(), str.c_str() + str.size(), &value, nullptr);
+}
+
+Json::Value stringToJson(const std::string& str) {
+    Json::Value result;
+    return stringToJson(str, result) ? result : Json::Value(Json::nullValue);
+}
+
+std::string jsonToString(const Json::Value& value) {
+  Json::StreamWriterBuilder builder;
+  builder["indentation"] = "    ";
+  builder["enableYAMLCompatibility"] = true;
+
+  return Json::writeString(builder, value);
+}
+
+} // namespace

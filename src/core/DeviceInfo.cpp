@@ -25,7 +25,7 @@ bool DeviceInfo::getDisplayWidth(int &value)
 
     ret = getDeviceInfo("DisplayWidth", valueStr);
     if (ret)
-        ret = strToInt(valueStr, value);
+        ret = util::strToInt(valueStr, value);
 
     return ret;
 }
@@ -42,7 +42,7 @@ bool DeviceInfo::getDisplayHeight(int &value)
 
     ret = getDeviceInfo("DisplayHeight", valueStr);
     if (ret)
-        ret = strToInt(valueStr, value);
+        ret = util::strToInt(valueStr, value);
 
     return ret;
 }

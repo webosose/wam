@@ -20,8 +20,8 @@
 #include <gtest/gtest.h>
 #include <json/json.h>
 
-#include "JsonHelper.h"
 #include "PlatformModuleFactoryImpl.h"
+#include "Utils.h"
 #include "WebAppFactoryManagerMock.h"
 #include "WebAppManager.h"
 #include "WebAppManagerServiceLuna.h"
@@ -242,7 +242,7 @@ TEST_F(LaunchAppTestSuite, LaunchOnPrimaryDisplay)
     const uint32_t height = 777;
 
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(launchBareAppJsonBody, request));
+    ASSERT_TRUE(util::stringToJson(launchBareAppJsonBody, request));
 
     EXPECT_CALL(*webAppWindow, DisplayWidth()).WillRepeatedly(Return(width));
     EXPECT_CALL(*webAppWindow, DisplayHeight()).WillRepeatedly(Return(height));
@@ -280,7 +280,7 @@ TEST_F(LaunchAppTestSuite, LaunchOnSecondaryDisplay)
     constexpr char appId[] = "com.webos.app.test.webrtc";
 
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(launchWebRTCAppJsonBody, request));
+    ASSERT_TRUE(util::stringToJson(launchWebRTCAppJsonBody, request));
 
     EXPECT_CALL(*webAppWindow, SetWindowProperty(_, _)).Times(AnyNumber());
     EXPECT_CALL(*webAppWindow, SetWindowProperty("displayAffinity", "1")).Times(1);
@@ -301,7 +301,7 @@ TEST_F(LaunchAppTestSuite, LaunchOnSecondaryDisplay)
 TEST_F(LaunchAppTestSuite, LaunchAppsWithParams)
 {
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(launchBareAppJsonBody, request));
+    ASSERT_TRUE(util::stringToJson(launchBareAppJsonBody, request));
     request["parameters"]["testParamField"] = "testParamValue";
 
     EXPECT_CALL(*webView, addUserScript(::testing::HasSubstr("\"testParamField\": \"testParamValue\"")));
@@ -349,12 +349,12 @@ TEST_F(LaunchAppTestSuite, LaunchAppsWithError)
     }));
 
     Json::Value request;
-    ASSERT_TRUE(util::JsonValueFromString(localeInfo, request));
+    ASSERT_TRUE(util::stringToJson(localeInfo, request));
 
     WebAppManagerServiceLuna::instance()->getSystemLocalePreferencesCallback(request);
 
     request.clear();
-    ASSERT_TRUE(util::JsonValueFromString(launchWebRTCAppJsonBody, request));
+    ASSERT_TRUE(util::stringToJson(launchWebRTCAppJsonBody, request));
 
     const auto& result = WebAppManagerServiceLuna::instance()->launchApp(request);
     ASSERT_TRUE(result.isObject());

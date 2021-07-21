@@ -23,8 +23,8 @@
 #include <json/json.h>
 #include <luna-service2/lunaservice.h>
 
-#include "JsonHelper.h"
 #include "LogManager.h"
+#include "Utils.h"
 
 class LSHandle;
 class LSMessage;
@@ -79,7 +79,7 @@ protected:
         }
 
         Json::Value request;
-        if (!util::JsonValueFromString(LSMessageGetPayload(message), request)) {
+        if (!util::stringToJson(LSMessageGetPayload(message), request)) {
             if (!LSMessageReply(handle, message, "{\"returnValue\": false}", &lsError))
                 return false;
             return true;
@@ -90,7 +90,7 @@ protected:
         reply = static_cast<LSCallbackHandler*>(user_data)->called(request);
 
         if (!reply.isNull())
-            return LSMessageReply(handle, message, util::StringFromJsonValue(reply).c_str(), &lsError);
+            return LSMessageReply(handle, message, util::jsonToString(reply).c_str(), &lsError);
         else
             return true;
     }
@@ -146,7 +146,7 @@ static bool bus_callback_json(LSHandle* handle, LSMessage* message, void* user_d
     }
 
     Json::Value request;
-    if (!util::JsonValueFromString(LSMessageGetPayload(message), request)) {
+    if (!util::stringToJson(LSMessageGetPayload(message), request)) {
         LOG_WARNING(MSGID_LUNA_API, 0, "Failed to parse request message.");
         return false;
     }
@@ -154,7 +154,7 @@ static bool bus_callback_json(LSHandle* handle, LSMessage* message, void* user_d
 
     reply = (static_cast<CLASS*>(user_data)->*FUNCTION)(request);
 
-    if (!LSMessageReply(handle, message, util::StringFromJsonValue(reply).c_str(), &lsError))
+    if (!LSMessageReply(handle, message, util::jsonToString(reply).c_str(), &lsError))
         return false;
 
     return true;
@@ -178,7 +178,7 @@ static bool bus_subscription_callback_json(LSHandle* handle, LSMessage* message,
     }
 
     Json::Value request;
-    if (!util::JsonValueFromString(LSMessageGetPayload(message), request)) {
+    if (!util::stringToJson(LSMessageGetPayload(message), request)) {
         LOG_WARNING(MSGID_LUNA_API, 0, "Failed to parse request message.");
         return false;
     }
@@ -189,7 +189,7 @@ static bool bus_subscription_callback_json(LSHandle* handle, LSMessage* message,
     if (subscribed)
         reply["subscribed"] = true;
 
-    if (!LSMessageReply(handle, message, util::StringFromJsonValue(reply).c_str(), &lsError))
+    if (!LSMessageReply(handle, message, util::jsonToString(reply).c_str(), &lsError))
         return false;
 
     return true;
@@ -203,7 +203,7 @@ static bool bus_callback_json(LSHandle* handle, LSMessage* message, void* user_d
 {
     Json::Value reply;
     if (message) {
-        if (!util::JsonValueFromString(LSMessageGetPayload(message), reply))
+        if (!util::stringToJson(LSMessageGetPayload(message), reply))
             LOG_WARNING(MSGID_LUNA_API, 0, "Failed to parse reply message.");
     }
 
@@ -242,7 +242,7 @@ public:
             m_serviceHandle,
             category(),
             subscription,
-            util::StringFromJsonValue(reply).c_str(),
+            util::jsonToString(reply).c_str(),
             &lsError);
     }
 
@@ -265,13 +265,13 @@ protected:
         bool err = false;
         if (parameters.isObject() && (parameters["subscribe"].asBool() || parameters["watch"].asBool())) {
             err = LSCall(m_serviceHandle, what,
-                util::StringFromJsonValue(parameters).c_str(),
+                util::jsonToString(parameters).c_str(),
                 bus_callback_json<HANDLER_CLASS, CALLBACK_METHOD>,
                 callback_receiver, NULL, &lsError);
         } else {
             err = LSCallOneReply(m_serviceHandle,
                 what,
-                util::StringFromJsonValue(parameters).c_str(),
+                util::jsonToString(parameters).c_str(),
                 bus_callback_json<HANDLER_CLASS, CALLBACK_METHOD>,
                 callback_receiver, NULL, &lsError);
         }

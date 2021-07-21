@@ -20,6 +20,10 @@
 #include <string>
 #include <vector>
 
+#include <json/json.h>
+
+namespace util {
+
 std::vector<std::string> getErrorPagePaths(const std::string& errorPageLocation, const std::string& language = "");
 std::string getHostname(const std::string& url);
 
@@ -29,10 +33,21 @@ std::string readFile(const std::string& path);
 std::string uriToLocal(const std::string& uri);
 std::string localToUri(const std::string& uri);
 
-bool strToInt(const std::string str, int32_t& value);
-int32_t strToIntWithDefault(const std::string& str, int32_t defaultValue);
-
-void replaceAll(std::string& source, const std::string& what, const std::string& with);
 std::string getEnvVar(const char* env);
+
+// STRING
+bool strToInt(const std::string str, int32_t& value);
+int strToIntWithDefault(const std::string& str, int defaultValue);
+std::vector<std::string> splitString(const std::string &str, char delimiter);
+std::string trimString(const std::string& str);
+void replaceSubstr(std::string& in, const std::string& toSearch,
+                   const std::string& replaceStr = "");
+
+// JSON
+bool stringToJson(const std::string& str, Json::Value& value);
+Json::Value stringToJson(const std::string& str);
+std::string jsonToString(const Json::Value& value);
+
+} // namespace
 
 #endif // UTILS_H

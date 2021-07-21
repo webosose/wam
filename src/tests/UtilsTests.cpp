@@ -24,6 +24,7 @@
 
 #include <gmock/gmock.h>
 #include <gtest/gtest.h>
+#include <limits>
 
 #include "Utils.h"
 
@@ -43,13 +44,13 @@ constexpr char path[] = "/usr/share/localization/wam/loaderror.html";
 
 TEST(UtilsTestSuite, emptyErrorPagePath)
 {
-    const auto& paths = getErrorPagePaths("", "");
+    const auto& paths = util::getErrorPagePaths("", "");
     ASSERT_TRUE(paths.empty());
 }
 
 TEST(UtilsTestSuite, nonEmptyErrorPagePath)
 {
-    const auto& paths = getErrorPagePaths(path, "");
+    const auto& paths = util::getErrorPagePaths(path, "");
     ASSERT_EQ(paths.size(), 2);
     EXPECT_THAT(paths[0], StrEq("/usr/share/localization/wam/resources/html/loaderror.html"));
     EXPECT_THAT(paths[1], ::testing::HasSubstr(path));
@@ -58,7 +59,7 @@ TEST(UtilsTestSuite, nonEmptyErrorPagePath)
 TEST(UtilsTestSuite, nonEmptyErrorPagePathWithLang)
 {
     constexpr char langTag[] = "en";
-    const auto& paths = getErrorPagePaths(path, langTag);
+    const auto& paths = util::getErrorPagePaths(path, langTag);
     ASSERT_EQ(paths.size(), 3);
     EXPECT_THAT(paths[0], StrEq("/usr/share/localization/wam/resources/en/html/loaderror.html"));
     EXPECT_THAT(paths[1], StrEq("/usr/share/localization/wam/resources/html/loaderror.html"));
@@ -68,7 +69,7 @@ TEST(UtilsTestSuite, nonEmptyErrorPagePathWithLang)
 TEST(UtilsTestSuite, nonEmptyErrorPagePathWithLangRegion)
 {
     constexpr char langTag[] = "en-US";
-    const auto& paths = getErrorPagePaths(path, langTag);
+    const auto& paths = util::getErrorPagePaths(path, langTag);
     ASSERT_EQ(paths.size(), 4);
     EXPECT_THAT(paths[0], StrEq("/usr/share/localization/wam/resources/en/US/html/loaderror.html"));
     EXPECT_THAT(paths[1], StrEq("/usr/share/localization/wam/resources/en/html/loaderror.html"));
@@ -79,7 +80,7 @@ TEST(UtilsTestSuite, nonEmptyErrorPagePathWithLangRegion)
 TEST(UtilsTestSuite, nonEmptyErrorPagePathWithLangRegionScript)
 {
     constexpr char langTag[] = "zh-Hant-HK";
-    const auto& paths = getErrorPagePaths(path, langTag);
+    const auto& paths = util::getErrorPagePaths(path, langTag);
     ASSERT_EQ(paths.size(), 5);
     EXPECT_THAT(paths[0], StrEq("/usr/share/localization/wam/resources/zh/Hant/HK/html/loaderror.html"));
     EXPECT_THAT(paths[1], StrEq("/usr/share/localization/wam/resources/zh/HK/html/loaderror.html"));
@@ -91,16 +92,16 @@ TEST(UtilsTestSuite, nonEmptyErrorPagePathWithLangRegionScript)
 TEST(UtilsTestSuite, replaceAll)
 {
     std::string source("\\");
-    replaceAll(source, "\\", "\\\\");
+    util::replaceSubstr(source, "\\", "\\\\");
     EXPECT_STREQ("\\\\", source.c_str());
     source = "'";
-    replaceAll(source, "'", "\\'");
+    util::replaceSubstr(source, "'", "\\'");
     EXPECT_STREQ("\\'", source.c_str());
     source = "\n";
-    replaceAll(source, "\n", "\\n");
+    util::replaceSubstr(source, "\n", "\\n");
     EXPECT_STREQ("\\n", source.c_str());
     source = "\r";
-    replaceAll(source, "\r", "\\r");
+    util::replaceSubstr(source, "\r", "\\r");
     EXPECT_STREQ("\\r", source.c_str());
 }
 
@@ -108,7 +109,7 @@ TEST(UtilsTestSuite, strToInt_IncorrectString)
 {
     std::string str = "not a number";
     int value;
-    bool result = strToInt(str, value);
+    bool result = util::strToInt(str, value);
     EXPECT_FALSE(result);
 }
 
@@ -117,7 +118,7 @@ TEST(UtilsTestSuite, strToInt_CorrectPositive)
     std::string str = "10";
     const int32_t expected = 10;
     int value;
-    bool result = strToInt(str, value);
+    bool result = util::strToInt(str, value);
     EXPECT_TRUE(result);
     EXPECT_EQ(value, expected);
 }
@@ -127,7 +128,7 @@ TEST(UtilsTestSuite, strToInt_CorrectNegative)
     std::string str = "-10";
     const int32_t expected = -10;
     int value;
-    bool result = strToInt(str, value);
+    bool result = util::strToInt(str, value);
     EXPECT_TRUE(result);
     EXPECT_EQ(value, expected);
 }
@@ -136,16 +137,16 @@ TEST(UtilsTestSuite, strToInt_Overflow)
 {
     std::string str = "+2147483648";
     int value;
-    bool result = strToInt(str, value);
+    bool result = util::strToInt(str, value);
     EXPECT_FALSE(result);
 }
 
 TEST(UtilsTestSuite, strToInt_MAX_VALUE)
 {
     std::string str = "+2147483647";
-    const int32_t expected = LONG_MAX;
+    const int expected = std::numeric_limits<int>::max();
     int value;
-    bool result = strToInt(str, value);
+    bool result = util::strToInt(str, value);
     EXPECT_TRUE(result);
     EXPECT_EQ(value, expected);
 }
@@ -154,16 +155,16 @@ TEST(UtilsTestSuite, strToInt_Underflow)
 {
     std::string str = "-2147483649";
     int value;
-    bool result = strToInt(str, value);
+    bool result = util::strToInt(str, value);
     EXPECT_FALSE(result);
 }
 
 TEST(UtilsTestSuite, strToInt_MIN_VALUE)
 {
-    std::string str = "-2147483648";
-    const int32_t expected = LONG_MIN;
+    std::string str = std::to_string(std::numeric_limits<int>::min());
+    const int32_t expected = std::numeric_limits<int>::min();
     int value;
-    bool result = strToInt(str, value);
+    bool result = util::strToInt(str, value);
     EXPECT_TRUE(result);
     EXPECT_EQ(value, expected);
 }
@@ -173,7 +174,7 @@ TEST(UtilsTestSuite, strToInt_Mixed)
     std::string str = "21 some words";
     const int32_t expected = 21;
     int value;
-    bool result = strToInt(str, value);
+    bool result = util::strToInt(str, value);
     EXPECT_TRUE(result);
     EXPECT_EQ(value, expected);
 }
@@ -183,7 +184,7 @@ TEST(UtilsTestSuite, strToInt_Mixed_Underscore)
     std::string str = "21_some_words";
     const int32_t expected = 21;
     int value;
-    bool result = strToInt(str, value);
+    bool result = util::strToInt(str, value);
     EXPECT_TRUE(result);
     EXPECT_EQ(value, expected);
 }
@@ -192,6 +193,6 @@ TEST(UtilsTestSuite, strToInt_Mixed_Underscore_Suffix)
 {
     std::string str = "some_words_21";
     int value;
-    bool result = strToInt(str, value);
+    bool result = util::strToInt(str, value);
     EXPECT_FALSE(result);
 }

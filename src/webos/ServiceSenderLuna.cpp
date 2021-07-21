@@ -19,9 +19,9 @@
 #include <json/json.h>
 
 #include "LogManager.h"
+#include "Utils.h"
 #include "WebAppManagerServiceLuna.h"
 #include "WebPageBase.h"
-#include "QtLessTemporaryHelpers.h"
 
 void ServiceSenderLuna::postlistRunningApps(std::vector<ApplicationInfo> &apps)
 {
@@ -53,7 +53,7 @@ void ServiceSenderLuna::postWebProcessCreated(const std::string& appId, const st
 
 void ServiceSenderLuna::serviceCall(const std::string& url, const std::string& payload, const std::string& appId)
 {
-    Json::Value jsonPayload = qtless::JsonHelper::jsonCppFromString(payload);
+    Json::Value jsonPayload = util::stringToJson(payload);
 
     bool ret = WebAppManagerServiceLuna::instance()->call(
         url.c_str(),
