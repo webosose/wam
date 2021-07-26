@@ -313,6 +313,19 @@ TEST_F(LaunchAppTestSuite, LaunchAppsWithParams)
     ASSERT_TRUE(result.isMember("appId"));
 }
 
+TEST_F(LaunchAppTestSuite, LaunchAppsWithoutParams)
+{
+    Json::Value request;
+    ASSERT_TRUE(util::stringToJson(launchBareAppJsonBody, request));
+    request.removeMember("parameters");
+
+    const auto& result = WebAppManagerServiceLuna::instance()->launchApp(request);
+    ASSERT_TRUE(result.isObject());
+    ASSERT_TRUE(result.isMember("returnValue"));
+    ASSERT_TRUE(result.isMember("instanceId"));
+    ASSERT_TRUE(result.isMember("appId"));
+}
+
 TEST_F(LaunchAppTestSuite, LaunchAppsWithError)
 {
     constexpr char path[] = "file:///usr/share/localization/wam/loaderror.html";

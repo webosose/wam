@@ -87,9 +87,9 @@ Json::Value WebAppManagerServiceLuna::launchApp(const Json::Value& requestJson)
 
     if (!requestJson.isObject()
        || (!requestJson.isMember("appDesc") || !requestJson["appDesc"].isObject() || !requestJson["appDesc"]["id"].isString())
-       || (!requestJson.isMember("parameters") || !requestJson["parameters"].isObject())
-       || (!requestJson.isMember("launchingAppId") || !requestJson["launchingAppId"].isString())
-       || (!requestJson.isMember("launchingProcId") || !requestJson["launchingProcId"].isString())
+       || (requestJson.isMember("parameters") && !requestJson["parameters"].isObject())
+       || (requestJson.isMember("launchingAppId") && !requestJson["launchingAppId"].isString())
+       || (requestJson.isMember("launchingProcId") && !requestJson["launchingProcId"].isString())
        || (!requestJson.isMember("instanceId") || !requestJson["instanceId"].isString())) {
         reply["returnValue"] = false;
         reply["errorCode"] = ERR_CODE_LAUNCHAPP_MISS_PARAM;
