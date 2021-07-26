@@ -160,8 +160,8 @@ Json::Value WebAppManagerServiceLuna::killApp(const Json::Value& requestJson)
     Json::Value reply;
 
     if (!requestJson.isObject()
-       || (!requestJson.isMember("instanceId") || !requestJson["instanceId"].isString())
-       || (!requestJson.isMember("appId") || !requestJson["appId"].isString())
+       || (requestJson.isMember("instanceId") && !requestJson["instanceId"].isString())
+       || (requestJson.isMember("appId") && !requestJson["appId"].isString())
        || (requestJson.isMember("reason") && !requestJson["reason"].isString())) {
         reply["returnValue"] = false;
         reply["errorCode"] = ERR_CODE_KILL_APP_INVALID_PARAM;
