@@ -100,6 +100,38 @@ TEST(KillAppTest, KillNotExistApp) {
   EXPECT_EQ(reply["errorCode"].asInt(), ERR_CODE_NO_RUNNING_APP);
 }
 
+TEST(KillAppTest, KillNotExistAppWithoutInstanceId) {
+  Json::Value request;
+  request["appId"] = kAppId;
+  const auto reply = WebAppManagerServiceLuna::instance()->killApp(request);
+
+  ASSERT_TRUE(reply.isObject());
+  EXPECT_TRUE(reply.isMember("returnValue"));
+  EXPECT_FALSE(reply["returnValue"].asBool());
+
+  EXPECT_TRUE(reply.isMember("errorText"));
+  EXPECT_EQ(reply["errorText"].asString(), err_noRunningApp);
+
+  EXPECT_TRUE(reply.isMember("errorCode"));
+  EXPECT_EQ(reply["errorCode"].asInt(), ERR_CODE_NO_RUNNING_APP);
+}
+
+TEST(KillAppTest, KillNotExistAppWithoutApplicationId) {
+  Json::Value request;
+  request["instanceId"] = kInstanceId;
+  const auto reply = WebAppManagerServiceLuna::instance()->killApp(request);
+
+  ASSERT_TRUE(reply.isObject());
+  EXPECT_TRUE(reply.isMember("returnValue"));
+  EXPECT_FALSE(reply["returnValue"].asBool());
+
+  EXPECT_TRUE(reply.isMember("errorText"));
+  EXPECT_EQ(reply["errorText"].asString(), err_noRunningApp);
+
+  EXPECT_TRUE(reply.isMember("errorCode"));
+  EXPECT_EQ(reply["errorCode"].asInt(), ERR_CODE_NO_RUNNING_APP);
+}
+
 TEST(KillAppTest, KillApp) {
   BaseMockInitializer<NiceWebViewMockImpl> mock_initializer;
   mock_initializer.GetWebViewMock()->SetOnInitActions();
