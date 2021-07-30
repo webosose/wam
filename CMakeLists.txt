@@ -25,6 +25,15 @@ set(CMAKE_BUILD_TYPE Release)
 include(webOS/webOS)
 include(FindPkgConfig)
 
+# Usage of LTTNG lead to runtime error in the zygote process
+# due to creation of the additional threads.
+# So, it is supressed.
+# Cromium code at zygote_main_linux.cc contains following comment:
+# "Check that the pre-sandbox initialization didn't spawn threads.
+# It's not just our code which may do so - some system-installed libraries
+# are known to be culprits, e.g. lttng."
+unset(WEBOS_LTTNG_ENABLED CACHE)
+
 webos_modules_init(1 6 3)
 webos_component(1 0 2)
 

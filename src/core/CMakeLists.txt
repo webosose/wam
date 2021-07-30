@@ -17,69 +17,69 @@
 project(WebAppMgrCore VERSION 1.0.0 DESCRIPTION "Core of the Web Application Manager")
 
 set(SOURCES
-    ApplicationDescription.cpp
-    DeviceInfo.cpp
-    PalmSystemBase.cpp
-    PlugInService.cpp
-    PluginLibWrapper.cpp
-    PluginLoader.cpp
-    WebAppBase.cpp
-    WebAppFactoryManagerImpl.cpp
-    WebAppManager.cpp
-    WebAppManagerConfig.cpp
-    WebAppManagerService.cpp
-    WebPageBase.cpp
-    WebPageObserver.cpp
-    WebProcessManager.cpp
-    ${WAM_ROOT_SOURCE_DIR}/util/BCP47.cpp
-    ${WAM_ROOT_SOURCE_DIR}/util/LogManager.cpp
-    ${WAM_ROOT_SOURCE_DIR}/util/NetworkStatus.cpp
-    ${WAM_ROOT_SOURCE_DIR}/util/NetworkStatusManager.cpp
-    ${WAM_ROOT_SOURCE_DIR}/util/Timer.cpp
-    ${WAM_ROOT_SOURCE_DIR}/util/Url.cpp
-    ${WAM_ROOT_SOURCE_DIR}/util/Utils.cpp
-    ${WAM_ROOT_SOURCE_DIR}/util/WebAppManagerUtils.cpp
+    application_description.cc
+    device_info.cc
+    palm_system_base.cc
+    plugin_service.cc
+    plugin_lib_wrapper.cc
+    plugin_loader.cc
+    web_app_base.cc
+    web_app_factory_manager_impl.cc
+    web_app_manager.cc
+    web_app_manager_config.cc
+    web_app_manager_service.cc
+    web_page_base.cc
+    web_page_observer.cc
+    web_process_manager.cc
+    ${WAM_ROOT_SOURCE_DIR}/util/bcp47.cc
+    ${WAM_ROOT_SOURCE_DIR}/util/log_manager.cc
+    ${WAM_ROOT_SOURCE_DIR}/util/network_status.cc
+    ${WAM_ROOT_SOURCE_DIR}/util/network_status_manager.cc
+    ${WAM_ROOT_SOURCE_DIR}/util/timer.cc
+    ${WAM_ROOT_SOURCE_DIR}/util/url.cc
+    ${WAM_ROOT_SOURCE_DIR}/util/utils.cc
+    ${WAM_ROOT_SOURCE_DIR}/util/web_app_manager_utils.cc
 )
 
 set(HEADERS
-    ApplicationDescription.h
-    DeviceInfo.h
-    PalmSystemBase.h
-    PlatformModuleFactory.h
-    PlugInService.h
-    PluginLibWrapper.h
-    PluginLoader.h
-    ServiceSender.h
-    WebAppBase.h
-    WebAppFactoryInterface.h
-    WebAppFactoryManager.h
-    WebAppFactoryManagerImpl.h
-    WebAppManager.h
-    WebAppManagerConfig.h
-    WebAppManagerService.h
-    WebPageBase.h
-    WebPageObserver.h
-    WebProcessManager.h
-    WindowTypes.h
-    ${WAM_ROOT_SOURCE_DIR}/util/BCP47.h
-    ${WAM_ROOT_SOURCE_DIR}/util/BaseCheck.h
-    ${WAM_ROOT_SOURCE_DIR}/util/LogManager.h
-    ${WAM_ROOT_SOURCE_DIR}/util/LogMsgId.h
-    ${WAM_ROOT_SOURCE_DIR}/util/NetworkStatus.h
-    ${WAM_ROOT_SOURCE_DIR}/util/NetworkStatusManager.h
-    ${WAM_ROOT_SOURCE_DIR}/util/Timer.h
-    ${WAM_ROOT_SOURCE_DIR}/util/Url.h
-    ${WAM_ROOT_SOURCE_DIR}/util/Utils.h
-    ${WAM_ROOT_SOURCE_DIR}/util/WebAppManagerUtils.h
+    application_description.h
+    device_info.h
+    palm_system_base.h
+    platform_module_factory.h
+    plugin_service.h
+    plugin_lib_wrapper.h
+    plugin_loader.h
+    service_sender.h
+    web_app_base.h
+    web_app_factory_interface.h
+    web_app_factory_manager.h
+    web_app_factory_manager_impl.h
+    web_app_manager.h
+    web_app_manager_config.h
+    web_app_manager_service.h
+    web_page_base.h
+    web_page_observer.h
+    web_process_manager.h
+    window_types.h
+    ${WAM_ROOT_SOURCE_DIR}/util/bcp47.h
+    ${WAM_ROOT_SOURCE_DIR}/util/base_check.h
+    ${WAM_ROOT_SOURCE_DIR}/util/log_manager.h
+    ${WAM_ROOT_SOURCE_DIR}/util/log_msg_id.h
+    ${WAM_ROOT_SOURCE_DIR}/util/network_status.h
+    ${WAM_ROOT_SOURCE_DIR}/util/network_status_manager.h
+    ${WAM_ROOT_SOURCE_DIR}/util/timer.h
+    ${WAM_ROOT_SOURCE_DIR}/util/url.h
+    ${WAM_ROOT_SOURCE_DIR}/util/utils.h
+    ${WAM_ROOT_SOURCE_DIR}/util/web_app_manager_utils.h
 )
 
 if(DISABLE_PMLOG)
-    list(APPEND SOURCES ${WAM_ROOT_SOURCE_DIR}/util/LogManagerConsole.cpp)
-    list(APPEND HEADERS ${WAM_ROOT_SOURCE_DIR}/util/LogManagerConsole.h
-                        ${WAM_ROOT_SOURCE_DIR}/util/LogManagerConsoleHelpers.h)
+    list(APPEND SOURCES ${WAM_ROOT_SOURCE_DIR}/util/log_manager_console.cc)
+    list(APPEND HEADERS ${WAM_ROOT_SOURCE_DIR}/util/log_manager_console.h
+                        ${WAM_ROOT_SOURCE_DIR}/util/log_manager_console_helpers.h)
 else()
-    list(APPEND SOURCES ${WAM_ROOT_SOURCE_DIR}/util/LogManagerPmLog.cpp)
-    list(APPEND HEADERS ${WAM_ROOT_SOURCE_DIR}/util/LogManagerPmLog.h)
+    list(APPEND SOURCES ${WAM_ROOT_SOURCE_DIR}/util/log_manager_pmlog.cc)
+    list(APPEND HEADERS ${WAM_ROOT_SOURCE_DIR}/util/log_manager_pmlog.h)
 endif()
 
 set(CORE_INCLUDE_DIRS

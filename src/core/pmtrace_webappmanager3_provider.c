@@ -15,8 +15,8 @@
 // SPDX-License-Identifier: Apache-2.0
 
 /*
- * These #defines alter the behavior of pmtrace_webappmanager3_provider.h to define the tracing
- * primitives rather than just declaring them.
+ * These #defines alter the behavior of pmtrace_webappmanager3_provider.h to
+ * define the tracing primitives rather than just declaring them.
  */
 #define TRACEPOINT_CREATE_PROBES
 #define TRACEPOINT_DEFINE

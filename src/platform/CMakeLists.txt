@@ -17,49 +17,49 @@
 project(WebAppMgr VERSION 1.0.0 DESCRIPTION "Web Application Manager library")
 
 set(SOURCES
-    PalmSystemWebOS.cpp
-    WebAppWayland.cpp
-    WebAppWaylandWindow.cpp
-    WebAppWindowImpl.cpp
-    webengine/BlinkWebProcessManager.cpp
-    webengine/BlinkWebView.cpp
-    webengine/BlinkWebViewProfileHelper.cpp
-    webengine/PalmSystemBlink.cpp
-    webengine/WebPageBlink.cpp
-    webengine/WebViewImpl.cpp
-    ${WAM_ROOT_SOURCE_DIR}/webos/DeviceInfoImpl.cpp
-    ${WAM_ROOT_SOURCE_DIR}/webos/PalmServiceBase.cpp
-    ${WAM_ROOT_SOURCE_DIR}/webos/PlatformModuleFactoryImpl.cpp
-    ${WAM_ROOT_SOURCE_DIR}/webos/PlugInServiceLuna.cpp
-    ${WAM_ROOT_SOURCE_DIR}/webos/ServiceSenderLuna.cpp
-    ${WAM_ROOT_SOURCE_DIR}/webos/WebAppManagerServiceLuna.cpp
-    ${WAM_ROOT_SOURCE_DIR}/webos/WebAppManagerServiceLunaImpl.cpp
+    palm_system_webos.cc
+    web_app_wayland.cc
+    web_app_wayland_window.cc
+    web_app_window_impl.cc
+    webengine/blink_web_process_manager.cc
+    webengine/blink_web_view.cc
+    webengine/blink_web_view_profile_helper.cc
+    webengine/palm_system_blink.cc
+    webengine/web_page_blink.cc
+    webengine/web_view_impl.cc
+    ${WAM_ROOT_SOURCE_DIR}/webos/device_info_impl.cc
+    ${WAM_ROOT_SOURCE_DIR}/webos/palm_service_base.cc
+    ${WAM_ROOT_SOURCE_DIR}/webos/platform_module_factory_impl.cc
+    ${WAM_ROOT_SOURCE_DIR}/webos/plugin_service_luna.cc
+    ${WAM_ROOT_SOURCE_DIR}/webos/service_sender_luna.cc
+    ${WAM_ROOT_SOURCE_DIR}/webos/web_app_manager_service_luna.cc
+    ${WAM_ROOT_SOURCE_DIR}/webos/web_app_manager_service_luna_impl.cc
 )
 
 set(HEADERS
-    PalmSystemWebOS.h
-    WebAppWayland.h
-    WebAppWaylandWindow.h
-    WebAppWindow.h
-    WebAppWindowFactory.h
-    WebAppWindowImpl.h
-    webengine/BlinkWebProcessManager.h
-    webengine/BlinkWebView.h
-    webengine/BlinkWebViewProfileHelper.h
-    webengine/PalmSystemBlink.h
-    webengine/WebPageBlink.h
-    webengine/WebPageBlinkDelegate.h
-    webengine/WebPageBlinkObserver.h
-    webengine/WebView.h
-    webengine/WebViewFactory.h
-    webengine/WebViewImpl.h
-    ${WAM_ROOT_SOURCE_DIR}/webos/DeviceInfoImpl.h
-    ${WAM_ROOT_SOURCE_DIR}/webos/PalmServiceBase.h
-    ${WAM_ROOT_SOURCE_DIR}/webos/PlatformModuleFactoryImpl.h
-    ${WAM_ROOT_SOURCE_DIR}/webos/PlugInServiceLuna.h
-    ${WAM_ROOT_SOURCE_DIR}/webos/ServiceSenderLuna.h
-    ${WAM_ROOT_SOURCE_DIR}/webos/WebAppManagerServiceLuna.h
-    ${WAM_ROOT_SOURCE_DIR}/webos/WebAppManagerServiceLunaImpl.h
+    palm_system_webos.h
+    web_app_wayland.h
+    web_app_wayland_window.h
+    web_app_window.h
+    web_app_window_factory.h
+    web_app_window_impl.h
+    webengine/blink_web_process_manager.h
+    webengine/blink_web_view.h
+    webengine/blink_web_view_profile_helper.h
+    webengine/palm_system_blink.h
+    webengine/web_page_blink.h
+    webengine/web_page_blink_delegate.h
+    webengine/web_page_blink_observer.h
+    webengine/web_view.h
+    webengine/web_view_factory.h
+    webengine/web_view_impl.h
+    ${WAM_ROOT_SOURCE_DIR}/webos/device_info_impl.h
+    ${WAM_ROOT_SOURCE_DIR}/webos/palm_service_base.h
+    ${WAM_ROOT_SOURCE_DIR}/webos/platform_module_factory_impl.h
+    ${WAM_ROOT_SOURCE_DIR}/webos/plugin_service_luna.h
+    ${WAM_ROOT_SOURCE_DIR}/webos/service_sender_luna.h
+    ${WAM_ROOT_SOURCE_DIR}/webos/web_app_manager_service_luna.h
+    ${WAM_ROOT_SOURCE_DIR}/webos/web_app_manager_service_luna_impl.h
 )
 
 set(WAM_LIB_INCLUDE_DIRS

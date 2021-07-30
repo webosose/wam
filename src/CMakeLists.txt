@@ -74,7 +74,7 @@ set(WAM_LIBS
     WebAppMgrCore
 )
 
-add_executable(${PROJECT_NAME} Main.cpp)
+add_executable(${PROJECT_NAME} wam_main.cc)
 set_target_properties(${PROJECT_NAME} PROPERTIES OUTPUT_NAME "WebAppMgr")
 target_include_directories(${PROJECT_NAME} PRIVATE ${WAM_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} PRIVATE ${WAM_LIBS})

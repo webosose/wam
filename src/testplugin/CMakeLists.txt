@@ -16,8 +16,8 @@
 
 project(webappmgr-test-plugin VERSION 1.0.0 DESCRIPTION "WAM test plugin used to test the plugin loader.")
 
-set(SOURCES TestPlugin.cpp)
-set(HEADERS TestPlugin.h)
+set(SOURCES test_plugin.cc)
+set(HEADERS test_plugin.h)
 
 set(TEST_PLUGIN_INCLUDE_DIRS
     ${CHROMIUM_SRC_DIR}

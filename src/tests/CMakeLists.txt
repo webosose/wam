@@ -21,53 +21,53 @@ pkg_search_module(GMOCK REQUIRED gmock)
 pkg_search_module(GTEST REQUIRED gtest)
 
 set(SOURCES
-    ApplicationDescriptionUnitTest.cpp
-    BCP47Tests.cpp
-    ClearBrowsingDataComponentTest.cpp
-    CloseAllAppsComponentTest.cpp
-    DeviceInfoUnitTest.cpp
-    GetWebProcessSizeTest.cpp
-    JsonHelperUnitTest.cpp
-    KillAppTest.cpp
-    LaunchAppComponentTest.cpp
-    ListRunningAppsTest.cpp
-    LogControlComponentTest.cpp
-    NetworkStatusUnitTest.cpp
-    PalmSystemBlinkTests.cpp
-    PauseAppTest.cpp
-    PluginLoadTest.cpp
-    PluginLoaderUnitTest.cpp
-    SetInspectorEnableTest.cpp
-    StringUtilsUnitTest.cpp
-    TouchEventTest.cpp
-    UrlUnitTest.cpp
-    UtilsTests.cpp
-    WebAppManagerConfigUnitTest.cpp
-    WebPageBlinkUnitTest.cpp
-    WebProcessCreatedTest.cpp
-    mocks/BlinkWebProcessManagerMock.cpp
-    mocks/PlatformModuleFactoryImplMock.cpp
-    mocks/WebAppFactoryManagerMock.cpp
-    mocks/WebAppManagerConfigMock.cpp
-    mocks/WebAppWindowFactoryMock.cpp
-    mocks/WebViewFactoryMock.cpp
-    mocks/WebViewMockImpl.cpp
+    application_description_test.cc
+    bcp47_test.cc
+    clear_browsing_data_test.cc
+    close_all_apps_test.cc
+    device_info_test.cc
+    get_web_process_size_test.cc
+    json_helper_test.cc
+    kill_app_test.cc
+    launch_app_test.cc
+    list_running_apps_test.cc
+    log_control_test.cc
+    network_status_test.cc
+    palm_system_blink_test.cc
+    pause_app_test.cc
+    plugin_load_test.cc
+    plugin_loader_test.cc
+    set_inspector_enable_test.cc
+    string_utils_test.cc
+    touch_event_test.cc
+    url_test.cc
+    utils_test.cc
+    web_app_manager_config_test.cc
+    web_page_blink_test.cc
+    web_process_created_test.cc
+    mocks/blink_web_process_manager_mock.cc
+    mocks/platform_module_factory_impl_mock.cc
+    mocks/web_app_factory_manager_mock.cc
+    mocks/web_app_manager_config_mock.cc
+    mocks/web_app_window_factory_mock.cc
+    mocks/web_view_factory_mock.cc
+    mocks/web_view_mock_impl.cc
 )
 
 set(HEADERS
-    mocks/BaseMockInitializer.h
-    mocks/BlinkWebProcessManagerMock.h
-    mocks/PlatformModuleFactoryImplMock.h
-    mocks/PluginLibWrapperMock.h
-    mocks/WebAppBaseMock.h
-    mocks/WebAppFactoryInterfaceMock.h
-    mocks/WebAppFactoryManagerMock.h
-    mocks/WebAppManagerConfigMock.h
-    mocks/WebAppWindowFactoryMock.h
-    mocks/WebAppWindowMock.h
-    mocks/WebViewFactoryMock.h
-    mocks/WebViewMock.h
-    mocks/WebViewMockImpl.h
+    mocks/base_mock_initializer.h
+    mocks/blink_web_process_manager_mock.h
+    mocks/platform_module_factory_impl_mock.h
+    mocks/plugin_lib_wrapper_mock.h
+    mocks/web_app_base_mock.h
+    mocks/web_app_factory_interface_mock.h
+    mocks/web_app_factory_manager_mock.h
+    mocks/web_app_manager_config_mock.h
+    mocks/web_app_window_factory_mock.h
+    mocks/web_app_window_mock.h
+    mocks/web_view_factory_mock.h
+    mocks/web_view_mock.h
+    mocks/web_view_mock_impl.h
 )
 
 set(TEST_BIN_INCLUDE_DIRS

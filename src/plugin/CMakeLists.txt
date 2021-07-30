@@ -17,13 +17,13 @@
 project(webappmgr-default-plugin VERSION 1.0.0 DESCRIPTION "Default WAM plugin")
 
 set (SOURCES
-    WebAppFactoryLuna.cpp
-    WebAppWaylandWebOS.cpp
+    web_app_factory_luna.cc
+    web_app_wayland_webos.cc
 )
 
 set (HEADERS
-    WebAppFactoryLuna.h
-    WebAppWaylandWebOS.h
+    web_app_factory_luna.h
+    web_app_wayland_webos.h
 )
 
 set (WAM_PLUGIN_INCLUDE_DIRS
