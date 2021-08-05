@@ -44,22 +44,6 @@
   Call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>( \
       SERVICE, PARAMS, this)
 
-static void LogJsonTruncated(const char* func_name,
-                             const Json::Value& request) {
-  std::string request_buffer = util::JsonToString(request);
-  const size_t chunk_size = 255;
-  const size_t chunks_count = request_buffer.size() % chunk_size
-                                  ? (request_buffer.size() / chunk_size) + 1
-                                  : request_buffer.size() / chunk_size;
-  for (size_t i = 0, part = 1; i < request_buffer.size();
-       i += chunk_size, part++) {
-    const auto& chunk = request_buffer.substr(i, chunk_size);
-    LOG_INFO(MSGID_WAM_DEBUG, 0,
-             ">>>>>>> WebAppManagerServiceLuna::%s [%u/%u] request:\"%s\"",
-             func_name, part, chunks_count, chunk.c_str());
-  }
-}
-
 LSMethod WebAppManagerServiceLuna::methods_[] = {
     LS2_METHOD_ENTRY(launchApp),
     LS2_METHOD_ENTRY(killApp),
@@ -84,7 +68,6 @@ bool WebAppManagerServiceLuna::StartService() {
 }
 
 Json::Value WebAppManagerServiceLuna::launchApp(const Json::Value& request) {
-  LogJsonTruncated(__func__, request);
   int err_code;
   std::string err_msg;
   Json::Value reply;
@@ -160,7 +143,6 @@ bool WebAppManagerServiceLuna::IsValidInstanceId(
 }
 
 Json::Value WebAppManagerServiceLuna::killApp(const Json::Value& request) {
-  LogJsonTruncated(__func__, request);
   Json::Value reply;
 
   if (!request.isObject() ||
@@ -202,7 +184,6 @@ Json::Value WebAppManagerServiceLuna::killApp(const Json::Value& request) {
 }
 
 Json::Value WebAppManagerServiceLuna::pauseApp(const Json::Value& request) {
-  LogJsonTruncated(__func__, request);
   Json::Value reply;
 
   if (!request.isObject() ||
@@ -232,7 +213,6 @@ Json::Value WebAppManagerServiceLuna::pauseApp(const Json::Value& request) {
 
 Json::Value WebAppManagerServiceLuna::setInspectorEnable(
     const Json::Value& request) {
-  LogJsonTruncated(__func__, request);
   LOG_DEBUG("WebAppManagerService::SetInspectorEnable");
   Json::Value reply;
   std::string error_message("Not supported on this platform");
@@ -244,7 +224,6 @@ Json::Value WebAppManagerServiceLuna::setInspectorEnable(
 }
 
 Json::Value WebAppManagerServiceLuna::closeAllApps(const Json::Value& request) {
-  LogJsonTruncated(__func__, request);
   bool val = WebAppManagerService::OnCloseAllApps();
 
   Json::Value reply;
@@ -253,8 +232,6 @@ Json::Value WebAppManagerServiceLuna::closeAllApps(const Json::Value& request) {
 }
 
 Json::Value WebAppManagerServiceLuna::logControl(const Json::Value& request) {
-  LogJsonTruncated(__func__, request);
-
   if (!request.isObject() ||
       (!request.isMember("keys") || !request["keys"].isString()) ||
       (!request.isMember("value") || !request["value"].isString())) {
@@ -271,7 +248,6 @@ Json::Value WebAppManagerServiceLuna::logControl(const Json::Value& request) {
 
 Json::Value WebAppManagerServiceLuna::discardCodeCache(
     const Json::Value& request) {
-  LogJsonTruncated(__func__, request);
   Json::Value reply;
 
   if (!request.isObject()) {
@@ -322,14 +298,12 @@ Json::Value WebAppManagerServiceLuna::discardCodeCache(
 
 Json::Value WebAppManagerServiceLuna::getWebProcessSize(
     const Json::Value& request) {
-  LogJsonTruncated(__func__, request);
   return WebAppManagerService::GetWebProcessProfiling();
 }
 
 Json::Value WebAppManagerServiceLuna::listRunningApps(
     const Json::Value& request,
     bool subscribed) {
-  LogJsonTruncated(__func__, request);
   bool include_sys_apps = request["includeSysApps"] == true;
 
   std::vector<ApplicationInfo> apps =
@@ -351,7 +325,6 @@ Json::Value WebAppManagerServiceLuna::listRunningApps(
 
 Json::Value WebAppManagerServiceLuna::clearBrowsingData(
     const Json::Value& request) {
-  LogJsonTruncated(__func__, request);
   Json::Value reply;
 
   if (!request.isObject()) {
