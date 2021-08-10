@@ -193,7 +193,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
 
   auto disallow_scrolling = json_obj["disallowScrollingInMainFrame"];
   app_desc->disallow_scrolling_in_main_frame_ =
-      disallow_scrolling.isBool() && disallow_scrolling.asBool();
+      disallow_scrolling.isBool() ? disallow_scrolling.asBool() : true;
 
   auto media_extension =
       json_obj.get("mediaExtension", Json::Value(Json::objectValue));

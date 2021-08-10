@@ -172,6 +172,14 @@ TEST_F(ApplicationDescriptionTest, checkGetUsePrerendering) {
 
 TEST_F(ApplicationDescriptionTest, checkGetDisallowScrollingInMainFrame) {
   EXPECT_FALSE(application_description_->DisallowScrollingInMainFrame());
+  EXPECT_TRUE(ApplicationDescription::FromJsonString(
+                  "{\"disallowScrollingInMainFrame\":true}")
+                  ->DisallowScrollingInMainFrame());
+}
+
+TEST_F(ApplicationDescriptionTest, checkMissedDisallowScrollingInMainFrame) {
+  EXPECT_TRUE(ApplicationDescription::FromJsonString("{}")
+                  ->DisallowScrollingInMainFrame());
 }
 
 TEST_F(ApplicationDescriptionTest, checkGetHandlesDeeplinking) {
