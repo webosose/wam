@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2019-2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,16 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/*
- * These #defines alter the behavior of pmtrace_webappmanager3_provider.h to
- * define the tracing primitives rather than just declaring them.
- */
-#define TRACEPOINT_CREATE_PROBES
-#define TRACEPOINT_DEFINE
-/*
- * The header containing our TRACEPOINT_EVENTs.
- */
-#include "pmtrace_webappmanager3_provider.h"
+#ifndef CORE_WINDOW_TYPES_H_
+#define CORE_WINDOW_TYPES_H_
+
+const char kWtCard[] = "_WEBOS_WINDOW_TYPE_CARD";
+const char kWtPopup[] = "_WEBOS_WINDOW_TYPE_POPUP";
+const char kWtMinimal[] = "_WEBOS_WINDOW_TYPE_RESTRICTED";
+const char kWtOverlay[] = "_WEBOS_WINDOW_TYPE_OVERLAY";
+const char kWtNone[] = "_WEBOS_WINDOW_TYPE_NONE";
+const char kWtFloating[] = "_WEBOS_WINDOW_TYPE_FLOATING";
+const char kWtUnknown[] = "_WEBOS_WINDOW_TYPE_UNKNOWN";
+const char kWtSystemUi[] = "_WEBOS_WINDOW_TYPE_SYSTEM_UI";
+
+#endif  // CORE_WINDOW_TYPES_H_

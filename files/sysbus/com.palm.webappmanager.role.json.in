@@ -1,35 +1,35 @@
 {
-    \"exeName\":\"$$WEBOS_INSTALL_BINS/WebAppMgr\",
-    \"type\": \"privileged\",
-    \"trustLevel\" : \"oem\",
-    \"allowedNames\": [
-        \"com.palm.webappmanager\",
-        \"com.webos.service.webappmanager\",
-        \"com.webos.rm.client.*\",
-        \"com.webos.settingsservice.client-*\"
+    "exeName":"@WEBOS_INSTALL_BINDIR@/WebAppMgr",
+    "type": "privileged",
+    "trustLevel" : "oem",
+    "allowedNames": [
+        "com.palm.webappmanager",
+        "com.webos.service.webappmanager",
+        "com.webos.rm.client.*",
+        "com.webos.settingsservice.client-*"
     ],
-    \"permissions\": [
+    "permissions": [
       {
-        \"service\":\"com.palm.webappmanager\",
-        \"outbound\":[
-          \"com.palm.bus\",
-          \"com.webos.applicationManager\",
-          \"com.webos.bootManager\",
-          \"com.webos.memorymanager\",
-          \"com.webos.service.activitymanager\",
-          \"com.webos.service.connectionmanager\",
-          \"com.webos.settingsservice\"
+        "service":"com.palm.webappmanager",
+        "outbound":[
+          "com.palm.bus",
+          "com.webos.applicationManager",
+          "com.webos.bootManager",
+          "com.webos.memorymanager",
+          "com.webos.service.activitymanager",
+          "com.webos.service.connectionmanager",
+          "com.webos.settingsservice"
         ]
       },
       {
-        \"service\":\"com.webos.rm.client.*\",
-        \"outbound\":[\"com.webos.media\"]
+        "service":"com.webos.rm.client.*",
+        "outbound":["com.webos.media"]
       },
       {
-        \"service\":\"com.webos.settingsservice.client-*\",
-        \"outbound\":[
-          \"com.webos.applicationManager\",
-          \"com.webos.settingsservice\"
+        "service":"com.webos.settingsservice.client-*",
+        "outbound":[
+          "com.webos.applicationManager",
+          "com.webos.settingsservice"
         ]
       }
     ]

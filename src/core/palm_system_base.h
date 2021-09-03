@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2012-2018 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,22 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/*
- * These #defines alter the behavior of pmtrace_webappmanager3_provider.h to
- * define the tracing primitives rather than just declaring them.
- */
-#define TRACEPOINT_CREATE_PROBES
-#define TRACEPOINT_DEFINE
-/*
- * The header containing our TRACEPOINT_EVENTs.
- */
-#include "pmtrace_webappmanager3_provider.h"
+#ifndef CORE_PALM_SYSTEM_BASE_H_
+#define CORE_PALM_SYSTEM_BASE_H_
+
+#include <string>
+
+class PalmSystemBase {
+ public:
+  PalmSystemBase() {}
+  virtual ~PalmSystemBase() {}
+
+ protected:
+  virtual std::string GetDeviceInfo(const std::string& name) const;
+  virtual std::string Country() const;
+  virtual std::string Locale() const;
+  virtual std::string LocaleRegion() const;
+  virtual std::string PhoneRegion() const;
+};
+
+#endif  // CORE_PALM_SYSTEM_BASE_H_

@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,32 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/*
- * These #defines alter the behavior of pmtrace_webappmanager3_provider.h to
- * define the tracing primitives rather than just declaring them.
- */
-#define TRACEPOINT_CREATE_PROBES
-#define TRACEPOINT_DEFINE
-/*
- * The header containing our TRACEPOINT_EVENTs.
- */
-#include "pmtrace_webappmanager3_provider.h"
+#ifndef UTIL_BCP47_H_
+#define UTIL_BCP47_H_
+
+#include <memory>
+#include <string>
+
+class BCP47 {
+ public:
+  static std::unique_ptr<BCP47> FromString(const std::string& bcp47_string);
+
+  bool HasLanguage() const;
+  bool HasScript() const;
+  bool HasRegion() const;
+
+  std::string Language() const;
+  std::string Script() const;
+  std::string Region() const;
+
+  ~BCP47();
+
+ private:
+  BCP47();
+
+  std::string language_;
+  std::string script_;
+  std::string region_;
+};
+
+#endif  //  UTIL_BCP47_H_

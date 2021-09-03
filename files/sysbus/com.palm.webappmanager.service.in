@@ -1,4 +1,4 @@
 [D-BUS Service]
 Name=com.palm.webappmanager;
-Exec=@WEBOS_INSTALL_BINS@/WebAppMgr
+Exec=@WEBOS_INSTALL_BINDIR@/WebAppMgr
 Type=static

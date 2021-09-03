@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,13 +14,15 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-/*
- * These #defines alter the behavior of pmtrace_webappmanager3_provider.h to
- * define the tracing primitives rather than just declaring them.
- */
-#define TRACEPOINT_CREATE_PROBES
-#define TRACEPOINT_DEFINE
-/*
- * The header containing our TRACEPOINT_EVENTs.
- */
-#include "pmtrace_webappmanager3_provider.h"
+#ifndef UTIL_BASE_CHECK_H_
+#define UTIL_BASE_CHECK_H_
+
+#ifdef NDEBUG
+// Supress Werror=unused-variable in release build.
+#define UTIL_ASSERT(c) ((void)(c))
+#else
+#include <cassert>
+#define UTIL_ASSERT(c) (assert(c))
+#endif
+
+#endif  // UTIL_BASE_CHECK_H_
