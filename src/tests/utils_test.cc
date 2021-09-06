@@ -153,7 +153,7 @@ TEST(UtilsTestSuite, strToInt_Overflow) {
 
 TEST(UtilsTestSuite, strToInt_MAX_VALUE) {
   std::string str = "+2147483647";
-  const int32_t expected = LONG_MAX;
+  const int32_t expected = INT_MAX;
   int value;
   bool result = util::StrToInt(str, value);
   EXPECT_TRUE(result);
@@ -169,7 +169,7 @@ TEST(UtilsTestSuite, strToInt_Underflow) {
 
 TEST(UtilsTestSuite, strToInt_MIN_VALUE) {
   std::string str = "-2147483648";
-  const int32_t expected = LONG_MIN;
+  const int32_t expected = INT_MIN;
   int value;
   bool result = util::StrToInt(str, value);
   EXPECT_TRUE(result);
