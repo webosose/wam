@@ -26,7 +26,7 @@
 
 int WebAppManagerUtils::UpdateAndGetCpuIdle(bool update_only) {
   static long old_cpu_time[4];
-  long cur_cpu_time[4];
+  long cur_cpu_time[4] = {0};
   long* cpu_time = cur_cpu_time;
 
   if (update_only)
