@@ -38,7 +38,7 @@ std::string LocalToUri(const std::string& uri);
 std::string GetEnvVar(const char* env);
 
 // STRING
-bool StrToInt(const std::string str, int32_t& value);
+bool StrToInt(const std::string& str, int32_t& value);
 int StrToIntWithDefault(const std::string& str, int default_value);
 std::vector<std::string> SplitString(const std::string& str, char delimiter);
 std::string TrimString(const std::string& str);

@@ -151,10 +151,10 @@ std::string GetEnvVar(const char* env) {
 }
 
 // STRING
-bool StrToInt(const std::string str, int& num) {
+bool StrToInt(const std::string& str, int& num) {
   char* endptr = nullptr;
   errno = 0;
-  long value = strtol(str.c_str(), &endptr, 10);
+  long long value = strtoll(str.c_str(), &endptr, 10);
   if (endptr == str) {
     return false;
   }
