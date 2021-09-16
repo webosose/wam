@@ -62,7 +62,7 @@ const std::unordered_map<std::string, webos::WebOSKeyMask>& GetKeyMaskTable() {
   return mapTable;
 }
 
-const webos::WebOSKeyMask GetKeyMask(const std::string& key) {
+webos::WebOSKeyMask GetKeyMask(const std::string& key) {
   static const auto& mapTable = GetKeyMaskTable();
   auto iter = mapTable.find(key);
   return iter != mapTable.end() ? iter->second
