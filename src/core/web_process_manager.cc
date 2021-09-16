@@ -102,7 +102,7 @@ std::string WebProcessManager::GetWebProcessMemSize(uint32_t pid) const {
 
   std::string line;
   while (std::getline(in, line)) {
-    if (!line.find("VmRSS:", 0, 6)) {
+    if (line.find("VmRSS:", 0, 6) != std::string::npos) {
       return util::TrimString(std::string(line, 6)).c_str();
     }
   }
