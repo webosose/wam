@@ -18,6 +18,14 @@
 
 #include <glib.h>
 
+namespace {
+std::string GetSubString(const std::string& str,
+                         std::size_t start,
+                         std::size_t end) {
+  return str.substr(
+      start, end == std::string::npos ? str.size() - start : end - start);
+}
+}  // namespace
 namespace wam {
 
 Url::Url(const std::string& uri) {
@@ -81,30 +89,30 @@ void Url::ParseUri(const std::string& uri) {
       host_start = user_info_end + 1;
     auto host_end = uri.find_first_of(":/?#", host_start);
     if (host_start != std::string::npos)
-      host_ = uri.substr(host_start, host_end - host_start);
-    if (uri[host_end] == ':')
-      port_ = uri.substr(host_end + 1, authority_end - host_end - 1);
+      host_ = GetSubString(uri, host_start, host_end);
+    if (host_end != std::string::npos && uri[host_end] == ':')
+      port_ = GetSubString(uri, host_end + 1, authority_end);
   }
 
   auto path_end = uri.find_first_of("?#", authority_end);
   // Save part of the original uri without query and fragment.
-  uri_ = uri.substr(0, path_end);
+  uri_ = GetSubString(uri, 0, path_end);
 
   if (authority_start == std::string::npos) {
     path_ = uri.substr(scheme_delimeter + 1, uri.size() - scheme_delimeter);
   } else if (authority_end != std::string::npos) {
     if (uri[authority_end] == '/')
-      path_ = uri.substr(authority_end, path_end - authority_end);
+      path_ = GetSubString(uri, authority_end, path_end);
 
     auto query_start = uri.find("?", authority_end);
     if (query_start != std::string::npos) {
       auto query_end = uri.find("#", query_start);
-      query_ = uri.substr(query_start, query_end - query_start);
+      query_ = GetSubString(uri, query_start, query_end);
     }
 
     auto fragment_start = uri.find("#", authority_end);
     if (fragment_start != std::string::npos) {
-      fragment_ = uri.substr(fragment_start, uri.size() - fragment_start);
+      fragment_ = GetSubString(uri, fragment_start, uri.size());
     }
   }
 }
