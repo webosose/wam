@@ -28,45 +28,70 @@ class DeviceInfoTest : public ::testing::Test {
 
 TEST_F(DeviceInfoTest, checkAsciStringDeviceInfo) {
   const char* expected_value = "ASCII String";
+  const char* expected_value2 = "ASCII String2";
   std::string actual_value;
 
   device_info_.SetDeviceInfo("SimpleString", expected_value);
   ASSERT_TRUE(device_info_.GetDeviceInfo("SimpleString", actual_value));
   EXPECT_STREQ(expected_value, actual_value.c_str());
+
+  device_info_.SetDeviceInfo("SimpleString", expected_value2);
+  ASSERT_TRUE(device_info_.GetDeviceInfo("SimpleString", actual_value));
+  EXPECT_STREQ(expected_value2, actual_value.c_str());
 }
 
 TEST_F(DeviceInfoTest, checkNotAsciStringDeviceInfo) {
   const char* expected_value = "String with not ASCII symbols (föö)";
+  const char* expected_value2 = "String with not ASCII symbols (föö)2";
   std::string actual_value;
 
   device_info_.SetDeviceInfo("ComplexString", expected_value);
   ASSERT_TRUE(device_info_.GetDeviceInfo("ComplexString", actual_value));
   EXPECT_STREQ(expected_value, actual_value.c_str());
+
+  device_info_.SetDeviceInfo("ComplexString", expected_value2);
+  ASSERT_TRUE(device_info_.GetDeviceInfo("ComplexString", actual_value));
+  EXPECT_STREQ(expected_value2, actual_value.c_str());
 }
 
 TEST_F(DeviceInfoTest, checkSystemLanguage) {
   const char* expected_value = "ENG";
+  const char* expected_value2 = "KR";
   std::string actual_value;
 
   device_info_.SetSystemLanguage(expected_value);
   ASSERT_TRUE(device_info_.GetSystemLanguage(actual_value));
   EXPECT_STREQ(expected_value, actual_value.c_str());
+
+  device_info_.SetSystemLanguage(expected_value2);
+  ASSERT_TRUE(device_info_.GetSystemLanguage(actual_value));
+  EXPECT_STREQ(expected_value2, actual_value.c_str());
 }
 
 TEST_F(DeviceInfoTest, checkDisplayWidth) {
   int expected_value = 1900;
+  int expected_value2 = 2000;
   int actual_value = 0;
 
   device_info_.SetDisplayWidth(expected_value);
   ASSERT_TRUE(device_info_.GetDisplayWidth(actual_value));
   EXPECT_EQ(expected_value, actual_value);
+
+  device_info_.SetDisplayWidth(expected_value2);
+  ASSERT_TRUE(device_info_.GetDisplayWidth(actual_value));
+  EXPECT_EQ(expected_value2, actual_value);
 }
 
 TEST_F(DeviceInfoTest, checkDisplayHeight) {
   int expected_value = 1080;
+  int expected_value2 = 1090;
   int actual_value = 0;
 
   device_info_.SetDisplayHeight(expected_value);
   ASSERT_TRUE(device_info_.GetDisplayHeight(actual_value));
   EXPECT_EQ(expected_value, actual_value);
+
+  device_info_.SetDisplayHeight(expected_value2);
+  ASSERT_TRUE(device_info_.GetDisplayHeight(actual_value));
+  EXPECT_EQ(expected_value2, actual_value);
 }
