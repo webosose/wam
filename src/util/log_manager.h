@@ -43,6 +43,9 @@
 #define LOG_STRING(...) \
   do {                  \
   } while (0)
+#define LOG_INFO_WITH_CLOCK_TO_CUSTOM_CONTEXT(...) \
+  do {                                             \
+  } while (0)
 
 #else
 

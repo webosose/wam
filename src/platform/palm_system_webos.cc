@@ -146,9 +146,9 @@ void PalmSystemWebOS::SetKeepAlive(bool keep) {
 void PalmSystemWebOS::LogMsgWithClock(const std::string& msg_id,
                                       const std::string& perf_type,
                                       const std::string& perf_group) {
-  LOG_INFO_WITH_CLOCK(
-      msg_id.size() ? msg_id.c_str() : nullptr, 2,
-      PMLOGKS("PerfType", perf_type.size() ? perf_type.c_str() : "empty"),
+  LOG_INFO_WITH_CLOCK_TO_CUSTOM_CONTEXT(
+      app_->Page()->AppId().c_str(), msg_id.size() ? msg_id.c_str() : nullptr,
+      2, PMLOGKS("PerfType", perf_type.size() ? perf_type.c_str() : "empty"),
       PMLOGKS("PerfGroup", perf_group.size() ? perf_group.c_str() : "empty"),
       "");
 }
@@ -157,7 +157,8 @@ void PalmSystemWebOS::LogMsgString(int32_t level,
                                    const std::string& msg_id,
                                    const std::string& kvpairs,
                                    const std::string& message) {
-  LOG_STRING(level, msg_id.size() ? msg_id.c_str() : nullptr,
+  LOG_STRING(app_->Page()->AppId().c_str(), level,
+             msg_id.size() ? msg_id.c_str() : nullptr,
              kvpairs.size() ? kvpairs.c_str() : nullptr,
              message.size() ? message.c_str() : nullptr);
 }

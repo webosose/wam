@@ -57,8 +57,10 @@ void LogString(int32_t level,
 #define LOG_ERROR(__msgid, ...) LogError(__msgid, __VA_ARGS__)
 #define LOG_CRITICAL(__msgid, ...) LogCritical(__msgid, __VA_ARGS__)
 
-#define LOG_STRING(__level, __msgid, ...) \
+#define LOG_STRING(_context, __level, __msgid, ...) \
   ::LogString(__level, __msgid, ##__VA_ARGS__)
+#define LOG_INFO_WITH_CLOCK_TO_CUSTOM_CONTEXT(__context, __msgid, ...) \
+  LogInfo(__msgid, __VA_ARGS__)
 
 #define PMLOGKFV(literal_key, literal_fmt, value) \
   literal_key, literal_fmt, value
