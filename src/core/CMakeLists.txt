@@ -100,9 +100,10 @@ set(CORE_LIBS
 )
 
 if(WEBOS_LTTNG_ENABLED)
-    list(APPEND SOURCES pmtrace_webappmanager3_provider.c)
-    list(APPEND HEADERS pmtrace_webappmanager3_provider.h)
-    list(APPEND CORE_LIBS ${LTTNG_LDFLAGS})
+    list(APPEND SOURCES pmtrace_provider_lib_wrapper.cc)
+    list(APPEND HEADERS pmtrace_provider_lib_wrapper.h)
+    add_subdirectory(trace)
+    add_definitions(-DTRACE_PROVIDER_LIB_PATH="${WAM_TRACE_LIB_PATH}")
 endif()
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})

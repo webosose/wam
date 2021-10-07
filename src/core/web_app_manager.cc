@@ -157,6 +157,8 @@ void WebAppManager::OnRelaunchApp(const std::string& instance_id,
                                   const std::string& app_id,
                                   const std::string& args,
                                   const std::string& launching_app_id) {
+  PMTRACE_FUNCTION;
+
   WebAppBase* app = FindAppByInstanceId(instance_id);
 
   if (!app) {
@@ -303,6 +305,8 @@ WebAppBase* WebAppManager::OnLaunchUrl(
     const std::string& launching_app_id,
     int& err_code,
     std::string& err_msg) {
+  PMTRACE_FUNCTION;
+
   WebAppFactoryManager* factory = GetWebAppFactory();
   WebAppBase* app = factory->CreateWebApp(win_type.c_str(), app_desc,
                                           app_desc->SubType().c_str());
@@ -670,6 +674,8 @@ std::string WebAppManager::Launch(const std::string& app_desc_string,
                                   const std::string& launching_app_id,
                                   int& err_code,
                                   std::string& err_msg) {
+  PMTRACE_FUNCTION;
+
   std::shared_ptr<ApplicationDescription> desc(
       ApplicationDescription::FromJsonString(app_desc_string.c_str()));
   if (!desc)

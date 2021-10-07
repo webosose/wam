@@ -148,6 +148,8 @@
 #define MSGID_TYPE_ERROR                  "DATA_TYPE_ERROR" /** Use a invalid data type **/
 #define MSGID_FILE_ERROR                  "FILE_ERROR" /** Use a not existing file **/
 
+#define MSGID_DL_ERROR                  "DL_ERROR" /** Dinamic load library error **/
+
 // clang-format on
 
 #endif  // LOGMSGID_H

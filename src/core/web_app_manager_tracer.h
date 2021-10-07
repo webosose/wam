@@ -19,51 +19,54 @@
 
 #ifdef HAS_LTTNG
 
-#include "pmtrace_webappmanager3_provider.h"
+#include "pmtrace_provider_lib_wrapper.h"
 
 /* PMTRACE_LOG is for free form tracing. Provide a string
    which uniquely identifies your trace point. */
-#define PMTRACE(label) tracepoint(pmtrace_webappmanager3, message, label)
+#define PMTRACE(label) \
+  pmtrace::TraceMessage(label)
 
 /* PMTRACE_BEFORE / AFTER is for tracing a time duration
  * which is not contained within a scope (curly braces) or function,
  * or in C code where there is no mechanism to automatically detect
  * exiting a scope or function.
  */
-#define PMTRACE_BEFORE(label) tracepoint(pmtrace_webappmanager3, before, label)
-#define PMTRACE_AFTER(label) tracepoint(pmtrace_webappmanager3, after, label)
+#define PMTRACE_BEFORE(label) \
+  pmtrace::TraceBefore(label)
+#define PMTRACE_AFTER(label) \
+  pmtrace::TraceAfter(label)
 
 /* PMTRACE_SCOPE* is for tracing a the duration of a scope.  In
  * C++ code use PMTRACE_SCOPE only, in C code use the
  * ENTRY/EXIT macros and be careful to catch all exit cases.
  */
 #define PMTRACE_SCOPE_ENTRY(label) \
-  tracepoint(pmtrace_webappmanager3, scope_entry, label)
+  pmtrace::TraceScopeEntry(label)
 #define PMTRACE_SCOPE_EXIT(label) \
-  tracepoint(pmtrace_webappmanager3, scope_exit, label)
-#define PMTRACE_SCOPE(label) PmTraceScope traceScope(label)
+  pmtrace::TraceScopeExit(label)
+#define PMTRACE_SCOPE(label) PmTraceScope trace_scope(label)
 
 /* PMTRACE_FUNCTION* is for tracing a the duration of a scope.
  * In C++ code use PMTRACE_FUNCTION only, in C code use the
  * ENTRY/EXIT macros and be careful to catch all exit cases.
  */
 #define PMTRACE_FUNCTION_ENTRY(label) \
-  tracepoint(pmtrace_webappmanager3, function_entry, label)
+  pmtrace::TraceFunctionEntry(label)
 #define PMTRACE_FUNCTION_EXIT(label) \
-  tracepoint(pmtrace_webappmanager3, function_exit, label)
+  pmtrace::TraceFunctionExit(label)
 #define PMTRACE_FUNCTION \
-  PmTraceFunction traceFunction(__func__))
+  PmTraceFunction trace_function(__FILE__, __FUNCTION__)
 
 class PmTraceScope {
  public:
-  PmTraceScope(char* label) : scope_label_(label) {
-    PMTRACE_SCOPE_ENTRY(scope_label_);
+  PmTraceScope(const char* label) : scope_label_(label) {
+    PMTRACE_SCOPE_ENTRY(scope_label_.c_str());
   }
 
-  ~PmTraceScope() { PMTRACE_SCOPE_EXIT(scope_label_); }
+  ~PmTraceScope() { PMTRACE_SCOPE_EXIT(scope_label_.c_str()); }
 
  private:
-  char* scope_label_;
+  std::string scope_label_;
 
   // Prevent heap allocation
   void operator delete(void*);
@@ -74,14 +77,20 @@ class PmTraceScope {
 
 class PmTraceFunction {
  public:
-  PmTraceFunction(char* label) : fn_label(label) {
-    PMTRACE_FUNCTION_ENTRY(fn_label);
+  PmTraceFunction(const char* label) : fn_label_(label) {
+    PMTRACE_FUNCTION_ENTRY(fn_label_.c_str());
   }
 
-  ~PmTraceFunction() { PMTRACE_FUNCTION_EXIT(fn_label); }
+  PmTraceFunction(const char* file, const char* name) : fn_label_(file) {
+    fn_label_ += "::";
+    fn_label_ += name;
+    PMTRACE_FUNCTION_ENTRY(fn_label_.c_str());
+  }
+
+  ~PmTraceFunction() { PMTRACE_FUNCTION_EXIT(fn_label_.c_str()); }
 
  private:
-  char* fn_label;
+  std::string fn_label_;
 
   // Prevent heap allocation
   void operator delete(void*);

@@ -20,6 +20,7 @@
 
 #include "log_manager.h"
 #include "web_app_base.h"
+#include "web_app_manager_tracer.h"
 
 WebAppManagerService::WebAppManagerService() {}
 
@@ -28,6 +29,7 @@ std::string WebAppManagerService::OnLaunch(const std::string& app_desc_string,
                                            const std::string& launching_app_id,
                                            int& err_code,
                                            std::string& err_msg) {
+  PMTRACE_FUNCTION;
   return WebAppManager::Instance()->Launch(app_desc_string, params,
                                            launching_app_id, err_code, err_msg);
 }

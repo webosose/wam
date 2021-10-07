@@ -25,6 +25,7 @@
 
 #include "log_manager.h"
 #include "utils.h"
+#include "web_app_manager_tracer.h"
 
 // just to save some typing, the template filled out with the name of this class
 #define QCB(FUNC) \
@@ -68,6 +69,8 @@ bool WebAppManagerServiceLuna::StartService() {
 }
 
 Json::Value WebAppManagerServiceLuna::launchApp(const Json::Value& request) {
+  PMTRACE_FUNCTION;
+
   int err_code;
   std::string err_msg;
   Json::Value reply;
