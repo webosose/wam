@@ -136,18 +136,28 @@ var onExitApp = function () {
     window.close();
 }
 
+function getDisplayId() {
+    return JSON.parse(window.webOSSystem.launchParams).displayAffinity;
+}
+
 var onLaunchSetting = function (target) {
-    var response;
-    var palmObject = new PalmServiceBridge();
+    const palmObject = new PalmServiceBridge();
     palmObject.onservicecallback = function (msg) {
-        response = JSON.parse(msg);
+        const response = JSON.parse(msg);
         console.log("response.returnValue : " + response.returnValue);
         if (response.returnValue === false)
             console.log("response.errorText : " + response.errorText);
     };
-    var url = "palm://com.webos.applicationManager/launch";
-    var params = "{\"id\": \"com.palm.app.settings\", \"params\" : {\"target\":\"" + target + "\"}}";
-    palmObject.call(url, params);
+    const url = "palm://com.webos.applicationManager/launch";
+    const displayId = getDisplayId();
+    const params = {
+        id: "com.palm.app.settings",
+        params: {
+            target: target,
+            ...(displayId != undefined ? {displayAffinity: displayId} : {}),
+        },
+    };
+    palmObject.call(url, JSON.stringify(params));
 }
 
 var onLaunchNetworkSetting = function () {
