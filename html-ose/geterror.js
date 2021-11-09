@@ -7,7 +7,8 @@ webappResBundle = new ilib.ResBundle({
 webappLocaleInfo = new ilib.LocaleInfo();
 
 var errorCode = getUrlParams("errorCode");
-var hostname = getUrlParams("hostname");
+var failedUrl = decodeURIComponent(getUrlParams("failedUrl"));
+var hostname = getHostFromURL(failedUrl);
 
 var networkStatus = false;
 
@@ -23,17 +24,7 @@ var cursor_x = 0; // X-position of cursor
 
 /* Handle webOSRelaunch event */
 function relaunchHandler(e) {
-    function onclosecallback() {
-        var param = {};
-        var q_param = {};
-        var serviceCall_url = "luna://com.webos.applicationManager/launch";
-        param["id"] = PalmSystem.identifier;
-        q_param["query"] = e.detail.query;
-        param["params"] = q_param;
-        PalmSystem.serviceCall(serviceCall_url, param);
-    }
-    PalmSystem.onclose = onclosecallback;
-    window.close();
+    window.location = failedUrl;
 }
 document.addEventListener('webOSRelaunch', relaunchHandler);
 
@@ -81,6 +72,12 @@ function getUrlParams(target) {
         }
     }
     return "";
+}
+
+function getHostFromURL(url) {
+    var location = document.createElement('a');
+    location.href = url;
+    return location.hostname;
 }
 
 window.onkeyup = function checkEnter(e) {
@@ -257,22 +254,7 @@ function createButtonOnPage(str_name, str_id, b_dir, func) {
 }
 
 var onRetryApp = function () {
-    function onclosecallback() {
-        var bridge = new PalmServiceBridge();
-        bridge.onservicecallback = function (msg) {
-            var response = JSON.parse(msg);
-            console.log("response.returnValue : " + response.returnValue);
-            if (response.returnValue === false)
-                console.log("response.errorText : " + response.errorText);
-        };
-
-        var url = "palm://com.webos.applicationManager/launch";
-        var params = "{\"id\":\"" + PalmSystem.identifier + "\"}";
-        bridge.call(url, params);
-    }
-
-    PalmSystem.onclose = onclosecallback;
-    window.close();
+    window.location = failedUrl;
 }
 
 function getCurrentTime() {

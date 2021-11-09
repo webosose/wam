@@ -818,6 +818,19 @@ void WebAppManager::UpdateNetworkStatus(const Json::Value& object) {
   webos::Runtime::GetInstance()->SetNetworkConnected(
       status.IsInternetConnectionAvailable());
   network_status_manager_->UpdateNetworkStatus(status);
+
+  if (status.IsInternetConnectionAvailable()) {
+    for (auto& page : app_page_map_) {
+      if (page.second->IsLoadErrorPageFinish()) {
+        LOG_INFO(MSGID_WAM_DEBUG, 2,
+                 PMLOGKS("APP_ID", page.second->AppId().c_str()),
+                 PMLOGKS("INSTANCE_ID", page.second->InstanceId().c_str()),
+                 "Reload failed URL '%s' on restore connection",
+                 page.second->FailedUrl().c_str());
+        page.second->LoadUrl(page.second->FailedUrl());
+      }
+    }
+  }
 }
 
 bool WebAppManager::IsEnyoApp(const std::string& appId) {

@@ -65,6 +65,7 @@ class WebPageBase {
   virtual wam::Url Url() const = 0;
   virtual wam::Url DefaultUrl() const { return default_url_; }
   virtual void SetDefaultUrl(const wam::Url& url) { default_url_ = url; }
+  virtual std::string FailedUrl() const = 0;
   virtual void LoadUrl(const std::string& url) = 0;
   virtual int Progress() const = 0;
   virtual bool HasBeenShown() const = 0;

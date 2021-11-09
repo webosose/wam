@@ -44,6 +44,7 @@
  */
 
 static const int kExecuteCloseCallbackTimeOutMs = 10000;
+static const int kReloadTimeoutMs = 60000;
 
 class WebPageBlinkPrivate {
  public:
@@ -284,6 +285,13 @@ std::vector<std::string> WebPageBlink::GetErrorPagePath(
   return util::GetErrorPagePaths(filepath, language);
 }
 
+void WebPageBlink::ReloadFailedUrl() {
+  LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", AppId().c_str()),
+           PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
+           "ReloadFailedUrl: '%s'", load_failed_url_.c_str());
+  page_private_->page_view_->LoadUrl(load_failed_url_);
+}
+
 void WebPageBlink::LoadErrorPage(int errorCode) {
   const std::string& errorpage = GetWebAppManagerConfig()->GetErrorPageUrl();
   if (!errorpage.empty()) {
@@ -319,24 +327,22 @@ void WebPageBlink::LoadErrorPage(int errorCode) {
     if (found != paths.end()) {
       // re-create it as a proper URL, so WebKit can understand it
       is_load_error_page_start_ = true;
-      std::string errorUrl = util::LocalToUri(*found);
-      if (errorUrl.empty()) {
+      wam::Url errorUrl = wam::Url::FromLocalFile(*found);
+      if (errorUrl.ToString().empty()) {
         LOG_ERROR(MSGID_ERROR_ERROR, 1, PMLOGKS("PATH", errorpage.c_str()),
                   "Error during conversion %s to URI", found->c_str());
         return;
       }
-      std::stringstream ss;
-      ss << errorUrl << "?";
-      ss << "errorCode"
-         << "=" << errorCode;
-      ss << "&hostname";
-      if (!load_failed_hostname_.empty())
-        ss << "=" << load_failed_hostname_;
+      wam::Url::UrlQuery query;
+      query.emplace_back("errorCode", std::to_string(errorCode));
+      if (!load_failed_url_.empty())
+        query.emplace_back("failedUrl", load_failed_url_);
+      errorUrl.SetQuery(query);
       LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", AppId().c_str()),
                PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
                PMLOGKFV("PID", "%d", GetWebProcessPID()), "LoadErrorPage : %s",
-               errorUrl.c_str());
-      page_private_->page_view_->LoadUrl(ss.str());
+               errorUrl.ToString().c_str());
+      page_private_->page_view_->LoadUrl(errorUrl.ToString());
     } else
       LOG_ERROR(MSGID_ERROR_ERROR, 1, PMLOGKS("PATH", errorpage.c_str()),
                 "Error loading error page");
@@ -723,11 +729,7 @@ void WebPageBlink::LoadFailed(const std::string& url,
     return;
   }
 
-  // We follow through only if we have SSL error
-  if (err_desc != "SSL_ERROR")
-    return;
-
-  load_failed_hostname_ = util::GetHostname(url);
+  load_failed_url_ = url;
   HandleLoadFailed(err_code);
 }
 
@@ -1193,6 +1195,18 @@ void WebPageBlink::UpdateIsLoadErrorPageFinish() {
   // is_load_error_page_finish_ will be updated
   bool was_error_page = is_load_error_page_finish_;
   WebPageBase::UpdateIsLoadErrorPageFinish();
+  if (is_load_error_page_finish_) {
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", AppId().c_str()),
+             PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
+             "Start reload timer");
+    net_error_reload_timer_.Stop();
+    net_error_reload_timer_.Start(kReloadTimeoutMs, this,
+                                  &WebPageBlink::ReloadFailedUrl);
+  } else if (was_error_page && !is_load_error_page_finish_) {
+    LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", AppId().c_str()),
+             PMLOGKS("INSTANCE_ID", InstanceId().c_str()), "Stop reload timer");
+    net_error_reload_timer_.Stop();
+  }
 
   if (TrustLevel().compare("trusted") &&
       was_error_page != is_load_error_page_finish_) {

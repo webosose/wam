@@ -57,6 +57,7 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   void NotifyMemoryPressure(
       webos::WebViewBase::MemoryPressureLevel level) override;
   wam::Url Url() const override;
+  std::string FailedUrl() const override { return load_failed_url_; }
   void LoadUrl(const std::string& url) override;
   int Progress() const override;
   bool HasBeenShown() const override;
@@ -198,6 +199,7 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   void SetCustomPluginIfNeeded();
   void SetDisallowScrolling(bool disallow);
   std::vector<std::string> GetErrorPagePath(const std::string& error_page);
+  void ReloadFailedUrl();
 
  private:
   WebPageBlinkPrivate* page_private_;
@@ -213,9 +215,10 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   bool has_close_callback_;
   OneShotTimer<WebPageBlink> close_callback_timer_;
   std::string trust_level_;
-  std::string load_failed_hostname_;
+  std::string load_failed_url_;
   std::string loading_url_;
   int custom_suspend_dom_time_;
+  RepeatingTimer<WebPageBlink> net_error_reload_timer_;
 
   WebPageBlinkObserver* observer_;
 
