@@ -363,8 +363,10 @@ TEST_F(LaunchAppTestSuite, LaunchAppsWithError) {
   EXPECT_CALL(*web_view_, LoadUrl(::testing::HasSubstr("loaderror.html")))
       .WillOnce(Invoke([&](const std::string& url) {
         view_url_ = url;
-        EXPECT_THAT(url, ::testing::HasSubstr(
-                             "?errorCode=404&hostname=www.youtube.com"));
+        EXPECT_THAT(
+            url,
+            ::testing::HasSubstr(
+                "errorCode=404&failedUrl=https%3A%2F%2Fwww.youtube.com%2F"));
 
         if (!web_view_delegate_) {
           return;

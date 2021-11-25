@@ -24,9 +24,15 @@ class WebProcessManager;
 class PlatformModuleFactoryImplMock : public PlatformModuleFactoryImpl {
  public:
   PlatformModuleFactoryImplMock() = default;
+  static void SetDefaultConfig(
+      const std::map<std::string, std::string>& config);
 
  protected:
   std::unique_ptr<WebProcessManager> CreateWebProcessManager() override;
+  std::unique_ptr<WebAppManagerConfig> CreateWebAppManagerConfig() override;
+
+ private:
+  static std::map<std::string, std::string> default_config_;
 };
 
 #endif  // TESTS_MOCKS_PLATFORM_MODULE_FACTORY_IMPL_MOCK_H_

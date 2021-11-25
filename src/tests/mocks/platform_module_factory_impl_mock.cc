@@ -17,8 +17,24 @@
 #include "platform_module_factory_impl_mock.h"
 
 #include "blink_web_process_manager_mock.h"
+#include "web_app_manager_config.h"
+#include "web_app_manager_config_mock.h"
+
+std::map<std::string, std::string>
+    PlatformModuleFactoryImplMock::default_config_;
+
+void PlatformModuleFactoryImplMock::SetDefaultConfig(
+    const std::map<std::string, std::string>& config) {
+  default_config_ = config;
+}
 
 std::unique_ptr<WebProcessManager>
 PlatformModuleFactoryImplMock::CreateWebProcessManager() {
   return std::make_unique<BlinkWebProcessManagerMock>();
+}
+
+std::unique_ptr<WebAppManagerConfig>
+PlatformModuleFactoryImplMock::CreateWebAppManagerConfig() {
+  return default_config_.empty() ? std::make_unique<WebAppManagerConfig>()
+      : std::make_unique<WebAppManagerConfigMock>(&default_config_);
 }
