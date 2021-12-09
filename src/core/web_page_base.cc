@@ -310,7 +310,6 @@ void WebPageBase::HandleLoadFailed(int errorCode) {
 void WebPageBase::CleanResourcesFinished() {
   WebAppManager::Instance()->PostRunningAppList();
   if (cleaning_resources_) {
-    WebAppManager::Instance()->RemoveWebAppFromWebProcessInfoMap(AppId());
     delete this;
   }
 }

@@ -132,7 +132,6 @@ class WebAppManager {
 
   void WebPageAdded(WebPageBase* page);
   void WebPageRemoved(WebPageBase* page);
-  void RemoveWebAppFromWebProcessInfoMap(const std::string& app_id);
 
   void AppDeleted(WebAppBase* app);
   void PostRunningAppList();
@@ -192,7 +191,6 @@ class WebAppManager {
   std::unordered_map<std::string, WebAppBase*> closing_app_list_;
 
   // Mappings
-  std::unordered_map<std::string, WebPageBase*> shell_page_map_;
   AppList app_list_;
   std::unordered_multimap<std::string, WebPageBase*> app_page_map_;
 

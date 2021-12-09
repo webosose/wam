@@ -389,7 +389,6 @@ void WebAppManager::CloseAppInternal(WebAppBase* app,
   std::string type = app->GetAppDescription()->DefaultWindowType();
   AppDeleted(app);
   WebPageRemoved(app->Page());
-  RemoveWebAppFromWebProcessInfoMap(app->AppId());
   PostRunningAppList();
   last_crashed_app_ids_ = std::unordered_map<std::string, int>();
 
@@ -483,11 +482,6 @@ void WebAppManager::WebPageRemoved(WebPageBase* page) {
   }
 }
 
-void WebAppManager::RemoveWebAppFromWebProcessInfoMap(
-    const std::string& appId) {
-  // Deprecated (2016-04-01)
-}
-
 WebAppBase* WebAppManager::FindAppById(const std::string& app_id) {
   for (AppList::iterator it = app_list_.begin(); it != app_list_.end(); ++it) {
     WebAppBase* app = (*it);
@@ -526,14 +520,7 @@ void WebAppManager::AppDeleted(WebAppBase* app) {
   if (!app)
     return;
 
-  std::string app_id;
-  if (app->Page())
-    app_id = app->AppId();
-
   app_list_.remove(app);
-
-  if (!app_id.empty())
-    shell_page_map_.erase(app_id);
 }
 
 void WebAppManager::SetSystemLanguage(const std::string& language) {

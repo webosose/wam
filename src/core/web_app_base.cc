@@ -467,6 +467,7 @@ void WebAppBase::CloseWebApp() {
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", Page()->GetWebProcessPID()),
            "closeCallback/about:blank is DONE");
+  WebAppManager::Instance()->AppDeleted(this);
   WebAppManager::Instance()->RemoveClosingAppList(AppId());
   delete this;
 }
