@@ -170,7 +170,8 @@ Json::Value WebAppManagerServiceLuna::killApp(const Json::Value& request) {
            PMLOGKS("INSTANCE_ID", instance_id.c_str()),
            PMLOGKS("API", "killApp"), "reason : %s", reason.c_str());
 
-  bool memory_reclaim = reason.compare("memoryReclaim") == 0;
+  bool memory_reclaim =
+      reason.empty() || reason.compare("com.webos.service.memorymanager") == 0;
   instances =
       WebAppManagerService::OnKillApp(app_id, instance_id, memory_reclaim);
 
