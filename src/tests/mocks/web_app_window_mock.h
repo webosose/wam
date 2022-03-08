@@ -61,6 +61,7 @@ class WebAppWindowMock : public WebAppWindow {
   MOCK_METHOD(void, RecreatedWebContents, (), (override));
   MOCK_METHOD(void, DetachWindowGroup, (), (override));
   MOCK_METHOD(void, SetUseVirtualKeyboard, (bool), (override));
+  MOCK_METHOD(void, SetFirstActivateTimeoutMs, (uint32_t), (override));
 
   MOCK_METHOD(void, SetWebApp, (WebAppWayland*), (override));
   MOCK_METHOD(void, Hide, (), (override));

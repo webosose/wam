@@ -112,6 +112,7 @@ class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
   bool IsKeyboardVisible() override;
   bool HideWindow() override;
   void SetUseVirtualKeyboard(const bool enable) override;
+  void SetDisplayFirstActivateTimeoutMs(uint32_t timeout) override;
 
   // WebAppWayland
   virtual void SetKeyMask(webos::WebOSKeyMask key_mask, bool value);

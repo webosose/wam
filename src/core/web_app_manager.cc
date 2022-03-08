@@ -333,6 +333,7 @@ WebAppBase* WebAppManager::OnLaunchUrl(
   app->SetLaunchingAppId(launching_app_id);
   if (web_app_manager_config_->IsCheckLaunchTimeEnabled())
     app->StartLaunchTimer();
+  app->SetDisplayFirstActivateTimeoutMs(app_desc->SplashDismissTimeoutMs());
   app->Attach(page);
   app->SetPreloadState(args);
 

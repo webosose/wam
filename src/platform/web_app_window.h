@@ -52,6 +52,7 @@ class WebAppWindow {
   virtual void RecreatedWebContents() = 0;
   virtual void DetachWindowGroup() = 0;
   virtual void SetUseVirtualKeyboard(bool enable) = 0;
+  virtual void SetFirstActivateTimeoutMs(uint32_t timeout) = 0;
 
   virtual void SetWebApp(WebAppWayland* w) = 0;
   virtual void Hide() = 0;

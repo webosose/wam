@@ -52,6 +52,7 @@ class WebAppWindowImpl : public WebAppWindow {
   void RecreatedWebContents() override;
   void DetachWindowGroup() override;
   void SetUseVirtualKeyboard(bool enable) override;
+  void SetFirstActivateTimeoutMs(uint32_t timeout) override;
 
   void SetWebApp(WebAppWayland* w) override;
   void Hide() override;

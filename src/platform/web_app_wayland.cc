@@ -846,3 +846,7 @@ void WebAppWayland::KeyboardVisibilityChanged(bool visible, int height) {
 void WebAppWayland::SetUseVirtualKeyboard(const bool enable) {
   app_window_->SetUseVirtualKeyboard(enable);
 }
+
+void WebAppWayland::SetDisplayFirstActivateTimeoutMs(uint32_t timeout) {
+  app_window_->SetFirstActivateTimeoutMs(timeout);
+}

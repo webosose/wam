@@ -78,6 +78,7 @@ class ApplicationDescription {
   bool IsInspectable() const { return inspectable_; }
   bool UseCustomPlugin() const { return custom_plugin_; }
   bool UseNativeScroll() const { return use_native_scroll_; }
+  uint32_t SplashDismissTimeoutMs() const {return splash_dismiss_timeout_ms_; }
   bool UsePrerendering() const { return use_prerendering_; }
 
   bool DoNotTrack() const { return do_not_track_; }
@@ -184,6 +185,7 @@ class ApplicationDescription {
   bool allow_audio_capture_;
   bool supports_audio_guidance_;
   bool use_native_scroll_;
+  uint32_t splash_dismiss_timeout_ms_ = 8000;
   bool use_prerendering_;
   double network_stable_timeout_;
   bool disallow_scrolling_in_main_frame_;

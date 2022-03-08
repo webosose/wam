@@ -123,6 +123,11 @@ void WebAppWindowImpl::SetUseVirtualKeyboard(bool enable) {
     window_->SetUseVirtualKeyboard(enable);
 }
 
+void WebAppWindowImpl::SetFirstActivateTimeoutMs(uint32_t timeout) {
+  if (window_)
+    window_->SetFirstActivateTimeoutMs(timeout);
+}
+
 void WebAppWindowImpl::SetWebApp(WebAppWayland* w) {
   if (window_)
     window_->SetWebApp(w);

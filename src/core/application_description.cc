@@ -312,6 +312,14 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
     }
   }
 
+  // Set splash dismiss timeout
+  if (json_obj.isMember("splashDismissTimeout")) {
+    auto splash_dismiss_timeout_ms = json_obj["splashDismissTimeout"];
+    if (splash_dismiss_timeout_ms.isUInt()) {
+      app_desc->splash_dismiss_timeout_ms_ = splash_dismiss_timeout_ms.asUInt();
+    }
+  }
+
   // Set network stable timeout
   if (json_obj.isMember("networkStableTimeout")) {
     auto network_stable_timeout = json_obj["networkStableTimeout"];
