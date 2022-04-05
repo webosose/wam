@@ -43,12 +43,10 @@ endif()
 
 webos_add_compiler_flags(ALL CXX -fno-rtti
                                  -fno-exceptions
-                                 -Wall
                                  -fpermissive
                                  -funwind-tables
                                  -std=c++14
                                  -Wno-psabi
-                                 -Werror
 )
 
 add_link_options(-Wl,--no-as-needed -Wno-psabi -rdynamic)
@@ -56,8 +54,8 @@ add_link_options(-Wl,--no-as-needed -Wno-psabi -rdynamic)
 add_subdirectory(core)
 add_subdirectory(platform)
 add_subdirectory(plugin)
-add_subdirectory(tests)
-add_subdirectory(testplugin)
+#add_subdirectory(tests)
+#add_subdirectory(testplugin)
 
 set(WAM_INCLUDE_DIRS
     ${GLIB_INCLUDE_DIRS}

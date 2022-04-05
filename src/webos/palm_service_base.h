@@ -53,6 +53,7 @@ class LSCallbackHandler {
       : func_(func) {}
 
   virtual ~LSCallbackHandler() {}
+  friend class PalmServiceBase;
 
  protected:
   Json::Value Called(Json::Value payload) { return func_(payload); }
