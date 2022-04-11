@@ -48,9 +48,10 @@ void DeviceInfoImpl::Initialize() {
   Json::Value locale_json = util::StringToJson(json_string);
   if (!locale_json.isObject() || locale_json.empty() ||
       !locale_json["localeInfo"].isObject() ||
-      !locale_json["localeInfo"]["locales"].isString() ||
-      !locale_json["localeInfo"]["country"].isString() ||
-      !locale_json["localeInfo"]["smartServiceCountryCode3"].isString()) {
+      !locale_json["localeInfo"]["locales"].isObject() ||
+      !locale_json["localeInfo"]["locales"]["UI"].isString() ||
+      !locale_json["country"].isString() ||
+      !locale_json["smartServiceCountryCode3"].isString()) {
     LOG_ERROR(MSGID_LOCALEINFO_READ_FAIL, 1,
               PMLOGKS("CONTENT", json_string.c_str()), "");
     return;
@@ -58,10 +59,10 @@ void DeviceInfoImpl::Initialize() {
 
   Json::Value locale_info = locale_json["localeInfo"];
 
-  std::string language(locale_info["locales"].asString());
-  std::string localcountry(locale_info["country"].asString());
+  std::string language(locale_info["locales"]["UI"].asString());
+  std::string localcountry(locale_json["country"].asString());
   std::string smartservicecountry(
-      locale_info["smartServiceCountryCode3"].asString());
+      locale_json["smartServiceCountryCode3"].asString());
 
   SetSystemLanguage(language.c_str());
   SetDeviceInfo("LocalCountry", localcountry.c_str());
