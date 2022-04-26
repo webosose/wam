@@ -464,6 +464,11 @@ void WebViewImpl::SetMediaPreferences(const std::string& preferences) {
     web_view_->SetMediaPreferences(preferences);
 }
 
+void WebViewImpl::SetEnableWebOSVDA(bool use) {
+  if (web_view_)
+    web_view_->SetEnableWebOSVDA(use);
+}
+
 void WebViewImpl::SetSearchKeywordForCustomPlayer(bool enabled) {
   if (web_view_)
     web_view_->SetSearchKeywordForCustomPlayer(enabled);

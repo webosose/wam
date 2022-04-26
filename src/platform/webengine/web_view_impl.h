@@ -128,6 +128,7 @@ class WebViewImpl : public WebView {
   void SetBoardType(const std::string& board_type) override;
   void SetMediaCodecCapability(const std::string& capability) override;
   void SetMediaPreferences(const std::string& preferences) override;
+  void SetEnableWebOSVDA(bool use) override;
   void SetSearchKeywordForCustomPlayer(bool enabled) override;
   void SetUseUnlimitedMediaPolicy(bool enabled) override;
   void SetAudioGuidanceOn(bool on) override;

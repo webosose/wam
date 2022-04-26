@@ -179,6 +179,7 @@ void WebPageBlink::Init() {
   page_private_->page_view_->SetUseUnlimitedMediaPolicy(
       app_desc_->UseUnlimitedMediaPolicy());
   page_private_->page_view_->SetMediaPreferences(app_desc_->MediaPreferences());
+  page_private_->page_view_->SetEnableWebOSVDA(app_desc_->EnableWebOSVDA());
 
   page_private_->page_view_->UpdatePreferences();
 

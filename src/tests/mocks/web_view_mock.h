@@ -131,6 +131,7 @@ class WebViewMock : public WebView {
   MOCK_METHOD(void, SetBoardType, (const std::string&), (override));
   MOCK_METHOD(void, SetMediaCodecCapability, (const std::string&), (override));
   MOCK_METHOD(void, SetMediaPreferences, (const std::string&), (override));
+  MOCK_METHOD(void, SetEnableWebOSVDA, (bool), (override));
   MOCK_METHOD(void, SetSearchKeywordForCustomPlayer, (bool), (override));
   MOCK_METHOD(void, SetUseUnlimitedMediaPolicy, (bool), (override));
   MOCK_METHOD(void, SetAudioGuidanceOn, (bool), (override));

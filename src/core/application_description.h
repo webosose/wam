@@ -77,6 +77,7 @@ class ApplicationDescription {
   bool UseCustomPlugin() const { return custom_plugin_; }
   bool UseNativeScroll() const { return use_native_scroll_; }
   bool UsePrerendering() const { return use_prerendering_; }
+  bool EnableWebOSVDA() const { return enable_webos_vda_; }
 
   bool DoNotTrack() const { return do_not_track_; }
 
@@ -179,6 +180,7 @@ class ApplicationDescription {
   bool supports_audio_guidance_;
   bool use_native_scroll_;
   bool use_prerendering_;
+  bool enable_webos_vda_;
   double network_stable_timeout_;
   bool disallow_scrolling_in_main_frame_;
   int delay_ms_for_lanch_optimization_;
