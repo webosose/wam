@@ -24,7 +24,6 @@ endif()
 set(CHROMIUM_LDFLAGS -lcbe)
 
 find_package(PkgConfig REQUIRED)
-find_package(Boost COMPONENTS filesystem REQUIRED)
 pkg_search_module(GLIB REQUIRED glib-2.0)
 pkg_search_module(JSONCPP REQUIRED jsoncpp)
 pkg_search_module(LIBLUNAPREFS REQUIRED luna-prefs)

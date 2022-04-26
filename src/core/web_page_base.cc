@@ -20,7 +20,8 @@
 #include <sstream>
 
 #include <json/value.h>
-#include <boost/filesystem.hpp>
+#include "base/files/file_path.h"
+#include "base/files/file.h"
 
 #include "application_description.h"
 #include "log_manager.h"
@@ -29,8 +30,6 @@
 #include "web_app_manager_config.h"
 #include "web_page_observer.h"
 #include "web_process_manager.h"
-
-namespace fs = boost::filesystem;
 
 namespace {
 
@@ -484,16 +483,16 @@ void WebPageBase::UpdateIsLoadErrorPageFinish() {
   if (!Url().IsLocalFile())
     return;
 
-  fs::path url_path(Url().ToLocalFile());
-  fs::path url_file_name = url_path.filename();
+  base::FilePath url_path(Url().ToLocalFile());
+  base::FilePath url_file_name = url_path.BaseName();
+  base::FilePath url_dir_path = url_path.DirName();
 
-  fs::path url_dir_path = url_path.parent_path();
-  fs::path err_path(
+  base::FilePath err_path(
       wam::Url(GetWebAppManagerConfig()->GetErrorPageUrl()).ToLocalFile());
-  fs::path err_file_name = err_path.filename();
-  fs::path err_dir_path = err_path.parent_path();
+  base::FilePath err_file_name = err_path.BaseName();
+  base::FilePath err_dir_path = err_path.DirName();
 
-  if ((url_dir_path.string().find(err_dir_path.string()) ==
+  if ((url_dir_path.value().find(err_dir_path.value()) ==
        0)  // urlDirPath starts with errDirPath
       && url_file_name == err_file_name) {
     LOG_DEBUG("[%s] This is WAM ErrorPage; URL: %s ", AppId().c_str(),
@@ -505,22 +504,22 @@ void WebPageBase::UpdateIsLoadErrorPageFinish() {
 void WebPageBase::SetCustomUserScript() {
   // 1. check app folder has userScripts
   // 2. check userscript.js there is, appfolder/webOSUserScripts/*.js
-  auto userScriptFilePath = fs::path(app_desc_->FolderPath()) /
-                            GetWebAppManagerConfig()->GetUserScriptPath();
+  auto userScriptFilePath = base::FilePath(app_desc_->FolderPath())
+        .Append(base::FilePath(GetWebAppManagerConfig()->GetUserScriptPath()));
 
-  if (!fs::exists(userScriptFilePath) ||
-      !fs::is_regular_file(fs::canonical(userScriptFilePath))) {
+  base::File userScriptFile(userScriptFilePath, base::File::FLAG_OPEN);
+  if (userScriptFile.error_details() != base::File::FILE_OK ||
+      !userScriptFile.IsValid()) {
     LOG_WARNING(MSGID_FILE_ERROR, 0,
-                "[%s] script not exist on file system '%s'", app_id_.c_str(),
-                userScriptFilePath.string().c_str());
+                "[%s] script not exist on file system ", app_id_.c_str());
     return;
   }
 
   LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", GetWebProcessPID()),
-           "User Scripts exists : %s", userScriptFilePath.c_str());
-  AddUserScriptUrl(wam::Url::FromLocalFile(userScriptFilePath.string()));
+           "User Scripts exists : %s", userScriptFilePath.value().c_str());
+  AddUserScriptUrl(wam::Url::FromLocalFile(userScriptFilePath.value()));
 }
 
 void WebPageBase::AddObserver(WebPageObserver* observer) {

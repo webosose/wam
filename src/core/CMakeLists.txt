@@ -95,7 +95,6 @@ set(CORE_LIBS
     ${CHROMIUM_LDFLAGS}
     ${GLIB_LDFLAGS}
     ${PMLOGLIB_LDFLAGS}
-    Boost::filesystem
     dl
 )
 

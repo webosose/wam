@@ -29,10 +29,13 @@
 #include <glib.h>
 #include <json/json.h>
 #include <sys/stat.h>
-#include <boost/algorithm/string.hpp>
-#include <boost/filesystem.hpp>
+
+#include "base/files/file_path.h"
+#include "log_manager.h"
 
 #include "bcp47.h"
+
+
 namespace util {
 
 static std::string GetString(const char* value) {
@@ -45,11 +48,9 @@ std::vector<std::string> GetErrorPagePaths(
   if (error_page_location.empty())
     return std::vector<std::string>();
 
-  namespace fs = boost::filesystem;
-
-  fs::path page_location(error_page_location);
-  fs::path filename = page_location.filename();
-  fs::path search_path = fs::canonical(page_location.parent_path());
+  base::FilePath page_location(error_page_location);
+  base::FilePath filename = page_location.BaseName();
+  base::FilePath search_path = page_location.DirName();
   auto bcp47_pieces = BCP47::FromString(language);
 
   // search order:
@@ -64,33 +65,33 @@ std::vector<std::string> GetErrorPagePaths(
   if (bcp47_pieces) {
     if (bcp47_pieces->HasScript()) {
       std::stringstream ss;
-      ss << search_path.string() << "/resources/";
+      ss << search_path.value() << "/resources/";
       ss << bcp47_pieces->Language() << "/";
       ss << bcp47_pieces->Script();
 
       if (bcp47_pieces->HasRegion())
         ss << "/" << bcp47_pieces->Region();
 
-      ss << "/html/" << filename.string();
+      ss << "/html/" << filename.value();
       result.emplace_back(ss.str());
     }
     if (bcp47_pieces->HasRegion()) {
       std::stringstream ss;
-      ss << search_path.string() << "/resources/";
+      ss << search_path.value() << "/resources/";
       ss << bcp47_pieces->Language() << "/";
       ss << bcp47_pieces->Region() << "/html/";
-      ss << filename.string();
+      ss << filename.value();
       result.emplace_back(ss.str());
     }
     std::stringstream ss;
-    ss << search_path.string() << "/resources/";
+    ss << search_path.value() << "/resources/";
     ss << bcp47_pieces->Language() << "/html/";
-    ss << filename.string();
+    ss << filename.value();
     result.emplace_back(ss.str());
   }
-  result.emplace_back(search_path.string() + "/resources/html/" +
-                      filename.string());
-  result.emplace_back(page_location.string());
+  result.emplace_back(search_path.value() + "/resources/html/" +
+                      filename.value());
+  result.emplace_back(page_location.value());
 
   return result;
 }
@@ -190,10 +191,16 @@ std::vector<std::string> SplitString(const std::string& str, char delimiter) {
 }
 
 std::string TrimString(const std::string& str) {
-  std::string trimmed(str);
-  boost::trim_right(trimmed);
-  boost::trim_left(trimmed);
+  auto begin = str.begin();
+  auto end = str.end();
 
+  while (begin != end && isspace(static_cast<unsigned char>(*begin)))
+    ++begin;
+
+  while (begin != end && isspace(static_cast<unsigned char>(*(end - 1))))
+    --end;
+
+  std::string trimmed(begin, end);
   return trimmed;
 }
 
