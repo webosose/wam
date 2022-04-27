@@ -398,14 +398,12 @@ void WebPageBase::ApplyPolicyForUrlResponse(bool isMainFrame,
   wam::Url response_url(url);
   static const int http_error_status_code = 400;
   if (response_url.Scheme() != "file" &&
-      status_code >= http_error_status_code) {
-    if (!HasLoadErrorPolicy(true, status_code) && isMainFrame) {
-      // If app does not have policy for load error and
-      // this error response is from main frame document
-      // then before open server error page, reset the body's background color
-      // to white
-      SetBackgroundColorOfBody("white");
-    }
+      !HasLoadErrorPolicy(status_code >= http_error_status_code, status_code) && isMainFrame) {
+    // If app does not have policy for load error and
+    // this error response is from main frame document
+    // then before open server error page, reset the body's background color
+    // to white
+    SetBackgroundColorOfBody("white");
   }
 }
 
