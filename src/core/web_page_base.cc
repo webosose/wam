@@ -161,10 +161,26 @@ bool WebPageBase::Relaunch(const std::string& launch_params,
   ResumeWebPagePaintingAndJSExecution();
 
   // for common webapp relaunch scenario
-  // 1. For hosted webapp deeplinking : reload default page
-  // 2-1. check progress; to send webOSRelaunch event, then page loading
-  // progress should be 100 2-2. Update launchParams 2-3. send webOSRelaunch
-  // event
+  // 1. Service worker clients.openWindow case : call LoadUrl with the
+  // given url
+  // 2. For hosted webapp deeplinking : reload default page
+  // 3-1. Check progress; to send webOSRelaunch event, then page loading
+  // progress should be 100
+  // 3-2. Update launchParams
+  // 3-3. Send webOSRelaunch event
+
+  // 1. Handling service worker clients.openWindow case
+  Json::Value json_obj = util::StringToJson(launch_params);
+  if (json_obj.isMember("sw_clients_openwindow")) {
+    auto sw_clients_openwindow = json_obj["sw_clients_openwindow"];
+    if (sw_clients_openwindow.isString()) {
+      std::string target_url = sw_clients_openwindow.asString();
+      LOG_DEBUG("[%s] service worker clients.openWindow(%s) relaunch",
+                app_id_.c_str(), target_url.c_str());
+      LoadUrl(target_url);
+      return true;
+    }
+  }
 
   if (DoHostedWebAppRelaunch(launch_params)) {
     LOG_DEBUG("[%s] Hosted webapp; handled", app_id_.c_str());
