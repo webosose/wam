@@ -659,6 +659,13 @@ std::string WebAppManager::Launch(const std::string& app_desc_string,
                                   std::string& err_msg) {
   PMTRACE_FUNCTION;
 
+#if defined(__clang__)
+  LOG_DEBUG("WAM compiled with clang - Start app");
+#else
+  // we can`t use __GNUC__ because of clang define this macros too
+  LOG_DEBUG("WAM compiled with gcc - Start app");
+#endif //defined(__clang__)
+
   std::shared_ptr<ApplicationDescription> desc(
       ApplicationDescription::FromJsonString(app_desc_string.c_str()));
   if (!desc)
