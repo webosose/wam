@@ -91,11 +91,14 @@ ObserverList<ObserverType>::End() {
   return observers_.end();
 }
 
-#define FOR_EACH_OBSERVER(ObserverType, observer_list, func)              \
-  if (observer_list.Size()) {                                             \
-    for (std::vector<ObserverType*>::iterator it = observer_list.Begin(); \
-         it != observer_list.End(); ++it)                                 \
-      (*it)->func;                                                        \
+#define FOR_EACH_OBSERVER(ObserverType, observer_list, func)                \
+  {                                                                         \
+    auto buffered_list = observer_list;                                     \
+    if (buffered_list.Size()) {                                             \
+      for (std::vector<ObserverType*>::iterator it = buffered_list.Begin(); \
+           it != buffered_list.End(); ++it)                                 \
+        (*it)->func;                                                        \
+    }                                                                       \
   }
 
 #endif  // UTIL_OBSERVER_LIST_H_
