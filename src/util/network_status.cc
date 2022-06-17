@@ -16,8 +16,7 @@
 
 #include "network_status.h"
 
-#include <time.h>
-
+#include <glib.h>
 #include <json/json.h>
 
 #include "utils.h"
@@ -44,9 +43,13 @@ void NetworkStatus::FromJsonObject(const Json::Value& object) {
     }
   }
 
-  time_t raw_time;
-  time(&raw_time);
-  saved_date_ = util::TrimString(ctime(&raw_time));
+  if (GDateTime* date_time = g_date_time_new_now_local()) {
+    if (gchar* saved_date = g_date_time_format(date_time, "%c")) {
+      saved_date_ = std::string(saved_date);
+      g_free(saved_date);
+    }
+    g_date_time_unref(date_time);
+  }
 }
 
 void NetworkStatus::Information::FromJsonObject(const Json::Value& info) {
