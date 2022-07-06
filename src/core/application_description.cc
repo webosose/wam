@@ -56,7 +56,6 @@ ApplicationDescription::ApplicationDescription()
       supports_audio_guidance_(false),
       use_native_scroll_(false),
       use_prerendering_(false),
-      enable_webos_vda_(false),
       network_stable_timeout_(std::numeric_limits<double>::quiet_NaN()),
       disallow_scrolling_in_main_frame_(true),
       delay_ms_for_lanch_optimization_(0),
@@ -191,10 +190,6 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   auto use_prerendering = json_obj["usePrerendering"];
   app_desc->use_prerendering_ =
       use_prerendering.isBool() && use_prerendering.asBool();
-
-  auto enable_webos_vda = json_obj["enableWebOSVDA"];
-  app_desc->enable_webos_vda_ =
-      enable_webos_vda.isBool() && enable_webos_vda.asBool();
 
   auto disallow_scrolling = json_obj["disallowScrollingInMainFrame"];
   app_desc->disallow_scrolling_in_main_frame_ =

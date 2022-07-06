@@ -130,7 +130,6 @@ class WebView {
   virtual void SetBoardType(const std::string& board_type) = 0;
   virtual void SetMediaCodecCapability(const std::string& capability) = 0;
   virtual void SetMediaPreferences(const std::string& preferences) = 0;
-  virtual void SetEnableWebOSVDA(bool use) = 0;
   virtual void SetSearchKeywordForCustomPlayer(bool enabled) = 0;
   virtual void SetUseUnlimitedMediaPolicy(bool enabled) = 0;
   virtual void SetAudioGuidanceOn(bool on) = 0;
