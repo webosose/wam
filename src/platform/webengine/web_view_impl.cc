@@ -172,11 +172,6 @@ void WebViewImpl::SetVisibilityState(
     web_view_->SetVisibilityState(visibilityState);
 }
 
-void WebViewImpl::DeleteWebStorages(const std::string& identifier) {
-  if (web_view_)
-    web_view_->DeleteWebStorages(identifier);
-}
-
 std::string WebViewImpl::DocumentTitle() const {
   return web_view_ ? web_view_->DocumentTitle() : "";
 }

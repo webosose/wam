@@ -119,10 +119,6 @@ void WebAppManagerService::SetForceCloseApp(const std::string& appId,
   WebAppManager::Instance()->SetForceCloseApp(appId, instance_id);
 }
 
-void WebAppManagerService::DeleteStorageData(const std::string& identifier) {
-  WebAppManager::Instance()->DeleteStorageData(identifier);
-}
-
 void WebAppManagerService::KillCustomPluginProcess(
     const std::string& app_base_path) {
   WebAppManager::Instance()->KillCustomPluginProcess(app_base_path);

@@ -69,7 +69,6 @@ class WebViewMock : public WebView {
               SetVisibilityState,
               (webos::WebViewBase::WebPageVisibilityState),
               (override));
-  MOCK_METHOD(void, DeleteWebStorages, (const std::string&), (override));
   MOCK_METHOD(std::string, DocumentTitle, (), (const, override));
   MOCK_METHOD(void, SuspendWebPageDOM, (), (override));
   MOCK_METHOD(void, ResumeWebPageDOM, (), (override));

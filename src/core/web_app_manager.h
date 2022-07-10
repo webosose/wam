@@ -122,7 +122,6 @@ class WebAppManager {
 
   int GetSuspendDelay() { return suspend_delay_; }
   int GetMaxCustomSuspendDelay() const { return max_custom_suspend_delay_; }
-  void DeleteStorageData(const std::string& identifier);
   void KillCustomPluginProcess(const std::string& base_path);
   bool ProcessCrashed(const std::string& app_id,
                       const std::string& instance_id);

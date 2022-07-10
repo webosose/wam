@@ -71,7 +71,6 @@ class WebView {
   virtual void SetPrerenderState();
   virtual void SetVisibilityState(
       webos::WebViewBase::WebPageVisibilityState visibilityState) = 0;
-  virtual void DeleteWebStorages(const std::string& identifier) = 0;
   virtual std::string DocumentTitle() const = 0;
   virtual void SuspendWebPageDOM() = 0;
   virtual void ResumeWebPageDOM() = 0;

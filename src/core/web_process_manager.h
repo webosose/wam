@@ -48,7 +48,6 @@ class WebProcessManager {
 
   virtual Json::Value GetWebProcessProfiling() = 0;
   virtual uint32_t GetWebProcessPID(const WebAppBase* app) const = 0;
-  virtual void DeleteStorageData(const std::string& identifier) = 0;
   virtual uint32_t GetInitialWebViewProxyID() const = 0;
   virtual void ClearBrowsingData(const int remove_browsing_data_mask) = 0;
   virtual int MaskForBrowsingDataType(const char* type) = 0;

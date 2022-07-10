@@ -93,7 +93,6 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   void ReloadExtensionData() override;
   void UpdateIsLoadErrorPageFinish() override;
   void UpdateDatabaseIdentifier() override;
-  void DeleteWebStorages(const std::string& identfier) override;
   void SetInspectorEnable() override;
   void SetKeepAliveWebApp(bool keepAlive) override;
 

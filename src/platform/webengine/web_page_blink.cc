@@ -1116,10 +1116,6 @@ void WebPageBlink::UpdateDatabaseIdentifier() {
   page_private_->page_view_->SetDatabaseIdentifier(app_id_);
 }
 
-void WebPageBlink::DeleteWebStorages(const std::string& identifier) {
-  page_private_->page_view_->DeleteWebStorages(identifier);
-}
-
 void WebPageBlink::SetInspectorEnable() {
   LOG_DEBUG("[%s] Inspector enable", AppId().c_str());
   page_private_->page_view_->SetInspectable(true);

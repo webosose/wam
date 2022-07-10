@@ -108,7 +108,6 @@ class WebPageBase {
   virtual bool IsLoadErrorPageStart() { return is_load_error_page_start_; }
   virtual void UpdateIsLoadErrorPageFinish();
   virtual void UpdateDatabaseIdentifier() {}
-  virtual void DeleteWebStorages(const std::string& identifier) {}
   virtual void SetInspectorEnable() {}
   virtual void SetKeepAliveWebApp(bool keep_alive) {}
   virtual void SetContentsScale() {}

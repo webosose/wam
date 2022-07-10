@@ -634,11 +634,6 @@ void WebAppManager::RequestKillWebProcess(uint32_t pid) {
   // Deprecated (2016-0401)
 }
 
-void WebAppManager::DeleteStorageData(const std::string& identifier) {
-  web_process_manager_->DeleteStorageData(
-      IdentifierForSecurityOrigin(identifier));
-}
-
 void WebAppManager::KillCustomPluginProcess(const std::string& base_path) {
   // Deprecated (2016-04-01)
 }

@@ -110,7 +110,6 @@ class WebAppManagerService {
   std::string GetSystemLanguage();
   void SetForceCloseApp(const std::string& appId,
                         const std::string& instance_id);
-  void DeleteStorageData(const std::string& identifier);
   void KillCustomPluginProcess(const std::string& app_base_path);
   void RequestKillWebProcess(uint32_t pid);
   void UpdateNetworkStatus(const Json::Value& object);

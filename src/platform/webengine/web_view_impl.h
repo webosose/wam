@@ -69,7 +69,6 @@ class WebViewImpl : public WebView {
   void SetPrerenderState();
   void SetVisibilityState(
       webos::WebViewBase::WebPageVisibilityState visibility_state) override;
-  void DeleteWebStorages(const std::string& identifier) override;
   std::string DocumentTitle() const override;
   void SuspendWebPageDOM() override;
   void ResumeWebPageDOM() override;

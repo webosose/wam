@@ -71,20 +71,6 @@ Json::Value BlinkWebProcessManager::GetWebProcessProfiling() {
   return reply;
 }
 
-void BlinkWebProcessManager::DeleteStorageData(const std::string& identifier) {
-  std::list<const WebAppBase*> running_app_list = RunningApps();
-  if (!running_app_list.empty()) {
-    running_app_list.front()->Page()->DeleteWebStorages(identifier);
-    return;
-  }
-
-  BlinkWebView* webview = new BlinkWebView();
-  if (webview) {
-    webview->DeleteWebStorages(identifier);
-    delete webview;
-  }
-}
-
 uint32_t BlinkWebProcessManager::GetInitialWebViewProxyID() const {
   return 0;
 }
