@@ -68,7 +68,7 @@ class WebView {
   virtual void NotifyMemoryPressure(
       webos::WebViewBase::MemoryPressureLevel level) = 0;
   virtual void SetVisible(bool visible) = 0;
-  virtual void SetPrerenderState();
+  virtual void SetPrerenderState() = 0;
   virtual void SetVisibilityState(
       webos::WebViewBase::WebPageVisibilityState visibilityState) = 0;
   virtual std::string DocumentTitle() const = 0;

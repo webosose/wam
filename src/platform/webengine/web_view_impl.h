@@ -66,7 +66,7 @@ class WebViewImpl : public WebView {
   void NotifyMemoryPressure(
       webos::WebViewBase::MemoryPressureLevel level) override;
   void SetVisible(bool visible) override;
-  void SetPrerenderState();
+  void SetPrerenderState() override;
   void SetVisibilityState(
       webos::WebViewBase::WebPageVisibilityState visibility_state) override;
   std::string DocumentTitle() const override;
