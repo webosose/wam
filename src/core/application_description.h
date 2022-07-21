@@ -28,6 +28,8 @@ class ApplicationDescription {
  public:
   enum WindowClass { kWindowClassNormal = 0x00, kWindowClassHidden = 0x01 };
 
+  enum class ThirdPartyCookiesPolicy { kDefault, kAllow, kDeny };
+
   ApplicationDescription();
   virtual ~ApplicationDescription() {}
 
@@ -93,6 +95,10 @@ class ApplicationDescription {
   bool IsEnableBackgroundRun() const { return enable_background_run_; }
   bool AllowVideoCapture() const { return allow_video_capture_; }
   bool AllowAudioCapture() const { return allow_audio_capture_; }
+
+  ThirdPartyCookiesPolicy GetThirdPartyCookiesPolicy() const {
+    return third_party_cookies_policy_;
+  }
 
   virtual bool UseVirtualKeyboard() const { return use_virtual_keyboard_; }
   // Key code is changed only for facebooklogin WebApp
@@ -183,6 +189,8 @@ class ApplicationDescription {
   bool disallow_scrolling_in_main_frame_;
   int delay_ms_for_lanch_optimization_;
   bool use_unlimited_media_policy_;
+  ThirdPartyCookiesPolicy third_party_cookies_policy_ =
+      ThirdPartyCookiesPolicy::kDefault;
   int display_affinity_;
   std::string location_hint_;
   bool use_virtual_keyboard_;

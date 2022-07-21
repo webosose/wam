@@ -147,6 +147,7 @@ class WebView {
   virtual void SetAppPreloadHint(bool is_preload) = 0;
   virtual void SetTransparentBackground(bool enabled) = 0;
   virtual void SetBackHistoryAPIDisabled(const bool on) = 0;
+  virtual void SetAllowThirdPartyCookies(bool enabled) = 0;
   virtual content::WebContents* GetWebContents() = 0;
 };
 

@@ -540,6 +540,11 @@ void WebViewImpl::SetBackHistoryAPIDisabled(const bool on) {
     web_view_->SetBackHistoryAPIDisabled(on);
 }
 
+void WebViewImpl::SetAllowThirdPartyCookies(bool enabled) {
+  if (web_view_)
+    web_view_->SetAllowThirdPartyCookies(enabled);
+}
+
 content::WebContents* WebViewImpl::GetWebContents() {
   return web_view_ ? web_view_->GetWebContents() : nullptr;
 }

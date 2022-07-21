@@ -144,6 +144,7 @@ class WebViewImpl : public WebView {
   void SetAppPreloadHint(bool is_preload) override;
   void SetTransparentBackground(bool enabled) override;
   void SetBackHistoryAPIDisabled(const bool on) override;
+  void SetAllowThirdPartyCookies(bool enabled) override;
   content::WebContents* GetWebContents() override;
 
  private:

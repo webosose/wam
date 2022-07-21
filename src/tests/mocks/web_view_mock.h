@@ -149,6 +149,7 @@ class WebViewMock : public WebView {
   MOCK_METHOD(void, SetAppPreloadHint, (bool), (override));
   MOCK_METHOD(void, SetTransparentBackground, (bool), (override));
   MOCK_METHOD(void, SetBackHistoryAPIDisabled, (const bool), (override));
+  MOCK_METHOD(void, SetAllowThirdPartyCookies, (bool), (override));
   MOCK_METHOD(content::WebContents*, GetWebContents, (), (override));
 };
 

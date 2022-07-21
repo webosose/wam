@@ -139,6 +139,18 @@ void WebPageBlink::Init() {
     page_private_->page_view_->SetNetworkStableTimeout(
         app_desc_->NetworkStableTimeout());
 
+  switch (app_desc_->GetThirdPartyCookiesPolicy()) {
+    case ApplicationDescription::ThirdPartyCookiesPolicy::kAllow:
+      page_private_->page_view_->SetAllowThirdPartyCookies(true);
+      break;
+    case ApplicationDescription::ThirdPartyCookiesPolicy::kDeny:
+      page_private_->page_view_->SetAllowThirdPartyCookies(false);
+      break;
+    default:
+      page_private_->page_view_->SetAllowThirdPartyCookies(
+          !(util::GetEnvVar("WAM_DEFAULT_ALLOW_THIRD_PARTY_COOKIES") == "0"));
+  }
+
   if (app_desc_->TrustLevel() == "trusted") {
     LOG_DEBUG("[%s] trustLevel : trusted; allow load local Resources",
               AppId().c_str());

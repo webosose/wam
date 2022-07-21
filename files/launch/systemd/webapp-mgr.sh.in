@@ -91,6 +91,10 @@ export NACL_IRT_LIBRARY=${CHROMIUM_PATH}"/nacl_irt_arm.nexe"
 export NACL_HELPER=${CHROMIUM_PATH}"/nacl_helper"
 export NACL_HELPER_BOOTSTRAP=${CHROMIUM_PATH}"/nacl_helper_bootstrap"
 
+# If set to 0, it will block by default third party cookies. Can be
+# overriden in application manifest.
+export WAM_DEFAULT_ALLOW_THIRD_PARTY_COOKIES=1
+
 # Set location of extra libraries
 export CDM_LIB_PATH="/usr/lib"
 

@@ -299,6 +299,19 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   app_desc->use_native_scroll_ = json_obj["useNativeScroll"].isBool() &&
                                  json_obj["useNativeScroll"].asBool();
 
+  // Third party cookies policy
+  if (json_obj.isMember("thirdPartyCookiesPolicy")) {
+    auto third_party_cookies_policy = json_obj["thirdPartyCookiesPolicy"];
+    if (third_party_cookies_policy.isString()) {
+      auto policy_as_string = third_party_cookies_policy.asString();
+      if (policy_as_string == "allow") {
+        app_desc->third_party_cookies_policy_ = ThirdPartyCookiesPolicy::kAllow;
+      } else if (policy_as_string == "deny") {
+        app_desc->third_party_cookies_policy_ = ThirdPartyCookiesPolicy::kDeny;
+      }
+    }
+  }
+
   // Set network stable timeout
   if (json_obj.isMember("networkStableTimeout")) {
     auto network_stable_timeout = json_obj["networkStableTimeout"];
