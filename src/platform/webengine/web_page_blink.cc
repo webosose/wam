@@ -179,6 +179,8 @@ void WebPageBlink::Init() {
   UpdateBackHistoryAPIDisabled();
   page_private_->page_view_->SetUseUnlimitedMediaPolicy(
       app_desc_->UseUnlimitedMediaPolicy());
+  page_private_->page_view_->SetEnableBackgroundRun(
+      app_desc_->IsEnableBackgroundRun());
   page_private_->page_view_->SetMediaPreferences(app_desc_->MediaPreferences());
 
   page_private_->page_view_->UpdatePreferences();

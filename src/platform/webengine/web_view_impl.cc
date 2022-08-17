@@ -469,6 +469,11 @@ void WebViewImpl::SetUseUnlimitedMediaPolicy(bool enabled) {
     web_view_->SetUseUnlimitedMediaPolicy(enabled);
 }
 
+void WebViewImpl::SetEnableBackgroundRun(bool enabled) {
+  if (web_view_)
+    web_view_->SetEnableBackgroundRun(enabled);
+}
+
 void WebViewImpl::SetAudioGuidanceOn(bool on) {
   if (web_view_)
     web_view_->SetAudioGuidanceOn(on);
