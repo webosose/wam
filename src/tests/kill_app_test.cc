@@ -201,7 +201,7 @@ TEST(KillAppTest, ForceKillApp) {
   Json::Value request;
   request["instanceId"] = kInstanceId;
   request["appId"] = kAppId;
-  request["reason"] = "memoryReclaim";
+  request["reason"] = "com.webos.service.memorymanager";
   const auto reply = luna_service->killApp(request);
 
   app_list = WebAppManager::Instance()->RunningApps(kPid);
