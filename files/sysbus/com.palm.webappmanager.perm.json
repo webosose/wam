@@ -7,6 +7,10 @@
         "settings.query",
         "memorymanager.query"
     ],
+    "com.webos.chromium.camera-*": [
+        "camera.query",
+        "camera.operation"
+    ],
     "com.webos.rm.client.*": [
         "media.operation"
     ],
