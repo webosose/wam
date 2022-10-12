@@ -16,6 +16,7 @@
         "camera.operation",
         "camera.query"
     ],
+    "com.webos.notification.client*": ["private"],
     "com.webos.rm.client.*": [
         "media.operation"
     ],

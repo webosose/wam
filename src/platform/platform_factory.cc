@@ -17,6 +17,7 @@
 #include "platform_factory.h"
 
 #include "log_manager.h"
+#include "notification_platform_bridge.h"
 #include "permission_prompt.h"
 
 PlatformFactory::PlatformFactory() = default;
@@ -24,8 +25,7 @@ PlatformFactory::~PlatformFactory() = default;
 
 std::unique_ptr<neva_app_runtime::NotificationPlatformBridge>
 PlatformFactory::CreateNotificationPlatformBridge() {
-  LOG_DEBUG("[%s] not implemented", __func__);
-  return nullptr;
+  return std::make_unique<NotificationPlatformBridge>();
 }
 
 std::unique_ptr<neva_app_runtime::PermissionPrompt>

@@ -17,6 +17,7 @@
 project(WebAppMgr VERSION 1.0.0 DESCRIPTION "Web Application Manager library")
 
 set(SOURCES
+    notification_platform_bridge.cc
     palm_system_webos.cc
     permission_prompt.cc
     platform_factory.cc
@@ -34,11 +35,13 @@ set(SOURCES
     ${WAM_ROOT_SOURCE_DIR}/webos/platform_module_factory_impl.cc
     ${WAM_ROOT_SOURCE_DIR}/webos/plugin_service_luna.cc
     ${WAM_ROOT_SOURCE_DIR}/webos/service_sender_luna.cc
+    ${WAM_ROOT_SOURCE_DIR}/webos/web_app_luna.cc
     ${WAM_ROOT_SOURCE_DIR}/webos/web_app_manager_service_luna.cc
     ${WAM_ROOT_SOURCE_DIR}/webos/web_app_manager_service_luna_impl.cc
 )
 
 set(HEADERS
+    notification_platform_bridge.h
     palm_system_webos.h
     permission_prompt.h
     platform_factory.h
@@ -62,6 +65,7 @@ set(HEADERS
     ${WAM_ROOT_SOURCE_DIR}/webos/platform_module_factory_impl.h
     ${WAM_ROOT_SOURCE_DIR}/webos/plugin_service_luna.h
     ${WAM_ROOT_SOURCE_DIR}/webos/service_sender_luna.h
+    ${WAM_ROOT_SOURCE_DIR}/webos/web_app_luna.h
     ${WAM_ROOT_SOURCE_DIR}/webos/web_app_manager_service_luna.h
     ${WAM_ROOT_SOURCE_DIR}/webos/web_app_manager_service_luna_impl.h
 )
