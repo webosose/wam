@@ -1,4 +1,4 @@
-// Copyright (c) 2013-2018 LG Electronics, Inc.
+// Copyright (c) 2013-2022 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -17,8 +17,8 @@
 #undef TRACEPOINT_PROVIDER
 #define TRACEPOINT_PROVIDER pmtrace_webappmanager3
 
-#undef TRACEPOINT_INCLUDE_FILE
-#define TRACEPOINT_INCLUDE_FILE pmtrace_webappmanager3_provider.h
+#undef TRACEPOINT_INCLUDE
+#define TRACEPOINT_INCLUDE "pmtrace_webappmanager3_provider.h"
 
 #ifdef __cplusplus
 extern "C" {
