@@ -79,3 +79,8 @@ void BlinkWebProcessManager::ClearBrowsingData(
 int BlinkWebProcessManager::MaskForBrowsingDataType(const char* type) {
   return BlinkWebViewProfileHelper::MaskForBrowsingDataType(type);
 }
+
+void BlinkWebProcessManager::SetNotifierEnabled(const std::string& app_id,
+                                                bool enabled) {
+  BlinkWebViewProfileHelper::SetNotifierEnabled(app_id, enabled);
+}

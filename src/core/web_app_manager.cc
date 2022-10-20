@@ -884,3 +884,11 @@ std::string WebAppManager::IdentifierForSecurityOrigin(
   }
   return (lowcase_identifier + webos::WebViewBase::kSecurityOriginPostfix);
 }
+
+void WebAppManager::SetNotifierEnabled(const std::string& app_id,
+                                       bool enabled) {
+  LOG_INFO(MSGID_SET_PERMISSION, 3, PMLOGKS("type", "notification"),
+           PMLOGKS("app_id", app_id.c_str()),
+           PMLOGKFV("enabled", "%d", enabled), "");
+  web_process_manager_->SetNotifierEnabled(app_id, enabled);
+}

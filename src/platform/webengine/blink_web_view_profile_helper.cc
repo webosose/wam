@@ -75,3 +75,9 @@ int BlinkWebViewProfileHelper::MaskForBrowsingDataType(const char* type) {
 
   return 0;
 }
+
+void BlinkWebViewProfileHelper::SetNotifierEnabled(const std::string& app_id,
+                                                   bool enabled) {
+  webos::WebViewProfile::GetDefaultProfile()->SetNotifierEnabled(app_id,
+                                                                 enabled);
+}

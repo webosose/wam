@@ -17,6 +17,8 @@
 #ifndef PLATFORM_WEBENGINE_BLINK_WEB_VIEW_PROFILE_HELPER_H_
 #define PLATFORM_WEBENGINE_BLINK_WEB_VIEW_PROFILE_HELPER_H_
 
+#include <string>
+
 namespace webos {
 class WebViewProfile;
 }
@@ -44,6 +46,7 @@ class BlinkWebViewProfileHelper {
                                 webos::WebViewProfile* profile = nullptr);
   static void ClearDefaultBrowsingData(const int remove_browsing_data_mask);
   static int MaskForBrowsingDataType(const char* key);
+  static void SetNotifierEnabled(const std::string& app_id, bool enabled);
 };
 
 #endif  // PLATFORM_WEBENGINE_BLINK_WEB_VIEW_PROFILE_HELPER_H_

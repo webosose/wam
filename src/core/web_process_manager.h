@@ -38,6 +38,7 @@ class WebProcessManager {
   virtual uint32_t GetWebProcessPID(const WebAppBase* app) const = 0;
   virtual void ClearBrowsingData(const int remove_browsing_data_mask) = 0;
   virtual int MaskForBrowsingDataType(const char* type) = 0;
+  virtual void SetNotifierEnabled(const std::string& app_id, bool enabled) = 0;
 
  protected:
   std::list<const WebAppBase*> RunningApps();

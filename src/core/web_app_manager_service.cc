@@ -136,6 +136,12 @@ void WebAppManagerService::NotifyMemoryPressure(
   WebAppManager::Instance()->NotifyMemoryPressure(level);
 }
 
+void WebAppManagerService::UpdateNotificationPermission(
+    const std::string& app_id,
+    bool enabled) {
+  WebAppManager::Instance()->SetNotifierEnabled(app_id, enabled);
+}
+
 bool WebAppManagerService::IsEnyoApp(const std::string& app_id) {
   return WebAppManager::Instance()->IsEnyoApp(app_id);
 }

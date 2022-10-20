@@ -158,6 +158,9 @@ class WebAppManager {
 
   std::string IdentifierForSecurityOrigin(const std::string& identifier);
 
+  // Set notification permissions recieved from system.
+  void SetNotifierEnabled(const std::string& app_id, bool enabled);
+
  private:
   WebAppFactoryManager* GetWebAppFactory();
   void LoadEnvironmentVariable();

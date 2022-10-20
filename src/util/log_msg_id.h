@@ -138,6 +138,7 @@
 
 #define MSGID_DL_ERROR                  "DL_ERROR" /** Dynamic load library error **/
 
+#define MSGID_SET_PERMISSION      "SET_PERMISSION" /** Set permission*/
 // clang-format on
 
 #endif  // UTIL_LOG_MSG_ID_H_

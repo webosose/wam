@@ -103,6 +103,7 @@ class WebAppManagerService {
                         const std::string& instance_id);
   void UpdateNetworkStatus(const Json::Value& object);
   void NotifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level);
+  void UpdateNotificationPermission(const std::string& app_id, bool enabled);
   void SetAccessibilityEnabled(bool enable);
   uint32_t GetWebProcessId(const std::string& app_id,
                            const std::string& instance_id);
