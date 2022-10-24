@@ -19,10 +19,12 @@
 #include <unistd.h>
 
 #include <webos/app/webos_main.h>
+#include <webos/public/runtime.h>
 
 #include <cassert>
 
 #include "log_manager.h"
+#include "platform/platform_factory.h"
 #include "platform_module_factory_impl.h"
 #include "utils.h"
 #include "web_app_manager.h"
@@ -74,6 +76,8 @@ class WebOSMainDelegateWAM : public webos::WebOSMainDelegate {
 
 int main(int argc, const char** argv) {
   WebOSMainDelegateWAM delegate;
+  webos::Runtime::GetInstance()->SetPlatformFactory(
+      std::make_unique<PlatformFactory>());
   webos::WebOSMain webos_main(&delegate);
   return webos_main.Run(argc, argv);
 }
