@@ -439,7 +439,7 @@ void WebPageBase::SetBackgroundColorOfBody(const std::string& color) {
          "document.body.style.backgroundColor');"
       << "           else {"
       << "               console.log('[Server Error] set background Color of "
-         "body to '"
+         "body to "
       << color << "');"
       << "               document.body.style.backgroundColor = '" << color
       << "';"
