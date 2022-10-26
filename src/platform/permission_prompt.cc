@@ -14,23 +14,25 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "platform_factory.h"
+#include "platform/permission_prompt.h"
+#include "util/log_manager.h"
 
-#include "log_manager.h"
-#include "permission_prompt.h"
-
-PlatformFactory::PlatformFactory() = default;
-PlatformFactory::~PlatformFactory() = default;
-
-std::unique_ptr<neva_app_runtime::NotificationPlatformBridge>
-PlatformFactory::CreateNotificationPlatformBridge() {
-  LOG_DEBUG("[%s] not implemented", __func__);
-  return nullptr;
+PermissionPrompt::PermissionPrompt(
+    neva_app_runtime::PermissionPrompt::Delegate* delegate)
+    : delegate_(delegate) {
+  Close();
 }
 
-std::unique_ptr<neva_app_runtime::PermissionPrompt>
-PlatformFactory::CreatePermissionPrompt(
-    neva_app_runtime::PermissionPrompt::Delegate* delegate) {
-  LOG_DEBUG("CreatePermissionPrompt");
-  return std::make_unique<PermissionPrompt>(delegate);
+PermissionPrompt::~PermissionPrompt() = default;
+
+void PermissionPrompt::Show() {
+  LOG_DEBUG("PermissionPrompt::Show");
+  // TODO: A permission prompt displays when web app asks for permission if
+  // needed.
+  delegate_->Accept();
+}
+
+void PermissionPrompt::Close() {
+  LOG_DEBUG("PermissionPrompt::Close");
+  delegate_->Closing();
 }

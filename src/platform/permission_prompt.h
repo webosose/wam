@@ -14,23 +14,20 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#include "platform_factory.h"
+#ifndef PLATFORM_PERMISSION_PROMPT_H_
+#define PLATFORM_PERMISSION_PROMPT_H_
 
-#include "log_manager.h"
-#include "permission_prompt.h"
+#include "neva/app_runtime/public/permission_prompt.h"
 
-PlatformFactory::PlatformFactory() = default;
-PlatformFactory::~PlatformFactory() = default;
+class PermissionPrompt : public neva_app_runtime::PermissionPrompt {
+ public:
+  PermissionPrompt(neva_app_runtime::PermissionPrompt::Delegate* delegate);
+  ~PermissionPrompt() override;
 
-std::unique_ptr<neva_app_runtime::NotificationPlatformBridge>
-PlatformFactory::CreateNotificationPlatformBridge() {
-  LOG_DEBUG("[%s] not implemented", __func__);
-  return nullptr;
-}
+ private:
+  void Show();
+  void Close();
+  neva_app_runtime::PermissionPrompt::Delegate* delegate_;
+};
 
-std::unique_ptr<neva_app_runtime::PermissionPrompt>
-PlatformFactory::CreatePermissionPrompt(
-    neva_app_runtime::PermissionPrompt::Delegate* delegate) {
-  LOG_DEBUG("CreatePermissionPrompt");
-  return std::make_unique<PermissionPrompt>(delegate);
-}
+#endif  // PLATFORM_PERMISSION_PROMPT_H_

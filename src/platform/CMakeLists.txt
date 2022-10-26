@@ -18,6 +18,7 @@ project(WebAppMgr VERSION 1.0.0 DESCRIPTION "Web Application Manager library")
 
 set(SOURCES
     palm_system_webos.cc
+    permission_prompt.cc
     platform_factory.cc
     web_app_wayland.cc
     web_app_wayland_window.cc
@@ -39,6 +40,7 @@ set(SOURCES
 
 set(HEADERS
     palm_system_webos.h
+    permission_prompt.h
     platform_factory.h
     web_app_wayland.h
     web_app_wayland_window.h
