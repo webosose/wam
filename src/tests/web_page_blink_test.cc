@@ -142,7 +142,8 @@ TEST_F(WebPageBlinkTestSuite, CheckWebViewInitializeCall) {
 
 TEST_F(WebPageBlinkTestSuite, CheckWebViewLoad) {
   EXPECT_CALL(*factory->web_view_,
-              LoadUrl("file:///usr/palm/applications/com.webos.app.test.webrtc/"
+              LoadUrl("file://com.webos.app.test.webrtc-webos/"
+                      "usr/palm/applications/com.webos.app.test.webrtc/"
                       "index.html"));
 
   WebPageBlink web_page(wam::Url(description->EntryPoint()), description,

@@ -270,7 +270,7 @@ TEST_F(LaunchAppTestSuite, LaunchOnPrimaryDisplay) {
   EXPECT_CALL(*web_view_, LoadUrl(_));
   EXPECT_CALL(
       *web_view_,
-      LoadUrl(StrEq("file:///usr/palm/applications/bareapp/index.html")));
+      LoadUrl(StrEq("file://bareapp-webos/usr/palm/applications/bareapp/index.html")));
 
   const auto& result = WebAppManagerServiceLuna::Instance()->launchApp(request);
   ASSERT_TRUE(result.isObject());

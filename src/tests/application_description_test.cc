@@ -228,7 +228,7 @@ TEST_F(ApplicationDescriptionTest, checkGetEntryPoint) {
   if (stat("/usr/palm/applications/bareapp/index.html", &info))
     EXPECT_STREQ("index.html", application_description_->EntryPoint().c_str());
   else
-    EXPECT_STREQ("file:///usr/palm/applications/bareapp/index.html",
+    EXPECT_STREQ("file://bareapp-webos/usr/palm/applications/bareapp/index.html",
                  application_description_->EntryPoint().c_str());
 }
 
