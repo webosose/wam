@@ -31,6 +31,7 @@ NotificationPlatformBridge::~NotificationPlatformBridge() = default;
 void NotificationPlatformBridge::Display(
     const neva_app_runtime::Notification& notification) {
   std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+
   WebAppLuna toast_luna(notification.AppId());
 
   Json::Value toast_params;
@@ -44,30 +45,56 @@ void NotificationPlatformBridge::Display(
 
   WebAppLuna alert_luna("");
 
-  Json::Value ok_button;
-  ok_button["label"] = "OK";
-  Json::Value button_params;
-  button_params["id"] = notification.AppId();
-  Json::Value shortcut_button;
-  shortcut_button["label"] = "Shortcut";
-  shortcut_button["onclick"] =
-      "luna://com.webos.service.applicationmanager/launch";
-  shortcut_button["params"] = button_params;
-  Json::Value buttons;
-  buttons.append(ok_button);
-  buttons.append(shortcut_button);
+  const std::vector<neva_app_runtime::ButtonInfo>& notificationButtons =
+      notification.Buttons();
+
+  Json::Value alert_buttons;
+  Json::Value button;
+
+  button["label"] = "OK";
+
+  alert_buttons.append(button);
+
+  if (notificationButtons.size() == 0) {
+    Json::Value click_button;
+    Json::Value params;
+
+    params["type"] = "notificationclick";
+    params["appId"] = notification.AppId();
+    params["notificationId"] = notification.Id();
+    params["origin"] = notification.Origin();
+
+    click_button["label"] = "Shortcut";
+    click_button["onclick"] =
+        "luna://com.webos.service.webappmanager/fireNotificationEvent";
+    click_button["params"] = params;
+
+    alert_buttons.append(click_button);
+  } else {
+    Json::Value click_button;
+    Json::Value params;
+
+    params["type"] = "notificationclick";
+    params["appId"] = notification.AppId();
+    params["notificationId"] = notification.Id();
+    params["origin"] = notification.Origin();
+    params["actionIndex"] = 0;
+
+    click_button["label"] = notificationButtons[0].title;
+    click_button["onclick"] =
+        "luna://com.webos.service.webappmanager/fireNotificationEvent";
+    click_button["params"] = params;
+
+    alert_buttons.append(click_button);
+  }
+
   Json::Value alert_params;
-  alert_params["buttons"] = buttons;
+  alert_params["buttons"] = alert_buttons;
   alert_params["message"] = convert.to_bytes(notification.Message());
   alert_params["title"] = convert.to_bytes(notification.Title());
 
   alert_luna.Call("luna://com.webos.notification/createAlert",
                   util::JsonToString(alert_params).c_str());
-
-  auto dispatcher = neva_app_runtime::GetNotificationEventDispatcher();
-  dispatcher->Click(notification.Id(), notification.Origin(),
-                    std::make_pair(-1, false),
-                    std::make_pair(std::u16string(), false));
 }
 
 void NotificationPlatformBridge::Close(const std::string& notificationId) {}

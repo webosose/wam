@@ -51,6 +51,7 @@ class WebAppManagerServiceLuna : public PalmServiceBase,
   Json::Value clearBrowsingData(const Json::Value& request) override;
   Json::Value webProcessCreated(const Json::Value& request,
                                 bool subscribed) override;
+  Json::Value fireNotificationEvent(const Json::Value& request) override;
 
   // PlamServiceBase
   void DidConnect() override;

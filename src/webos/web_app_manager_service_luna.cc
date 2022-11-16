@@ -16,6 +16,8 @@
 
 #include "web_app_manager_service_luna.h"
 
+#include <codecvt>
+#include <locale>
 #include <string>
 #include <vector>
 
@@ -56,6 +58,7 @@ LSMethod WebAppManagerServiceLuna::methods_[] = {
     LS2_METHOD_ENTRY(logControl),
     LS2_METHOD_ENTRY(getWebProcessSize),
     LS2_METHOD_ENTRY(clearBrowsingData),
+    LS2_METHOD_ENTRY(fireNotificationEvent),
     LS2_SUBSCRIPTION_ENTRY(listRunningApps),
     LS2_SUBSCRIPTION_ENTRY(webProcessCreated),
     {}};
@@ -348,6 +351,59 @@ Json::Value WebAppManagerServiceLuna::clearBrowsingData(
 
   reply["returnValue"] = return_value;
   return reply;
+}
+
+Json::Value WebAppManagerServiceLuna::fireNotificationEvent(
+    const Json::Value& request) {
+  std::string appId;
+  if (request.isMember("appId") && request["appId"].isString()) {
+    appId = request["appId"].asString();
+  }
+  std::string notificationId;
+  if (request.isMember("notificationId") &&
+      request["notificationId"].isString()) {
+    notificationId = request["notificationId"].asString();
+  }
+  std::string origin;
+  if (request.isMember("origin") && request["origin"].isString()) {
+    origin = request["origin"].asString();
+  }
+  std::string type;
+  if (request.isMember("type") && request["type"].isString()) {
+    type = request["type"].asString();
+  }
+  if (appId.empty() || notificationId.empty() || origin.empty() ||
+      type.empty()) {
+    Json::Value response;
+    response["returnValue"] = false;
+    response["errorCode"] = kErrCodeFireNotificationEventMissingParameter;
+    response["errorText"] = kErrFireNotificationEventMissingParameter;
+    return response;
+  }
+  if (type != "notificationclick" && type != "notificationclose") {
+    Json::Value response;
+    response["returnValue"] = false;
+    response["errorCode"] = kErrCodeFireNotificationEventUnsupportedType;
+    response["errorText"] = kErrFireNotificationEventUnsupportedType;
+    return response;
+  }
+  auto actionIndex = std::make_pair(0, false);
+  if (request.isMember("actionIndex") && request["actionIndex"].isInt()) {
+    actionIndex.first = request["actionIndex"].asInt();
+    actionIndex.second = true;
+  }
+  auto reply = std::make_pair(std::u16string(), false);
+  if (request.isMember("reply") && request["reply"].isString()) {
+    std::wstring_convert<std::codecvt_utf8_utf16<char16_t>, char16_t> convert;
+    reply.first = convert.from_bytes(request["reply"].asString());
+    reply.second = true;
+  }
+  auto dispatcher = neva_app_runtime::GetNotificationEventDispatcher();
+  dispatcher->Click(notificationId, origin, actionIndex, reply);
+
+  Json::Value response;
+  response["returnValue"] = true;
+  return response;
 }
 
 void WebAppManagerServiceLuna::DidConnect() {

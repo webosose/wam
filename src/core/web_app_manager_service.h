@@ -36,6 +36,8 @@ enum ErrorCode {
   kErrCodeClearDataBrawsingEmptyArray = 3000,
   kErrCodeClearDataBrawsingInvalidValue = 3001,
   kErrCodeClearDataBrawsingUnknownData = 3002,
+  kErrCodeFireNotificationEventMissingParameter = 4000,
+  kErrCodeFireNotificationEventUnsupportedType = 4001,
   kErrCodeInvalidParam = 5000
 };
 
@@ -53,6 +55,10 @@ const std::string kErrEmptyArray = "Empty array is not allowed.";
 const std::string kErrInvalidValue = "Invalid value";
 const std::string kErrUnknownData = "Unknown data";
 const std::string kErrOnlyAllowedForString = "Only allowed for string type";
+
+const std::string kErrFireNotificationEventMissingParameter =
+    "Missing parameter(s)";
+const std::string kErrFireNotificationEventUnsupportedType = "Unsupported type";
 
 class WebAppBase;
 
@@ -75,6 +81,7 @@ class WebAppManagerService {
   virtual Json::Value clearBrowsingData(const Json::Value& request) = 0;
   virtual Json::Value webProcessCreated(const Json::Value& request,
                                         bool subscribed) = 0;
+  virtual Json::Value fireNotificationEvent(const Json::Value& request) = 0;
 
  protected:
   std::string OnLaunch(const std::string& app_desc_string,
