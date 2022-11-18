@@ -27,6 +27,8 @@ class PermissionPrompt : public neva_app_runtime::PermissionPrompt {
  private:
   void Show();
   void Close();
+  void SetDecisions();
+  bool GetPermissionStatusFromAppDesc(const char* type);
   neva_app_runtime::PermissionPrompt::Delegate* delegate_;
 };
 

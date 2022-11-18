@@ -349,6 +349,15 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
         use_video_decode_accelerator.asBool();
   }
 
+  // Set permissions into contents settings
+  if (json_obj.isMember("webAppPermissions") &&
+      json_obj["webAppPermissions"].isArray()) {
+    for (const Json::Value& perm : json_obj["webAppPermissions"]) {
+      if (perm.isString())
+        app_desc->web_app_permissions_.insert(perm.asString());
+    }
+  }
+
   return app_desc;
 }
 

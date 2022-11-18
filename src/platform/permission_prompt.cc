@@ -15,12 +15,31 @@
 // SPDX-License-Identifier: Apache-2.0
 
 #include "platform/permission_prompt.h"
+
+#include <string>
+
+#include "core/application_description.h"
+#include "core/web_app_base.h"
+#include "core/web_app_manager.h"
 #include "util/log_manager.h"
+
+using PermissionRequest = neva_app_runtime::PermissionRequest;
+
+namespace {
+const char* PermissionRequestTypeToString(PermissionRequest::RequestType type) {
+  switch (type) {
+    case PermissionRequest::RequestType::kNotifications:
+      return "notifications";
+    default:
+      return nullptr;
+  }
+}
+}  // namespace
 
 PermissionPrompt::PermissionPrompt(
     neva_app_runtime::PermissionPrompt::Delegate* delegate)
     : delegate_(delegate) {
-  Close();
+  SetDecisions();
 }
 
 PermissionPrompt::~PermissionPrompt() = default;
@@ -35,4 +54,35 @@ void PermissionPrompt::Show() {
 void PermissionPrompt::Close() {
   LOG_DEBUG("PermissionPrompt::Close");
   delegate_->Closing();
+}
+
+void PermissionPrompt::SetDecisions() {
+  LOG_DEBUG("PermissionPrompt::SetDecisions");
+  for (const PermissionRequest* request : delegate_->Requests()) {
+    PermissionRequest::RequestType type = request->GetRequestType();
+    switch (type) {
+      case PermissionRequest::RequestType::kNotifications: {
+        bool status =
+            GetPermissionStatusFromAppDesc(PermissionRequestTypeToString(type));
+        if (status)
+          delegate_->Accept();
+        else
+          delegate_->Deny();
+      } break;
+      default:
+        LOG_ERROR(MSGID_ERROR_ERROR, 0,
+                  "There is no matching permission type.");
+    }
+  }
+}
+
+bool PermissionPrompt::GetPermissionStatusFromAppDesc(const char* type) {
+  const std::string app_id = delegate_->GetAppId();
+  WebAppBase* app = WebAppManager::Instance()->FindAppById(app_id);
+
+  auto& permissions = app->GetAppDescription()->WebAppPermissions();
+  bool status = (permissions.find(type) != permissions.end());
+  LOG_INFO(MSGID_SET_PERMISSION, 2, PMLOGKS("APP_ID", app_id.c_str()),
+           PMLOGKS("PERMISSION_STATUS", (status ? "granted" : "denied")), "");
+  return status;
 }

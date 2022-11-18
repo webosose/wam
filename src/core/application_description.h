@@ -97,6 +97,9 @@ class ApplicationDescription {
   bool IsEnableBackgroundRun() const { return enable_background_run_; }
   bool AllowVideoCapture() const { return allow_video_capture_; }
   bool AllowAudioCapture() const { return allow_audio_capture_; }
+  const std::set<std::string>& WebAppPermissions() const {
+    return web_app_permissions_;
+  }
 
   ThirdPartyCookiesPolicy GetThirdPartyCookiesPolicy() const {
     return third_party_cookies_policy_;
@@ -204,6 +207,7 @@ class ApplicationDescription {
   std::optional<int> custom_suspend_dom_time_;
   std::string media_preferences_;
   bool use_video_decode_accelerator_ = false;
+  std::set<std::string> web_app_permissions_;
 };
 
 #endif  // CORE_APPLICATION_DESCRIPTION_H_
