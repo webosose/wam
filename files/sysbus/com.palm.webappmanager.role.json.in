@@ -4,6 +4,7 @@
     "trustLevel" : "oem",
     "allowedNames": [
         "com.palm.webappmanager",
+        "com.webos.chromium.audio-*",
         "com.webos.chromium.camera-*",
         "com.webos.service.webappmanager",
         "com.webos.rm.client.*",
@@ -20,6 +21,12 @@
           "com.webos.service.activitymanager",
           "com.webos.service.connectionmanager",
           "com.webos.settingsservice"
+        ]
+      },
+      {
+        "service":"com.webos.chromium.audio-*",
+        "outbound":[
+            "com.webos.service.audio"
         ]
       },
       {
