@@ -53,8 +53,8 @@ add_link_options(-Wl,--no-as-needed -Wno-psabi -rdynamic)
 add_subdirectory(core)
 add_subdirectory(platform)
 add_subdirectory(plugin)
-#add_subdirectory(tests)
-#add_subdirectory(testplugin)
+add_subdirectory(tests)
+add_subdirectory(testplugin)
 
 set(WAM_INCLUDE_DIRS
     ${GLIB_INCLUDE_DIRS}
