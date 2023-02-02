@@ -64,20 +64,6 @@ bool WebAppManagerService::OnCloseAllApps(uint32_t pid) {
   return WebAppManager::Instance()->CloseAllApps(pid);
 }
 
-bool WebAppManagerService::IsDiscardCodeCacheRequired() {
-  return WebAppManager::Instance()->IsDiscardCodeCacheRequired();
-}
-
-void WebAppManagerService::OnDiscardCodeCache(uint32_t pid) {
-  LOG_INFO(MSGID_LUNA_API, 2, PMLOGKS("API", "discardCodeCache"),
-           PMLOGKFV("PID", "%d", pid), "");
-  WebAppManager::Instance()->DiscardCodeCache(pid);
-}
-
-bool WebAppManagerService::OnPurgeSurfacePool(uint32_t pid) {
-  return WebAppManager::Instance()->PurgeSurfacePool(pid);
-}
-
 Json::Value WebAppManagerService::GetWebProcessProfiling() {
   return WebAppManager::Instance()->GetWebProcessProfiling();
 }

@@ -99,15 +99,12 @@ class WebAppManager {
   const std::string GetActiveInstanceId() const { return active_instance_id_; }
 
   void OnGlobalProperties(int key);
-  bool PurgeSurfacePool(uint32_t pid);
   void OnShutdownEvent();
   bool OnKillApp(const std::string& app_id,
                  const std::string& instance_id,
                  bool force = false);
   bool OnPauseApp(const std::string& instance_id);
-  bool IsDiscardCodeCacheRequired();
   bool SetInspectorEnable(const std::string& app_id);
-  void DiscardCodeCache(uint32_t pid);
 
   void SetSystemLanguage(const std::string& value);
   void SetDeviceInfo(const std::string& name, const std::string& value);

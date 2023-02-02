@@ -39,7 +39,6 @@ enum ErrorCode {
   kErrCodeKillAppInvalidParam = 4100,
   kErrCodePauseAppInvalidParam = 4200,
   kErrCodeLogControlInvalidParam = 4300,
-  kErrCodeDiscardCodeCacheInvalidParam = 4400,
   kErrCodeClearBrowsingDataInvalidParam = 4500,
   kErrCodeWebProcessCreatedInvalidParam = 4600
 };
@@ -74,7 +73,6 @@ class WebAppManagerService {
   virtual Json::Value logControl(const Json::Value& request) = 0;
   virtual Json::Value setInspectorEnable(const Json::Value& request) = 0;
   virtual Json::Value closeAllApps(const Json::Value& request) = 0;
-  virtual Json::Value discardCodeCache(const Json::Value& request) = 0;
   virtual Json::Value listRunningApps(const Json::Value& request,
                                       bool subscribed) = 0;
   virtual Json::Value getWebProcessSize(const Json::Value& request) = 0;
@@ -95,9 +93,6 @@ class WebAppManagerService {
   bool OnPauseApp(const std::string& instance_id);
   Json::Value OnLogControl(const std::string& keys, const std::string& value);
   bool OnCloseAllApps(uint32_t pid = 0);
-  bool IsDiscardCodeCacheRequired();
-  void OnDiscardCodeCache(uint32_t pid);
-  bool OnPurgeSurfacePool(uint32_t pid);
   Json::Value GetWebProcessProfiling();
   int MaskForBrowsingDataType(const char* type);
   void OnClearBrowsingData(const int remove_browsing_data_mask);

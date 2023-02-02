@@ -52,7 +52,6 @@ LSMethod WebAppManagerServiceLuna::methods_[] = {
     LS2_METHOD_ENTRY(closeAllApps),
     LS2_METHOD_ENTRY(setInspectorEnable),
     LS2_METHOD_ENTRY(logControl),
-    LS2_METHOD_ENTRY(discardCodeCache),
     LS2_METHOD_ENTRY(getWebProcessSize),
     LS2_METHOD_ENTRY(clearBrowsingData),
     LS2_SUBSCRIPTION_ENTRY(listRunningApps),
@@ -60,7 +59,7 @@ LSMethod WebAppManagerServiceLuna::methods_[] = {
     {0, 0}};
 
 WebAppManagerServiceLuna::WebAppManagerServiceLuna()
-    : cleared_cache_(false), boot_done_(false), debug_level_("release") {}
+    : boot_done_(false), debug_level_("release") {}
 
 WebAppManagerServiceLuna::~WebAppManagerServiceLuna() {}
 
@@ -248,56 +247,6 @@ Json::Value WebAppManagerServiceLuna::logControl(const Json::Value& request) {
 
   return WebAppManagerService::OnLogControl(request["keys"].asString(),
                                             request["value"].asString());
-}
-
-Json::Value WebAppManagerServiceLuna::discardCodeCache(
-    const Json::Value& request) {
-  Json::Value reply;
-
-  if (!request.isObject()) {
-    Json::Value reply;
-    reply["returnValue"] = false;
-    reply["errorCode"] = kErrCodeDiscardCodeCacheInvalidParam;
-    reply["errorText"] = kErrInvalidParam;
-    return reply;
-  }
-
-  bool forced_clear_cache = false;
-  uint32_t pid = 0;
-  std::list<const WebAppBase*> running;
-
-  if (!WebAppManagerService::IsDiscardCodeCacheRequired()) {
-    reply["returnValue"] = true;
-    return reply;
-  }
-
-  if (request.isMember("force"))
-    forced_clear_cache = request["force"] == true;
-
-  if (request.isMember("pid") && request["pid"].isUInt())
-    pid = request["pid"].asUInt();
-
-  if (!pid)
-    running = WebAppManagerService::RunningApps();
-  else
-    running = WebAppManagerService::RunningApps(pid);
-
-  if (running.size() != 0 && !forced_clear_cache) {
-    reply["returnValue"] = false;
-    return reply;
-  }
-
-  if (!WebAppManagerService::OnCloseAllApps(pid)) {
-    reply["returnValue"] = false;
-    return reply;
-  }
-
-  cleared_cache_ = true;
-  WebAppManagerService::OnDiscardCodeCache(pid);
-  if (forced_clear_cache)
-    WebAppManagerService::OnPurgeSurfacePool(pid);
-  reply["returnValue"] = true;
-  return reply;
 }
 
 Json::Value WebAppManagerServiceLuna::getWebProcessSize(
@@ -628,9 +577,6 @@ void WebAppManagerServiceLuna::GetForegroundAppInfoCallback(
     LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", kErrInvalidParam.c_str());
     return;
   }
-
-  if (cleared_cache_)
-    cleared_cache_ = false;
 
   if (reply["returnValue"] == true) {
     if (reply.isMember("appId") && reply["appId"].isString()) {

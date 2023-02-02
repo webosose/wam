@@ -44,7 +44,6 @@ class WebAppManagerServiceLuna : public PalmServiceBase,
   Json::Value logControl(const Json::Value& request) override;
   Json::Value setInspectorEnable(const Json::Value& request) override;
   Json::Value closeAllApps(const Json::Value& request) override;
-  Json::Value discardCodeCache(const Json::Value& request) override;
   Json::Value listRunningApps(const Json::Value& request,
                               bool subscribed) override;
   Json::Value getWebProcessSize(const Json::Value& request) override;
@@ -85,7 +84,6 @@ class WebAppManagerServiceLuna : public PalmServiceBase,
 
   static LSMethod methods_[];
 
-  bool cleared_cache_;
   bool boot_done_;
   std::string debug_level_;
 

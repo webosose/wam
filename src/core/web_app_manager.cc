@@ -200,14 +200,6 @@ void WebAppManager::OnRelaunchApp(const std::string& instance_id,
   }
 }
 
-bool WebAppManager::PurgeSurfacePool(uint32_t pid) {
-  return true;  // Deprecated (2016-04-01)
-}
-
-bool WebAppManager::IsDiscardCodeCacheRequired() {
-  return false;  // Deprecated (2016-04-01)
-}
-
 bool WebAppManager::SetInspectorEnable(const std::string& app_id) {
   // 1. find appId from then running App List,
   for (AppList::const_iterator it = app_list_.begin(); it != app_list_.end();
@@ -220,10 +212,6 @@ bool WebAppManager::SetInspectorEnable(const std::string& app_id) {
     }
   }
   return false;
-}
-
-void WebAppManager::DiscardCodeCache(uint32_t pid) {
-  // Deprecated (2016-04-01)
 }
 
 void WebAppManager::OnShutdownEvent() {
