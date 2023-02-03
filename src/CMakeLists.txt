@@ -42,7 +42,6 @@ endif()
 
 webos_add_compiler_flags(ALL CXX -fno-rtti
                                  -fno-exceptions
-                                 -fpermissive
                                  -funwind-tables
                                  -std=c++14
                                  -Wno-psabi
