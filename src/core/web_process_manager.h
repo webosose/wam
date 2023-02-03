@@ -17,6 +17,7 @@
 #ifndef CORE_WEB_PROCESS_MANAGER_H_
 #define CORE_WEB_PROCESS_MANAGER_H_
 
+#include <cstdint>
 #include <list>
 #include <string>
 #include <unordered_map>
