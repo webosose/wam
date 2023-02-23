@@ -114,9 +114,9 @@ void ErrorPageTestSuite::LaunchApp() {
 
 void ErrorPageTestSuite::SetExpectedLoadUrlRequests() {
   auto view_mock = mock_initializer_->GetWebViewMock();
-  EXPECT_CALL(*view_mock,
-              LoadUrl(::testing::HasSubstr(
-                  "loaderror.html?errorCode=404&failedUrl")))
+  EXPECT_CALL(
+      *view_mock,
+      LoadUrl(::testing::HasSubstr("loaderror.html?errorCode=404&failedUrl")))
       .WillOnce(testing::Invoke(
           [this](const std::string& url) { ProcessLoading(url); }));
   EXPECT_CALL(*view_mock, LoadUrl(std::string("about:blank")))

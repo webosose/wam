@@ -23,39 +23,31 @@
 
 /* PMTRACE_LOG is for free form tracing. Provide a string
    which uniquely identifies your trace point. */
-#define PMTRACE(label) \
-  pmtrace::TraceMessage(label)
+#define PMTRACE(label) pmtrace::TraceMessage(label)
 
 /* PMTRACE_BEFORE / AFTER is for tracing a time duration
  * which is not contained within a scope (curly braces) or function,
  * or in C code where there is no mechanism to automatically detect
  * exiting a scope or function.
  */
-#define PMTRACE_BEFORE(label) \
-  pmtrace::TraceBefore(label)
-#define PMTRACE_AFTER(label) \
-  pmtrace::TraceAfter(label)
+#define PMTRACE_BEFORE(label) pmtrace::TraceBefore(label)
+#define PMTRACE_AFTER(label) pmtrace::TraceAfter(label)
 
 /* PMTRACE_SCOPE* is for tracing a the duration of a scope.  In
  * C++ code use PMTRACE_SCOPE only, in C code use the
  * ENTRY/EXIT macros and be careful to catch all exit cases.
  */
-#define PMTRACE_SCOPE_ENTRY(label) \
-  pmtrace::TraceScopeEntry(label)
-#define PMTRACE_SCOPE_EXIT(label) \
-  pmtrace::TraceScopeExit(label)
+#define PMTRACE_SCOPE_ENTRY(label) pmtrace::TraceScopeEntry(label)
+#define PMTRACE_SCOPE_EXIT(label) pmtrace::TraceScopeExit(label)
 #define PMTRACE_SCOPE(label) PmTraceScope trace_scope(label)
 
 /* PMTRACE_FUNCTION* is for tracing a the duration of a scope.
  * In C++ code use PMTRACE_FUNCTION only, in C code use the
  * ENTRY/EXIT macros and be careful to catch all exit cases.
  */
-#define PMTRACE_FUNCTION_ENTRY(label) \
-  pmtrace::TraceFunctionEntry(label)
-#define PMTRACE_FUNCTION_EXIT(label) \
-  pmtrace::TraceFunctionExit(label)
-#define PMTRACE_FUNCTION \
-  PmTraceFunction trace_function(__FILE__, __FUNCTION__)
+#define PMTRACE_FUNCTION_ENTRY(label) pmtrace::TraceFunctionEntry(label)
+#define PMTRACE_FUNCTION_EXIT(label) pmtrace::TraceFunctionExit(label)
+#define PMTRACE_FUNCTION PmTraceFunction trace_function(__FILE__, __FUNCTION__)
 
 class PmTraceScope {
  public:

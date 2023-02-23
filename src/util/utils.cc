@@ -35,7 +35,6 @@
 
 #include "bcp47.h"
 
-
 namespace util {
 
 static std::string GetString(const char* value) {

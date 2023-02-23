@@ -35,6 +35,7 @@ PlatformModuleFactoryImplMock::CreateWebProcessManager() {
 
 std::unique_ptr<WebAppManagerConfig>
 PlatformModuleFactoryImplMock::CreateWebAppManagerConfig() {
-  return default_config_.empty() ? std::make_unique<WebAppManagerConfig>()
-      : std::make_unique<WebAppManagerConfigMock>(&default_config_);
+  return default_config_.empty()
+             ? std::make_unique<WebAppManagerConfig>()
+             : std::make_unique<WebAppManagerConfigMock>(&default_config_);
 }

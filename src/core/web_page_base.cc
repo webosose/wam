@@ -20,8 +20,8 @@
 #include <sstream>
 
 #include <json/value.h>
-#include "base/files/file_path.h"
 #include "base/files/file.h"
+#include "base/files/file_path.h"
 
 #include "application_description.h"
 #include "log_manager.h"
@@ -397,7 +397,8 @@ void WebPageBase::ApplyPolicyForUrlResponse(bool isMainFrame,
   wam::Url response_url(url);
   static const int http_error_status_code = 400;
   if (response_url.Scheme() != "file" &&
-      !HasLoadErrorPolicy(status_code >= http_error_status_code, status_code) && isMainFrame) {
+      !HasLoadErrorPolicy(status_code >= http_error_status_code, status_code) &&
+      isMainFrame) {
     // If app does not have policy for load error and
     // this error response is from main frame document
     // then before open server error page, reset the body's background color
@@ -504,14 +505,16 @@ void WebPageBase::UpdateIsLoadErrorPageFinish() {
 void WebPageBase::SetCustomUserScript() {
   // 1. check app folder has userScripts
   // 2. check userscript.js there is, appfolder/webOSUserScripts/*.js
-  auto userScriptFilePath = base::FilePath(app_desc_->FolderPath())
-        .Append(base::FilePath(GetWebAppManagerConfig()->GetUserScriptPath()));
+  auto userScriptFilePath =
+      base::FilePath(app_desc_->FolderPath())
+          .Append(
+              base::FilePath(GetWebAppManagerConfig()->GetUserScriptPath()));
 
   base::File userScriptFile(userScriptFilePath, base::File::FLAG_OPEN);
   if (userScriptFile.error_details() != base::File::FILE_OK ||
       !userScriptFile.IsValid()) {
-    LOG_WARNING(MSGID_FILE_ERROR, 0,
-                "[%s] script not exist on file system ", app_id_.c_str());
+    LOG_WARNING(MSGID_FILE_ERROR, 0, "[%s] script not exist on file system ",
+                app_id_.c_str());
     return;
   }
 

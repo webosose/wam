@@ -78,7 +78,7 @@ class ApplicationDescription {
   bool IsInspectable() const { return inspectable_; }
   bool UseCustomPlugin() const { return custom_plugin_; }
   bool UseNativeScroll() const { return use_native_scroll_; }
-  uint32_t SplashDismissTimeoutMs() const {return splash_dismiss_timeout_ms_; }
+  uint32_t SplashDismissTimeoutMs() const { return splash_dismiss_timeout_ms_; }
   bool UsePrerendering() const { return use_prerendering_; }
 
   bool DoNotTrack() const { return do_not_track_; }

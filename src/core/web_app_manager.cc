@@ -664,7 +664,7 @@ std::string WebAppManager::Launch(const std::string& app_desc_string,
 #else
   // we can`t use __GNUC__ because of clang define this macros too
   LOG_DEBUG("WAM compiled with gcc - Start app");
-#endif //defined(__clang__)
+#endif  // defined(__clang__)
 
   std::shared_ptr<ApplicationDescription> desc(
       ApplicationDescription::FromJsonString(app_desc_string.c_str()));
