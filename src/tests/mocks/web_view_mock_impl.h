@@ -31,7 +31,7 @@ class WebViewMockImpl : public WebViewMock {
   WebPageBlinkDelegate* GetWebViewDelegate();
 
  private:
-  WebPageBlinkDelegate* web_wiew_delegate_ = nullptr;
+  WebPageBlinkDelegate* web_view_delegate_ = nullptr;
   std::string view_url_;
 };
 

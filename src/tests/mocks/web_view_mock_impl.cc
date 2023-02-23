@@ -21,7 +21,7 @@
 void WebViewMockImpl::SetOnInitActions() {
   ON_CALL(*this, SetDelegate(testing::_))
       .WillByDefault(testing::Invoke([&](WebPageBlinkDelegate* delegate) {
-        web_wiew_delegate_ = delegate;
+        web_view_delegate_ = delegate;
       }));
 }
 
@@ -30,16 +30,16 @@ void WebViewMockImpl::SetOnLoadURLActions() {
   ON_CALL(*this, LoadUrl(testing::_))
       .WillByDefault(testing::Invoke([&](const std::string& url) {
         view_url_ = url;
-        if (!web_wiew_delegate_) {
+        if (!web_view_delegate_) {
           return;
         }
-        web_wiew_delegate_->LoadStarted();
-        web_wiew_delegate_->LoadProgressChanged(100.0);
-        web_wiew_delegate_->LoadVisuallyCommitted();
-        web_wiew_delegate_->LoadFinished(url);
+        web_view_delegate_->LoadStarted();
+        web_view_delegate_->LoadProgressChanged(100.0);
+        web_view_delegate_->LoadVisuallyCommitted();
+        web_view_delegate_->LoadFinished(url);
       }));
 }
 
 WebPageBlinkDelegate* WebViewMockImpl::GetWebViewDelegate() {
-  return web_wiew_delegate_;
+  return web_view_delegate_;
 };

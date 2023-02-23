@@ -72,7 +72,7 @@ class ErrorPageTestSuite : public ::testing::Test {
                                       NiceWebAppWindowMock,
                                       PlatformModuleFactoryImplMock>>
       mock_initializer_;
-  WebPageBlinkDelegate* web_wiew_delegate_ = nullptr;
+  WebPageBlinkDelegate* web_view_delegate_ = nullptr;
   std::string instance_id_;
   std::string current_url_;
   std::string app_url_;
@@ -91,8 +91,8 @@ void ErrorPageTestSuite::SetUp() {
   ON_CALL(*view_mock, GetUrl()).WillByDefault(testing::ReturnRef(current_url_));
   ON_CALL(*view_mock, LoadUrl(testing::_))
       .WillByDefault(testing::Invoke([this](const std::string& url) {
-        if (!web_wiew_delegate_) {
-          web_wiew_delegate_ =
+        if (!web_view_delegate_) {
+          web_view_delegate_ =
               mock_initializer_->GetWebViewMock()->GetWebViewDelegate();
         }
         app_url_ = url;
@@ -126,11 +126,11 @@ void ErrorPageTestSuite::SetExpectedLoadUrlRequests() {
 
 void ErrorPageTestSuite::ProcessLoading(const std::string url) {
   current_url_ = url;
-  ASSERT_NE(web_wiew_delegate_, nullptr);
-  web_wiew_delegate_->LoadStarted();
-  web_wiew_delegate_->LoadProgressChanged(1.0);
-  web_wiew_delegate_->LoadVisuallyCommitted();
-  web_wiew_delegate_->LoadFinished(url);
+  ASSERT_NE(web_view_delegate_, nullptr);
+  web_view_delegate_->LoadStarted();
+  web_view_delegate_->LoadProgressChanged(1.0);
+  web_view_delegate_->LoadVisuallyCommitted();
+  web_view_delegate_->LoadFinished(url);
 }
 
 void ErrorPageTestSuite::TearDown() {
@@ -149,7 +149,7 @@ TEST_F(ErrorPageTestSuite, LoadErrorPage) {
   ASSERT_NE(app, nullptr);
   auto page = app->Page();
   ASSERT_NE(page, nullptr);
-  ASSERT_NE(web_wiew_delegate_, nullptr);
+  ASSERT_NE(web_view_delegate_, nullptr);
 
   EXPECT_FALSE(page->IsLoadErrorPageStart());
   EXPECT_FALSE(page->IsLoadErrorPageFinish());
@@ -158,7 +158,7 @@ TEST_F(ErrorPageTestSuite, LoadErrorPage) {
   EXPECT_EQ(static_cast<WebPageBlink*>(page)->TrustLevel(),
             std::string("default"));
 
-  web_wiew_delegate_->LoadFailed(app_url_, 404, {});
+  web_view_delegate_->LoadFailed(app_url_, 404, {});
 
   EXPECT_TRUE(page->IsLoadErrorPageStart());
   EXPECT_TRUE(page->IsLoadErrorPageFinish());
@@ -170,22 +170,22 @@ TEST_F(ErrorPageTestSuite, LoadErrorPage) {
 
 TEST_F(ErrorPageTestSuite, ReloadOnRelaunch) {
   SetExpectedLoadUrlRequests();
-  ASSERT_NE(web_wiew_delegate_, nullptr);
+  ASSERT_NE(web_view_delegate_, nullptr);
   auto view_mock = mock_initializer_->GetWebViewMock();
   EXPECT_CALL(*view_mock, RunJavaScript(::testing::HasSubstr("webOSRelaunch")))
       .Times(1);
-  web_wiew_delegate_->LoadFailed(app_url_, 404, {});
+  web_view_delegate_->LoadFailed(app_url_, 404, {});
   LaunchApp();
 }
 
 TEST_F(ErrorPageTestSuite, ReloadOnNetworkRecovery) {
   SetExpectedLoadUrlRequests();
-  ASSERT_NE(web_wiew_delegate_, nullptr);
+  ASSERT_NE(web_view_delegate_, nullptr);
   auto view_mock = mock_initializer_->GetWebViewMock();
   EXPECT_CALL(*view_mock, LoadUrl(app_url_))
       .WillOnce(testing::Invoke(
           [this](const std::string& url) { ProcessLoading(url); }));
-  web_wiew_delegate_->LoadFailed(app_url_, 404, {});
+  web_view_delegate_->LoadFailed(app_url_, 404, {});
   Json::Value status;
   status["isInternetConnectionAvailable"] = true;
   WebAppManager::Instance()->UpdateNetworkStatus(status);
@@ -193,7 +193,7 @@ TEST_F(ErrorPageTestSuite, ReloadOnNetworkRecovery) {
 
 TEST_F(ErrorPageTestSuite, ReloadOnTimeout) {
   SetExpectedLoadUrlRequests();
-  ASSERT_NE(web_wiew_delegate_, nullptr);
+  ASSERT_NE(web_view_delegate_, nullptr);
   auto view_mock = mock_initializer_->GetWebViewMock();
   GMainLoop* loop = g_main_loop_new(NULL, FALSE);
   EXPECT_CALL(*view_mock, LoadUrl(app_url_))
@@ -202,7 +202,7 @@ TEST_F(ErrorPageTestSuite, ReloadOnTimeout) {
         g_main_loop_quit(loop);
       }));
   guint id = g_timeout_add(61000, OnTimeoutFail, loop);
-  web_wiew_delegate_->LoadFailed(app_url_, 404, {});
+  web_view_delegate_->LoadFailed(app_url_, 404, {});
   g_main_loop_run(loop);
   if (!timeout_exceeded_)
     g_source_remove(id);

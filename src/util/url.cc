@@ -73,9 +73,9 @@ std::string Url::FileName() const {
 }
 
 void Url::ParseUri(const std::string& uri) {
-  auto scheme_delimeter = uri.find(':');
-  if (scheme_delimeter != std::string::npos)
-    scheme_ = uri.substr(0, scheme_delimeter);
+  auto scheme_delimiter = uri.find(':');
+  if (scheme_delimiter != std::string::npos)
+    scheme_ = uri.substr(0, scheme_delimiter);
 
   auto authority_start = uri.find("//");
   if (authority_start != std::string::npos)
@@ -99,7 +99,7 @@ void Url::ParseUri(const std::string& uri) {
   uri_ = GetSubString(uri, 0, path_end);
 
   if (authority_start == std::string::npos) {
-    path_ = uri.substr(scheme_delimeter + 1, uri.size() - scheme_delimeter);
+    path_ = uri.substr(scheme_delimiter + 1, uri.size() - scheme_delimiter);
   } else if (authority_end != std::string::npos) {
     if (uri[authority_end] == '/')
       path_ = GetSubString(uri, authority_end, path_end);

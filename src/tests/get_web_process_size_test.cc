@@ -117,12 +117,12 @@ TEST(GetWebProcessSizeTest, checkCaseProcessExists) {
   ASSERT_TRUE(response_launch.isMember("returnValue"));
   ASSERT_TRUE(response_launch["returnValue"].asBool());
 
-  BlinkWebProcessManagerMock* proccess_manager =
+  BlinkWebProcessManagerMock* process_manager =
       static_cast<BlinkWebProcessManagerMock*>(
           WebAppManager::Instance()->GetWebProcessManager());
-  EXPECT_CALL(*proccess_manager, GetWebProcessPIDMock())
+  EXPECT_CALL(*process_manager, GetWebProcessPIDMock())
       .WillRepeatedly(testing::Return(kProcessId));
-  EXPECT_CALL(*proccess_manager, GetWebProcessMemSize(kProcessId))
+  EXPECT_CALL(*process_manager, GetWebProcessMemSize(kProcessId))
       .WillRepeatedly(testing::Return(kProcessMemSize));
 
   const Json::Value request_process_size(Json::objectValue);
