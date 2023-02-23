@@ -23,18 +23,23 @@ pkg_search_module(CHROMIUM REQUIRED libcbe)
 pkg_search_module(GLIB REQUIRED glib-2.0)
 pkg_search_module(JSONCPP REQUIRED jsoncpp)
 pkg_search_module(LIBLUNAPREFS REQUIRED luna-prefs)
+set(PKGCONFIG_REQUIRES_PRIVATE "libcbe" "glib-2.0" "jsoncpp" "luna-prefs")
 
 if(DISABLE_PMLOG)
     message(STATUS "PMLog disabled")
     add_compile_definitions(DISABLE_PMLOG)
 else()
     pkg_search_module(PMLOGLIB REQUIRED PmLogLib)
+    list(APPEND PKGCONFIG_REQUIRES_PRIVATE "PmLogLib")
 endif()
 
 if(WEBOS_LTTNG_ENABLED)
     pkg_search_module(LTTNG REQUIRED lttng-ust)
+    list(APPEND PKGCONFIG_REQUIRES_PRIVATE "lttng-ust")
     add_compile_definitions(HAS_LTTNG)
 endif()
+
+string(REPLACE ";" ", " PKGCONFIG_REQUIRES_PRIVATE "${PKGCONFIG_REQUIRES_PRIVATE}")
 
 webos_add_compiler_flags(ALL CXX -fno-rtti
                                  -fno-exceptions

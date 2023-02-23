@@ -6,6 +6,7 @@ includedir=${prefix}/include/webappmanager
 Name: libWebAppMgr
 Description: Web Application Manager library
 Version: 1.0.0
+Requires.private: @PKGCONFIG_REQUIRES_PRIVATE@
 
 Libs: -L${libdir} @PKGCONFIG_WAM_LIBS@
 Cflags: -I${includedir}
