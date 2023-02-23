@@ -69,7 +69,7 @@ export WAM_RESOURCE_BUFFER_SIZE=1048576
 # setup 200 seconds for watchdog timeout of render process
 export WATCHDOG_RENDERER_TIMEOUT=200
 
-# setup nubmer of raster threads to 1
+# setup number of raster threads to 1
 export BLINK_NUM_RASTER_THREADS=2
 
 # use default tile width if not sed by recipe
@@ -80,7 +80,7 @@ fi
 # setup 2 Mb maximum for the program GPU cache
 export GPU_PROGRAM_CACHE_SIZE=2048
 
-# disable using enyo system app specfic optimization
+# disable using enyo system app specific optimization
 # currently used optimizations : inline caching off
 export USE_SYSTEM_APP_OPTIMIZATION="0"
 
@@ -92,7 +92,7 @@ export NACL_HELPER=${CHROMIUM_PATH}"/nacl_helper"
 export NACL_HELPER_BOOTSTRAP=${CHROMIUM_PATH}"/nacl_helper_bootstrap"
 
 # If set to 0, it will block by default third party cookies. Can be
-# overriden in application manifest.
+# overridden in application manifest.
 export WAM_DEFAULT_ALLOW_THIRD_PARTY_COOKIES=1
 
 # Set location of extra libraries

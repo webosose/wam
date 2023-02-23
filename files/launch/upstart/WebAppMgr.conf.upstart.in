@@ -83,7 +83,7 @@ script
     # setup 200 seconds for watchdog timeout of render process
     export WATCHDOG_RENDER_TIMEOUT=200
 
-    # setup nubmer of raster threads to 1
+    # setup number of raster threads to 1
     export BLINK_NUM_RASTER_THREADS=WEBOS_NUM_RASTER_THREADS
 
     # use default tile width if not sed by recipe
@@ -94,7 +94,7 @@ script
     # setup 2 Mb maximum for the program GPU cache
     export GPU_PROGRAM_CACHE_SIZE=2048
 
-    # disable using enyo system app specfic optimization
+    # disable using enyo system app specific optimization
     # currently used optimizations : inline caching off
     export USE_SYSTEM_APP_OPTIMIZATION="0"
 

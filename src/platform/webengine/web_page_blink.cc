@@ -415,7 +415,7 @@ void WebPageBlink::SuspendWebPageAll() {
   // suspend painting
   // set visibility : hidden
   // set send to plugin about this visibility change
-  // but NOT suspend DOM and JS Excution
+  // but NOT suspend DOM and JS Execution
   /* actually suspendWebPagePaintingAndJSExecution will do this again,
    * but this visibilitychange event and paint suspend should be done ASAP
    */
@@ -451,7 +451,7 @@ void WebPageBlink::ResumeWebPageAll() {
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", GetWebProcessPID()), "");
   // resume painting
-  // Resume DOM and JS Excution
+  // Resume DOM and JS Execution
   // set visibility : visible (dispatch visibilitychange event)
   // set send to plugin about this visibility change
   if (ShouldStopJSOnSuspend()) {
@@ -873,7 +873,7 @@ bool WebPageBlink::Inspectable() {
 // again -- triggering a page reload will cause it to fire the event again.
 
 // There are a few caveats here, though:
-// 1- We don't want to make a seperate HTML file just for this, so we use the C
+// 1- We don't want to make a separate HTML file just for this, so we use the C
 // API for adding a UserScript 2- The QT API for adding a user script only
 // accepts a URL to a file, not absolute code. 3- We can't call
 // WKPageGroupAddUserScript with the same argument more than once unless we want

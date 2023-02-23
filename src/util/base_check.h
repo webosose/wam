@@ -18,7 +18,7 @@
 #define UTIL_BASE_CHECK_H_
 
 #ifdef NDEBUG
-// Supress Werror=unused-variable in release build.
+// Suppress Werror=unused-variable in release build.
 #define UTIL_ASSERT(c) ((void)(c))
 #else
 #include <cassert>

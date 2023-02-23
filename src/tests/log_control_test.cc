@@ -26,10 +26,10 @@ TEST(LogControl, SetEventOn) {
         "value":"on"
     })";
 
-  Json::Value reuest;
-  ASSERT_TRUE(util::StringToJson(json_parameters, reuest));
+  Json::Value request;
+  ASSERT_TRUE(util::StringToJson(json_parameters, request));
 
-  const auto reply = WebAppManagerServiceLuna::Instance()->logControl(reuest);
+  const auto reply = WebAppManagerServiceLuna::Instance()->logControl(request);
 
   ASSERT_TRUE(reply.isObject());
   ASSERT_TRUE(reply.isMember("event"));
@@ -46,10 +46,10 @@ TEST(LogControl, SetEventOff) {
         "value":"off"
     })";
 
-  Json::Value reuest;
-  ASSERT_TRUE(util::StringToJson(json_parameters, reuest));
+  Json::Value request;
+  ASSERT_TRUE(util::StringToJson(json_parameters, request));
 
-  const auto reply = WebAppManagerServiceLuna::Instance()->logControl(reuest);
+  const auto reply = WebAppManagerServiceLuna::Instance()->logControl(request);
 
   ASSERT_TRUE(reply.isObject());
   ASSERT_TRUE(reply.isMember("event"));
@@ -66,10 +66,10 @@ TEST(LogControl, SetBundleMessageOn) {
         "value":"on"
     })";
 
-  Json::Value reuest;
-  ASSERT_TRUE(util::StringToJson(json_parameters, reuest));
+  Json::Value request;
+  ASSERT_TRUE(util::StringToJson(json_parameters, request));
 
-  const auto reply = WebAppManagerServiceLuna::Instance()->logControl(reuest);
+  const auto reply = WebAppManagerServiceLuna::Instance()->logControl(request);
 
   ASSERT_TRUE(reply.isObject());
   ASSERT_TRUE(reply.isMember("event"));
@@ -86,10 +86,10 @@ TEST(LogControl, SetBundleMessageOff) {
         "value":"off"
     })";
 
-  Json::Value reuest;
-  ASSERT_TRUE(util::StringToJson(json_parameters, reuest));
+  Json::Value request;
+  ASSERT_TRUE(util::StringToJson(json_parameters, request));
 
-  const auto reply = WebAppManagerServiceLuna::Instance()->logControl(reuest);
+  const auto reply = WebAppManagerServiceLuna::Instance()->logControl(request);
 
   ASSERT_TRUE(reply.isObject());
   ASSERT_TRUE(reply.isMember("event"));
@@ -106,10 +106,10 @@ TEST(LogControl, SetMouseMoveOn) {
         "value":"on"
     })";
 
-  Json::Value reuest;
-  ASSERT_TRUE(util::StringToJson(json_parameters, reuest));
+  Json::Value request;
+  ASSERT_TRUE(util::StringToJson(json_parameters, request));
 
-  const auto reply = WebAppManagerServiceLuna::Instance()->logControl(reuest);
+  const auto reply = WebAppManagerServiceLuna::Instance()->logControl(request);
 
   ASSERT_TRUE(reply.isObject());
   ASSERT_TRUE(reply.isMember("event"));
@@ -126,10 +126,10 @@ TEST(LogControl, SetMouseMoveOff) {
         "value":"off"
     })";
 
-  Json::Value reuest;
-  ASSERT_TRUE(util::StringToJson(json_parameters, reuest));
+  Json::Value request;
+  ASSERT_TRUE(util::StringToJson(json_parameters, request));
 
-  const auto reply = WebAppManagerServiceLuna::Instance()->logControl(reuest);
+  const auto reply = WebAppManagerServiceLuna::Instance()->logControl(request);
 
   ASSERT_TRUE(reply.isObject());
   ASSERT_TRUE(reply.isMember("event"));

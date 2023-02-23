@@ -233,7 +233,7 @@ void WebAppBase::Relaunch(const std::string& args,
                PMLOGKFV("PID", "%d", page->GetWebProcessPID()),
                "Can't handle Relaunch now, backup the args and handle it after "
                "page loading finished");
-      // if relaunch hasn't beeh executed, then set and wait till currnt page
+      // if relaunch hasn't beeh executed, then set and wait till current page
       // loading is finished
       in_progress_relaunch_params_ = args;
       in_progress_relaunch_launching_app_id_ = launching_app_id;

@@ -173,7 +173,7 @@ void WebAppManager::OnRelaunchApp(const std::string& instance_id,
                 app_id.c_str());
   }
 
-  // Do not relaunch when preload args is setted
+  // Do not relaunch when preload args is set
   // luna-send -n 1 luna://com.webos.applicationManager/launch '{"id":<AppId>
   // "preload":<PreloadState> }'
   Json::Value json = util::StringToJson(args);

@@ -328,7 +328,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
     if (!network_stable_timeout.isDouble()) {
       LOG_ERROR(MSGID_TYPE_ERROR, 2, PMLOGKS("APP_ID", app_desc->Id().c_str()),
                 PMLOGKFV("DATA_TYPE", "%d", network_stable_timeout.type()),
-                "Invaild JsonValue type");
+                "Invalid JsonValue type");
     } else {
       app_desc->network_stable_timeout_ = network_stable_timeout.asDouble();
     }

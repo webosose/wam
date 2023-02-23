@@ -191,15 +191,15 @@ void PalmSystemBlinkTestSuite::SetUp() {
         web_view_delegate_->LoadFinished(url);
       }));
 
-  Json::Value reuest;
-  ASSERT_TRUE(util::StringToJson(kLocaleInfo, reuest));
+  Json::Value request;
+  ASSERT_TRUE(util::StringToJson(kLocaleInfo, request));
   WebAppManagerServiceLuna::Instance()->GetSystemLocalePreferencesCallback(
-      reuest);
+      request);
 
-  reuest.clear();
-  ASSERT_TRUE(util::StringToJson(kLaunchBareAppJsonBody, reuest));
+  request.clear();
+  ASSERT_TRUE(util::StringToJson(kLaunchBareAppJsonBody, request));
 
-  const auto& result = WebAppManagerServiceLuna::Instance()->launchApp(reuest);
+  const auto& result = WebAppManagerServiceLuna::Instance()->launchApp(request);
 
   ASSERT_TRUE(result.isObject());
   ASSERT_TRUE(result.isMember("instanceId"));

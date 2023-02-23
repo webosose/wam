@@ -317,7 +317,7 @@ function setButtonsOnPage(layoutCase) {
 }
 
 function initFocus() {
-    // To prevent timing issue that button is ignored by alert elemets,
+    // To prevent timing issue that button is ignored by alert elements,
     // set alert role on header before set focus on button
     var header = document.getElementById("error_header");
     header.setAttribute("role", "alert");

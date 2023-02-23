@@ -316,7 +316,7 @@ void WebPageBase::HandleLoadFinished() {
 void WebPageBase::HandleLoadFailed(int errorCode) {
   // errorCode 204 specifically states that the web browser not relocate
   // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
-  // we can't handle unknown protcol like mailto.
+  // we can't handle unknown protocol like mailto.
   // Client want to not show error page with unknown protocol like chrome.
   if (!is_preload_ && errorCode != 204 && errorCode != 301)
     LoadErrorPage(errorCode);

@@ -35,7 +35,7 @@
 #define MSGID_WINDOW_EVENT            "WINDOW_EVENT" /* WebApp Window Event */
 #define MSGID_WINDOW_STATE_CHANGED     "WINDOW_STATE_CHANGED" /* Window state is changed */
 #define MSGID_RESUME_ALL                     "RESUME_ALL" /* Resume JS and Media */
-#define MSGID_SUSPEND_WEBPAGE_DELAYED        "SUSPEND_WEBPAGE_DELAYED" /* Delayed Suspending JS excution of WebPage */
+#define MSGID_SUSPEND_WEBPAGE_DELAYED        "SUSPEND_WEBPAGE_DELAYED" /* Delayed Suspending JS execution of WebPage */
 #define MSGID_SUSPEND_WEBPAGE                "SUSPEND_WEBPAGE"  /* Suspending JS execution of  WebPage */
 #define MSGID_SUSPEND_PAINTING_VISIBILITY_HIDDEN "SUSPEND_PAINTING_VISIBILITY_HIDDEN"  /* Suspending painting and set visibility : hidden */
 #define MSGID_RESUME_WEBPAGE                 "RESUME_WEBPAGE"   /* Resuming JS execution of WebPage */
@@ -113,7 +113,7 @@
 
 #define MSGID_WEBPROCESSENV_READ_FAIL       "WEBPROCESSENV_FILE_READ_FAIL" /** Fail to read WebProcess environment setting from /etc/wam/com.webos.wam.json */
 #define MSGID_WEBPROCESS_INFO_ADDED         "WEBPROCESS_INFO_ADDED" /** New WebProcess info is added to WebProcess info map */
-#define MSGID_WEBPROCESS_PROXYID_SET        "WEBPROCESS_PROXYID_SET" /** WebProcess ProxyID is set from defalut value(0) */
+#define MSGID_WEBPROCESS_PROXYID_SET        "WEBPROCESS_PROXYID_SET" /** WebProcess ProxyID is set from default value(0) */
 #define MSGID_WEBPAGE_ADDED                 "WEBPAGE_ADDED" /** New web page is added to WebProcess info */
 #define MSGID_WEBPAGE_REMOVED               "WEBPAGE_REMOVED" /** Web page is removed from WebProcess info */
 
@@ -148,7 +148,7 @@
 #define MSGID_TYPE_ERROR                  "DATA_TYPE_ERROR" /** Use a invalid data type **/
 #define MSGID_FILE_ERROR                  "FILE_ERROR" /** Use a not existing file **/
 
-#define MSGID_DL_ERROR                  "DL_ERROR" /** Dinamic load library error **/
+#define MSGID_DL_ERROR                  "DL_ERROR" /** Dynamic load library error **/
 
 // clang-format on
 
