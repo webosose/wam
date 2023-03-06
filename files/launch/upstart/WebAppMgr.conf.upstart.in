@@ -65,12 +65,6 @@ script
     # set directories permission
     chown ${WAM_UID}:${WAM_GID} ${WAM_DATA_PATH}
 
-    # setup 50 Mb maximum for ApplicationCache
-    export WAM_APPCACHE_MAXSIZE=52428800
-
-    # setup 10 Mb maximum for ApplicationCache per domain
-    export WAM_APPCACHE_DOMAINLIMIT=10485760
-
     # setup 50 Mb maximum for DiskCache
     export WAM_DISKCACHE_MAXSIZE=52428800
 
@@ -148,8 +142,6 @@ script
     export WAM_EXTRA_FLAGS=""
     export WAM_JS_FLAGS=""
     export WAM_COMMON_SWITCHES=" \
-        --application-cache-domain-limit=$WAM_APPCACHE_DOMAINLIMIT \
-        --application-cache-size=$WAM_APPCACHE_MAXSIZE \
         --browser-subprocess-path=$WAM_EXE_PATH \
         --disable-direct-npapi-requests \
         --disable-extensions \

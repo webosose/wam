@@ -23,7 +23,6 @@ class WebViewProfile;
 
 namespace browsing_data_types {
 const char kAll[] = "all";
-const char kAppCache[] = "appcache";
 const char kCache[] = "cache";
 const char kCodeCache[] = "codecache";
 const char kCookies[] = "cookies";

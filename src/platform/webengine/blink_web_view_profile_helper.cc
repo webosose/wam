@@ -39,8 +39,6 @@ void BlinkWebViewProfileHelper::ClearDefaultBrowsingData(
 int BlinkWebViewProfileHelper::MaskForBrowsingDataType(const char* type) {
   if (strcmp(type, browsing_data_types::kAll) == 0)
     return webos::WebViewProfile::REMOVE_ALL;
-  if (strcmp(type, browsing_data_types::kAppCache) == 0)
-    return webos::WebViewProfile::REMOVE_APPCACHE;
   if (strcmp(type, browsing_data_types::kCache) == 0)
     return webos::WebViewProfile::REMOVE_CACHE;
   if (strcmp(type, browsing_data_types::kCodeCache) == 0)

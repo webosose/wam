@@ -44,12 +44,6 @@ mkdir -p ${WAM_DATA_PATH}
 # set directories permission
 chown -R ${WAM_UID}:${WAM_GID} ${WAM_DATA_PATH}
 
-# setup 50 Mb maximum for ApplicationCache
-export WAM_APPCACHE_MAXSIZE=52428800
-
-# setup 10 Mb maximum for ApplicationCache per domain
-export WAM_APPCACHE_DOMAINLIMIT=10485760
-
 # setup maximum for DiskCache
 total_memory=$(vmstat -s | grep "total memory" | sed -e 's/^[ \t]*//' | cut -f1 -d" ")
 if [ $total_memory -lt 1048576 ]; then
@@ -148,8 +142,6 @@ export WAM_EXTRA_FLAGS=""
 export WAM_JS_FLAGS=""
 export WAM_COMMON_SWITCHES=" \
     --accelerated-plugin-rendering-blacklist=device;drmAgent;sound;service \
-    --application-cache-domain-limit=$WAM_APPCACHE_DOMAINLIMIT \
-    --application-cache-size=$WAM_APPCACHE_MAXSIZE \
     --autoplay-policy=no-user-gesture-required \
     --browser-subprocess-path=$WAM_EXE_PATH \
     --deadline-to-synchronize-surfaces=40 \

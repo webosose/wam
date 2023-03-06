@@ -97,22 +97,6 @@ TEST(ClearBrowsingData, all) {
   EXPECT_TRUE(reply["returnValue"].asBool());
 }
 
-TEST(ClearBrowsingData, appcache) {
-  const char json_parameter[] = R"({
-        "types":["appcache"]
-    })";
-
-  BaseMockInitializer<> mockInitializer;
-  Json::Value request;
-  ASSERT_TRUE(util::StringToJson(json_parameter, request));
-
-  const auto reply =
-      WebAppManagerServiceLuna::Instance()->clearBrowsingData(request);
-  ASSERT_TRUE(reply.isObject());
-  ASSERT_TRUE(reply.isMember("returnValue"));
-  EXPECT_TRUE(reply["returnValue"].asBool());
-}
-
 TEST(ClearBrowsingData, cache) {
   const char json_parameter[] = R"({
         "types":["cache"]
