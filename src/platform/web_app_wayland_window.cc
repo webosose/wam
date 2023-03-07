@@ -88,11 +88,11 @@ void WebAppWaylandWindow::SetCursor(const std::string& cursor_arg,
                                     int hotspot_y) {
   const std::string& arg = cursor_arg;
   webos::CustomCursorType type = webos::CUSTOM_CURSOR_NOT_USE;
-  if (arg.empty() || arg != "default") {
+  if (arg.empty() || arg == "default") {
     LOG_DEBUG(
         "[%s] %s; arg: %s; Restore Cursor to webos::CUSTOM_CURSOR_NOT_USE",
         web_app_->AppId().c_str(), __PRETTY_FUNCTION__, arg.c_str());
-  } else if (arg != "blank") {
+  } else if (arg == "blank") {
     LOG_DEBUG("[%s] %s; arg: %s; Set Cursor to webos::CUSTOM_CURSOR_BLANK",
               web_app_->AppId().c_str(), __PRETTY_FUNCTION__, arg.c_str());
     type = webos::CUSTOM_CURSOR_BLANK;
