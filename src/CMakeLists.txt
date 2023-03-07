@@ -18,12 +18,8 @@ project(WebAppMgrExec VERSION 1.0.0 DESCRIPTION "WAM")
 
 set(WAM_ROOT_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 
-if(NOT DEFINED CHROMIUM_SRC_DIR)
-    message(FATAL_ERROR "CHROMIUM_SRC_DIR was not set")
-endif()
-set(CHROMIUM_LDFLAGS -lcbe)
-
 find_package(PkgConfig REQUIRED)
+pkg_search_module(CHROMIUM REQUIRED libcbe)
 pkg_search_module(GLIB REQUIRED glib-2.0)
 pkg_search_module(JSONCPP REQUIRED jsoncpp)
 pkg_search_module(LIBLUNAPREFS REQUIRED luna-prefs)

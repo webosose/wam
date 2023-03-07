@@ -20,7 +20,7 @@ set(SOURCES test_plugin.cc)
 set(HEADERS test_plugin.h)
 
 set(TEST_PLUGIN_INCLUDE_DIRS
-    ${CHROMIUM_SRC_DIR}
+    ${CHROMIUM_INCLUDE_DIRS}
     ${WAM_ROOT_SOURCE_DIR}/core
     ${WAM_ROOT_SOURCE_DIR}/tests/mocks
 )

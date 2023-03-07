@@ -27,7 +27,7 @@ set (HEADERS
 )
 
 set (WAM_PLUGIN_INCLUDE_DIRS
-    ${CHROMIUM_SRC_DIR}
+    ${CHROMIUM_INCLUDE_DIRS}
     ${WAM_ROOT_SOURCE_DIR}/core
     ${WAM_ROOT_SOURCE_DIR}/platform
     ${WAM_ROOT_SOURCE_DIR}/platform/webengine
