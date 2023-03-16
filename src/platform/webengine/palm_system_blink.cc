@@ -132,9 +132,9 @@ std::string PalmSystemBlink::HandleBrowserControlMessage(
     }
     SetGroupClientEnvironment(kKeyMask, data);
   } else if (command == "focusOwner") {
-    SetGroupClientEnvironment(kFocusOwner, nullptr);
+    SetGroupClientEnvironment(kFocusOwner, std::string());
   } else if (command == "focusLayer") {
-    SetGroupClientEnvironment(kFocusLayer, nullptr);
+    SetGroupClientEnvironment(kFocusLayer, std::string());
   } else if (command == "hide") {
     Hide();
   } else if (command == "setLoadErrorPolicy") {
