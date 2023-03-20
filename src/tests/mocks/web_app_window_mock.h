@@ -24,7 +24,7 @@
 class WebAppWindowMock : public WebAppWindow {
  public:
   WebAppWindowMock() = default;
-  virtual ~WebAppWindowMock() = default;
+  ~WebAppWindowMock() override = default;
 
   void SetInputRegion(const std::vector<gfx::Rect>&) override {}
   MOCK_METHOD(int, DisplayWidth, (), (override));

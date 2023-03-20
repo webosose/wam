@@ -37,11 +37,11 @@ class BlinkWebView : public webos::WebViewBase {
   WebPageBlinkDelegate* Delegate() { return delegate_; }
   int Progress() { return progress_; }
 
-  // webos::WebViewBase(indirectly from webos::WebViewDelegate)
+  // webos::WebViewBase (indirectly from neva_app_runtime::WebViewDelegate)
   void OnLoadProgressChanged(double progress) override;
   void DidFirstFrameFocused() override;
-  void TitleChanged(const std::string& title);
-  void NavigationHistoryChanged();
+  void TitleChanged(const std::string& title) override;
+  void NavigationHistoryChanged() override;
   void Close() override;
   bool DecidePolicyForResponse(bool is_main_frame,
                                int status_code,
@@ -63,11 +63,11 @@ class BlinkWebView : public webos::WebViewBase {
                            bool is_in_main_frame) override;
   void RenderProcessCreated(int pid) override;
   void RenderProcessGone() override;
-  void DidHistoryBackOnTopPage() {}
-  void DidClearWindowObject() {}
-  virtual void DidDropAllPeerConnections(
-      webos::DropPeerConnectionReason reason);
-  void DidSwapCompositorFrame();
+  void DidHistoryBackOnTopPage() override {}
+  void DidClearWindowObject() override {}
+  void DidDropAllPeerConnections(
+      webos::DropPeerConnectionReason reason) override;
+  void DidSwapCompositorFrame() override;
   void HandleBrowserControlCommand(
       const std::string& command,
       const std::vector<std::string>& arguments) override;

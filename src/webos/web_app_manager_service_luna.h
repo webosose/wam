@@ -34,7 +34,7 @@ class WebAppManagerServiceLuna : public PalmServiceBase,
 
   static WebAppManagerServiceLuna* Instance();
 
-  bool StartService();
+  bool StartService() override;
 
   // WebAppManagerService
   // NOTE: Names of the functions are used for LUNA mapping so, we keep them in

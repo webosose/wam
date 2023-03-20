@@ -89,6 +89,7 @@ class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
   bool IsNormal() override;
   void OnStageActivated() override;
   void OnStageDeactivated() override;
+  void StartLaunchTimer() override;
   void ConfigureWindow(const std::string& type) override;
   void SetKeepAlive(bool keep_alive) override;
   bool IsWindowed() const override { return true; }
@@ -129,7 +130,6 @@ class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
   bool CursorVisibility() {
     return InputManager::Instance()->GlobalCursorVisibility();
   }
-  void StartLaunchTimer();
   void SendWebOSMouseEvent(const std::string& event_name);
 
   void PostEvent(WebOSEvent* ev);
@@ -157,8 +157,7 @@ class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
   // WebPageObserver
   void WebPageLoadFinished() override;
   void WebPageLoadFailed(int error_code) override;
-
-  virtual void WebViewRecreated();
+  void WebViewRecreated() override;
 
  private:
   void Init(int width, int height);

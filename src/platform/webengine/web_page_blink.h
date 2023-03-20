@@ -64,6 +64,7 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   void SetPageProperties() override;
   void SetPreferredLanguages(const std::string& language) override;
   void SetDefaultFont(const std::string& font) override;
+  void CleanResources() override;
   void ReloadDefaultPage() override;
   void Reload() override;
   void SetVisibilityState(WebPageVisibilityState visibility_state) override;
@@ -80,7 +81,7 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   uint32_t GetWebProcessProxyID() override;
   uint32_t GetWebProcessPID() const override { return RenderProcessPid(); }
   void CreatePalmSystem(WebAppBase* app) override;
-  void SetUseLaunchOptimization(bool enabled, int delayMs = 0);
+  void SetUseLaunchOptimization(bool enabled, int delayMs = 0) override;
   void SetUseSystemAppOptimization(bool enabled) override;
   void SetUseAccessibility(bool enabled) override;
   void SetAppPreloadHint(bool is_preload) override;
@@ -90,20 +91,23 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   void ResumeWebPageMedia() override;
   void ResumeWebPagePaintingAndJSExecution() override;
   bool IsRegisteredCloseCallback() override { return has_close_callback_; }
+  void ExecuteCloseCallback(bool forced) override;
   void ReloadExtensionData() override;
   void UpdateIsLoadErrorPageFinish() override;
   void UpdateDatabaseIdentifier() override;
   void SetInspectorEnable() override;
   void SetKeepAliveWebApp(bool keepAlive) override;
+  void ForwardEvent(void* event) override;
+  void SetAudioGuidanceOn(bool on) override;
+  void ActivateRendererCompositor() override;
+  void DeactivateRendererCompositor() override;
 
   // WebPageBlink
   virtual void LoadExtension();
   virtual void ClearExtensions();
   virtual void SetViewportSize();
   virtual void SetHasOnCloseCallback(bool has_close_callback);
-  virtual void ExecuteCloseCallback(bool forced);
   virtual void DidRunCloseCallback();
-  virtual void CleanResources();
 
   // WebPageBlinkDelegate
   void Close() override;
@@ -132,6 +136,8 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   void TitleChanged(const std::string& title) override;
   void NavigationHistoryChanged() override;
   void DidErrorPageLoadedFromNetErrorHelper() override;
+  void DidSwapCompositorFrame() override;
+  void DidResumeDOM() override;
 
   void UpdateExtensionData(const std::string& key, const std::string& value);
   void SetLoadErrorPolicy(const std::string& policy);
@@ -150,31 +156,25 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   void SetSupportDolbyHDRContents();
   void UpdateHardwareResolution();
 
-  void ForwardEvent(void* event) override;
-  void DidSwapCompositorFrame();
-  void ActivateRendererCompositor() override;
-  void DeactivateRendererCompositor() override;
-
-  void DidResumeDOM() override;
-
   // Timer callback
   void TimeoutCloseCallback();
 
-  void SetAudioGuidanceOn(bool on) override;
   void UpdateBackHistoryAPIDisabled();
 
  protected:
   WebView* PageView() const;
 
   // WebPageBase
-  virtual void LoadDefaultUrl();
-  virtual void LoadErrorPage(int error_code);
+  void LoadDefaultUrl() override;
+  void LoadErrorPage(int error_code) override;
+  void AddUserScript(const std::string& script) override;
+  void AddUserScriptUrl(const wam::Url& url) override;
+  void RecreateWebView() override;
+  void SetVisible(bool visible) override;
+  void SuspendWebPagePaintingAndJSExecution() override;
+
   virtual WebView* CreatePageView();
   virtual void SetupStaticUserScripts();
-  virtual void AddUserScript(const std::string& script);
-  virtual void AddUserScriptUrl(const wam::Url& url);
-  virtual void RecreateWebView();
-  virtual void SetVisible(bool visible);
   virtual bool ShouldStopJSOnSuspend() const { return true; }
 
   bool Inspectable();
@@ -191,15 +191,12 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
       const std::string& command,
       const std::vector<std::string>& arguments);
 
-  virtual void SuspendWebPagePaintingAndJSExecution();
-
  private:
   void SetCustomPluginIfNeeded();
   void SetDisallowScrolling(bool disallow);
   std::vector<std::string> GetErrorPagePath(const std::string& error_page);
   void ReloadFailedUrl();
 
- private:
   WebPageBlinkPrivate* page_private_;
 
   bool is_paused_;

@@ -100,7 +100,7 @@ class LSCalloutContext : public LSCallbackHandler {
   LSCalloutContext(std::function<Json::Value(const Json::Value&)> func)
       : LSCallbackHandler(func), service_(0), token_(LSMESSAGE_TOKEN_INVALID){};
 
-  ~LSCalloutContext() { Cancel(); };
+  ~LSCalloutContext() override { Cancel(); };
 
   bool Cancel();
 

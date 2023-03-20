@@ -26,7 +26,7 @@ class Value;
 class WebAppManagerServiceLunaImpl : public WebAppManagerServiceLuna {
  public:
   // Overridden from WebAppManagerServiceLuna
-  void SystemServiceConnectCallback(const Json::Value& reply);
+  void SystemServiceConnectCallback(const Json::Value& reply) override;
   Json::Value setInspectorEnable(const Json::Value& request) override;
 
   void GetSystemOptionCallback(const Json::Value& reply);

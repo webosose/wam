@@ -24,7 +24,7 @@ class WebAppWayland;
 class WebAppWaylandWindow : public webos::WebAppWindowBase {
  public:
   WebAppWaylandWindow();
-  virtual ~WebAppWaylandWindow() {}
+  ~WebAppWaylandWindow() override = default;
   static WebAppWaylandWindow* Take();
   static void Prepare();
 
