@@ -312,7 +312,9 @@ WebAppBase* WebAppManager::OnLaunchUrl(
   // set use launching time optimization true while app loading.
   page->SetUseLaunchOptimization(true);
 
-  if (win_type == kWtFloating || win_type == kWtCard)
+  // Support background running from the app config.
+  // Currently we enable this feature for specific window types.
+  if (win_type == kWtFloating || win_type == kWtCard || win_type == kWtSystemUi)
     page->SetEnableBackgroundRun(app_desc->IsEnableBackgroundRun());
 
   app->SetAppDescription(app_desc);

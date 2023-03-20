@@ -144,6 +144,11 @@ void WebPageBase::SetupLaunchEvent() {
 }
 
 void WebPageBase::SendLocaleChangeEvent(const std::string& language) {
+  // TODO(luc2.tran): This should be probably run only when |enable_background_run_|
+  // is set to 'true' or the web app is not suspended. The other case (app is suspended),
+  // I think we're better not to run the script instead of using a timeout.
+  // Using the timeout could make unexpected behavior when the app is unsuspended
+  // and then all timers will be executed.
   EvaluateJavaScript(
       "setTimeout(function () {"
       "    var localeEvent=new CustomEvent('webOSLocaleChange');"
