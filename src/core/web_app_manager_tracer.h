@@ -51,44 +51,43 @@
 
 class PmTraceScope {
  public:
-  PmTraceScope(const char* label) : scope_label_(label) {
+  PmTraceScope(const std::string& label) : scope_label_(label) {
     PMTRACE_SCOPE_ENTRY(scope_label_.c_str());
   }
 
   ~PmTraceScope() { PMTRACE_SCOPE_EXIT(scope_label_.c_str()); }
 
+  // Prevent heap allocation
+  void operator delete(void*) = delete;
+  void* operator new(size_t) = delete;
+  PmTraceScope(const PmTraceScope&) = delete;
+  PmTraceScope& operator=(const PmTraceScope&) = delete;
+
  private:
   std::string scope_label_;
-
-  // Prevent heap allocation
-  void operator delete(void*);
-  void* operator new(size_t);
-  PmTraceScope(const PmTraceScope&);
-  PmTraceScope& operator=(const PmTraceScope&);
 };
 
 class PmTraceFunction {
  public:
-  PmTraceFunction(const char* label) : fn_label_(label) {
+  PmTraceFunction(const std::string& label) : fn_label_(label) {
     PMTRACE_FUNCTION_ENTRY(fn_label_.c_str());
   }
 
-  PmTraceFunction(const char* file, const char* name) : fn_label_(file) {
-    fn_label_ += "::";
-    fn_label_ += name;
+  PmTraceFunction(const std::string& file, const std::string& name)
+      : fn_label_(file + "::" + name) {
     PMTRACE_FUNCTION_ENTRY(fn_label_.c_str());
   }
 
   ~PmTraceFunction() { PMTRACE_FUNCTION_EXIT(fn_label_.c_str()); }
 
+  // Prevent heap allocation
+  void operator delete(void*) = delete;
+  void* operator new(size_t) = delete;
+  PmTraceFunction(const PmTraceFunction&) = delete;
+  PmTraceFunction& operator=(const PmTraceFunction&) = delete;
+
  private:
   std::string fn_label_;
-
-  // Prevent heap allocation
-  void operator delete(void*);
-  void* operator new(size_t);
-  PmTraceFunction(const PmTraceFunction&);
-  PmTraceFunction& operator=(const PmTraceFunction&);
 };
 
 #else  // HAS_LTNG

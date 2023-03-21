@@ -26,7 +26,10 @@ PalmServiceBase::~PalmServiceBase() {
 }
 
 bool PalmServiceBase::StartService() {
-  service_name_ = ServiceName();
+  const char* service_name = ServiceName();
+  if (service_name) {
+    service_name_ = service_name;
+  }
 
   LSErrorSafe ls_error;
 
