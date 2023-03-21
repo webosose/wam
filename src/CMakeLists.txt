@@ -23,6 +23,7 @@ pkg_search_module(CHROMIUM REQUIRED libcbe)
 pkg_search_module(GLIB REQUIRED glib-2.0)
 pkg_search_module(JSONCPP REQUIRED jsoncpp)
 pkg_search_module(LIBLUNAPREFS REQUIRED luna-prefs)
+pkg_search_module(LS2 REQUIRED luna-service2)
 set(PKGCONFIG_REQUIRES_PRIVATE "libcbe" "glib-2.0" "jsoncpp" "luna-prefs")
 
 if(DISABLE_PMLOG)

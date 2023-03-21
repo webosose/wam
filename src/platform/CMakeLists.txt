@@ -76,8 +76,8 @@ set(WAM_LIB_INCLUDE_DIRS
 set(WAM_LIB_LIBS
     ${JSONCPP_LDFLAGS}
     ${LIBLUNAPREFS_LDFLAGS}
+    ${LS2_LDFLAGS}
     WebAppMgrCore
-    lunaservice
 )
 
 add_library(${PROJECT_NAME} SHARED ${HEADERS} ${SOURCES})
