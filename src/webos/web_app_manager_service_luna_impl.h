@@ -21,7 +21,7 @@
 
 namespace Json {
 class Value;
-};
+}
 
 class WebAppManagerServiceLunaImpl : public WebAppManagerServiceLuna {
  public:

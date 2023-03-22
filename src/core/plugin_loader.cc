@@ -80,7 +80,7 @@ void PluginLoader::Unload(const std::string& file_name) {
     lib_wrapper_->Unload(plugin->second.handle);
     plugins_.erase(plugin);
   }
-};
+}
 
 std::string PluginLoader::GetError() {
   return lib_wrapper_->GetLastError();

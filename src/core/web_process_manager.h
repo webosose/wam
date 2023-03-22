@@ -25,7 +25,7 @@
 
 namespace Json {
 class Value;
-};
+}
 
 class ApplicationDescription;
 class WebPageBase;

@@ -23,7 +23,7 @@
 
 namespace Json {
 class Value;
-};
+}
 
 class WebAppBase;
 

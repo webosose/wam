@@ -31,7 +31,7 @@
 
 namespace Json {
 class Value;
-};
+}
 
 class ApplicationDescription;
 class WebAppWaylandWindow;

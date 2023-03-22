@@ -51,8 +51,8 @@ class BaseMockInitializer {
 
   ~BaseMockInitializer() { WebAppManager::Instance()->CloseAllApps(); }
 
-  T* GetWebViewMock() { return web_view_; };
-  U* GetWebAppWindowMock() { return web_app_window_; };
+  T* GetWebViewMock() { return web_view_; }
+  U* GetWebAppWindowMock() { return web_app_window_; }
 
  private:
   BaseMockInitializer(const BaseMockInitializer&) = delete;

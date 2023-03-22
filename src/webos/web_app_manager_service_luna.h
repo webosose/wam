@@ -24,7 +24,7 @@
 
 namespace Json {
 class Value;
-};
+}
 
 class WebAppManagerServiceLuna : public PalmServiceBase,
                                  public WebAppManagerService {
@@ -79,8 +79,8 @@ class WebAppManagerServiceLuna : public PalmServiceBase,
 
  protected:
   // methods implementation of PalmServiceBase
-  LSMethod* Methods() const override { return methods_; };
-  const char* ServiceName() const override { return "com.palm.webappmanager"; };
+  LSMethod* Methods() const override { return methods_; }
+  const char* ServiceName() const override { return "com.palm.webappmanager"; }
 
   static LSMethod methods_[];
 

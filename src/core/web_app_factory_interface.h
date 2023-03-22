@@ -42,7 +42,7 @@ class WebAppFactoryInterface {
       const wam::Url& url,
       std::shared_ptr<ApplicationDescription> desc,
       const std::string& launch_params = {}) = 0;
-  virtual ~WebAppFactoryInterface(){};
+  virtual ~WebAppFactoryInterface() = default;
 };
 
 #endif  // CORE_WEB_APP_FACTORY_INTERFACE_H_

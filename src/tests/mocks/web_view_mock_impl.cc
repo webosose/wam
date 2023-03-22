@@ -42,4 +42,4 @@ void WebViewMockImpl::SetOnLoadURLActions() {
 
 WebPageBlinkDelegate* WebViewMockImpl::GetWebViewDelegate() {
   return web_view_delegate_;
-};
+}

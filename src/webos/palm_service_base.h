@@ -37,7 +37,7 @@ class PalmServiceBase;
 
 class LSErrorSafe : public LSError {
  public:
-  LSErrorSafe() { LSErrorInit(this); };
+  LSErrorSafe() { LSErrorInit(this); }
   ~LSErrorSafe() { LSErrorFree(this); }
 };
 
@@ -98,9 +98,9 @@ class LSCalloutContext : public LSCallbackHandler {
 
  public:
   LSCalloutContext(std::function<Json::Value(const Json::Value&)> func)
-      : LSCallbackHandler(func), service_(0), token_(LSMESSAGE_TOKEN_INVALID){};
+      : LSCallbackHandler(func), service_(0), token_(LSMESSAGE_TOKEN_INVALID) {}
 
-  ~LSCalloutContext() override { Cancel(); };
+  ~LSCalloutContext() override { Cancel(); }
 
   bool Cancel();
 
@@ -147,7 +147,7 @@ static bool bus_callback_json(LSHandle* handle,
     return false;
 
   return true;
-};
+}
 
 template <class CLASS,
           Json::Value (CLASS::*FUNCTION)(const Json::Value&, bool subscribed)>
@@ -185,7 +185,7 @@ static bool bus_subscription_callback_json(LSHandle* handle,
     return false;
 
   return true;
-};
+}
 
 /*
  * same as above, but for a void function handling the reply
@@ -203,7 +203,7 @@ static bool bus_callback_json(LSHandle* handle,
   (static_cast<CLASS*>(user_data)->*FUNCTION)(reply);
 
   return true;
-};
+}
 
 class PalmServiceBase {
  public:
@@ -222,7 +222,7 @@ class PalmServiceBase {
                    const char* application_id = 0,
                    LSCalloutContext* context = 0) {
     return Call(service_handle_, what, parameters, application_id, context);
-  };
+  }
 
   /*
    * methods to post subscription updates TODO make subscriptions represented
@@ -270,11 +270,11 @@ class PalmServiceBase {
       return false;
     }
     return true;
-  };
+  }
 
   virtual LSMethod* Methods() const = 0;
   virtual const char* ServiceName() const = 0;
-  virtual const char* Category() const { return "/"; };
+  virtual const char* Category() const { return "/"; }
   virtual GMainLoop* MainLoop() const;
   LSHandle* service_handle_;
 

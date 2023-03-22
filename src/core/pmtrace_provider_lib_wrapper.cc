@@ -117,18 +117,7 @@ class PmtraceProviderLibWrapper {
   }
 
  private:
-  PmtraceProviderLibWrapper()
-      : is_ready(false),
-        lib_handle_(nullptr),
-        func_trace_message_(nullptr),
-        func_trace_before_(nullptr),
-        func_trace_after_(nullptr),
-        func_trace_scope_entry_(nullptr),
-        func_trace_scope_exit_(nullptr),
-        func_trace_function_entry_(nullptr),
-        func_trace_function_exit_(nullptr),
-        func_trace_item_(nullptr),
-        func_trace_position_(nullptr){};
+  PmtraceProviderLibWrapper() = default;
 
   bool CheckIsReady() {
     if (!is_ready && !lib_handle_) {
@@ -162,17 +151,17 @@ class PmtraceProviderLibWrapper {
     return is_ready;
   }
 
-  bool is_ready;
-  void* lib_handle_;
-  FunctypeTraceLabel func_trace_message_;
-  FunctypeTraceLabel func_trace_before_;
-  FunctypeTraceLabel func_trace_after_;
-  FunctypeTraceLabel func_trace_scope_entry_;
-  FunctypeTraceLabel func_trace_scope_exit_;
-  FunctypeTraceLabel func_trace_function_entry_;
-  FunctypeTraceLabel func_trace_function_exit_;
-  FunctypeTraceItem func_trace_item_;
-  FunctypeTracePosition func_trace_position_;
+  bool is_ready = false;
+  void* lib_handle_ = nullptr;
+  FunctypeTraceLabel func_trace_message_ = nullptr;
+  FunctypeTraceLabel func_trace_before_ = nullptr;
+  FunctypeTraceLabel func_trace_after_ = nullptr;
+  FunctypeTraceLabel func_trace_scope_entry_ = nullptr;
+  FunctypeTraceLabel func_trace_scope_exit_ = nullptr;
+  FunctypeTraceLabel func_trace_function_entry_ = nullptr;
+  FunctypeTraceLabel func_trace_function_exit_ = nullptr;
+  FunctypeTraceItem func_trace_item_ = nullptr;
+  FunctypeTracePosition func_trace_position_ = nullptr;
 };  // class PmtraceProviderLibWrapper
 }  // namespace
 

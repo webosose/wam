@@ -24,8 +24,8 @@ class DeviceInfo {
  public:
   virtual ~DeviceInfo() {}
 
-  virtual void Initialize(){};
-  virtual void Terminate(){};
+  virtual void Initialize() {}
+  virtual void Terminate() {}
 
   virtual bool GetDisplayWidth(int& value) const;
   virtual void SetDisplayWidth(int value);

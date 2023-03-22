@@ -24,7 +24,7 @@
 
 namespace Json {
 class Value;
-};
+}
 
 class PalmSystemBlink : public PalmSystemWebOS {
  public:

@@ -29,7 +29,7 @@ class WebPageBase;
 
 namespace Json {
 class Value;
-};
+}
 
 class WebAppBase : public WebPageObserver {
  public:

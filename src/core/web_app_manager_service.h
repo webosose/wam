@@ -26,7 +26,7 @@
 
 namespace Json {
 class Value;
-};
+}
 
 enum ErrorCode {
   kErrCodeLaunchappMissParam = 1000,

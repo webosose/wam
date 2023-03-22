@@ -166,7 +166,7 @@ class AppTestContext {
   AppTestContext&& operator=(const AppTestContext&&) = delete;
 
   WebViewMock* GetView() { return web_view_; }
-  WebAppWindowMock* GetWindow() { return web_app_window_; };
+  WebAppWindowMock* GetWindow() { return web_app_window_; }
 
  private:
   WebViewMock* CreateView();

@@ -39,7 +39,7 @@ class WebPageBase;
 
 namespace Json {
 class Value;
-};
+}
 
 class ApplicationInfo {
  public:
