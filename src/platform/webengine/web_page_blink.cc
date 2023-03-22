@@ -1259,10 +1259,6 @@ void WebPageBlink::SetVisibilityState(WebPageVisibilityState visibilityState) {
       static_cast<webos::WebViewBase::WebPageVisibilityState>(visibilityState));
 }
 
-bool WebPageBlink::AllowMouseOnOffEvent() const {
-  return false;
-}
-
 void WebPageBlink::SetObserver(WebPageBlinkObserver* observer) {
   observer_ = observer;
 }

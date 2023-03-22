@@ -68,7 +68,6 @@ class BlinkWebView : public webos::WebViewBase {
   virtual void DidDropAllPeerConnections(
       webos::DropPeerConnectionReason reason);
   void DidSwapCompositorFrame();
-  virtual bool AllowMouseOnOffEvent() const;
   void HandleBrowserControlCommand(
       const std::string& command,
       const std::vector<std::string>& arguments) override;

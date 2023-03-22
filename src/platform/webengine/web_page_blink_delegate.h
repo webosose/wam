@@ -59,7 +59,6 @@ class WebPageBlinkDelegate {
   virtual void DidClearWindowObject() {}
   virtual void DidDropAllPeerConnections() {}
   virtual void DidSwapCompositorFrame() {}
-  virtual bool AllowMouseOnOffEvent() const = 0;
   virtual void DidResumeDOM() {}
   virtual void DidErrorPageLoadedFromNetErrorHelper() = 0;
 };

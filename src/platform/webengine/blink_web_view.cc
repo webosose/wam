@@ -220,13 +220,6 @@ void BlinkWebView::NavigationHistoryChanged() {
   delegate_->NavigationHistoryChanged();
 }
 
-bool BlinkWebView::AllowMouseOnOffEvent() const {
-  if (!delegate_)
-    return false;
-
-  return delegate_->AllowMouseOnOffEvent();
-}
-
 void BlinkWebView::DidResumeDOM() {
   if (delegate_)
     delegate_->DidResumeDOM();

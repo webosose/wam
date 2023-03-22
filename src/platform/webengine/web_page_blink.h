@@ -151,7 +151,6 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   void UpdateHardwareResolution();
 
   void ForwardEvent(void* event) override;
-  bool AllowMouseOnOffEvent() const override;
   void DidSwapCompositorFrame();
   void ActivateRendererCompositor() override;
   void DeactivateRendererCompositor() override;
