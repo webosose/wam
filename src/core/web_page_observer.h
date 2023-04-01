@@ -34,16 +34,16 @@ class WebPageObserver {
   virtual void WebViewRecreated() {}
 
  protected:
-  WebPageObserver(WebPageBase* page);
+  explicit WebPageObserver(WebPageBase* page);
   WebPageObserver();
 
-  virtual ~WebPageObserver() {}
+  virtual ~WebPageObserver() = default;
 
   void Observe(WebPageBase* page);
   void Unobserve(WebPageBase* page);
 
  private:
-  WebPageBase* page_;
+  WebPageBase* page_ = nullptr;
 };
 
 #endif  // CORE_WEB_PAGE_OBSERVER_H_

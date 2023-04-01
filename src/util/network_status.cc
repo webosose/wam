@@ -21,8 +21,7 @@
 
 #include "utils.h"
 
-NetworkStatus::NetworkStatus()
-    : is_internet_connection_available_(false), return_value_(false) {}
+NetworkStatus::NetworkStatus() = default;
 
 void NetworkStatus::FromJsonObject(const Json::Value& object) {
   if (!object.isObject())

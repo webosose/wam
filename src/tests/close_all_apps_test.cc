@@ -156,7 +156,7 @@ static constexpr char kLaunchWebRTCAppJsonBody[] = R"({
 
 class AppTestContext {
  public:
-  AppTestContext();
+  AppTestContext() = default;
   ~AppTestContext() = default;
 
   AppTestContext(const AppTestContext&) = delete;
@@ -172,8 +172,8 @@ class AppTestContext {
   WebViewMock* CreateView();
   WebAppWindowMock* CreateWindow();
 
-  WebViewMock* web_view_ = nullptr;
-  WebAppWindowMock* web_app_window_ = nullptr;
+  WebViewMock* web_view_ = CreateView();
+  WebAppWindowMock* web_app_window_ = CreateWindow();
   WebPageBlinkDelegate* page_delegate_ = nullptr;
   WebAppWayland* web_app_ = nullptr;
   std::string url_ = "";
@@ -207,9 +207,6 @@ WebAppWindowMock* AppTestContext::CreateWindow() {
           Invoke([&](WebAppWayland* web_app) { web_app_ = web_app; }));
   return window;
 }
-
-AppTestContext::AppTestContext()
-    : web_view_(CreateView()), web_app_window_(CreateWindow()) {}
 
 void AttachContext(WebAppFactoryManagerMock* web_app_factory,
                    AppTestContext* context) {

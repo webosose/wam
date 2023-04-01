@@ -34,7 +34,7 @@ class PluginLibWrapper {
   virtual DeleteInstanceFunc GetDeleteInstanceFunction(void* handle);
   virtual std::string GetAppType(void* handle);
   virtual std::string GetLastError();
-  virtual ~PluginLibWrapper() {}
+  virtual ~PluginLibWrapper() = default;
 };
 
 #endif  // CORE_PLUGIN_LIB_WRAPPER_H_

@@ -19,11 +19,7 @@
 #include "log_manager.h"
 #include "web_page_blink_delegate.h"
 
-BlinkWebView::BlinkWebView(bool do_initialize)
-    : WebViewBase::WebViewBase(),
-      delegate_(nullptr),
-      progress_(0),
-      user_script_executed_(false) {}
+BlinkWebView::BlinkWebView(bool do_initialize) {}
 
 void BlinkWebView::AddUserScript(const std::string& script) {
   user_scripts_.push_back(script);
@@ -37,9 +33,9 @@ void BlinkWebView::ExecuteUserScripts() {
   if (user_script_executed_)
     return;
 
-  for (std::vector<std::string>::const_iterator it = user_scripts_.begin();
-       it != user_scripts_.end(); ++it)
-    RunJavaScript(*it);
+  for (const std::string& script : user_scripts_) {
+    RunJavaScript(script);
+  }
 
   user_script_executed_ = true;
 }

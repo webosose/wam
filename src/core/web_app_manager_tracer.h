@@ -51,7 +51,7 @@
 
 class PmTraceScope {
  public:
-  PmTraceScope(const std::string& label) : scope_label_(label) {
+  explicit PmTraceScope(const std::string& label) : scope_label_(label) {
     PMTRACE_SCOPE_ENTRY(scope_label_.c_str());
   }
 
@@ -69,7 +69,7 @@ class PmTraceScope {
 
 class PmTraceFunction {
  public:
-  PmTraceFunction(const std::string& label) : fn_label_(label) {
+  explicit PmTraceFunction(const std::string& label) : fn_label_(label) {
     PMTRACE_FUNCTION_ENTRY(fn_label_.c_str());
   }
 

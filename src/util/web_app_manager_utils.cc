@@ -63,7 +63,7 @@ char* WebAppManagerUtils::SkipToken(const char* p) {
     p++;
   while (*p && !isspace(*p))
     p++;
-  return (char*)p;
+  return const_cast<char*>(p);
 }
 
 long WebAppManagerUtils::Percentages(int cnt,
@@ -77,7 +77,8 @@ long WebAppManagerUtils::Percentages(int cnt,
   for (int i = 0; i < cnt; i++) {
     long change = *now - *old;
     if (change < 0)
-      change = (int)((unsigned long)*now - (unsigned long)*old);
+      change = static_cast<int>(static_cast<unsigned long>(*now) -
+                                static_cast<unsigned long>(*old));
     total_change += (*dp++ = change);
     *old++ = *now++;
   }

@@ -18,11 +18,11 @@
 
 #include "web_page_base.h"
 
-WebPageObserver::WebPageObserver(WebPageBase* page) : page_(nullptr) {
+WebPageObserver::WebPageObserver(WebPageBase* page) {
   Observe(page);
 }
 
-WebPageObserver::WebPageObserver() : page_(nullptr) {}
+WebPageObserver::WebPageObserver() = default;
 
 void WebPageObserver::Observe(WebPageBase* page) {
   if (page_ == page)

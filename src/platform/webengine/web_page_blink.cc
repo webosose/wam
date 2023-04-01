@@ -49,18 +49,14 @@ static const int kReloadTimeoutMs = 60000;
 
 class WebPageBlinkPrivate {
  public:
-  WebPageBlinkPrivate(WebPageBlink* page)
-      : page_(page), page_view_(0), palm_system_(0) {}
+  explicit WebPageBlinkPrivate(WebPageBlink* page) : page_(page) {}
 
-  ~WebPageBlinkPrivate() {
-    delete page_view_;
-    delete palm_system_;
-  }
+  ~WebPageBlinkPrivate() = default;
 
  public:
   WebPageBlink* page_;
-  WebView* page_view_;
-  PalmSystemBlink* palm_system_;
+  std::unique_ptr<WebView> page_view_;
+  std::unique_ptr<PalmSystemBlink> palm_system_;
 };
 
 WebPageBlink::WebPageBlink(const wam::Url& url,
@@ -68,17 +64,8 @@ WebPageBlink::WebPageBlink(const wam::Url& url,
                            const std::string& params,
                            std::unique_ptr<WebViewFactory> factory)
     : WebPageBase(url, desc, params),
-      page_private_(new WebPageBlinkPrivate(this)),
-      is_paused_(false),
-      is_suspended_(false),
-      has_custom_policy_for_response_(false),
-      has_been_shown_(false),
-      vkb_height_(0),
-      vkb_was_overlap_(false),
-      has_close_callback_(false),
+      page_private_(std::make_unique<WebPageBlinkPrivate>(this)),
       trust_level_(desc->TrustLevel()),
-      custom_suspend_dom_time_(0),
-      observer_(nullptr),
       factory_(std::move(factory)) {}
 
 WebPageBlink::WebPageBlink(const wam::Url& url,
@@ -89,13 +76,10 @@ WebPageBlink::WebPageBlink(const wam::Url& url,
 WebPageBlink::~WebPageBlink() {
   if (dom_suspend_timer_.IsRunning())
     dom_suspend_timer_.Stop();
-
-  delete page_private_;
-  page_private_ = nullptr;
 }
 
 void WebPageBlink::Init() {
-  page_private_->page_view_ = CreatePageView();
+  page_private_->page_view_ = std::unique_ptr<WebView>(CreatePageView());
   page_private_->page_view_->SetDelegate(this);
   page_private_->page_view_->Initialize(
       app_desc_->Id() + std::to_string(app_desc_->GetDisplayAffinity()),
@@ -204,7 +188,7 @@ void WebPageBlink::Init() {
 }
 
 void* WebPageBlink::GetWebContents() {
-  return (void*)page_private_->page_view_->GetWebContents();
+  return static_cast<void*>(page_private_->page_view_->GetWebContents());
 }
 
 void WebPageBlink::HandleBrowserControlCommand(
@@ -773,7 +757,7 @@ void WebPageBlink::NavigationHistoryChanged() {
 }
 
 void WebPageBlink::ForwardEvent(void* event) {
-  page_private_->page_view_->ForwardWebOSEvent((WebOSEvent*)event);
+  page_private_->page_view_->ForwardWebOSEvent(static_cast<WebOSEvent*>(event));
 }
 
 void WebPageBlink::RecreateWebView() {
@@ -781,7 +765,6 @@ void WebPageBlink::RecreateWebView() {
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", GetWebProcessPID()),
            "recreateWebView; initialize WebPage");
-  delete page_private_->page_view_;
   if (!custom_plugin_path_.empty()) {
     // check setCustomPluginIfNeeded logic
     // not to set duplicated plugin path, it compares custom_plugin_path_ and
@@ -855,7 +838,7 @@ WebView* WebPageBlink::CreatePageView() {
 }
 
 WebView* WebPageBlink::PageView() const {
-  return page_private_->page_view_;
+  return page_private_->page_view_.get();
 }
 
 bool WebPageBlink::Inspectable() {
@@ -950,7 +933,7 @@ void WebPageBlink::SetPageProperties() {
 }
 
 void WebPageBlink::CreatePalmSystem(WebAppBase* app) {
-  page_private_->palm_system_ = new PalmSystemBlink(app);
+  page_private_->palm_system_ = std::make_unique<PalmSystemBlink>(app);
   page_private_->palm_system_->SetLaunchParams(launch_params_);
 }
 

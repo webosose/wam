@@ -33,11 +33,7 @@ template <typename T = NiceWebViewMock,
           typename P = PlatformModuleFactoryImpl>
 class BaseMockInitializer {
  public:
-  BaseMockInitializer()
-      : web_view_factory_(new WebViewFactoryMock()),
-        web_app_window_factory_(new WebAppWindowFactoryMock()),
-        web_view_(new T()),
-        web_app_window_(new U()) {
+  BaseMockInitializer() {
     WebAppManager::Instance()->SetPlatformModules(std::make_unique<P>());
 
     auto web_app_factory_manager = std::make_unique<WebAppFactoryManagerMock>();
@@ -49,19 +45,20 @@ class BaseMockInitializer {
         std::move(web_app_factory_manager));
   }
 
+  BaseMockInitializer(const BaseMockInitializer&) = delete;
+  BaseMockInitializer& operator=(const BaseMockInitializer&) = delete;
+
   ~BaseMockInitializer() { WebAppManager::Instance()->CloseAllApps(); }
 
   T* GetWebViewMock() { return web_view_; }
   U* GetWebAppWindowMock() { return web_app_window_; }
 
  private:
-  BaseMockInitializer(const BaseMockInitializer&) = delete;
-  BaseMockInitializer& operator=(const BaseMockInitializer&) = delete;
-
-  WebViewFactoryMock* web_view_factory_;
-  WebAppWindowFactoryMock* web_app_window_factory_;
-  T* web_view_;
-  U* web_app_window_;
+  WebViewFactoryMock* web_view_factory_ = new WebViewFactoryMock();
+  WebAppWindowFactoryMock* web_app_window_factory_ =
+      new WebAppWindowFactoryMock();
+  T* web_view_ = new T();
+  U* web_app_window_ = new U();
 };
 
 #endif  // TESTS_MOCKS_BASE_MOCK_INITIALIZER_H_

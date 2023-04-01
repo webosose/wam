@@ -28,7 +28,7 @@ class BlinkWebView;
 
 class WebViewImpl : public WebView {
  public:
-  WebViewImpl(std::unique_ptr<BlinkWebView> webview);
+  explicit WebViewImpl(std::unique_ptr<BlinkWebView> webview);
   ~WebViewImpl() override;
 
   void AddUserScript(const std::string& script) override;

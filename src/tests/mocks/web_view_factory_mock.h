@@ -30,7 +30,7 @@ class WebViewFactoryMock : public WebViewFactory {
   void SetWebView(WebView* web_view);
 
  private:
-  WebView* web_view_;
+  WebView* web_view_ = nullptr;
 };
 
 #endif  // TESTS_MOCKS_WEB_VIEW_FACTORY_MOCK_H_

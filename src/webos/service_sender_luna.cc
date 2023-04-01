@@ -27,12 +27,12 @@ void ServiceSenderLuna::PostlistRunningApps(
     std::vector<ApplicationInfo>& apps) {
   Json::Value reply;
   Json::Value running_apps;
-  for (auto it = apps.begin(); it != apps.end(); ++it) {
-    Json::Value app;
-    app["id"] = it->app_id_;
-    app["instanceid"] = it->instance_id_;
-    app["webprocessid"] = std::to_string(it->pid_);
-    running_apps.append(app);
+  for (const ApplicationInfo& app_info : apps) {
+    Json::Value app_json;
+    app_json["id"] = app_info.app_id_;
+    app_json["instanceid"] = app_info.instance_id_;
+    app_json["webprocessid"] = std::to_string(app_info.pid_);
+    running_apps.append(app_json);
   }
   reply["running"] = running_apps;
   reply["returnValue"] = true;

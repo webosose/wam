@@ -19,7 +19,7 @@
 #include "log_manager.h"
 #include "utils.h"
 
-PalmServiceBase::PalmServiceBase() : service_handle_(0) {}
+PalmServiceBase::PalmServiceBase() = default;
 
 PalmServiceBase::~PalmServiceBase() {
   StopService();
@@ -40,8 +40,8 @@ bool PalmServiceBase::StartService() {
   }
 
   if (!LSRegisterCategory(service_handle_, Category(), Methods(),
-                          NULL,  // LSSignal - ?
-                          NULL, &ls_error)) {
+                          nullptr,  // LSSignal - ?
+                          nullptr, &ls_error)) {
     LOG_ERROR(MSGID_REG_LS2_CAT_FAIL, 2, PMLOGKS("SERVICE", ServiceName()),
               PMLOGKS("ERROR", ls_error.message), "");
     StopService();
@@ -74,7 +74,7 @@ bool PalmServiceBase::StopService() {
 
   LSErrorSafe lsError;
   if (!LSUnregister(service_handle_, &lsError)) {
-    service_handle_ = 0;
+    service_handle_ = nullptr;
     return true;
   }
 
@@ -88,8 +88,8 @@ bool PalmServiceBase::StopService() {
 bool PalmServiceBase::Call(LSHandle* handle,
                            const char* what,
                            Json::Value parameters,
-                           const char* applicationId = 0,
-                           LSCalloutContext* context = 0) {
+                           const char* applicationId = nullptr,
+                           LSCalloutContext* context = nullptr) {
   std::string parameters_str = util::JsonToString(parameters);
   if (!parameters.isObject()) {
     LOG_WARNING(MSGID_LS2_CALL_FAIL, 2, PMLOGKS("SERVICE", ServiceName()),
@@ -109,7 +109,8 @@ bool PalmServiceBase::Call(LSHandle* handle,
     } else {
       // caller does not care about reply from call
       call_ret = LSCallFromApplication(handle, what, parameters_str.c_str(),
-                                       applicationId, 0, 0, 0, &ls_error);
+                                       applicationId, nullptr, nullptr, nullptr,
+                                       &ls_error);
     }
   } else {
     if (context) {
@@ -120,9 +121,9 @@ bool PalmServiceBase::Call(LSHandle* handle,
       context->service_ = handle;
     } else {
       // caller does not care about reply from call
-      call_ret =
-          LSCallFromApplicationOneReply(handle, what, parameters_str.c_str(),
-                                        applicationId, 0, 0, 0, &ls_error);
+      call_ret = LSCallFromApplicationOneReply(
+          handle, what, parameters_str.c_str(), applicationId, nullptr, nullptr,
+          nullptr, &ls_error);
     }
   }
   if (!call_ret) {
@@ -136,12 +137,12 @@ bool PalmServiceBase::Call(LSHandle* handle,
 GMainLoop* PalmServiceBase::MainLoop() const {
   static GMainLoop* s_main_loop = nullptr;
   if (!s_main_loop)
-    s_main_loop = g_main_loop_new(nullptr, false);
+    s_main_loop = g_main_loop_new(nullptr, FALSE);
   return s_main_loop;
 }
 
 bool LSCalloutContext::Cancel() {
-  if (token_ == LSMESSAGE_TOKEN_INVALID || service_ == 0) {
+  if (token_ == LSMESSAGE_TOKEN_INVALID || service_ == nullptr) {
     LOG_WARNING(MSGID_LS2_CANCEL_NOT_ACTIVE, 0,
                 "callout context not cancelled: not active");
     return false;

@@ -28,13 +28,13 @@ void PluginLibWrapper::Unload(void* handle) {
 
 PluginLibWrapper::CreateInstanceFunc
 PluginLibWrapper::GetCreateInstanceFunction(void* handle) {
-  return reinterpret_cast<WebAppFactoryInterface* (*)(void)>(
+  return reinterpret_cast<WebAppFactoryInterface* (*)()>(
       dlsym(handle, "CreateInstance"));
 }
 
 PluginLibWrapper::DeleteInstanceFunc
 PluginLibWrapper::GetDeleteInstanceFunction(void* handle) {
-  return reinterpret_cast<void* (*)(WebAppFactoryInterface*)>(
+  return reinterpret_cast<void (*)(WebAppFactoryInterface*)>(
       dlsym(handle, "DeleteInstance"));
 }
 

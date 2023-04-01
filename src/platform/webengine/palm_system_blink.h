@@ -28,7 +28,7 @@ class Value;
 
 class PalmSystemBlink : public PalmSystemWebOS {
  public:
-  PalmSystemBlink(WebAppBase* app);
+  explicit PalmSystemBlink(WebAppBase* app);
 
   std::string HandleBrowserControlMessage(
       const std::string& command,
@@ -53,7 +53,7 @@ class PalmSystemBlink : public PalmSystemWebOS {
   virtual void OnCloseNotify(const std::string& params);
 
  private:
-  bool initialized_;
+  bool initialized_ = false;
 };
 
 #endif  // PLATFORM_WEBENGINE_PALM_SYSTEM_BLINK_H_

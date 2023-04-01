@@ -21,9 +21,8 @@ typedef struct _GTimer GTimer;
 
 class Timer {
  public:
-  Timer(bool is_repeating)
-      : source_id_(0), is_running_(false), is_repeating_(is_repeating) {}
-  virtual ~Timer() {}
+  explicit Timer(bool is_repeating) : is_repeating_(is_repeating) {}
+  virtual ~Timer() = default;
 
   // Timer
   virtual void HandleCallback() = 0;
@@ -37,8 +36,8 @@ class Timer {
   void Running(bool is_running) { is_running_ = is_running; }
 
  private:
-  int source_id_;
-  bool is_running_;
+  int source_id_ = 0;
+  bool is_running_ = false;
   bool is_repeating_;
 };
 
@@ -47,7 +46,7 @@ class BaseTimer : public Timer {
  public:
   typedef void (Receiver::*ReceiverMethod)();
 
-  BaseTimer() : Timer(kIsRepeating), receiver_(nullptr), method_(nullptr) {}
+  BaseTimer() : Timer(kIsRepeating) {}
 
   ~BaseTimer() override {
     if (IsRunning())
@@ -69,8 +68,8 @@ class BaseTimer : public Timer {
   }
 
  private:
-  Receiver* receiver_;
-  ReceiverMethod method_;
+  Receiver* receiver_ = nullptr;
+  ReceiverMethod method_ = nullptr;
 };
 
 template <class Receiver>
@@ -92,12 +91,14 @@ class SingleShotTimer : public BaseTimer<Receiver, false> {
   }
 
  private:
-  SingleShotTimer() {}
+  SingleShotTimer() = default;
 };
 
 class ElapsedTimer {
  public:
   ElapsedTimer();
+  ElapsedTimer(const ElapsedTimer&) = delete;
+  ElapsedTimer& operator=(const ElapsedTimer&) = delete;
   ~ElapsedTimer();
 
   bool IsRunning() const;
@@ -107,10 +108,7 @@ class ElapsedTimer {
   int ElapsedUs() const;
 
  private:
-  ElapsedTimer(const ElapsedTimer&) = delete;
-  ElapsedTimer& operator=(const ElapsedTimer&) = delete;
-
-  bool is_running_;
+  bool is_running_ = false;
   GTimer* timer_;
 };
 

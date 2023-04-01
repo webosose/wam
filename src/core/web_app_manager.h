@@ -47,7 +47,7 @@ class ApplicationInfo {
                   const std::string& in_app_id,
                   const uint32_t& in_pid)
       : instance_id_(in_instance_id), app_id_(in_app_id), pid_(in_pid) {}
-  ~ApplicationInfo() {}
+  ~ApplicationInfo() = default;
 
   std::string instance_id_;
   std::string app_id_;
@@ -191,7 +191,7 @@ class WebAppManager {
   std::unordered_multimap<std::string, WebPageBase*> app_page_map_;
 
   PageList pages_to_delete_list_;
-  bool deleting_pages_;
+  bool deleting_pages_ = false;
 
   std::string active_instance_id_;
 
@@ -204,12 +204,12 @@ class WebAppManager {
 
   std::unordered_map<std::string, int> last_crashed_app_ids_;
 
-  int suspend_delay_;
-  int max_custom_suspend_delay_;
+  int suspend_delay_ = 0;
+  int max_custom_suspend_delay_ = 0;
 
   std::map<std::string, std::string> app_version_;
 
-  bool is_accessibility_enabled_;
+  bool is_accessibility_enabled_ = false;
 };
 
 #endif  // CORE_WEB_APP_MANAGER_H_

@@ -197,25 +197,25 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   std::vector<std::string> GetErrorPagePath(const std::string& error_page);
   void ReloadFailedUrl();
 
-  WebPageBlinkPrivate* page_private_;
+  std::unique_ptr<WebPageBlinkPrivate> page_private_;
 
-  bool is_paused_;
-  bool is_suspended_;
-  bool has_custom_policy_for_response_;
-  bool has_been_shown_;
+  bool is_paused_ = false;
+  bool is_suspended_ = false;
+  bool has_custom_policy_for_response_ = false;
+  bool has_been_shown_ = false;
   OneShotTimer<WebPageBlink> dom_suspend_timer_;
   std::string custom_plugin_path_;
-  double vkb_height_;
-  bool vkb_was_overlap_;
-  bool has_close_callback_;
+  double vkb_height_ = 0;
+  bool vkb_was_overlap_ = false;
+  bool has_close_callback_ = false;
   OneShotTimer<WebPageBlink> close_callback_timer_;
   std::string trust_level_;
   std::string load_failed_url_;
   std::string loading_url_;
-  int custom_suspend_dom_time_;
+  int custom_suspend_dom_time_ = 0;
   RepeatingTimer<WebPageBlink> net_error_reload_timer_;
 
-  WebPageBlinkObserver* observer_;
+  WebPageBlinkObserver* observer_ = nullptr;
 
   std::unique_ptr<WebViewFactory> factory_;
 };

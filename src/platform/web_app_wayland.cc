@@ -27,8 +27,6 @@
 #include "log_manager.h"
 #include "utils.h"
 #include "web_app_wayland_window.h"
-#include "web_app_window.h"
-#include "web_app_window_factory.h"
 #include "web_app_window_impl.h"
 #include "web_page_base.h"
 #include "web_page_blink.h"
@@ -76,14 +74,7 @@ WebAppWayland::WebAppWayland(const std::string& type,
                              int height,
                              int display_id,
                              const std::string& location_hint)
-    : WebAppBase(),
-      app_window_(0),
-      window_type_(type),
-      last_swapped_time_(0),
-      enable_input_region_(false),
-      is_focused_(false),
-      vkb_height_(0),
-      lost_focus_by_set_window_property_(false),
+    : window_type_(type),
       display_id_(display_id),
       location_hint_(location_hint) {
   Init(width, height);
@@ -95,15 +86,9 @@ WebAppWayland::WebAppWayland(const std::string& type,
                              int height,
                              int display_id,
                              const std::string& location_hint)
-    : WebAppBase(),
-      app_window_(
-          new WebAppWindowImpl(std::unique_ptr<WebAppWaylandWindow>(window))),
+    : app_window_(std::make_unique<WebAppWindowImpl>(
+          std::unique_ptr<WebAppWaylandWindow>(window))),
       window_type_(type),
-      last_swapped_time_(0),
-      enable_input_region_(false),
-      is_focused_(false),
-      vkb_height_(0),
-      lost_focus_by_set_window_property_(false),
       display_id_(display_id),
       location_hint_(location_hint) {
   Init(width, height);
@@ -115,22 +100,11 @@ WebAppWayland::WebAppWayland(const std::string& type,
                              int height,
                              int display_id,
                              const std::string& location_hint)
-    : WebAppBase(),
-      app_window_(nullptr),
-      window_type_(type),
-      last_swapped_time_(0),
-      enable_input_region_(false),
-      is_focused_(false),
-      vkb_height_(0),
-      lost_focus_by_set_window_property_(false),
+    : window_type_(type),
       display_id_(display_id),
       location_hint_(location_hint),
       window_factory_(std::move(factory)) {
   Init(width, height);
-}
-
-WebAppWayland::~WebAppWayland() {
-  delete app_window_;
 }
 
 static webos::WebAppWindowBase::LocationHint GetLocationHintFromString(
@@ -157,9 +131,10 @@ static webos::WebAppWindowBase::LocationHint GetLocationHintFromString(
 void WebAppWayland::Init(int width, int height) {
   if (!app_window_) {
     if (window_factory_)
-      app_window_ = window_factory_->CreateWindow();
+      app_window_ =
+          std::unique_ptr<WebAppWindow>(window_factory_->CreateWindow());
     else
-      app_window_ = new WebAppWindowImpl(
+      app_window_ = std::make_unique<WebAppWindowImpl>(
           std::unique_ptr<WebAppWaylandWindow>(WebAppWaylandWindow::Take()));
   }
   if (!(width && height)) {
@@ -827,9 +802,7 @@ void WebAppWayland::MoveInputRegion(int height) {
     vkb_height_ = -vkb_height_;
 
   std::vector<gfx::Rect> newRegion;
-  for (std::vector<gfx::Rect>::iterator it = input_region_.begin();
-       it != input_region_.end(); ++it) {
-    gfx::Rect rect = static_cast<gfx::Rect>(*it);
+  for (gfx::Rect rect : input_region_) {
     rect.SetRect(rect.x(), rect.y() - vkb_height_, rect.width(), rect.height());
     newRegion.push_back(rect);
   }

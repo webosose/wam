@@ -27,6 +27,8 @@
 #include "display_id.h"
 #include "timer.h"
 #include "web_app_base.h"
+#include "web_app_window.h"
+#include "web_app_window_factory.h"
 #include "web_page_blink_observer.h"
 
 namespace Json {
@@ -35,8 +37,6 @@ class Value;
 
 class ApplicationDescription;
 class WebAppWaylandWindow;
-class WebAppWindowFactory;
-class WebAppWindow;
 
 class InputManager : public webos::InputPointer {
  public:
@@ -56,11 +56,11 @@ class InputManager : public webos::InputPointer {
 
 class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
  public:
-  WebAppWayland(const std::string& type,
-                int width = 0,
-                int height = 0,
-                int displayId = kUndefinedDisplayId,
-                const std::string& location_hint = {});
+  explicit WebAppWayland(const std::string& type,
+                         int width = 0,
+                         int height = 0,
+                         int displayId = kUndefinedDisplayId,
+                         const std::string& location_hint = {});
   WebAppWayland(const std::string& type,
                 WebAppWaylandWindow* window,
                 int width = 0,
@@ -75,7 +75,7 @@ class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
                 int displayId = kUndefinedDisplayId,
                 const std::string& location_hint = {});
 
-  ~WebAppWayland() override;
+  ~WebAppWayland() override = default;
 
   // WebAppBase
   void Attach(WebPageBase*) override;
@@ -162,21 +162,21 @@ class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
  private:
   void Init(int width, int height);
 
-  WebAppWindow* app_window_;
+  std::unique_ptr<WebAppWindow> app_window_;
   std::string window_type_;
-  int last_swapped_time_;
+  int last_swapped_time_ = 0;
   bool did_activate_stage_ = false;
 
   std::vector<gfx::Rect> input_region_;
-  bool enable_input_region_;
+  bool enable_input_region_ = false;
 
-  bool is_focused_;
-  float vkb_height_;
+  bool is_focused_ = false;
+  float vkb_height_ = 0;
 
   ElapsedTimer elapsed_launch_timer_;
   OneShotTimer<WebAppWayland> launch_timeout_timer_;
 
-  bool lost_focus_by_set_window_property_;
+  bool lost_focus_by_set_window_property_ = false;
 
   int display_id_;
   std::string location_hint_;

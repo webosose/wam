@@ -55,19 +55,14 @@ WebAppWaylandWindow* WebAppWaylandWindow::CreateWindow() {
   if (!window) {
     LOG_CRITICAL(MSGID_PREPARE_FAIL, 0,
                  "Failed to prepare WindowedWebAppWindow");
-    return 0;
+    return nullptr;
   }
   window->Resize(1, 1);
   return window;
 }
 
 WebAppWaylandWindow::WebAppWaylandWindow()
-    : web_app_(0),
-      cursor_visible_(false),
-      xinput_activated_(false),
-      last_mouse_event_(WebOSMouseEvent(WebOSEvent::None, -1., -1.)) {
-  cursor_enabled_ = util::GetEnvVar("ENABLE_CURSOR_BY_DEFAULT") == "1";
-}
+    : cursor_enabled_(util::GetEnvVar("ENABLE_CURSOR_BY_DEFAULT") == "1") {}
 
 void WebAppWaylandWindow::HideWindow() {
   LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", web_app_->AppId().c_str()),
@@ -299,14 +294,14 @@ void WebAppWaylandWindow::LogEventDebugging(WebOSEvent* event) {
         float scale = 1.0;
         int height = web_app_->GetAppDescription()->HeightOverride();
         if (height)
-          scale = (float)DisplayHeight() /
+          scale = static_cast<float>(DisplayHeight()) /
                   web_app_->GetAppDescription()->HeightOverride();
         LOG_INFO(
             MSGID_MOUSE_BUTTON_EVENT, 6,
             PMLOGKS("APP_ID", web_app_->AppId().c_str()),
             PMLOGKS("INSTANCE_ID", web_app_->InstanceId().c_str()),
             PMLOGKFV("VALUE", "%d",
-                     (int)static_cast<WebOSMouseEvent*>(event)->GetButton()),
+                     static_cast<WebOSMouseEvent*>(event)->GetButton()),
             PMLOGKS("STATUS", event->GetType() == WebOSEvent::MouseButtonPress
                                   ? "MouseButtonPress"
                                   : "MouseButtonRelease"),

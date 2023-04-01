@@ -58,12 +58,11 @@ LSMethod WebAppManagerServiceLuna::methods_[] = {
     LS2_METHOD_ENTRY(clearBrowsingData),
     LS2_SUBSCRIPTION_ENTRY(listRunningApps),
     LS2_SUBSCRIPTION_ENTRY(webProcessCreated),
-    {0, 0}};
+    {nullptr, nullptr}};
 
-WebAppManagerServiceLuna::WebAppManagerServiceLuna()
-    : boot_done_(false), debug_level_("release") {}
+WebAppManagerServiceLuna::WebAppManagerServiceLuna() = default;
 
-WebAppManagerServiceLuna::~WebAppManagerServiceLuna() {}
+WebAppManagerServiceLuna::~WebAppManagerServiceLuna() = default;
 
 bool WebAppManagerServiceLuna::StartService() {
   return PalmServiceBase::StartService();
@@ -266,12 +265,12 @@ Json::Value WebAppManagerServiceLuna::listRunningApps(
 
   Json::Value reply;
   Json::Value running_apps;
-  for (auto it = apps.begin(); it != apps.end(); ++it) {
-    Json::Value app;
-    app["id"] = it->app_id_;
-    app["instanceId"] = it->instance_id_;
-    app["webprocessid"] = std::to_string(it->pid_);
-    running_apps.append(app);
+  for (const ApplicationInfo& app_info : apps) {
+    Json::Value app_json;
+    app_json["id"] = app_info.app_id_;
+    app_json["instanceId"] = app_info.instance_id_;
+    app_json["webprocessid"] = std::to_string(app_info.pid_);
+    running_apps.append(app_json);
   }
   reply["running"] = running_apps;
   reply["returnValue"] = true;
@@ -290,25 +289,25 @@ Json::Value WebAppManagerServiceLuna::clearBrowsingData(
     return reply;
   }
 
-  Json::Value value = request["types"];
+  Json::Value clear_types = request["types"];
   bool return_value = true;
   int remove_browsing_data_mask = 0;
 
-  switch (value.type()) {
+  switch (clear_types.type()) {
     case Json::ValueType::nullValue:
       remove_browsing_data_mask =
           WebAppManagerService::MaskForBrowsingDataType("all");
       break;
     case Json::ValueType::arrayValue: {
-      if (value.size() < 1) {
+      if (clear_types.size() < 1) {
         reply["errorCode"] = kErrCodeClearDataBrawsingEmptyArray;
         reply["errorText"] = kErrEmptyArray;
         return_value = false;
         break;
       }
 
-      for (Json::Value::ArrayIndex i = 0; i < value.size(); ++i) {
-        if (!value[i].isString()) {
+      for (const Json::Value& clear_type : clear_types) {
+        if (!clear_type.isString()) {
           std::stringstream error_text;
           error_text << kErrInvalidValue << " (" << kErrOnlyAllowedForString
                      << ")";
@@ -319,10 +318,10 @@ Json::Value WebAppManagerServiceLuna::clearBrowsingData(
         }
 
         int mask = WebAppManagerService::MaskForBrowsingDataType(
-            value[i].asString().c_str());
+            clear_type.asString().c_str());
         if (mask == 0) {
           std::stringstream error_text;
-          error_text << kErrUnknownData << " (" << value[i].asString() << ")";
+          error_text << kErrUnknownData << " (" << clear_type.asString() << ")";
           reply["errorCode"] = kErrCodeClearDataBrawsingUnknownData;
           reply["errorText"] = error_text.str();
           return_value = false;
@@ -450,8 +449,8 @@ void WebAppManagerServiceLuna::MemoryManagerConnectCallback(
 
     if (!Call<WebAppManagerServiceLuna,
               &WebAppManagerServiceLuna::GetCloseAppIdCallback>(
-            "luna://com.webos.service.memorymanager/getManagerEvent", closeAppObj,
-            this)) {
+            "luna://com.webos.service.memorymanager/getManagerEvent",
+            closeAppObj, this)) {
       LOG_WARNING(MSGID_MEM_MGR_API_CALL_FAIL, 0,
                   "Failed to get close application identifier");
     }

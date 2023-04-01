@@ -68,11 +68,11 @@ class WebAppWaylandWindow : public webos::WebAppWindowBase {
 
   bool cursor_enabled_;
 
-  WebAppWayland* web_app_;
-  bool cursor_visible_;
-  bool xinput_activated_;
+  WebAppWayland* web_app_ = nullptr;
+  bool cursor_visible_ = false;
+  bool xinput_activated_ = false;
 
-  WebOSMouseEvent last_mouse_event_;
+  WebOSMouseEvent last_mouse_event_{WebOSEvent::None, -1., -1.};
 };
 
 #endif  // PLATFORM_WEB_APP_WAYLAND_WINDOW_H_

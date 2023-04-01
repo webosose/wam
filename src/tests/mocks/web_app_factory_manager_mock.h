@@ -48,8 +48,8 @@ class WebAppFactoryManagerMock : public WebAppFactoryManager {
   void SetWebAppWindowFactory(WebAppWindowFactory* window_factory);
 
  private:
-  WebViewFactory* view_factory_;
-  WebAppWindowFactory* window_factory_;
+  WebViewFactory* view_factory_ = nullptr;
+  WebAppWindowFactory* window_factory_ = nullptr;
 };
 
 #endif  // TESTS_MOCKS_WEB_APP_FACTORY_MANAGER_MOCK_H_

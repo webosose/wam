@@ -24,7 +24,7 @@
 class WebAppManagerConfigMock : public WebAppManagerConfig {
  public:
   WebAppManagerConfigMock() = default;
-  WebAppManagerConfigMock(
+  explicit WebAppManagerConfigMock(
       const std::map<std::string, std::string>* environment_variables);
   ~WebAppManagerConfigMock() override;
 

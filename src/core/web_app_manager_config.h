@@ -22,7 +22,7 @@
 class WebAppManagerConfig {
  public:
   WebAppManagerConfig();
-  virtual ~WebAppManagerConfig() {}
+  virtual ~WebAppManagerConfig() = default;
 
   virtual std::string GetWebAppFactoryPluginTypes() const {
     return web_app_factory_plugin_types_;
@@ -72,18 +72,18 @@ class WebAppManagerConfig {
 
   std::string web_app_factory_plugin_types_;
   std::string web_app_factory_plugin_path_;
-  int suspend_delay_time_;
-  int max_custom_suspend_delay_time_;
+  int suspend_delay_time_ = 0;
+  int max_custom_suspend_delay_time_ = 0;
   std::string web_process_config_path_;
-  bool dev_mode_enabled_;
-  bool inspector_enabled_;
+  bool dev_mode_enabled_ = false;
+  bool inspector_enabled_ = false;
   std::string error_page_url_;
   std::string tellurium_nub_path_;
-  bool dynamic_pluggable_load_enabled_;
-  bool post_web_process_created_disabled_;
-  bool check_launch_time_enabled_;
-  bool use_system_app_optimization_;
-  bool launch_optimization_enabled_;
+  bool dynamic_pluggable_load_enabled_ = false;
+  bool post_web_process_created_disabled_ = false;
+  bool check_launch_time_enabled_ = false;
+  bool use_system_app_optimization_ = false;
+  bool launch_optimization_enabled_ = false;
   std::string user_script_path_;
   std::string name_;
 };

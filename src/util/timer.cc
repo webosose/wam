@@ -19,14 +19,14 @@
 #include <glib.h>
 
 static int TimeoutCallback(void* data) {
-  Timer* timer = (Timer*)data;
+  Timer* timer = static_cast<Timer*>(data);
   bool isRepeating = timer->IsRepeating();
   timer->HandleCallback();
   return isRepeating;
 }
 
 static int TimeoutCallbackDestroy(void* data) {
-  Timer* timer = (Timer*)data;
+  Timer* timer = static_cast<Timer*>(data);
   timer->HandleCallback();
   delete timer;
   return 0;
@@ -49,7 +49,7 @@ void Timer::Stop() {
   }
 }
 
-ElapsedTimer::ElapsedTimer() : is_running_(false), timer_(g_timer_new()) {}
+ElapsedTimer::ElapsedTimer() : timer_(g_timer_new()) {}
 
 ElapsedTimer::~ElapsedTimer() {
   g_timer_destroy(timer_);
@@ -70,9 +70,9 @@ void ElapsedTimer::Stop() {
 }
 
 int ElapsedTimer::ElapsedMs() const {
-  return static_cast<int>(g_timer_elapsed(timer_, NULL) * 1000);
+  return static_cast<int>(g_timer_elapsed(timer_, nullptr) * 1000);
 }
 
 int ElapsedTimer::ElapsedUs() const {
-  return static_cast<int>(g_timer_elapsed(timer_, NULL) * 1000000);
+  return static_cast<int>(g_timer_elapsed(timer_, nullptr) * 1000000);
 }

@@ -75,7 +75,7 @@ void ObserverList<ObserverType>::Clear() {
 template <class ObserverType>
 void ObserverList<ObserverType>::Compact() {
   observers_.erase(std::remove(observers_.begin(), observers_.end(),
-                               static_cast<ObserverType*>(NULL)),
+                               static_cast<ObserverType*>(nullptr)),
                    observers_.end());
 }
 

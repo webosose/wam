@@ -25,8 +25,7 @@
 #include "web_page_blink.h"
 #include "web_view_factory.h"
 
-WebAppFactoryManagerMock::WebAppFactoryManagerMock()
-    : view_factory_(nullptr), window_factory_(nullptr) {}
+WebAppFactoryManagerMock::WebAppFactoryManagerMock() = default;
 
 WebAppFactoryManagerMock::~WebAppFactoryManagerMock() = default;
 

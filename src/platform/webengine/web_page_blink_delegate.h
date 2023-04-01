@@ -22,7 +22,7 @@
 
 class WebPageBlinkDelegate {
  public:
-  virtual ~WebPageBlinkDelegate() {}
+  virtual ~WebPageBlinkDelegate() = default;
   virtual void Close() = 0;
   virtual bool DecidePolicyForResponse(bool is_main_frame,
                                        int status_code,

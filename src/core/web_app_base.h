@@ -155,18 +155,18 @@ class WebAppBase : public WebPageObserver {
   void WebPageLoadFinished() override;
 
  protected:
-  PreloadState preload_state_;
-  bool added_to_window_mgr_;
+  PreloadState preload_state_ = kNonePreload;
+  bool added_to_window_mgr_ = false;
   std::string in_progress_relaunch_params_;
   std::string in_progress_relaunch_launching_app_id_;
-  float scale_factor_;
+  float scale_factor_ = 1.0f;
 
  private:
-  WebAppBasePrivate* app_private_;
-  bool need_reload_;
-  bool crashed_;
-  bool hidden_window_;
-  bool close_page_requested_;  // window.close() is called once then have to
-                               // drop further requests
+  std::unique_ptr<WebAppBasePrivate> app_private_;
+  bool need_reload_ = false;
+  bool crashed_ = false;
+  bool hidden_window_ = false;
+  bool close_page_requested_ = false;  // window.close() is called once then
+                                       // have to drop further requests
 };
 #endif  // CORE_WEB_APP_BASE_H_

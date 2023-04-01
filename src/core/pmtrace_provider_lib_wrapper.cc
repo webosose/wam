@@ -25,6 +25,7 @@
 #include "log_manager.h"
 
 namespace {
+
 const char kTraceAfter[] = "TraceAfter";
 const char kTraceBefore[] = "TraceBefore";
 const char kTraceItem[] = "TraceItem";
@@ -163,6 +164,7 @@ class PmtraceProviderLibWrapper {
   FunctypeTraceItem func_trace_item_ = nullptr;
   FunctypeTracePosition func_trace_position_ = nullptr;
 };  // class PmtraceProviderLibWrapper
+
 }  // namespace
 
 void pmtrace::TraceMessage(const char* label) {

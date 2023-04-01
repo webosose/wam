@@ -189,23 +189,23 @@ class WebPageBase {
   std::shared_ptr<ApplicationDescription> app_desc_;
   std::string app_id_;
   std::string instance_id_;
-  bool suspend_at_load_;
-  bool is_closing_;
-  bool is_load_error_page_finish_;
-  bool is_load_error_page_start_;
-  bool did_error_page_loaded_from_net_error_helper_;
-  bool enable_background_run_;
-  wam::Url default_url_;
+  bool suspend_at_load_ = false;
+  bool is_closing_ = false;
+  bool is_load_error_page_finish_ = false;
+  bool is_load_error_page_start_ = false;
+  bool did_error_page_loaded_from_net_error_helper_ = false;
+  bool enable_background_run_ = false;
+  wam::Url default_url_{std::string()};
   std::string launch_params_;
-  std::string load_error_policy_;
+  std::string load_error_policy_ = "default";
   ObserverList<WebPageObserver> observers_;
 
  private:
   void SetBackgroundColorOfBody(const std::string& color);
   void SetupLaunchEvent();
 
-  bool cleaning_resources_;
-  bool is_preload_;
+  bool cleaning_resources_ = false;
+  bool is_preload_ = false;
 };
 
 #endif  // CORE_WEB_PAGE_BASE_H_

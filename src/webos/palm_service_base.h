@@ -49,10 +49,11 @@ class LSErrorSafe : public LSError {
  * */
 class LSCallbackHandler {
  public:
-  LSCallbackHandler(std::function<Json::Value(const Json::Value&)>& func)
+  explicit LSCallbackHandler(
+      std::function<Json::Value(const Json::Value&)>& func)
       : func_(func) {}
 
-  virtual ~LSCallbackHandler() {}
+  virtual ~LSCallbackHandler() = default;
   friend class PalmServiceBase;
 
  protected:
@@ -97,16 +98,16 @@ class LSCalloutContext : public LSCallbackHandler {
   friend class PalmServiceBase;
 
  public:
-  LSCalloutContext(std::function<Json::Value(const Json::Value&)> func)
-      : LSCallbackHandler(func), service_(0), token_(LSMESSAGE_TOKEN_INVALID) {}
+  explicit LSCalloutContext(std::function<Json::Value(const Json::Value&)> func)
+      : LSCallbackHandler(func) {}
 
   ~LSCalloutContext() override { Cancel(); }
 
   bool Cancel();
 
  private:
-  LSHandle* service_;
-  LSMessageToken token_;
+  LSHandle* service_ = nullptr;
+  LSMessageToken token_ = LSMESSAGE_TOKEN_INVALID;
 };
 
 /**
@@ -208,6 +209,8 @@ static bool bus_callback_json(LSHandle* handle,
 class PalmServiceBase {
  public:
   PalmServiceBase();
+  PalmServiceBase(const PalmServiceBase&) = delete;
+  PalmServiceBase& operator=(const PalmServiceBase&) = delete;
   virtual ~PalmServiceBase();
 
   bool StartService();
@@ -219,8 +222,8 @@ class PalmServiceBase {
    **/
   inline bool Call(const char* what,
                    Json::Value parameters,
-                   const char* application_id = 0,
-                   LSCalloutContext* context = 0) {
+                   const char* application_id = nullptr,
+                   LSCalloutContext* context = nullptr) {
     return Call(service_handle_, what, parameters, application_id, context);
   }
 
@@ -257,12 +260,12 @@ class PalmServiceBase {
       err =
           LSCall(service_handle_, what, util::JsonToString(parameters).c_str(),
                  bus_callback_json<HANDLER_CLASS, CALLBACK_METHOD>,
-                 callback_receiver, NULL, &ls_error);
+                 callback_receiver, nullptr, &ls_error);
     } else {
       err = LSCallOneReply(service_handle_, what,
                            util::JsonToString(parameters).c_str(),
                            bus_callback_json<HANDLER_CLASS, CALLBACK_METHOD>,
-                           callback_receiver, NULL, &ls_error);
+                           callback_receiver, nullptr, &ls_error);
     }
     if (!err) {
       LOG_WARNING(MSGID_LUNA_API, 0, "Failed to call in %s Service: %s",
@@ -276,11 +279,9 @@ class PalmServiceBase {
   virtual const char* ServiceName() const = 0;
   virtual const char* Category() const { return "/"; }
   virtual GMainLoop* MainLoop() const;
-  LSHandle* service_handle_;
+  LSHandle* service_handle_ = nullptr;
 
  private:
-  PalmServiceBase(const PalmServiceBase&) = delete;
-  PalmServiceBase& operator=(const PalmServiceBase&) = delete;
   static bool ServiceConnectCallback(LSHandle* sh,
                                      LSMessage* message,
                                      void* ctx);

@@ -22,7 +22,7 @@
 #include "web_app_base.h"
 #include "web_app_manager_tracer.h"
 
-WebAppManagerService::WebAppManagerService() {}
+WebAppManagerService::WebAppManagerService() = default;
 
 std::string WebAppManagerService::OnLaunch(const std::string& app_desc_string,
                                            const std::string& params,

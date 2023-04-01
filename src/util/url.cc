@@ -19,13 +19,16 @@
 #include <glib.h>
 
 namespace {
+
 std::string GetSubString(const std::string& str,
                          std::size_t start,
                          std::size_t end) {
   return str.substr(
       start, end == std::string::npos ? str.size() - start : end - start);
 }
+
 }  // namespace
+
 namespace wam {
 
 Url::Url(const std::string& uri) {

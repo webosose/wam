@@ -35,7 +35,7 @@
 #include "web_app_manager_utils.h"
 #include "web_page_base.h"
 
-WebProcessManager::WebProcessManager() : maximum_number_of_processes_(1) {
+WebProcessManager::WebProcessManager() {
   ReadWebProcessPolicy();
 }
 
@@ -150,11 +150,13 @@ void WebProcessManager::ReadWebProcessPolicy() {
 
   LOG_INFO(
       MSGID_SET_WEBPROCESS_ENVIRONMENT, 3,
-      PMLOGKFV("MAXIMUM_WEBPROCESS_NUMBER", "%u", maximum_number_of_processes_),
-      PMLOGKFV("GROUP_TRUSTLEVELS_COUNT", "%d",
-               web_process_group_trust_level_list_.size()),
-      PMLOGKFV("GROUP_APP_IDS_COUNT", "%d",
-               web_process_group_app_id_list_.size()),
+      PMLOGKS("MAXIMUM_WEBPROCESS_NUMBER",
+              std::to_string(maximum_number_of_processes_).c_str()),
+      PMLOGKS(
+          "GROUP_TRUSTLEVELS_COUNT",
+          std::to_string(web_process_group_trust_level_list_.size()).c_str()),
+      PMLOGKS("GROUP_APP_IDS_COUNT",
+              std::to_string(web_process_group_app_id_list_.size()).c_str()),
       "");
 }
 
@@ -182,7 +184,6 @@ std::string WebProcessManager::GetProcessKey(
     return std::string();
 
   std::string key;
-  std::vector<std::string> id_list, trust_level_list;
   if (maximum_number_of_processes_ == 1)
     key = "system";
   else if (maximum_number_of_processes_ == UINT_MAX) {
@@ -191,33 +192,34 @@ std::string WebProcessManager::GetProcessKey(
     else
       key = desc->Id();
   } else {
-    for (size_t i = 0; i < web_process_group_app_id_list_.size(); i++) {
-      std::string app_id = web_process_group_app_id_list_.at(i);
+    std::vector<std::string> id_list;
+    for (const std::string& app_id : web_process_group_app_id_list_) {
       if (app_id.find('*') != std::string::npos) {
-        util::ReplaceSubstr(app_id, "*");
-        auto l = util::SplitString(app_id, ',');
+        std::string replaced_app_id = app_id;
+        util::ReplaceSubstr(replaced_app_id, "*");
+        auto l = util::SplitString(replaced_app_id, ',');
         id_list.insert(id_list.end(), l.begin(), l.end());
         for (const auto& id : id_list)
           if (!desc->Id().compare(0, id.size(), id))
-            key = web_process_group_app_id_list_.at(i);
+            key = app_id;
       } else {
         auto l = util::SplitString(app_id, ',');
         id_list.insert(id_list.end(), l.begin(), l.end());
         for (const auto& id : id_list)
           if (id == desc->Id())
-            return web_process_group_app_id_list_.at(i);
+            return app_id;
       }
     }
     if (!key.empty())
       return key;
 
-    for (size_t i = 0; i < web_process_group_trust_level_list_.size(); i++) {
-      std::string trust_level = web_process_group_trust_level_list_.at(i);
+    std::vector<std::string> trust_level_list;
+    for (const std::string& trust_level : web_process_group_trust_level_list_) {
       auto l = util::SplitString(trust_level, ',');
       trust_level_list.insert(trust_level_list.end(), l.begin(), l.end());
       for (const auto& trust : trust_level_list) {
         if (trust == desc->TrustLevel()) {
-          return web_process_group_trust_level_list_.at(i);
+          return trust_level;
         }
       }
     }

@@ -37,8 +37,8 @@ const char kWebSQL[] = "webSQL";
 
 class BlinkWebViewProfileHelper {
  public:
-  BlinkWebViewProfileHelper() {}
-  virtual ~BlinkWebViewProfileHelper() {}
+  BlinkWebViewProfileHelper() = default;
+  virtual ~BlinkWebViewProfileHelper() = default;
 
   static void ClearBrowsingData(const int remove_browsing_data_mask,
                                 webos::WebViewProfile* profile = nullptr);

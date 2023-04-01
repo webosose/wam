@@ -19,6 +19,7 @@
 #include "web_app_manager_config_mock.h"
 
 namespace {
+
 const std::map<std::string, std::string> kEnvironmentVariables = {
     {"WAM_SUSPEND_DELAY_IN_MS", "15"},
     {"MAX_CUSTOM_SUSPEND_DELAY_IN_MS", "125"},
@@ -38,13 +39,12 @@ const std::map<std::string, std::string> kEnvironmentVariables = {
 
 class WebAppManagerConfigTest : public ::testing::Test {
  public:
-  WebAppManagerConfigTest()
-      : config_with_set_variables_(&kEnvironmentVariables) {}
+  WebAppManagerConfigTest() = default;
 
   ~WebAppManagerConfigTest() override = default;
 
   WebAppManagerConfigMock config_with_no_variables_;
-  WebAppManagerConfigMock config_with_set_variables_;
+  WebAppManagerConfigMock config_with_set_variables_{&kEnvironmentVariables};
 };
 
 TEST_F(WebAppManagerConfigTest, checkDynamicPluggableLoadEnabledIfNotDefined) {

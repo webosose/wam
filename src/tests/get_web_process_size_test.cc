@@ -26,6 +26,7 @@
 #include "web_view_mock.h"
 
 namespace {
+
 static constexpr int kProcessId = 7779;
 constexpr char kProcessMemSize[] = "320115";
 static constexpr char kInstanceId[] = "de90e74a-b86b-42c8-8785-3efd927a36430";

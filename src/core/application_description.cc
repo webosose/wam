@@ -21,7 +21,6 @@
 #include <unistd.h>
 
 #include <iostream>
-#include <limits>
 #include <sstream>
 
 #include <json/json.h>
@@ -40,30 +39,7 @@ bool ApplicationDescription::CheckTrustLevel(std::string trust_level) {
   return false;
 }
 
-ApplicationDescription::ApplicationDescription()
-    : transparency_(false),
-      window_class_value_(kWindowClassNormal),
-      handles_relaunch_(false),
-      inspectable_(true),
-      custom_plugin_(false),
-      back_history_api_disabled_(false),
-      width_override_(0),
-      height_override_(0),
-      do_not_track_(false),
-      handle_exit_key_(false),
-      enable_background_run_(false),
-      allow_video_capture_(false),
-      allow_audio_capture_(false),
-      supports_audio_guidance_(false),
-      use_native_scroll_(false),
-      use_prerendering_(false),
-      network_stable_timeout_(std::numeric_limits<double>::quiet_NaN()),
-      disallow_scrolling_in_main_frame_(true),
-      delay_ms_for_lanch_optimization_(0),
-      use_unlimited_media_policy_(false),
-      display_affinity_(kUndefinedDisplayId),
-      use_virtual_keyboard_(true),
-      custom_suspend_dom_time_(0) {}
+ApplicationDescription::ApplicationDescription() = default;
 
 const ApplicationDescription::WindowGroupInfo
 ApplicationDescription::GetWindowGroupInfo() {
@@ -142,8 +118,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
     return nullptr;
   }
 
-  auto app_desc =
-      std::unique_ptr<ApplicationDescription>(new ApplicationDescription());
+  auto app_desc = std::make_unique<ApplicationDescription>();
 
   app_desc->transparency_ = json_obj["transparent"].asBool();
   auto vendor_extension =

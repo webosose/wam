@@ -111,15 +111,14 @@ const char* kApplicationDescriptionJson = R"({
 
 class ApplicationDescriptionTest : public ::testing::Test {
  public:
-  ApplicationDescriptionTest()
-      : application_description_(ApplicationDescription::FromJsonString(
-            kApplicationDescriptionJson)) {}
+  ApplicationDescriptionTest() = default;
 
   ~ApplicationDescriptionTest() override = default;
 
   void SetUp() override { ASSERT_TRUE(application_description_.get()); }
 
-  std::unique_ptr<ApplicationDescription> application_description_;
+  std::unique_ptr<ApplicationDescription> application_description_ =
+      ApplicationDescription::FromJsonString(kApplicationDescriptionJson);
 };
 
 TEST_F(ApplicationDescriptionTest, checkGetIsTransparent) {

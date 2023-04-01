@@ -25,45 +25,30 @@
 
 class WebAppBasePrivate {
  public:
-  WebAppBasePrivate(WebAppBase* parent)
-      : parent_(parent),
-        page_(0),
-        keep_alive_(false),
-        force_close_(false),
-        app_desc_(nullptr) {}
+  explicit WebAppBasePrivate(WebAppBase* parent) : parent_(parent) {}
+
+  WebAppBasePrivate(const WebAppBasePrivate&) = delete;
+  WebAppBasePrivate& operator=(const WebAppBasePrivate&) = delete;
 
   ~WebAppBasePrivate() {
-    delete page_;
-
     LOG_DEBUG("Delete webapp base for Instance %s of App ID %s",
               instance_id_.c_str(), app_id_.c_str());
   }
 
  public:
   WebAppBase* parent_;
-  WebPageBase* page_;
-  bool keep_alive_;
-  bool force_close_;
+  std::unique_ptr<WebPageBase> page_;
+  bool keep_alive_ = false;
+  bool force_close_ = false;
   std::string launching_app_id_;
   std::string app_id_;
   std::string instance_id_;
   std::string url_;
   std::shared_ptr<ApplicationDescription> app_desc_;
-
- private:
-  WebAppBasePrivate(const WebAppBasePrivate&) = delete;
-  WebAppBasePrivate& operator=(const WebAppBasePrivate&) = delete;
 };
 
 WebAppBase::WebAppBase()
-    : preload_state_(kNonePreload),
-      added_to_window_mgr_(false),
-      scale_factor_(1.0f),
-      app_private_(new WebAppBasePrivate(this)),
-      need_reload_(false),
-      crashed_(false),
-      hidden_window_(false),
-      close_page_requested_(false) {}
+    : app_private_(std::make_unique<WebAppBasePrivate>(this)) {}
 
 WebAppBase::~WebAppBase() {
   LOG_INFO(MSGID_WEBAPP_CLOSED, 3,
@@ -71,7 +56,6 @@ WebAppBase::~WebAppBase() {
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", Page() ? Page()->GetWebProcessPID() : 0), "");
   CleanResources();
-  delete app_private_;
 }
 
 bool WebAppBase::GetCrashState() const {
@@ -107,7 +91,7 @@ bool WebAppBase::ForceClose() {
 }
 
 WebPageBase* WebAppBase::Page() const {
-  return app_private_->page_;
+  return app_private_->page_.get();
 }
 
 bool WebAppBase::IsWindowed() const {
@@ -176,19 +160,16 @@ void WebAppBase::Attach(WebPageBase* page) {
   if (app_private_->page_)
     Detach();
 
-  app_private_->page_ = page;
+  app_private_->page_ = std::unique_ptr<WebPageBase>(page);
   app_private_->page_->CreatePalmSystem(this);
 
-  Observe(app_private_->page_);
+  Observe(app_private_->page_.get());
 }
 
-WebPageBase* WebAppBase::Detach(void) {
-  WebPageBase* page = app_private_->page_;
+WebPageBase* WebAppBase::Detach() {
+  Unobserve(app_private_->page_.get());
 
-  Unobserve(app_private_->page_);
-
-  app_private_->page_ = nullptr;
-  return page;
+  return app_private_->page_.release();
 }
 
 void WebAppBase::Relaunch(const std::string& args,
@@ -225,7 +206,7 @@ void WebAppBase::Relaunch(const std::string& args,
   }
 
   if (app_private_->page_) {
-    WebPageBase* page = app_private_->page_;
+    WebPageBase* page = app_private_->page_.get();
     // try to do relaunch!!
     if (!(page->Relaunch(args, LaunchingAppId()))) {
       LOG_INFO(MSGID_APP_RELAUNCH, 3, PMLOGKS("APP_ID", AppId().c_str()),

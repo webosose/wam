@@ -29,7 +29,7 @@
 #include "web_page_base.h"
 
 PalmSystemWebOS::PalmSystemWebOS(WebAppBase* app)
-    : app_(static_cast<WebAppWayland*>(app)), launch_params_() {}
+    : app_(static_cast<WebAppWayland*>(app)) {}
 
 void PalmSystemWebOS::SetLaunchParams(const std::string& params) {
   Json::Value jsonDoc = Json::nullValue;
@@ -109,7 +109,7 @@ void PalmSystemWebOS::SetInputRegion(const std::string& params) {
 
 void PalmSystemWebOS::SetGroupClientEnvironment(GroupClientCallKey callKey,
                                                 const std::string& params) {
-  ApplicationDescription* app_desc = app_ ? app_->GetAppDescription() : 0;
+  ApplicationDescription* app_desc = app_ ? app_->GetAppDescription() : nullptr;
   if (app_desc) {
     ApplicationDescription::WindowGroupInfo group_info =
         app_desc->GetWindowGroupInfo();

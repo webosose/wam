@@ -27,7 +27,7 @@ class WebAppFactoryInterface;
 
 class PluginLoader {
  public:
-  PluginLoader(std::unique_ptr<PluginLibWrapper> lib_wrapper);
+  explicit PluginLoader(std::unique_ptr<PluginLibWrapper> lib_wrapper);
   std::string GetAppType(const std::string& file_name);
   bool Load(const std::string& file_name);
   WebAppFactoryInterface* GetWebAppFactoryInstance(

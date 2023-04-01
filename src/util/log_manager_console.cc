@@ -22,6 +22,7 @@
 #include "log_manager_console.h"
 
 namespace {
+
 // Source: /usr/include/PmLogLib.h
 enum PmLogLevelSubstitution {
   kPmLogLevel_None = -1,     /* no output */

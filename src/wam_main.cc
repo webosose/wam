@@ -63,8 +63,7 @@ static void StartWebAppManager() {
   bool result = luna_service->StartService();
   UTIL_ASSERT(result);
   WebAppManager::Instance()->SetPlatformModules(
-      std::unique_ptr<PlatformModuleFactoryImpl>(
-          new PlatformModuleFactoryImpl()));
+      std::make_unique<PlatformModuleFactoryImpl>());
 }
 
 class WebOSMainDelegateWAM : public webos::WebOSMainDelegate {

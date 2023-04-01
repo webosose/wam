@@ -15,8 +15,6 @@
 // SPDX-License-Identifier: Apache-2.0
 #include "log_manager_pmlog.h"
 
-#include <cstring>
-
 PmLogContext GetCustomPmLogContext(const char* context_id) {
   PmLogContext context;
   PmLogGetContext(context_id, &context);
@@ -25,8 +23,8 @@ PmLogContext GetCustomPmLogContext(const char* context_id) {
 
 extern PmLogContext GetWAMPmLogContext() {
   static PmLogContext wam_log_context;
-  // static variables are always initialized to 0 if not specified
-  if (0 == wam_log_context) {
+  // static variables are always initialized to nullptr if not specified
+  if (nullptr == wam_log_context) {
     PmLogGetContext(LOG_CONTEXT, &wam_log_context);
   }
   return wam_log_context;

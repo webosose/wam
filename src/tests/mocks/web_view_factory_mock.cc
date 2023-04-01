@@ -20,7 +20,7 @@
 
 #include "web_view.h"
 
-WebViewFactoryMock::WebViewFactoryMock() : web_view_(nullptr) {}
+WebViewFactoryMock::WebViewFactoryMock() = default;
 
 WebViewFactoryMock::~WebViewFactoryMock() = default;
 

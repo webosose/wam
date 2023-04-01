@@ -32,8 +32,7 @@ const char* toStr(const bool value) {
 
 }  // namespace
 
-PalmSystemBlink::PalmSystemBlink(WebAppBase* app)
-    : PalmSystemWebOS(app), initialized_(false) {}
+PalmSystemBlink::PalmSystemBlink(WebAppBase* app) : PalmSystemWebOS(app) {}
 
 std::string PalmSystemBlink::HandleBrowserControlMessage(
     const std::string& command,
@@ -232,7 +231,7 @@ Json::Value PalmSystemBlink::Initialize() {
   data["identifier"] = Identifier();
   data["screenOrientation"] = ScreenOrientation();
   data["deviceInfo"] = GetDeviceInfo("TvDeviceInfo");
-  data["activityId"] = (double)ActivityId();
+  data["activityId"] = static_cast<double>(ActivityId());
   data["phoneRegion"] = PhoneRegion();
   data["folderPath"] = app_->GetAppDescription()->FolderPath();
 

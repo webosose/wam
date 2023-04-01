@@ -21,8 +21,8 @@
 
 class PalmSystemBase {
  public:
-  PalmSystemBase() {}
-  virtual ~PalmSystemBase() {}
+  PalmSystemBase() = default;
+  virtual ~PalmSystemBase() = default;
 
  protected:
   virtual std::string GetDeviceInfo(const std::string& name) const;

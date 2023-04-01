@@ -28,21 +28,21 @@ PlatformModuleFactoryImpl::PlatformModuleFactoryImpl() {
 
 std::unique_ptr<ServiceSender>
 PlatformModuleFactoryImpl::CreateServiceSender() {
-  return std::unique_ptr<ServiceSenderLuna>(new ServiceSenderLuna());
+  return std::make_unique<ServiceSenderLuna>();
 }
 
 std::unique_ptr<WebProcessManager>
 PlatformModuleFactoryImpl::CreateWebProcessManager() {
-  return std::unique_ptr<BlinkWebProcessManager>(new BlinkWebProcessManager());
+  return std::make_unique<BlinkWebProcessManager>();
 }
 
 std::unique_ptr<DeviceInfo> PlatformModuleFactoryImpl::CreateDeviceInfo() {
-  return std::unique_ptr<DeviceInfoImpl>(new DeviceInfoImpl());
+  return std::make_unique<DeviceInfoImpl>();
 }
 
 std::unique_ptr<WebAppManagerConfig>
 PlatformModuleFactoryImpl::CreateWebAppManagerConfig() {
-  return std::unique_ptr<WebAppManagerConfig>(new WebAppManagerConfig());
+  return std::make_unique<WebAppManagerConfig>();
 }
 
 void PlatformModuleFactoryImpl::PrepareRenderingContext() {}

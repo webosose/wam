@@ -30,7 +30,7 @@ class WebAppWindowFactoryMock : public WebAppWindowFactory {
   void SetWebAppWindow(WebAppWindow* web_app_window);
 
  private:
-  WebAppWindow* web_app_window_;
+  WebAppWindow* web_app_window_ = nullptr;
 };
 
 #endif  // TESTS_MOCKS_WEB_APP_WINDOW_FACTORY_MOCK_H_

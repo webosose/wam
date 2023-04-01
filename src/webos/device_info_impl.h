@@ -26,23 +26,23 @@ class DeviceInfoImpl : public DeviceInfo {
   void Initialize() override;
 
  private:
-  int screen_width_;
-  int screen_height_;
+  int screen_width_ = 0;
+  int screen_height_ = 0;
 
-  float screen_density_;
+  float screen_density_ = 1.0f;
 
-  std::string model_name_;
-  std::string platform_version_;
+  std::string model_name_ = "webOS.Open";
+  std::string platform_version_ = "00.00.00";
 
   // platform versions are <major>.<minor>.<dot>
-  int version_major_;
-  int version_minor_;
-  int version_dot_;
+  int version_major_ = 0;
+  int version_minor_ = 0;
+  int version_dot_ = 0;
 
-  bool support_3d_;
+  bool support_3d_ = false;
   std::string ota_id_;
-  std::string hardware_version_;
-  std::string firmware_version_;
+  std::string hardware_version_ = "0x00000001";
+  std::string firmware_version_ = "00.00.01";
 
   bool GetInfoFromLunaPrefs(const char* key, std::string& value) const;
   void InitDisplayInfo();

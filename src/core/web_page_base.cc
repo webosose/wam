@@ -36,37 +36,17 @@ namespace {
 
 const char kIdentifierForNetErrorPage[] = "com.webos.settingsservice.client";
 
-}
+}  // namespace
 
-WebPageBase::WebPageBase()
-    : app_desc_(nullptr),
-      suspend_at_load_(false),
-      is_closing_(false),
-      is_load_error_page_finish_(false),
-      is_load_error_page_start_(false),
-      did_error_page_loaded_from_net_error_helper_(false),
-      enable_background_run_(false),
-      default_url_(std::string()),
-      load_error_policy_("default"),
-      cleaning_resources_(false),
-      is_preload_(false) {}
+WebPageBase::WebPageBase() = default;
 
 WebPageBase::WebPageBase(const wam::Url& url,
                          std::shared_ptr<ApplicationDescription> desc,
                          const std::string& params)
     : app_desc_(desc),
       app_id_(desc->Id()),
-      suspend_at_load_(false),
-      is_closing_(false),
-      is_load_error_page_finish_(false),
-      is_load_error_page_start_(false),
-      did_error_page_loaded_from_net_error_helper_(false),
-      enable_background_run_(false),
       default_url_(url),
-      launch_params_(params),
-      load_error_policy_("default"),
-      cleaning_resources_(false),
-      is_preload_(false) {
+      launch_params_(params) {
   Json::Value json = util::StringToJson(params);
   if (json.isObject()) {
     instance_id_ = json["instanceId"].asString();
@@ -145,11 +125,11 @@ void WebPageBase::SetupLaunchEvent() {
 }
 
 void WebPageBase::SendLocaleChangeEvent(const std::string& language) {
-  // TODO(luc2.tran): This should be probably run only when |enable_background_run_|
-  // is set to 'true' or the web app is not suspended. The other case (app is suspended),
-  // I think we're better not to run the script instead of using a timeout.
-  // Using the timeout could make unexpected behavior when the app is unsuspended
-  // and then all timers will be executed.
+  // TODO(luc2.tran): This should be probably run only when
+  // |enable_background_run_| is set to 'true' or the web app is not suspended.
+  // The other case (app is suspended), I think we're better not to run the
+  // script instead of using a timeout. Using the timeout could make unexpected
+  // behavior when the app is unsuspended and then all timers will be executed.
   EvaluateJavaScript(
       "setTimeout(function () {"
       "    var localeEvent=new CustomEvent('webOSLocaleChange');"

@@ -23,6 +23,7 @@
 #include "web_app_manager_service_luna.h"
 
 namespace {
+
 static constexpr char kApplicationId[] = "bareapp";
 
 // TODO: Move it to separate file.
@@ -77,6 +78,7 @@ constexpr char kLaunchAppJsonBody[] = R"({
   "launchingProcId": "",
   "instanceId": "de90e74a-b86b-42c8-8785-3efd927a36430"
 })";
+
 }  // namespace
 
 TEST(SetInspectorEnableTest, checkLunaRequestIsDummy) {

@@ -27,8 +27,8 @@ class WebPageBlinkDelegate;
 class BlinkWebView : public webos::WebViewBase {
  public:
   // TODO need to refactor both constructors (here & pluggables)
-  BlinkWebView(bool doInitialize = true);
-  BlinkWebView(const std::string& group) : BlinkWebView() {}
+  explicit BlinkWebView(bool doInitialize = true);
+  explicit BlinkWebView(const std::string& group) : BlinkWebView() {}
 
   void AddUserScript(const std::string& script);
   void ClearUserScripts();
@@ -79,10 +79,10 @@ class BlinkWebView : public webos::WebViewBase {
   void DidErrorPageLoadedFromNetErrorHelper() override;
 
  private:
-  WebPageBlinkDelegate* delegate_;
-  int progress_;
+  WebPageBlinkDelegate* delegate_ = nullptr;
+  int progress_ = 0;
 
-  bool user_script_executed_;
+  bool user_script_executed_ = false;
   std::vector<std::string> user_scripts_;
 };
 

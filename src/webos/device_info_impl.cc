@@ -25,18 +25,7 @@
 #include "log_manager.h"
 #include "utils.h"
 
-DeviceInfoImpl::DeviceInfoImpl()
-    : screen_width_(0),
-      screen_height_(0),
-      screen_density_(1.0f),
-      model_name_("webOS.Open"),
-      platform_version_("00.00.00"),
-      version_major_(0),
-      version_minor_(0),
-      version_dot_(0),
-      support_3d_(false),
-      hardware_version_("0x00000001"),
-      firmware_version_("00.00.01") {}
+DeviceInfoImpl::DeviceInfoImpl() = default;
 
 void DeviceInfoImpl::Initialize() {
   const std::string& json_string =
@@ -71,14 +60,14 @@ void DeviceInfoImpl::Initialize() {
 
 bool DeviceInfoImpl::GetInfoFromLunaPrefs(const char* key,
                                           std::string& value) const {
-  char* str = 0;
+  char* str = nullptr;
   if (LP_ERR_NONE == LPSystemCopyStringValue(key, &str) && str) {
     value = str;
-    g_free((gchar*)str);
+    g_free(static_cast<gchar*>(str));
     return true;
   }
 
-  g_free((gchar*)str);
+  g_free(static_cast<gchar*>(str));
   value = "Unknown";
   return false;
 }

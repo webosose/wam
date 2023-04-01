@@ -34,7 +34,7 @@ class WebAppBase;
 class WebProcessManager {
  public:
   WebProcessManager();
-  virtual ~WebProcessManager() {}
+  virtual ~WebProcessManager() = default;
 
   uint32_t GetWebProcessProxyID(const ApplicationDescription* desc) const;
   uint32_t GetWebProcessProxyID(uint32_t pid) const;
@@ -72,21 +72,19 @@ class WebProcessManager {
                    uint32_t code_cache = kDefaultCodeCache)
         : proxy_id_(id),
           web_process_pid_(pid),
-          number_of_apps_(1),
           memory_cache_size_(memory_cache),
-          code_cache_size_(code_cache),
-          request_kill_(false) {}
+          code_cache_size_(code_cache) {}
 
     uint32_t proxy_id_;
     uint32_t web_process_pid_;
-    uint32_t number_of_apps_;
+    uint32_t number_of_apps_ = 1;
     uint32_t memory_cache_size_;
     uint32_t code_cache_size_;
-    bool request_kill_;
+    bool request_kill_ = false;
   };
   std::unordered_map<std::string, WebProcessInfo> web_process_info_map_;
 
-  uint32_t maximum_number_of_processes_;
+  uint32_t maximum_number_of_processes_ = 1;
   std::vector<std::string> web_process_group_app_id_list_;
   std::vector<std::string> web_process_group_trust_level_list_;
 };

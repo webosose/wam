@@ -26,7 +26,7 @@ namespace wam {
 class Url {
  public:
   typedef std::vector<std::pair<std::string, std::string>> UrlQuery;
-  Url(const std::string& uri);
+  explicit Url(const std::string& uri);
   ~Url() = default;
 
   std::string Scheme() const { return scheme_; }

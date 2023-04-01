@@ -22,7 +22,7 @@
 
 class DeviceInfo {
  public:
-  virtual ~DeviceInfo() {}
+  virtual ~DeviceInfo() = default;
 
   virtual void Initialize() {}
   virtual void Terminate() {}

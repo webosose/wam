@@ -20,16 +20,7 @@
 
 #include "utils.h"
 
-WebAppManagerConfig::WebAppManagerConfig()
-    : suspend_delay_time_(0),
-      max_custom_suspend_delay_time_(0),
-      dev_mode_enabled_(false),
-      inspector_enabled_(false),
-      dynamic_pluggable_load_enabled_(false),
-      post_web_process_created_disabled_(false),
-      check_launch_time_enabled_(false),
-      use_system_app_optimization_(false),
-      launch_optimization_enabled_(false) {
+WebAppManagerConfig::WebAppManagerConfig() {
   InitConfiguration();
 }
 

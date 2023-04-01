@@ -16,17 +16,17 @@
 
 project(webappmgr-default-plugin VERSION 1.0.0 DESCRIPTION "Default WAM plugin")
 
-set (SOURCES
+set(SOURCES
     web_app_factory_luna.cc
     web_app_wayland_webos.cc
 )
 
-set (HEADERS
+set(HEADERS
     web_app_factory_luna.h
     web_app_wayland_webos.h
 )
 
-set (WAM_PLUGIN_INCLUDE_DIRS
+set(WAM_PLUGIN_INCLUDE_DIRS
     ${CHROMIUM_INCLUDE_DIRS}
     ${WAM_ROOT_SOURCE_DIR}/core
     ${WAM_ROOT_SOURCE_DIR}/platform

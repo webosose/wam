@@ -26,7 +26,7 @@ class WebAppWayland;
 
 class PalmSystemWebOS : public PalmSystemBase {
  public:
-  PalmSystemWebOS(WebAppBase* app);
+  explicit PalmSystemWebOS(WebAppBase* app);
 
   virtual void SetCountry() {}
   virtual void SetFolderPath(const std::string& params) {}

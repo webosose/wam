@@ -84,8 +84,8 @@ class WebAppManagerServiceLuna : public PalmServiceBase,
 
   static LSMethod methods_[];
 
-  bool boot_done_;
-  std::string debug_level_;
+  bool boot_done_ = false;
+  std::string debug_level_ = "release";
 
  private:
   bool IsValidInstanceId(const std::string& instance_id);

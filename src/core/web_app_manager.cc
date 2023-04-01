@@ -52,11 +52,7 @@ WebAppManager* WebAppManager::Instance() {
 }
 
 WebAppManager::WebAppManager()
-    : deleting_pages_(false),
-      network_status_manager_(new NetworkStatusManager()),
-      suspend_delay_(0),
-      max_custom_suspend_delay_(0),
-      is_accessibility_enabled_(false) {}
+    : network_status_manager_(std::make_unique<NetworkStatusManager>()) {}
 
 WebAppManager::~WebAppManager() {
   if (device_info_)
@@ -66,8 +62,7 @@ WebAppManager::~WebAppManager() {
 void WebAppManager::NotifyMemoryPressure(
     webos::WebViewBase::MemoryPressureLevel level) {
   std::list<const WebAppBase*> app_list = RunningApps();
-  for (auto it = app_list.begin(); it != app_list.end(); ++it) {
-    const WebAppBase* app = *it;
+  for (const WebAppBase* app : app_list) {
     // Skip memory pressure handling on preloaded apps if chromium pressure is
     // critical (when system is on low or critical) because they will be killed
     // anyway
@@ -201,10 +196,7 @@ void WebAppManager::OnRelaunchApp(const std::string& instance_id,
 }
 
 bool WebAppManager::SetInspectorEnable(const std::string& app_id) {
-  // 1. find appId from then running App List,
-  for (AppList::const_iterator it = app_list_.begin(); it != app_list_.end();
-       ++it) {
-    WebAppBase* app = (*it);
+  for (const WebAppBase* app : app_list_) {
     if (app_id == app->Page()->AppId()) {
       LOG_DEBUG("[%s] setInspectorEnable", app_id.c_str());
       app->Page()->SetInspectorEnable();
@@ -217,9 +209,8 @@ bool WebAppManager::SetInspectorEnable(const std::string& app_id) {
 void WebAppManager::OnShutdownEvent() {
 #if defined(TARGET_DESKTOP)
 
-  for (AppList::const_iterator it = app_list_.begin(); it != app_list_.end();
-       ++it) {
-    delete (*it);
+  for (const WebAppBase* app : app_list_) {
+    delete app;
   }
 
 //		Palm::WebGlobal::garbageCollectNow();
@@ -262,9 +253,8 @@ bool WebAppManager::OnPauseApp(const std::string& instance_id) {
 std::list<const WebAppBase*> WebAppManager::RunningApps() {
   std::list<const WebAppBase*> apps;
 
-  for (AppList::const_iterator it = app_list_.begin(); it != app_list_.end();
-       ++it) {
-    apps.push_back(*it);
+  for (const WebAppBase* app : app_list_) {
+    apps.push_back(app);
   }
 
   return apps;
@@ -273,10 +263,7 @@ std::list<const WebAppBase*> WebAppManager::RunningApps() {
 std::list<const WebAppBase*> WebAppManager::RunningApps(uint32_t pid) {
   std::list<const WebAppBase*> apps;
 
-  for (AppList::const_iterator it = app_list_.begin(); it != app_list_.end();
-       ++it) {
-    WebAppBase* app = (*it);
-
+  for (const WebAppBase* app : app_list_) {
     if (app->Page()->GetWebProcessPID() == pid)
       apps.push_back(app);
   }
@@ -419,12 +406,10 @@ void WebAppManager::CloseAppInternal(WebAppBase* app,
 bool WebAppManager::CloseAllApps(uint32_t pid) {
   AppList running_apps;
 
-  for (AppList::iterator it = app_list_.begin(); it != app_list_.end(); ++it) {
-    WebAppBase* app = (*it);
-    if (!pid)
+  for (WebAppBase* app : app_list_) {
+    if (!pid || web_process_manager_->GetWebProcessPID(app) == pid) {
       running_apps.insert(running_apps.end(), app);
-    else if (web_process_manager_->GetWebProcessPID(app) == pid)
-      running_apps.insert(running_apps.end(), app);
+    }
   }
 
   AppList::iterator it = running_apps.begin();
@@ -474,21 +459,17 @@ void WebAppManager::WebPageRemoved(WebPageBase* page) {
 }
 
 WebAppBase* WebAppManager::FindAppById(const std::string& app_id) {
-  for (AppList::iterator it = app_list_.begin(); it != app_list_.end(); ++it) {
-    WebAppBase* app = (*it);
-
+  for (WebAppBase* app : app_list_) {
     if (app->Page() && app->AppId() == app_id)
       return app;
   }
 
-  return 0;
+  return nullptr;
 }
 
 std::list<WebAppBase*> WebAppManager::FindAppsById(const std::string& appId) {
   std::list<WebAppBase*> apps;
-  for (AppList::iterator it = app_list_.begin(); it != app_list_.end(); ++it) {
-    WebAppBase* app = (*it);
-
+  for (WebAppBase* app : app_list_) {
     if (app->Page() && app->AppId() == appId)
       apps.push_back(app);
   }
@@ -497,14 +478,12 @@ std::list<WebAppBase*> WebAppManager::FindAppsById(const std::string& appId) {
 }
 
 WebAppBase* WebAppManager::FindAppByInstanceId(const std::string& instance_id) {
-  for (AppList::iterator it = app_list_.begin(); it != app_list_.end(); ++it) {
-    WebAppBase* app = (*it);
-
+  for (WebAppBase* app : app_list_) {
     if (app->Page() && (app->InstanceId() == instance_id))
       return app;
   }
 
-  return 0;
+  return nullptr;
 }
 
 void WebAppManager::AppDeleted(WebAppBase* app) {
@@ -520,9 +499,7 @@ void WebAppManager::SetSystemLanguage(const std::string& language) {
 
   device_info_->SetSystemLanguage(language);
 
-  for (AppList::const_iterator it = app_list_.begin(); it != app_list_.end();
-       ++it) {
-    WebAppBase* app = (*it);
+  for (WebAppBase* app : app_list_) {
     app->SetPreferredLanguages(language);
   }
 
@@ -546,9 +523,7 @@ void WebAppManager::SetDeviceInfo(const std::string& name,
 
 void WebAppManager::BroadcastWebAppMessage(WebAppMessageType type,
                                            const std::string& message) {
-  for (AppList::const_iterator it = app_list_.begin(); it != app_list_.end();
-       ++it) {
-    WebAppBase* app = (*it);
+  for (WebAppBase* app : app_list_) {
     app->HandleWebAppMessage(type, message);
   }
 }
@@ -634,7 +609,7 @@ void WebAppManager::KillCustomPluginProcess(const std::string& base_path) {
  *
  * @param appId The application ID to launch.
  * @param params The call parameters.
- * @param the ID of the application performing the launch (can be NULL).
+ * @param the ID of the application performing the launch (can be nullptr).
  * @param errMsg The error message (will be empty if this call was successful).
  *
  * @todo: this should now be moved private and be protected...leaving it for now
@@ -708,9 +683,11 @@ std::string WebAppManager::Launch(const std::string& app_desc_string,
 bool WebAppManager::IsRunningApp(const std::string& id) {
   std::list<const WebAppBase*> running = RunningApps();
 
-  for (auto it = running.begin(); it != running.end(); ++it)
-    if ((*it)->InstanceId() == id)
+  for (const WebAppBase* app : running) {
+    if (app->InstanceId() == id) {
       return true;
+    }
+  }
   return false;
 }
 
@@ -718,13 +695,10 @@ std::vector<ApplicationInfo> WebAppManager::List(bool include_system_apps) {
   std::vector<ApplicationInfo> list;
 
   std::list<const WebAppBase*> running = RunningApps();
-  for (auto it = running.begin(); it != running.end(); ++it) {
-    const WebAppBase* web_app_base = *it;
-    if (web_app_base->AppId().size() ||
-        (!web_app_base->AppId().size() && include_system_apps)) {
-      uint32_t pid = web_process_manager_->GetWebProcessPID(web_app_base);
-      list.push_back(ApplicationInfo(web_app_base->InstanceId(),
-                                     web_app_base->AppId(), pid));
+  for (const WebAppBase* app : running) {
+    if (!app->AppId().empty() || include_system_apps) {
+      uint32_t pid = web_process_manager_->GetWebProcessPID(app);
+      list.emplace_back(app->InstanceId(), app->AppId(), pid);
     }
   }
 
@@ -783,11 +757,12 @@ void WebAppManager::SetAccessibilityEnabled(bool enabled) {
   if (is_accessibility_enabled_ == enabled)
     return;
 
-  for (auto it = app_list_.begin(); it != app_list_.end(); ++it) {
+  for (WebAppBase* app : app_list_) {
     // set audion guidance on/off on settings app
-    if ((*it)->Page())
-      (*it)->Page()->SetAudioGuidanceOn(enabled);
-    (*it)->SetUseAccessibility(enabled);
+    if (app->Page()) {
+      app->Page()->SetAudioGuidanceOn(enabled);
+    }
+    app->SetUseAccessibility(enabled);
   }
 
   is_accessibility_enabled_ = enabled;
@@ -795,8 +770,7 @@ void WebAppManager::SetAccessibilityEnabled(bool enabled) {
 
 void WebAppManager::SendEventToAllAppsAndAllFrames(
     const std::string& jsscript) {
-  for (auto it = app_list_.begin(); it != app_list_.end(); ++it) {
-    WebAppBase* app = (*it);
+  for (const WebAppBase* app : app_list_) {
     if (app->Page()) {
       LOG_DEBUG("[%s] send event with %s", app->AppId().c_str(),
                 jsscript.c_str());

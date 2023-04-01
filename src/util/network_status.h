@@ -63,8 +63,8 @@ class NetworkStatus {
  private:
   std::string type_;
   Information information_;
-  bool is_internet_connection_available_;
-  bool return_value_;
+  bool is_internet_connection_available_ = false;
+  bool return_value_ = false;
   std::string saved_date_;
 };
 

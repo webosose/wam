@@ -24,7 +24,7 @@ class WebAppBase;
 
 class PlugInService {
  public:
-  virtual ~PlugInService() {}
+  virtual ~PlugInService() = default;
   virtual void StartService() = 0;
 
  protected:

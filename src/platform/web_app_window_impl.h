@@ -25,7 +25,7 @@ class WebAppWaylandWindow;
 
 class WebAppWindowImpl : public WebAppWindow {
  public:
-  WebAppWindowImpl(std::unique_ptr<WebAppWaylandWindow> window);
+  explicit WebAppWindowImpl(std::unique_ptr<WebAppWaylandWindow> window);
   ~WebAppWindowImpl() override;
 
  private:

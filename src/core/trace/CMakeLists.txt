@@ -16,7 +16,7 @@
 
 project(WebAppMgrTrace VERSION 1.0.0 DESCRIPTION "LTTng tracer of the Web Application Manager")
 
-set (TARGET_SO_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
+set(TARGET_SO_VERSION "${PROJECT_VERSION_MAJOR}.${PROJECT_VERSION_MINOR}")
 
 set(SOURCES
     web_app_manager_tracer_lib.cc
