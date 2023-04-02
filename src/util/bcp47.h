@@ -42,4 +42,4 @@ class BCP47 {
   std::string region_;
 };
 
-#endif  //  UTIL_BCP47_H_
+#endif  // UTIL_BCP47_H_

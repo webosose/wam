@@ -13,6 +13,7 @@
 // limitations under the License.
 //
 // SPDX-License-Identifier: Apache-2.0
+
 #include "log_manager_pmlog.h"
 
 PmLogContext GetCustomPmLogContext(const char* context_id) {

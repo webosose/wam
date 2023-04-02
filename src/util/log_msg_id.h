@@ -14,8 +14,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef LOGMSGID_H
-#define LOGMSGID_H
+#ifndef UTIL_LOG_MSG_ID_H_
+#define UTIL_LOG_MSG_ID_H_
 
 // clang-format off
 // Logging Message IDs
@@ -152,4 +152,4 @@
 
 // clang-format on
 
-#endif  // LOGMSGID_H
+#endif  // UTIL_LOG_MSG_ID_H_

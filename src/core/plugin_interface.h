@@ -14,6 +14,9 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
+#ifndef CORE_PLUGIN_INTERFACE_H_
+#define CORE_PLUGIN_INTERFACE_H_
+
 class WebAppFactoryInterface;
 
 extern "C" {
@@ -21,3 +24,5 @@ extern const char* kPluginApplicationType;
 WebAppFactoryInterface* CreateInstance();
 void DeleteInstance(WebAppFactoryInterface* interface);
 }
+
+#endif  // CORE_PLUGIN_INTERFACE_H_

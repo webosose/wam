@@ -37,4 +37,4 @@ class BlinkWebProcessManager : public WebProcessManager {
   int MaskForBrowsingDataType(const char* type) override;
 };
 
-#endif  // BLINKEBPROCESSMANAGER_H
+#endif  // PLATFORM_WEBENGINE_BLINK_WEB_PROCESS_MANAGER_H_

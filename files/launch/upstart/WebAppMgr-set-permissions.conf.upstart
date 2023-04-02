@@ -24,4 +24,3 @@ script
     chmod 660 /dev/mem
     chmod 775 /dev/shm/sem.kadp-*
 end script
-

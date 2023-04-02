@@ -14,8 +14,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef WEBVIEWIMPL_H
-#define WEBVIEWIMPL_H
+#ifndef PLATFORM_WEBENGINE_WEB_VIEW_IMPL_H_
+#define PLATFORM_WEBENGINE_WEB_VIEW_IMPL_H_
 
 #include <memory>
 #include <string>
@@ -152,4 +152,4 @@ class WebViewImpl : public WebView {
   std::unique_ptr<BlinkWebView> web_view_;
 };
 
-#endif
+#endif  // PLATFORM_WEBENGINE_WEB_VIEW_IMPL_H_

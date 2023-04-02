@@ -168,4 +168,5 @@ class WebAppBase : public WebPageObserver {
   bool close_page_requested_ = false;  // window.close() is called once then
                                        // have to drop further requests
 };
+
 #endif  // CORE_WEB_APP_BASE_H_

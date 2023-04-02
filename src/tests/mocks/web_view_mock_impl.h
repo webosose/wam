@@ -1,4 +1,4 @@
-//  (c) 2021 LG Electronics, Inc.
+// Copyright (c) 2021 LG Electronics, Inc.
 //
 // Licensed under the Apache License, Version 2.0 (the "License");
 // you may not use this file except in compliance with the License.
@@ -14,8 +14,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef tests_mocks_web_view_mock_impl_h_
-#define tests_mocks_web_view_mock_impl_h_
+#ifndef TESTS_MOCKS_WEB_VIEW_MOCK_IMPL_H_
+#define TESTS_MOCKS_WEB_VIEW_MOCK_IMPL_H_
 
 #include <string>
 
@@ -38,4 +38,4 @@ class WebViewMockImpl : public WebViewMock {
 using NiceWebViewMockImpl = testing::NiceMock<WebViewMockImpl>;
 using StrictWebViewMockImpl = testing::StrictMock<WebViewMockImpl>;
 
-#endif  // tests_mocks_web_view_mock_impl_h_
+#endif  // TESTS_MOCKS_WEB_VIEW_MOCK_IMPL_H_

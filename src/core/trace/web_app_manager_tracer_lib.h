@@ -14,8 +14,8 @@
 //
 // SPDX-License-Identifier: Apache-2.0
 
-#ifndef CORE_TRACE_WEB_APP_MANAGER_TRACER_H
-#define CORE_TRACE_WEB_APP_MANAGER_TRACER_H
+#ifndef CORE_TRACE_WEB_APP_MANAGER_TRACER_LIB_H_
+#define CORE_TRACE_WEB_APP_MANAGER_TRACER_LIB_H_
 
 #include <stdlib.h>
 
@@ -41,4 +41,4 @@ void TracePosition(const char* label, int pos_x, int pos_y);
 }
 #endif  // __cplusplus
 
-#endif  // CORE_TRACE_WEB_APP_MANAGER_TRACER_H
+#endif  // CORE_TRACE_WEB_APP_MANAGER_TRACER_LIB_H_
