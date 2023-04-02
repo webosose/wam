@@ -59,7 +59,6 @@ class WebProcessManager {
   WebAppBase* FindAppById(const std::string& app_id);
   WebAppBase* FindAppByInstanceId(const std::string& instance_id);
 
- protected:
   class WebProcessInfo {
    public:
     // FIXME: Fix default cache values when WebKit defaults change.

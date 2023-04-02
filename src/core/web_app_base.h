@@ -154,7 +154,6 @@ class WebAppBase : public WebPageObserver {
   void WebPageClosePageRequested() override;
   void WebPageLoadFinished() override;
 
- protected:
   PreloadState preload_state_ = kNonePreload;
   bool added_to_window_mgr_ = false;
   std::string in_progress_relaunch_params_;

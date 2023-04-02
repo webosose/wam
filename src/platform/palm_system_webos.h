@@ -70,7 +70,6 @@ class PalmSystemWebOS : public PalmSystemBase {
   virtual bool CursorVisibility();
   virtual void UpdateLaunchParams(const std::string& launch_params);
 
- protected:
   WebAppWayland* app_;
   std::string launch_params_;
 };

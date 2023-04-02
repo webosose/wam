@@ -160,7 +160,6 @@ class WebAppManager {
 
   std::string IdentifierForSecurityOrigin(const std::string& identifier);
 
- protected:
  private:
   WebAppFactoryManager* GetWebAppFactory();
   void LoadEnvironmentVariable();

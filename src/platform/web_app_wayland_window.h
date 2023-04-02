@@ -63,7 +63,6 @@ class WebAppWaylandWindow : public webos::WebAppWindowBase {
   static WebAppWaylandWindow* CreateWindow();
   void LogEventDebugging(WebOSEvent* event);
 
- private:
   static WebAppWaylandWindow* instance_;
 
   bool cursor_enabled_;

@@ -53,7 +53,6 @@ class WebPageBlinkPrivate {
 
   ~WebPageBlinkPrivate() = default;
 
- public:
   WebPageBlink* page_;
   std::unique_ptr<WebView> page_view_;
   std::unique_ptr<PalmSystemBlink> palm_system_;

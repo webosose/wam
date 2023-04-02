@@ -35,7 +35,6 @@ class WebAppBasePrivate {
               instance_id_.c_str(), app_id_.c_str());
   }
 
- public:
   WebAppBase* parent_;
   std::unique_ptr<WebPageBase> page_;
   bool keep_alive_ = false;
