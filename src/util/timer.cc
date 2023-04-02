@@ -20,9 +20,9 @@
 
 static int TimeoutCallback(void* data) {
   Timer* timer = static_cast<Timer*>(data);
-  bool isRepeating = timer->IsRepeating();
+  bool is_repeating = timer->IsRepeating();
   timer->HandleCallback();
-  return isRepeating;
+  return is_repeating;
 }
 
 static int TimeoutCallbackDestroy(void* data) {

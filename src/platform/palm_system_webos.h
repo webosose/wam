@@ -57,7 +57,7 @@ class PalmSystemWebOS : public PalmSystemBase {
   virtual void SetKeepAlive(bool keep);
   virtual void SetLoadErrorPolicy(const std::string& params) {}
   virtual void SetInputRegion(const std::string& params);
-  virtual void SetGroupClientEnvironment(GroupClientCallKey callKey,
+  virtual void SetGroupClientEnvironment(GroupClientCallKey call_key,
                                          const std::string& params);
 
   virtual void LogMsgWithClock(const std::string& msg_id,

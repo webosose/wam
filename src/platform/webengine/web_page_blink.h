@@ -81,7 +81,7 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   uint32_t GetWebProcessProxyID() override;
   uint32_t GetWebProcessPID() const override { return RenderProcessPid(); }
   void CreatePalmSystem(WebAppBase* app) override;
-  void SetUseLaunchOptimization(bool enabled, int delayMs = 0) override;
+  void SetUseLaunchOptimization(bool enabled, int delay_ms = 0) override;
   void SetUseSystemAppOptimization(bool enabled) override;
   void SetUseAccessibility(bool enabled) override;
   void SetAppPreloadHint(bool is_preload) override;
@@ -96,7 +96,7 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   void UpdateIsLoadErrorPageFinish() override;
   void UpdateDatabaseIdentifier() override;
   void SetInspectorEnable() override;
-  void SetKeepAliveWebApp(bool keepAlive) override;
+  void SetKeepAliveWebApp(bool keep_alive) override;
   void ForwardEvent(void* event) override;
   void SetAudioGuidanceOn(bool on) override;
   void ActivateRendererCompositor() override;

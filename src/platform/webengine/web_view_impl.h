@@ -121,7 +121,7 @@ class WebViewImpl : public WebView {
   void SetAdditionalFontFamilyEnabled(bool enable) override;
   void SetNetworkStableTimeout(double timeout) override;
   void SetAllowFakeBoldText(bool allow) override;
-  void SetAppId(const std::string& appId) override;
+  void SetAppId(const std::string& app_id) override;
   void SetSecurityOrigin(const std::string& identifier) override;
   void SetAcceptLanguages(const std::string& lauguages) override;
   void SetBoardType(const std::string& board_type) override;

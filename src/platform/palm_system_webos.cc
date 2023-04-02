@@ -32,11 +32,11 @@ PalmSystemWebOS::PalmSystemWebOS(WebAppBase* app)
     : app_(static_cast<WebAppWayland*>(app)) {}
 
 void PalmSystemWebOS::SetLaunchParams(const std::string& params) {
-  Json::Value jsonDoc = Json::nullValue;
+  Json::Value json_doc = Json::nullValue;
 
-  const bool result = util::StringToJson(params, jsonDoc);
+  const bool result = util::StringToJson(params, json_doc);
 
-  if (!result || jsonDoc.isNull())
+  if (!result || json_doc.isNull())
     launch_params_.erase();
   else
     launch_params_ = params;
@@ -62,8 +62,8 @@ int PalmSystemWebOS::ActivityId() const {
 }
 
 void PalmSystemWebOS::Activate() {
-  ApplicationDescription* appDesc = app_->GetAppDescription();
-  if (appDesc && !appDesc->HandlesRelaunch())
+  ApplicationDescription* app_desc = app_->GetAppDescription();
+  if (app_desc && !app_desc->HandlesRelaunch())
     return;
 
   // ask compositor to raise window. Compositor should raise us, then
@@ -98,23 +98,23 @@ void PalmSystemWebOS::Hide() {
 
 void PalmSystemWebOS::SetInputRegion(const std::string& params) {
   // this function is not related to windowGroup anymore
-  Json::Value jsonDoc;
-  const bool result = util::StringToJson(params, jsonDoc);
+  Json::Value json_doc;
+  const bool result = util::StringToJson(params, json_doc);
   if (result)
-    app_->SetInputRegion(jsonDoc);
+    app_->SetInputRegion(json_doc);
   else
     LOG_ERROR(MSGID_TYPE_ERROR, 0, "[%s] setInputRegion failed, params='%s'",
               app_->AppId().c_str(), params.c_str());
 }
 
-void PalmSystemWebOS::SetGroupClientEnvironment(GroupClientCallKey callKey,
+void PalmSystemWebOS::SetGroupClientEnvironment(GroupClientCallKey call_key,
                                                 const std::string& params) {
   ApplicationDescription* app_desc = app_ ? app_->GetAppDescription() : nullptr;
   if (app_desc) {
     ApplicationDescription::WindowGroupInfo group_info =
         app_desc->GetWindowGroupInfo();
     if (!group_info.name.empty() && !group_info.is_owner) {
-      switch (callKey) {
+      switch (call_key) {
         case kKeyMask: {
           Json::Value json_doc;
           const bool result = util::StringToJson(params, json_doc);

@@ -112,22 +112,22 @@ class PmtraceProviderLibWrapper {
       func_trace_item_(name, value);
   }
 
-  void DoTracePosition(const char* label, int posX, int posY) {
+  void DoTracePosition(const char* label, int pos_x, int pos_y) {
     if (CheckIsReady())
-      func_trace_position_(label, posX, posY);
+      func_trace_position_(label, pos_x, pos_y);
   }
 
  private:
   PmtraceProviderLibWrapper() = default;
 
   bool CheckIsReady() {
-    if (!is_ready && !lib_handle_) {
+    if (!is_ready_ && !lib_handle_) {
       lib_handle_ = dlopen(TRACE_PROVIDER_LIB_PATH, RTLD_LAZY);
       if (!lib_handle_) {
         LOG_ERROR(MSGID_DL_ERROR, 0, "The provider library loading error: %s",
                   dlerror());
       } else {
-        is_ready =
+        is_ready_ =
             TryGetFunction<LibFunctypeTraceLabel>(lib_handle_, kTraceMessage,
                                                   func_trace_message_) &&
             TryGetFunction<LibFunctypeTraceLabel>(lib_handle_, kTraceBefore,
@@ -149,10 +149,10 @@ class PmtraceProviderLibWrapper {
       }
     }
 
-    return is_ready;
+    return is_ready_;
   }
 
-  bool is_ready = false;
+  bool is_ready_ = false;
   void* lib_handle_ = nullptr;
   FunctypeTraceLabel func_trace_message_ = nullptr;
   FunctypeTraceLabel func_trace_before_ = nullptr;
@@ -199,6 +199,6 @@ void pmtrace::TraceItem(const char* name, const char* value) {
   PmtraceProviderLibWrapper::Instance()->DoTraceItem(name, value);
 }
 
-void pmtrace::TracePosition(const char* label, int posX, int posY) {
-  PmtraceProviderLibWrapper::Instance()->DoTracePosition(label, posX, posY);
+void pmtrace::TracePosition(const char* label, int pos_x, int pos_y) {
+  PmtraceProviderLibWrapper::Instance()->DoTracePosition(label, pos_x, pos_y);
 }

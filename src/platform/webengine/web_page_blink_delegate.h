@@ -40,8 +40,8 @@ class WebPageBlinkDelegate {
       std::string* result) = 0;
   virtual void LoadFinished(const std::string& url) = 0;
   virtual void LoadFailed(const std::string& url,
-                          int errCode,
-                          const std::string& errDesc) = 0;
+                          int err_code,
+                          const std::string& err_desc) = 0;
   virtual void LoadStopped() = 0;
   virtual void LoadAborted(const std::string& url) = 0;
   virtual void LoadStarted() {}

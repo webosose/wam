@@ -70,7 +70,7 @@ class WebView {
   virtual void SetVisible(bool visible) = 0;
   virtual void SetPrerenderState() = 0;
   virtual void SetVisibilityState(
-      webos::WebViewBase::WebPageVisibilityState visibilityState) = 0;
+      webos::WebViewBase::WebPageVisibilityState visibility_state) = 0;
   virtual std::string DocumentTitle() const = 0;
   virtual void SuspendWebPageDOM() = 0;
   virtual void ResumeWebPageDOM() = 0;
@@ -124,7 +124,7 @@ class WebView {
   virtual void SetAdditionalFontFamilyEnabled(bool enable) = 0;
   virtual void SetNetworkStableTimeout(double timeout) = 0;
   virtual void SetAllowFakeBoldText(bool allow) = 0;
-  virtual void SetAppId(const std::string& appId) = 0;
+  virtual void SetAppId(const std::string& app_id) = 0;
   virtual void SetSecurityOrigin(const std::string& identifier) = 0;
   virtual void SetAcceptLanguages(const std::string& lauguages) = 0;
   virtual void SetBoardType(const std::string& board_type) = 0;

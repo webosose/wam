@@ -42,7 +42,7 @@ class WebAppFactoryManagerMock : public WebAppFactoryManager {
                              const wam::Url& url,
                              std::shared_ptr<ApplicationDescription> desc,
                              const std::string& app_type,
-                             const std::string& launchParams) override;
+                             const std::string& launch_params) override;
 
   void SetWebViewFactory(WebViewFactory* view_factory);
   void SetWebAppWindowFactory(WebAppWindowFactory* window_factory);

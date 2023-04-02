@@ -73,6 +73,6 @@ class WebOSMainDelegateWAM : public webos::WebOSMainDelegate {
 
 int main(int argc, const char** argv) {
   WebOSMainDelegateWAM delegate;
-  webos::WebOSMain webOSMain(&delegate);
-  return webOSMain.Run(argc, argv);
+  webos::WebOSMain webos_main(&delegate);
+  return webos_main.Run(argc, argv);
 }

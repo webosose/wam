@@ -81,9 +81,9 @@ class WebAppManagerService {
                        const std::string& params,
                        const std::string& launching_app_id,
                        int& err_code,
-                       std::string& errMsg);
+                       std::string& err_msg);
 
-  bool OnKillApp(const std::string& appId,
+  bool OnKillApp(const std::string& app_id,
                  const std::string& instance_id,
                  bool force = false);
   bool OnPauseApp(const std::string& instance_id);
@@ -99,7 +99,7 @@ class WebAppManagerService {
   void SetUiSize(int width, int height);
   void SetSystemLanguage(const std::string& language);
   std::string GetSystemLanguage();
-  void SetForceCloseApp(const std::string& appId,
+  void SetForceCloseApp(const std::string& app_id,
                         const std::string& instance_id);
   void KillCustomPluginProcess(const std::string& app_base_path);
   void RequestKillWebProcess(uint32_t pid);

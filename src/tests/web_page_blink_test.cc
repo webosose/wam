@@ -172,11 +172,11 @@ TEST_F(WebPageBlinkTestSuite, AddCustomPluginDir) {
 
 TEST_F(WebPageBlinkTestSuite, PriviledgetPluginPath) {
   constexpr char path[] = "/usr/palm/applications/com.webos.app.test.webrtc/";
-  constexpr char varName[] = "PRIVILEGED_PLUGIN_PATH";
-  auto actual_value = getenv(varName);
+  constexpr char var_name[] = "PRIVILEGED_PLUGIN_PATH";
+  auto actual_value = getenv(var_name);
   std::string test_value(path);
   if (!actual_value) {
-    int result = setenv(varName, path, false);
+    int result = setenv(var_name, path, false);
     ASSERT_FALSE(result);
   } else {
     test_value = actual_value;
@@ -184,12 +184,12 @@ TEST_F(WebPageBlinkTestSuite, PriviledgetPluginPath) {
 
   EXPECT_CALL(*factory->web_view_, AddAvailablePluginDir(test_value));
 
-  WebPageBlink webPage(wam::Url(description->EntryPoint()), description,
-                       params.c_str(), std::move(factory));
-  webPage.Init();
+  WebPageBlink web_page(wam::Url(description->EntryPoint()), description,
+                        params.c_str(), std::move(factory));
+  web_page.Init();
 
   if (!actual_value) {
-    int result = unsetenv(varName);
+    int result = unsetenv(var_name);
     ASSERT_FALSE(result);
   }
 }
@@ -209,9 +209,9 @@ TEST_F(WebPageBlinkTestSuite, SetMediaCodecCapability) {
     skip = true;
   }
 
-  WebPageBlink webPage(wam::Url(description->EntryPoint()), description,
-                       params.c_str(), std::move(factory));
-  webPage.Init();
+  WebPageBlink web_page(wam::Url(description->EntryPoint()), description,
+                        params.c_str(), std::move(factory));
+  web_page.Init();
 
   if (skip)
     GTEST_SKIP();

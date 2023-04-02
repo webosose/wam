@@ -50,6 +50,6 @@ void TraceItem(const char* name, const char* value) {
   tracepoint(pmtrace_webappmanager3, item, (char*)name, (char*)value);
 }
 
-void TracePosition(const char* label, int posX, int posY) {
-  tracepoint(pmtrace_webappmanager3, position, (char*)label, posX, posY);
+void TracePosition(const char* label, int pos_x, int pos_y) {
+  tracepoint(pmtrace_webappmanager3, position, (char*)label, pos_x, pos_y);
 }

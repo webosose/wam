@@ -116,10 +116,10 @@ Json::Value WebAppManagerServiceLuna::launchApp(const Json::Value& request) {
 
   std::string str_params = util::JsonToString(json_params);
 
-  std::string appId = request["appDesc"]["id"].asString();
+  std::string app_id = request["appDesc"]["id"].asString();
   LOG_INFO_WITH_CLOCK(
       MSGID_APPLAUNCH_START, 4, PMLOGKS("PerfType", "AppLaunch"),
-      PMLOGKS("PerfGroup", appId.c_str()), PMLOGKS("APP_ID", appId.c_str()),
+      PMLOGKS("PerfGroup", app_id.c_str()), PMLOGKS("APP_ID", app_id.c_str()),
       PMLOGKS("INSTANCE_ID", instance_id.c_str()), "params : %s",
       str_params.c_str());
 
@@ -141,8 +141,8 @@ Json::Value WebAppManagerServiceLuna::launchApp(const Json::Value& request) {
 }
 
 bool WebAppManagerServiceLuna::IsValidInstanceId(
-    const std::string& instanceId) {
-  return instanceId.find_first_not_of("\f\n\r\v") != std::string::npos;
+    const std::string& instance_id) {
+  return instance_id.find_first_not_of("\f\n\r\v") != std::string::npos;
 }
 
 Json::Value WebAppManagerServiceLuna::killApp(const Json::Value& request) {
@@ -443,14 +443,14 @@ void WebAppManagerServiceLuna::MemoryManagerConnectCallback(
   }
 
   if (reply["connected"] == true) {
-    Json::Value closeAppObj;
-    closeAppObj["subscribe"] = true;
-    closeAppObj["type"] = "killing";
+    Json::Value close_app_obj;
+    close_app_obj["subscribe"] = true;
+    close_app_obj["type"] = "killing";
 
     if (!Call<WebAppManagerServiceLuna,
               &WebAppManagerServiceLuna::GetCloseAppIdCallback>(
             "luna://com.webos.service.memorymanager/getManagerEvent",
-            closeAppObj, this)) {
+            close_app_obj, this)) {
       LOG_WARNING(MSGID_MEM_MGR_API_CALL_FAIL, 0,
                   "Failed to get close application identifier");
     }
@@ -475,11 +475,11 @@ void WebAppManagerServiceLuna::GetCloseAppIdCallback(const Json::Value& reply) {
     return;
   }
 
-  std::string appId = reply["id"].asString();
-  std::string instanceId = reply["instanceId"].asString();
+  std::string app_id = reply["id"].asString();
+  std::string instance_id = reply["instanceId"].asString();
 
-  if (!appId.empty() && !instanceId.empty())
-    WebAppManagerService::SetForceCloseApp(appId.c_str(), instanceId.c_str());
+  if (!app_id.empty() && !instance_id.empty())
+    WebAppManagerService::SetForceCloseApp(app_id.c_str(), instance_id.c_str());
 }
 
 void WebAppManagerServiceLuna::ThresholdChangedCallback(
@@ -489,19 +489,19 @@ void WebAppManagerServiceLuna::ThresholdChangedCallback(
     return;
   }
 
-  std::string currentLevel = reply["current"].asString();
-  if (currentLevel.empty()) {
+  std::string current_level = reply["current"].asString();
+  if (current_level.empty()) {
     LOG_DEBUG("thresholdChanged without level");
     return;
   }
-  LOG_INFO(MSGID_NOTIFY_MEMORY_STATE, 1, PMLOGKS("State", currentLevel.c_str()),
-           "");
+  LOG_INFO(MSGID_NOTIFY_MEMORY_STATE, 1,
+           PMLOGKS("State", current_level.c_str()), "");
 
   webos::WebViewBase::MemoryPressureLevel level;
-  if (currentLevel.compare("medium") == 0)
+  if (current_level.compare("medium") == 0)
     level = webos::WebViewBase::MEMORY_PRESSURE_LOW;
-  else if (currentLevel.compare("critical") == 0 ||
-           currentLevel.compare("low") == 0)
+  else if (current_level.compare("critical") == 0 ||
+           current_level.compare("low") == 0)
     level = webos::WebViewBase::MEMORY_PRESSURE_CRITICAL;
   else
     level = webos::WebViewBase::MEMORY_PRESSURE_NONE;
@@ -581,9 +581,9 @@ void WebAppManagerServiceLuna::GetForegroundAppInfoCallback(
 
   if (reply["returnValue"] == true) {
     if (reply.isMember("appId") && reply["appId"].isString()) {
-      std::string appId = reply["appId"].asString();
+      std::string app_id = reply["appId"].asString();
       webos::Runtime::GetInstance()->SetIsForegroundAppEnyo(
-          WebAppManagerService::IsEnyoApp(appId.c_str()));
+          WebAppManagerService::IsEnyoApp(app_id.c_str()));
     }
   }
 }

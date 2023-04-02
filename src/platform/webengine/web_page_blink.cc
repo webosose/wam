@@ -294,10 +294,10 @@ void WebPageBlink::ReloadFailedUrl() {
   page_private_->page_view_->LoadUrl(load_failed_url_);
 }
 
-void WebPageBlink::LoadErrorPage(int errorCode) {
+void WebPageBlink::LoadErrorPage(int error_code) {
   const std::string& errorpage = GetWebAppManagerConfig()->GetErrorPageUrl();
   if (!errorpage.empty()) {
-    if (HasLoadErrorPolicy(false, errorCode)) {
+    if (HasLoadErrorPolicy(false, error_code)) {
       // has loadErrorPolicy, do not show error page
       LOG_DEBUG(
           "[%s] has own policy for Error Page, do not load Error page; send "
@@ -329,22 +329,22 @@ void WebPageBlink::LoadErrorPage(int errorCode) {
     if (found != paths.end()) {
       // re-create it as a proper URL, so WebKit can understand it
       is_load_error_page_start_ = true;
-      wam::Url errorUrl = wam::Url::FromLocalFile(*found);
-      if (errorUrl.ToString().empty()) {
+      wam::Url error_url = wam::Url::FromLocalFile(*found);
+      if (error_url.ToString().empty()) {
         LOG_ERROR(MSGID_ERROR_ERROR, 1, PMLOGKS("PATH", errorpage.c_str()),
                   "Error during conversion %s to URI", found->c_str());
         return;
       }
       wam::Url::UrlQuery query;
-      query.emplace_back("errorCode", std::to_string(errorCode));
+      query.emplace_back("errorCode", std::to_string(error_code));
       if (!load_failed_url_.empty())
         query.emplace_back("failedUrl", load_failed_url_);
-      errorUrl.SetQuery(query);
+      error_url.SetQuery(query);
       LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", AppId().c_str()),
                PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
                PMLOGKFV("PID", "%d", GetWebProcessPID()), "LoadErrorPage : %s",
-               errorUrl.ToString().c_str());
-      page_private_->page_view_->LoadUrl(errorUrl.ToString());
+               error_url.ToString().c_str());
+      page_private_->page_view_->LoadUrl(error_url.ToString());
     } else
       LOG_ERROR(MSGID_ERROR_ERROR, 1, PMLOGKS("PATH", errorpage.c_str()),
                 "Error loading error page");
@@ -365,9 +365,9 @@ void WebPageBlink::SetLaunchParams(const std::string& params) {
     page_private_->palm_system_->SetLaunchParams(params);
 }
 
-void WebPageBlink::SetUseLaunchOptimization(bool enabled, int delayMs) {
+void WebPageBlink::SetUseLaunchOptimization(bool enabled, int delay_ms) {
   if (GetWebAppManagerConfig()->IsLaunchOptimizationEnabled())
-    page_private_->page_view_->SetUseLaunchOptimization(enabled, delayMs);
+    page_private_->page_view_->SetUseLaunchOptimization(enabled, delay_ms);
 }
 
 void WebPageBlink::SetUseSystemAppOptimization(bool enabled) {
@@ -509,8 +509,8 @@ void WebPageBlink::SuspendWebPagePaintingAndJSExecution() {
 
   // if we haven't finished loading the page yet, wait until it is loaded before
   // suspending
-  bool isLoading = !HasBeenShown() && Progress() < 100;
-  if (isLoading) {
+  bool is_loading = !HasBeenShown() && Progress() < 100;
+  if (is_loading) {
     LOG_INFO(MSGID_SUSPEND_WEBPAGE, 4, PMLOGKS("APP_ID", AppId().c_str()),
              PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
              PMLOGKFV("PID", "%d", GetWebProcessPID()),
@@ -552,16 +552,16 @@ void WebPageBlink::ResumeWebPagePaintingAndJSExecution() {
 }
 
 std::string WebPageBlink::EscapeData(const std::string& value) {
-  std::string escapedValue = value;
-  util::ReplaceSubstr(escapedValue, "\\", "\\\\");
-  util::ReplaceSubstr(escapedValue, "'", "\\'");
-  util::ReplaceSubstr(escapedValue, "\n", "\\n");
-  util::ReplaceSubstr(escapedValue, "\r", "\\r");
-  return escapedValue;
+  std::string escaped_value = value;
+  util::ReplaceSubstr(escaped_value, "\\", "\\\\");
+  util::ReplaceSubstr(escaped_value, "'", "\\'");
+  util::ReplaceSubstr(escaped_value, "\n", "\\n");
+  util::ReplaceSubstr(escaped_value, "\r", "\\r");
+  return escaped_value;
 }
 
 void WebPageBlink::ReloadExtensionData() {
-  std::string eventJS =
+  std::string event_js =
       "if (typeof(webOSSystem) != 'undefined') {"
       "  webOSSystem.reloadInjectionData();"
       "};";
@@ -569,7 +569,7 @@ void WebPageBlink::ReloadExtensionData() {
   LOG_INFO(MSGID_PALMSYSTEM, 3, PMLOGKS("APP_ID", AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", GetWebProcessPID()), "Reload");
-  EvaluateJavaScript(eventJS);
+  EvaluateJavaScript(event_js);
 }
 
 void WebPageBlink::UpdateExtensionData(const std::string& key,
@@ -582,7 +582,7 @@ void WebPageBlink::UpdateExtensionData(const std::string& key,
                 value.c_str());
     return;
   }
-  std::string eventJS =
+  std::string event_js =
       "if (typeof(webOSSystem) != 'undefined') {"
       "  webOSSystem.updateInjectionData('" +
       EscapeData(key) + "', '" + EscapeData(value) +
@@ -592,7 +592,7 @@ void WebPageBlink::UpdateExtensionData(const std::string& key,
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", GetWebProcessPID()),
            "Update; key:%s; value:%s", key.c_str(), value.c_str());
-  EvaluateJavaScript(eventJS);
+  EvaluateJavaScript(event_js);
 }
 
 void WebPageBlink::HandleDeviceInfoChanged(const std::string& device_info) {
@@ -631,9 +631,9 @@ void WebPageBlink::DidFirstFrameFocused() {
             AppId().c_str());
   // App load is finished, set use launching time optimization false.
   // If Launch optimization had to be done late, use delayMsForLaunchOptmization
-  int delayMs = app_desc_->DelayMsForLaunchOptimization();
-  if (delayMs > 0)
-    SetUseLaunchOptimization(false, delayMs);
+  int delay_ms = app_desc_->DelayMsForLaunchOptimization();
+  if (delay_ms > 0)
+    SetUseLaunchOptimization(false, delay_ms);
   else
     SetUseLaunchOptimization(false);
 }
@@ -687,7 +687,7 @@ void WebPageBlink::DidStartNavigation(const std::string& url,
 }
 
 void WebPageBlink::DidFinishNavigation(const std::string& url,
-                                       bool isInMainFrame) {
+                                       bool is_in_main_frame) {
   LOG_INFO(MSGID_LOAD, 3, PMLOGKS("APP_ID", AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", GetWebProcessPID()), "[CONNECT]%s",
@@ -695,9 +695,9 @@ void WebPageBlink::DidFinishNavigation(const std::string& url,
 }
 
 void WebPageBlink::LoadProgressChanged(double progress) {
-  bool processTenPercent =
+  bool process_ten_percent =
       std::abs(progress - 0.1f) < std::numeric_limits<float>::epsilon();
-  if (!(loading_url_.empty() && processTenPercent)) {
+  if (!(loading_url_.empty() && process_ten_percent)) {
     // loading_url_ is empty then net didStartNavigation yet, default(initial)
     // progress : 0.1 so loading_url_ shouldn't be empty and greater than 0.1
     LOG_INFO(MSGID_LOAD, 3, PMLOGKS("APP_ID", AppId().c_str()),
@@ -885,15 +885,15 @@ void WebPageBlink::AddUserScriptUrl(const wam::Url& url) {
   }
 
   const std::string& path = url.ToLocalFile();
-  const std::string& fileContent = util::ReadFile(path);
+  const std::string& file_content = util::ReadFile(path);
 
-  if (fileContent.empty()) {
+  if (file_content.empty()) {
     LOG_DEBUG(
         "WebPageBlink: Couldn't open '%s' as user script due to error '%s'.",
         path.c_str(), strerror(errno));
     return;
   }
-  page_private_->page_view_->AddUserScript(fileContent);
+  page_private_->page_view_->AddUserScript(file_content);
 }
 
 void WebPageBlink::SetupStaticUserScripts() {
@@ -1022,8 +1022,8 @@ void WebPageBlink::SetFileAccessBlocked(bool blocked) {
   webos::WebViewBase::SetFileAccessBlocked(blocked);
 }
 
-void WebPageBlink::SetAdditionalContentsScale(float scaleX, float scaleY) {
-  page_private_->page_view_->SetAdditionalContentsScale(scaleX, scaleY);
+void WebPageBlink::SetAdditionalContentsScale(float scale_x, float scale_y) {
+  page_private_->page_view_->SetAdditionalContentsScale(scale_x, scale_y);
 }
 
 void WebPageBlink::UpdateHardwareResolution() {
@@ -1122,12 +1122,12 @@ void WebPageBlink::SetInspectorEnable() {
   page_private_->page_view_->EnableInspectablePage();
 }
 
-void WebPageBlink::SetKeepAliveWebApp(bool keepAlive) {
+void WebPageBlink::SetKeepAliveWebApp(bool keep_alive) {
   LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", GetWebProcessPID()), "setKeepAliveWebApp(%s)",
-           keepAlive ? "true" : "false");
-  page_private_->page_view_->SetKeepAliveWebApp(keepAlive);
+           keep_alive ? "true" : "false");
+  page_private_->page_view_->SetKeepAliveWebApp(keep_alive);
   page_private_->page_view_->UpdatePreferences();
 }
 
@@ -1142,20 +1142,22 @@ void WebPageBlink::SetLoadErrorPolicy(const std::string& policy) {
   }
 }
 
-bool WebPageBlink::DecidePolicyForResponse(bool isMainFrame,
-                                           int statusCode,
+bool WebPageBlink::DecidePolicyForResponse(bool is_main_frame,
+                                           int status_code,
                                            const std::string& url,
-                                           const std::string& statusText) {
+                                           const std::string& status_text) {
   LOG_INFO(MSGID_WAM_DEBUG, 8, PMLOGKS("APP_ID", AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", GetWebProcessPID()),
-           PMLOGKFV("STATUS_CODE", "%d", statusCode),
-           PMLOGKS("URL", url.c_str()), PMLOGKS("TEXT", statusText.c_str()),
-           PMLOGKS("MAIN_FRAME", isMainFrame ? "true" : "false"),
-           PMLOGKS("RESPONSE_POLICY", isMainFrame ? "event" : "default"), "");
+           PMLOGKFV("STATUS_CODE", "%d", status_code),
+           PMLOGKS("URL", url.c_str()), PMLOGKS("TEXT", status_text.c_str()),
+           PMLOGKS("MAIN_FRAME", is_main_frame ? "true" : "false"),
+           PMLOGKS("RESPONSE_POLICY",
+                   has_custom_policy_for_response_ ? "event" : "default"),
+           "");
 
   // how to WAM3 handle this response
-  ApplyPolicyForUrlResponse(isMainFrame, url, statusCode);
+  ApplyPolicyForUrlResponse(is_main_frame, url, status_code);
 
   // how to blink handle this response
   // ACR requirement : even if received error response from subframe(iframe)ACR
@@ -1172,16 +1174,16 @@ bool WebPageBlink::AcceptsAudioCapture() {
 }
 
 void WebPageBlink::KeyboardVisibilityChanged(bool visible) {
-  std::string visibleStr = visible ? "true" : "false";
+  std::string visible_str = visible ? "true" : "false";
   std::string javascript =
-      "console.log('[WAM] fires keyboardStateChange event : " + visibleStr +
+      "console.log('[WAM] fires keyboardStateChange event : " + visible_str +
       "');"
       "    var keyboardStateEvent =new CustomEvent('keyboardStateChange', { "
       "detail: { 'visibility' : " +
-      visibleStr +
+      visible_str +
       " } });"
       "    keyboardStateEvent.visibility = " +
-      visibleStr +
+      visible_str +
       ";"
       "    if(document) document.dispatchEvent(keyboardStateEvent);";
   EvaluateJavaScript(javascript);
@@ -1240,9 +1242,10 @@ void WebPageBlink::UpdateBackHistoryAPIDisabled() {
       app_desc_->BackHistoryAPIDisabled());
 }
 
-void WebPageBlink::SetVisibilityState(WebPageVisibilityState visibilityState) {
+void WebPageBlink::SetVisibilityState(WebPageVisibilityState visibility_state) {
   page_private_->page_view_->SetVisibilityState(
-      static_cast<webos::WebViewBase::WebPageVisibilityState>(visibilityState));
+      static_cast<webos::WebViewBase::WebPageVisibilityState>(
+          visibility_state));
 }
 
 void WebPageBlink::SetObserver(WebPageBlinkObserver* observer) {

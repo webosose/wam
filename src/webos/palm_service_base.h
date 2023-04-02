@@ -60,11 +60,11 @@ class LSCallbackHandler {
   Json::Value Called(Json::Value payload) { return func_(payload); }
 
   static bool Callback(LSHandle* handle, LSMessage* message, void* user_data) {
-    LSErrorSafe lsError;
+    LSErrorSafe ls_error;
 
     if (!message) {
       if (!LSMessageReply(handle, message, "{\"returnValue\": false}",
-                          &lsError))
+                          &ls_error))
         return false;
       return true;
     }
@@ -72,7 +72,7 @@ class LSCallbackHandler {
     Json::Value request;
     if (!util::StringToJson(LSMessageGetPayload(message), request)) {
       if (!LSMessageReply(handle, message, "{\"returnValue\": false}",
-                          &lsError))
+                          &ls_error))
         return false;
       return true;
     }
@@ -83,7 +83,7 @@ class LSCallbackHandler {
 
     if (!reply.isNull())
       return LSMessageReply(handle, message, util::JsonToString(reply).c_str(),
-                            &lsError);
+                            &ls_error);
     else
       return true;
   }
@@ -288,8 +288,8 @@ class PalmServiceBase {
 
   bool Call(LSHandle* service,
             const char* what,
-            Json::Value qParameters,
-            const char* applicationId,
+            Json::Value parameters,
+            const char* application_id,
             LSCalloutContext* context);
   std::string service_name_;
 };

@@ -99,9 +99,9 @@ void WebPageBase::Load() {
 }
 
 void WebPageBase::SetupLaunchEvent() {
-  std::stringstream launchEvent;
+  std::stringstream launch_event;
   std::string params = LaunchParams().empty() ? "{}" : LaunchParams();
-  launchEvent
+  launch_event
       << "(function() {"
       << "    var dispatchLaunchEvent = function() {"
       << "        var launchEvent = new CustomEvent('webOSLaunch', { detail: "
@@ -121,7 +121,7 @@ void WebPageBase::SetupLaunchEvent() {
       << "    }"
       << "})();";
 
-  AddUserScript(launchEvent.str());
+  AddUserScript(launch_event.str());
 }
 
 void WebPageBase::SendLocaleChangeEvent(const std::string& language) {
@@ -228,19 +228,19 @@ bool WebPageBase::DoDeeplinking(const std::string& launch_params) {
   if (!obj.isObject() || obj["contentTarget"].isNull())
     return false;
 
-  std::string handledBy =
+  std::string handled_by =
       obj["handledBy"].isNull() ? "default" : obj["handledBy"].asString();
-  if (handledBy == "platform") {
-    std::string targetUrl = obj["contentTarget"].asString();
+  if (handled_by == "platform") {
+    std::string target_url = obj["contentTarget"].asString();
     LOG_INFO(MSGID_DEEPLINKING, 4, PMLOGKS("APP_ID", AppId().c_str()),
              PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
              PMLOGKFV("PID", "%d", GetWebProcessPID()),
-             PMLOGKS("handledBy", handledBy.c_str()), "%s; load target URL:%s",
-             __func__, targetUrl.c_str());
+             PMLOGKS("handledBy", handled_by.c_str()), "%s; load target URL:%s",
+             __func__, target_url.c_str());
     // load the target URL directly
-    LoadUrl(targetUrl);
+    LoadUrl(target_url);
     return true;
-  } else if (handledBy == "app") {
+  } else if (handled_by == "app") {
     // If "handledBy" == "app" return false
     // then it will be handled just like common relaunch case, checking progress
     return false;
@@ -249,7 +249,7 @@ bool WebPageBase::DoDeeplinking(const std::string& launch_params) {
     LOG_INFO(MSGID_DEEPLINKING, 4, PMLOGKS("APP_ID", AppId().c_str()),
              PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
              PMLOGKFV("PID", "%d", GetWebProcessPID()),
-             PMLOGKS("handledBy", handledBy.c_str()), "%s; loadDefaultUrl",
+             PMLOGKS("handledBy", handled_by.c_str()), "%s; loadDefaultUrl",
              __func__);
     LoadDefaultUrl();
     return true;
@@ -264,16 +264,16 @@ void WebPageBase::SendRelaunchEvent() {
   // Send the relaunch event on the next tick after javascript is loaded
   // This is a workaround for a problem where WebKit can't free the page
   // if we don't use a timeout here.
-  std::stringstream relaunchEvent;
+  std::stringstream relaunch_event;
   std::string detail = LaunchParams().empty() ? "{}" : LaunchParams();
-  relaunchEvent
+  relaunch_event
       << "setTimeout(function () {"
       << "    console.log('[WAM] fires webOSRelaunch event');"
       << "    var launchEvent=new CustomEvent('webOSRelaunch', { detail: "
       << detail << " });"
       << "    document.dispatchEvent(launchEvent);"
       << "}, 1);";
-  EvaluateJavaScript(relaunchEvent.str().c_str());
+  EvaluateJavaScript(relaunch_event.str().c_str());
 }
 
 void WebPageBase::HandleLoadStarted() {
@@ -299,13 +299,13 @@ void WebPageBase::HandleLoadFinished() {
   UpdateIsLoadErrorPageFinish();
 }
 
-void WebPageBase::HandleLoadFailed(int errorCode) {
-  // errorCode 204 specifically states that the web browser not relocate
+void WebPageBase::HandleLoadFailed(int error_code) {
+  // error_code 204 specifically states that the web browser not relocate
   // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
   // we can't handle unknown protocol like mailto.
   // Client want to not show error page with unknown protocol like chrome.
-  if (!is_preload_ && errorCode != 204 && errorCode != 301)
-    LoadErrorPage(errorCode);
+  if (!is_preload_ && error_code != 204 && error_code != 301)
+    LoadErrorPage(error_code);
 }
 
 void WebPageBase::CleanResourcesFinished() {
@@ -359,15 +359,16 @@ std::string WebPageBase::TelluriumNubPath() {
   return GetWebAppManagerConfig()->GetTelluriumNubPath();
 }
 
-bool WebPageBase::HasLoadErrorPolicy(bool isHttpResponseError, int errorCode) {
+bool WebPageBase::HasLoadErrorPolicy(bool is_http_response_error,
+                                     int error_code) {
   if (load_error_policy_ == "event") {
     std::stringstream jss;
-    std::string genericError = isHttpResponseError ? "false" : "true";
+    std::string generic_error = is_http_response_error ? "false" : "true";
     jss << "{"
         << "    console.log('[WAM3] create webOSLoadError event');"
         << "    var launchEvent=new CustomEvent('webOSLoadError',"
-        << "        { detail : { genericError : " << genericError
-        << ", errorCode : " << errorCode << " }});"
+        << "        { detail : { genericError : " << generic_error
+        << ", errorCode : " << error_code << " }});"
         << "    document.dispatchEvent(launchEvent);"
         << "}";
     // App has load error policy, do not show platform load error page
@@ -377,14 +378,14 @@ bool WebPageBase::HasLoadErrorPolicy(bool isHttpResponseError, int errorCode) {
   return false;
 }
 
-void WebPageBase::ApplyPolicyForUrlResponse(bool isMainFrame,
+void WebPageBase::ApplyPolicyForUrlResponse(bool is_main_frame,
                                             const std::string& url,
                                             int status_code) {
   wam::Url response_url(url);
   static const int http_error_status_code = 400;
   if (response_url.Scheme() != "file" &&
       !HasLoadErrorPolicy(status_code >= http_error_status_code, status_code) &&
-      isMainFrame) {
+      is_main_frame) {
     // If app does not have policy for load error and
     // this error response is from main frame document
     // then before open server error page, reset the body's background color
@@ -491,22 +492,22 @@ void WebPageBase::UpdateIsLoadErrorPageFinish() {
 void WebPageBase::SetCustomUserScript() {
   // 1. check app folder has userScripts
   // 2. check userscript.js there is, appfolder/webOSUserScripts/*.js
-  auto userScriptFilePath = fs::path(app_desc_->FolderPath()) /
-                            GetWebAppManagerConfig()->GetUserScriptPath();
+  auto user_script_file_path = fs::path(app_desc_->FolderPath()) /
+                               GetWebAppManagerConfig()->GetUserScriptPath();
 
-  if (!fs::exists(userScriptFilePath) ||
-      !fs::is_regular_file(fs::status(userScriptFilePath))) {
+  if (!fs::exists(user_script_file_path) ||
+      !fs::is_regular_file(fs::status(user_script_file_path))) {
     LOG_WARNING(MSGID_FILE_ERROR, 0,
                 "[%s] script not exist on file system '%s'", app_id_.c_str(),
-                userScriptFilePath.c_str());
+                user_script_file_path.c_str());
     return;
   }
 
   LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", GetWebProcessPID()),
-           "User Scripts exists : %s", userScriptFilePath.c_str());
-  AddUserScriptUrl(wam::Url::FromLocalFile(userScriptFilePath.native()));
+           "User Scripts exists : %s", user_script_file_path.c_str());
+  AddUserScriptUrl(wam::Url::FromLocalFile(user_script_file_path.native()));
 }
 
 void WebPageBase::AddObserver(WebPageObserver* observer) {

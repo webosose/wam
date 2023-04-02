@@ -27,7 +27,7 @@ class WebPageBlinkDelegate;
 class BlinkWebView : public webos::WebViewBase {
  public:
   // TODO need to refactor both constructors (here & pluggables)
-  explicit BlinkWebView(bool doInitialize = true);
+  explicit BlinkWebView(bool do_initialize = true);
   explicit BlinkWebView(const std::string& group) : BlinkWebView() {}
 
   void AddUserScript(const std::string& script);

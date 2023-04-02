@@ -467,10 +467,10 @@ WebAppBase* WebAppManager::FindAppById(const std::string& app_id) {
   return nullptr;
 }
 
-std::list<WebAppBase*> WebAppManager::FindAppsById(const std::string& appId) {
+std::list<WebAppBase*> WebAppManager::FindAppsById(const std::string& app_id) {
   std::list<WebAppBase*> apps;
   for (WebAppBase* app : app_list_) {
-    if (app->Page() && app->AppId() == appId)
+    if (app->Page() && app->AppId() == app_id)
       apps.push_back(app);
   }
 
@@ -783,9 +783,9 @@ void WebAppManager::SendEventToAllAppsAndAllFrames(
 
 void WebAppManager::ServiceCall(const std::string& url,
                                 const std::string& payload,
-                                const std::string& appId) {
+                                const std::string& app_id) {
   if (service_sender_)
-    service_sender_->ServiceCall(url, payload, appId);
+    service_sender_->ServiceCall(url, payload, app_id);
 }
 
 void WebAppManager::UpdateNetworkStatus(const Json::Value& object) {
@@ -810,8 +810,8 @@ void WebAppManager::UpdateNetworkStatus(const Json::Value& object) {
   }
 }
 
-bool WebAppManager::IsEnyoApp(const std::string& appId) {
-  WebAppBase* app = FindAppById(appId);
+bool WebAppManager::IsEnyoApp(const std::string& app_id) {
+  WebAppBase* app = FindAppById(app_id);
   if (app && !app->GetAppDescription()->EnyoVersion().empty())
     return true;
 

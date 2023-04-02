@@ -152,7 +152,7 @@ class WebAppManager {
 
   void CloseApp(const std::string& app_id);
 
-  void ClearBrowsingData(const int removeBrowsingDataMask);
+  void ClearBrowsingData(const int remove_browsing_data_mask);
   int MaskForBrowsingDataType(const char* type);
 
   void AppInstalled(const std::string& app_id);
@@ -171,7 +171,7 @@ class WebAppManager {
                           const std::string& instance_id,
                           const std::string& args,
                           const std::string& launching_app_id,
-                          int& errCode,
+                          int& err_code,
                           std::string& err_msg);
   void OnRelaunchApp(const std::string& instance_id,
                      const std::string& app_id,

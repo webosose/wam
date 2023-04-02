@@ -12,9 +12,18 @@ Checks:          '-*,
                   modernize-use-equals-delete,
                   modernize-use-nullptr,
                   modernize-use-override,
+                  readability-identifier-naming,
                   readability-redundant-member-init'
 CheckOptions:
   - key:             modernize-use-default-member-init.UseAssignment
     value:           1
+  - key:             readability-identifier-naming.LocalVariableCase
+    value:           lower_case
+  - key:             readability-identifier-naming.ParameterCase
+    value:           lower_case
+  - key:             readability-identifier-naming.PrivateMemberCase
+    value:           lower_case
+  - key:             readability-identifier-naming.PrivateMemberSuffix
+    value:           _
 FormatStyle:     file
 ...

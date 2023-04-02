@@ -37,7 +37,7 @@ namespace {
 static int kLaunchFinishAssureTimeoutMs = 5000;
 
 const std::unordered_map<std::string, webos::WebOSKeyMask>& GetKeyMaskTable() {
-  static const std::unordered_map<std::string, webos::WebOSKeyMask> mapTable{
+  static const std::unordered_map<std::string, webos::WebOSKeyMask> map_table{
       {"KeyMaskNone", static_cast<webos::WebOSKeyMask>(0)},
       {"KeyMaskHome", webos::WebOSKeyMask::KEY_MASK_HOME},
       {"KeyMaskBack", webos::WebOSKeyMask::KEY_MASK_BACK},
@@ -57,14 +57,14 @@ const std::unordered_map<std::string, webos::WebOSKeyMask>& GetKeyMaskTable() {
       {"KeyMaskTeletext", webos::WebOSKeyMask::KEY_MASK_REMOTETELETEXTGROUP},
       {"KeyMaskDefault", webos::WebOSKeyMask::KEY_MASK_DEFAULT},
   };
-  return mapTable;
+  return map_table;
 }
 
 webos::WebOSKeyMask GetKeyMask(const std::string& key) {
-  static const auto& mapTable = GetKeyMaskTable();
-  auto iter = mapTable.find(key);
-  return iter != mapTable.end() ? iter->second
-                                : static_cast<webos::WebOSKeyMask>(0);
+  static const auto& map_table = GetKeyMaskTable();
+  auto iter = map_table.find(key);
+  return iter != map_table.end() ? iter->second
+                                 : static_cast<webos::WebOSKeyMask>(0);
 }
 
 }  // namespace
@@ -146,10 +146,10 @@ void WebAppWayland::Init(int width, int height) {
     app_window_->InitWindow(width, height);
   }
 
-  webos::WebAppWindowBase::LocationHint locationHint =
+  webos::WebAppWindowBase::LocationHint location_hint =
       GetLocationHintFromString(location_hint_);
-  if (locationHint != webos::WebAppWindowBase::LocationHint::kUnknown) {
-    app_window_->SetLocationHint(locationHint);
+  if (location_hint != webos::WebAppWindowBase::LocationHint::kUnknown) {
+    app_window_->SetLocationHint(location_hint);
   }
 
   app_window_->SetWebApp(this);
@@ -344,28 +344,28 @@ void WebAppWayland::ConfigureWindow(const std::string& type) {
   SetKeyMask(webos::WebOSKeyMask::KEY_MASK_EXIT,
              GetAppDescription()->HandleExitKey());
 
-  ApplicationDescription* appDesc = GetAppDescription();
-  if (!appDesc->GroupWindowDesc().empty())
-    SetupWindowGroup(appDesc);
+  ApplicationDescription* app_desc = GetAppDescription();
+  if (!app_desc->GroupWindowDesc().empty())
+    SetupWindowGroup(app_desc);
 }
 
 void WebAppWayland::SetupWindowGroup(ApplicationDescription* desc) {
   if (!desc)
     return;
 
-  ApplicationDescription::WindowGroupInfo groupInfo =
+  ApplicationDescription::WindowGroupInfo group_info =
       desc->GetWindowGroupInfo();
-  if (groupInfo.name.empty())
+  if (group_info.name.empty())
     return;
 
-  if (groupInfo.is_owner) {
-    ApplicationDescription::WindowOwnerInfo ownerInfo =
+  if (group_info.is_owner) {
+    ApplicationDescription::WindowOwnerInfo owner_info =
         desc->GetWindowOwnerInfo();
-    webos::WindowGroupConfiguration config(groupInfo.name);
-    config.SetIsAnonymous(ownerInfo.allow_anonymous);
+    webos::WindowGroupConfiguration config(group_info.name);
+    config.SetIsAnonymous(owner_info.allow_anonymous);
 
-    auto iter = ownerInfo.layers.begin();
-    while (iter != ownerInfo.layers.end()) {
+    auto iter = owner_info.layers.begin();
+    while (iter != owner_info.layers.end()) {
       config.AddLayer(
           webos::WindowGroupLayerConfiguration(iter->first, iter->second));
       iter++;
@@ -375,11 +375,11 @@ void WebAppWayland::SetupWindowGroup(ApplicationDescription* desc) {
              PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
              PMLOGKFV("PID", "%d", Page()->GetWebProcessPID()), "");
   } else {
-    ApplicationDescription::WindowClientInfo clientInfo =
+    ApplicationDescription::WindowClientInfo client_info =
         desc->GetWindowClientInfo();
-    app_window_->AttachToWindowGroup(groupInfo.name, clientInfo.layer);
+    app_window_->AttachToWindowGroup(group_info.name, client_info.layer);
     LOG_INFO(MSGID_ATTACH_SURFACEGROUP, 4, PMLOGKS("APP_ID", AppId().c_str()),
-             PMLOGKS("OWNER_ID", groupInfo.name.c_str()),
+             PMLOGKS("OWNER_ID", group_info.name.c_str()),
              PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
              PMLOGKFV("PID", "%d", Page()->GetWebProcessPID()), "");
   }
@@ -441,17 +441,17 @@ void WebAppWayland::SetCursor(const std::string& cursor_arg,
 }
 
 void WebAppWayland::SetKeyMask(const Json::Value& value) {
-  unsigned int keyMask = 0;
+  unsigned int key_mask = 0;
   if (value.isArray()) {
     for (const auto& child : value)
-      keyMask |= GetKeyMask(child.asString());
+      key_mask |= GetKeyMask(child.asString());
   }
 
-  app_window_->SetKeyMask(static_cast<webos::WebOSKeyMask>(keyMask));
+  app_window_->SetKeyMask(static_cast<webos::WebOSKeyMask>(key_mask));
 }
 
-void WebAppWayland::SetKeyMask(webos::WebOSKeyMask keyMask) {
-  app_window_->SetKeyMask(keyMask);
+void WebAppWayland::SetKeyMask(webos::WebOSKeyMask key_mask) {
+  app_window_->SetKeyMask(key_mask);
 }
 
 void WebAppWayland::FocusOwner() {
@@ -463,9 +463,9 @@ void WebAppWayland::FocusLayer() {
   app_window_->FocusWindowGroupLayer();
   ApplicationDescription* desc = GetAppDescription();
   if (desc) {
-    ApplicationDescription::WindowClientInfo clientInfo =
+    ApplicationDescription::WindowClientInfo client_info =
         desc->GetWindowClientInfo();
-    LOG_DEBUG("FocusLayer(layer:%s) [%s]", clientInfo.layer.c_str(),
+    LOG_DEBUG("FocusLayer(layer:%s) [%s]", client_info.layer.c_str(),
               AppId().c_str());
   }
 }
@@ -474,8 +474,8 @@ void WebAppWayland::SetOpacity(float opacity) {
   app_window_->SetOpacity(opacity);
 }
 
-void WebAppWayland::Hide(bool forcedHide) {
-  if (KeepAlive() || forcedHide) {
+void WebAppWayland::Hide(bool forced_hide) {
+  if (KeepAlive() || forced_hide) {
     OnStageDeactivated();
     app_window_->Hide();
     SetHiddenWindow(true);
@@ -578,7 +578,7 @@ void WebAppWayland::WebPageLoadFinished() {
   DoPendingRelaunch();
 }
 
-void WebAppWayland::WebPageLoadFailed(int errorCode) {
+void WebAppWayland::WebPageLoadFailed(int error_code) {
   // Do not load error page while preoload app launching.
   if (GetPreloadState() != kNonePreload)
     CloseAppInternal();
@@ -605,8 +605,8 @@ void WebAppWayland::DoClose() {
   CloseAppInternal();
 }
 
-void WebAppWayland::StateAboutToChange(webos::NativeWindowState willBe) {
-  if (willBe == webos::NATIVE_WINDOW_MINIMIZED) {
+void WebAppWayland::StateAboutToChange(webos::NativeWindowState will_be) {
+  if (will_be == webos::NATIVE_WINDOW_MINIMIZED) {
     LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", AppId().c_str()),
              PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
              PMLOGKFV("PID", "%d", Page()->GetWebProcessPID()),
@@ -618,14 +618,14 @@ void WebAppWayland::StateAboutToChange(webos::NativeWindowState willBe) {
   }
 }
 
-void WebAppWayland::StateChanged(webos::NativeWindowState newState) {
+void WebAppWayland::StateChanged(webos::NativeWindowState new_state) {
   if (IsClosing()) {
     LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 1, PMLOGKS("APP_ID", AppId().c_str()),
              "In Closing; return;");
     return;
   }
 
-  switch (newState) {
+  switch (new_state) {
     case webos::NATIVE_WINDOW_DEFAULT:
     case webos::NATIVE_WINDOW_MAXIMIZED:
     case webos::NATIVE_WINDOW_FULLSCREEN:
@@ -644,7 +644,7 @@ void WebAppWayland::StateChanged(webos::NativeWindowState newState) {
     default:
       LOG_INFO(MSGID_WINDOW_STATE_CHANGED, 2,
                PMLOGKS("APP_ID", AppId().c_str()),
-               PMLOGKFV("HOST_STATE", "%d", newState),
+               PMLOGKFV("HOST_STATE", "%d", new_state),
                "Unknown state. Do not calling nothing anymore.");
       break;
   }
@@ -801,13 +801,13 @@ void WebAppWayland::MoveInputRegion(int height) {
   else
     vkb_height_ = -vkb_height_;
 
-  std::vector<gfx::Rect> newRegion;
+  std::vector<gfx::Rect> new_region;
   for (gfx::Rect rect : input_region_) {
     rect.SetRect(rect.x(), rect.y() - vkb_height_, rect.width(), rect.height());
-    newRegion.push_back(rect);
+    new_region.push_back(rect);
   }
   input_region_.clear();
-  input_region_ = newRegion;
+  input_region_ = new_region;
   app_window_->SetInputRegion(input_region_);
 }
 

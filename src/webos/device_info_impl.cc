@@ -75,7 +75,6 @@ bool DeviceInfoImpl::GetInfoFromLunaPrefs(const char* key,
 void DeviceInfoImpl::InitDisplayInfo() {
   // Display information
   // --------------------------------------------------------
-  float screen_density_ = 1.0f;
   int hardware_screen_width = 0;
   int hardware_screen_height = 0;
 

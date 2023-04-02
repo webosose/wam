@@ -35,7 +35,7 @@ void TraceFunctionExit(const char* label);
 
 void TraceItem(const char* name, const char* value);
 
-void TracePosition(const char* label, int posX, int posY);
+void TracePosition(const char* label, int pos_x, int pos_y);
 
 #ifdef __cplusplus
 }

@@ -137,10 +137,10 @@ void WebProcessManager::ReadWebProcessPolicy() {
           web_process_group_app_id_list_.push_back(id.asString());
           SetWebProcessCacheProperty(value, id.asString());
         }
-        auto trustLevel = value["trustLevel"];
-        if (trustLevel.isString()) {
-          web_process_group_trust_level_list_.push_back(trustLevel.asString());
-          SetWebProcessCacheProperty(value, trustLevel.asString());
+        auto trust_level = value["trustLevel"];
+        if (trust_level.isString()) {
+          web_process_group_trust_level_list_.push_back(trust_level.asString());
+          SetWebProcessCacheProperty(value, trust_level.asString());
         }
       }
     }

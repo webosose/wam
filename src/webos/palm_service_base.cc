@@ -72,15 +72,15 @@ bool PalmServiceBase::StopService() {
   if (!service_handle_)
     return true;
 
-  LSErrorSafe lsError;
-  if (!LSUnregister(service_handle_, &lsError)) {
+  LSErrorSafe ls_error;
+  if (!LSUnregister(service_handle_, &ls_error)) {
     service_handle_ = nullptr;
     return true;
   }
 
   LOG_WARNING(MSGID_UNREG_LS2_FAIL, 2,
               PMLOGKS("SERVICE", service_name_.c_str()),
-              PMLOGKS("ERROR", lsError.message), "");
+              PMLOGKS("ERROR", ls_error.message), "");
 
   return false;
 }
@@ -88,7 +88,7 @@ bool PalmServiceBase::StopService() {
 bool PalmServiceBase::Call(LSHandle* handle,
                            const char* what,
                            Json::Value parameters,
-                           const char* applicationId = nullptr,
+                           const char* application_id = nullptr,
                            LSCalloutContext* context = nullptr) {
   std::string parameters_str = util::JsonToString(parameters);
   if (!parameters.isObject()) {
@@ -102,28 +102,28 @@ bool PalmServiceBase::Call(LSHandle* handle,
   if (parameters["subscribe"] == true || parameters["watch"] == true) {
     if (context) {
       call_ret = LSCallFromApplication(
-          handle, what, parameters_str.c_str(), applicationId,
+          handle, what, parameters_str.c_str(), application_id,
           LSCallbackHandler::Callback, static_cast<LSCallbackHandler*>(context),
           &context->token_, &ls_error);
       context->service_ = handle;
     } else {
       // caller does not care about reply from call
       call_ret = LSCallFromApplication(handle, what, parameters_str.c_str(),
-                                       applicationId, nullptr, nullptr, nullptr,
-                                       &ls_error);
+                                       application_id, nullptr, nullptr,
+                                       nullptr, &ls_error);
     }
   } else {
     if (context) {
       call_ret = LSCallFromApplicationOneReply(
-          handle, what, parameters_str.c_str(), applicationId,
+          handle, what, parameters_str.c_str(), application_id,
           LSCallbackHandler::Callback, static_cast<LSCallbackHandler*>(context),
           &context->token_, &ls_error);
       context->service_ = handle;
     } else {
       // caller does not care about reply from call
       call_ret = LSCallFromApplicationOneReply(
-          handle, what, parameters_str.c_str(), applicationId, nullptr, nullptr,
-          nullptr, &ls_error);
+          handle, what, parameters_str.c_str(), application_id, nullptr,
+          nullptr, nullptr, &ls_error);
     }
   }
   if (!call_ret) {

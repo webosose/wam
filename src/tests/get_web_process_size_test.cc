@@ -107,7 +107,7 @@ TEST(GetWebProcessSizeTest, checkCaseProcessNotExists) {
 TEST(GetWebProcessSizeTest, checkCaseProcessExists) {
   BaseMockInitializer<NiceWebViewMock, NiceWebAppWindowMock,
                       PlatformModuleFactoryImplMock>
-      mockInitializer;
+      mock_initializer;
 
   Json::Value request_launch;
   ASSERT_TRUE(util::StringToJson(kLaunchAppJsonBody, request_launch));

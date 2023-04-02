@@ -180,15 +180,15 @@ int StrToIntWithDefault(const std::string& str, int default_value) {
 }
 
 std::vector<std::string> SplitString(const std::string& str, char delimiter) {
-  std::vector<std::string> resList;
+  std::vector<std::string> res_list;
   std::stringstream ss(str);
   std::string s;
 
   while (std::getline(ss, s, delimiter)) {
-    resList.push_back(s);
+    res_list.push_back(s);
   }
 
-  return resList;
+  return res_list;
 }
 
 std::string TrimString(const std::string& str) {

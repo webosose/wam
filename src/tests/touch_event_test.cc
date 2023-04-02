@@ -135,7 +135,8 @@ void TouchEventTestSuite::SetUp() {
       std::move(web_app_factory_manager));
 
   ON_CALL(*web_app_window_, SetWebApp(_))
-      .WillByDefault(Invoke([&](WebAppWayland* WebApp) { web_app_ = WebApp; }));
+      .WillByDefault(
+          Invoke([&](WebAppWayland* web_app) { web_app_ = web_app; }));
 
   ON_CALL(*web_view_, GetUrl()).WillByDefault(ReturnRef(view_url_));
   ON_CALL(*web_view_, SetDelegate(_))

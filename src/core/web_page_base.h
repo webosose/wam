@@ -85,7 +85,7 @@ class WebPageBase {
   virtual void HandleDeviceInfoChanged(const std::string& device_info) = 0;
   virtual bool Relaunch(const std::string& args,
                         const std::string& launching_app_id);
-  virtual void EvaluateJavaScript(const std::string& jsCode) = 0;
+  virtual void EvaluateJavaScript(const std::string& js_code) = 0;
   virtual void EvaluateJavaScriptInAllFrames(const std::string& js_code,
                                              const char* method = {}) = 0;
   virtual uint32_t GetWebProcessProxyID() = 0;

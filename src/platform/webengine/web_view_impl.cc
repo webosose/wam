@@ -167,9 +167,9 @@ void WebViewImpl::SetPrerenderState() {
 }
 
 void WebViewImpl::SetVisibilityState(
-    webos::WebViewBase::WebPageVisibilityState visibilityState) {
+    webos::WebViewBase::WebPageVisibilityState visibility_state) {
   if (web_view_)
-    web_view_->SetVisibilityState(visibilityState);
+    web_view_->SetVisibilityState(visibility_state);
 }
 
 std::string WebViewImpl::DocumentTitle() const {
@@ -429,9 +429,9 @@ void WebViewImpl::SetAllowFakeBoldText(bool allow) {
     web_view_->SetAllowFakeBoldText(allow);
 }
 
-void WebViewImpl::SetAppId(const std::string& appId) {
+void WebViewImpl::SetAppId(const std::string& app_id) {
   if (web_view_)
-    web_view_->SetAppId(appId);
+    web_view_->SetAppId(app_id);
 }
 
 void WebViewImpl::SetSecurityOrigin(const std::string& identifier) {

@@ -55,7 +55,7 @@ class WebAppFactoryManagerImpl : public WebAppFactoryManager {
                              const wam::Url& url,
                              std::shared_ptr<ApplicationDescription> desc,
                              const std::string& app_type = {},
-                             const std::string& launchParams = {}) override;
+                             const std::string& launch_params = {}) override;
   WebAppFactoryInterface* GetPluggable(const std::string& app_type);
   WebAppFactoryInterface* LoadPluggable(const std::string& app_type = {});
 

@@ -100,9 +100,9 @@ std::string WebAppManagerService::GetSystemLanguage() {
   return language;
 }
 
-void WebAppManagerService::SetForceCloseApp(const std::string& appId,
+void WebAppManagerService::SetForceCloseApp(const std::string& app_id,
                                             const std::string& instance_id) {
-  WebAppManager::Instance()->SetForceCloseApp(appId, instance_id);
+  WebAppManager::Instance()->SetForceCloseApp(app_id, instance_id);
 }
 
 void WebAppManagerService::KillCustomPluginProcess(

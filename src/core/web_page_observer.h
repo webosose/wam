@@ -29,7 +29,7 @@ class WebPageObserver {
   virtual void TimeoutExecuteCloseCallback() {}
   virtual void TitleChanged() {}
   virtual void WebPageClosePageRequested() {}
-  virtual void WebPageLoadFailed(int errorCode) {}
+  virtual void WebPageLoadFailed(int error_code) {}
   virtual void WebPageLoadFinished() {}
   virtual void WebViewRecreated() {}
 
