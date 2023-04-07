@@ -132,6 +132,7 @@ class WebView {
   virtual void SetMediaPreferences(const std::string& preferences) = 0;
   virtual void SetSearchKeywordForCustomPlayer(bool enabled) = 0;
   virtual void SetUseUnlimitedMediaPolicy(bool enabled) = 0;
+  virtual void SetUseVideoDecodeAccelerator(bool enabled) = 0;
   virtual void SetEnableBackgroundRun(bool enabled) = 0;
   virtual void SetAudioGuidanceOn(bool on) = 0;
   virtual void SetStandardFontFamily(const std::string& font) = 0;

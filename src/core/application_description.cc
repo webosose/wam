@@ -352,6 +352,12 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   if (suspend_dom_time.isInt())
     app_desc->custom_suspend_dom_time_ = suspend_dom_time.asInt();
 
+  auto use_video_decode_accelerator = json_obj["useVideoDecodeAccelerator"];
+  if (use_video_decode_accelerator.isBool()) {
+    app_desc->use_video_decode_accelerator_ =
+        use_video_decode_accelerator.asBool();
+  }
+
   return app_desc;
 }
 

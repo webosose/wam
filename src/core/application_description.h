@@ -147,6 +147,10 @@ class ApplicationDescription {
   std::string MediaPreferences() const { return media_preferences_; }
   void SetMediaPreferences(const std::string& pref);
 
+  bool UseVideoDecodeAccelerator() const {
+    return use_video_decode_accelerator_;
+  }
+
  private:
   bool CheckTrustLevel(std::string trust_level);
 
@@ -198,6 +202,7 @@ class ApplicationDescription {
   bool use_virtual_keyboard_;
   int custom_suspend_dom_time_;
   std::string media_preferences_;
+  bool use_video_decode_accelerator_ = false;
 };
 
 #endif  // CORE_APPLICATION_DESCRIPTION_H_

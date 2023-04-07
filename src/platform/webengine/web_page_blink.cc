@@ -195,6 +195,9 @@ void WebPageBlink::Init() {
       app_desc_->IsEnableBackgroundRun());
   page_private_->page_view_->SetMediaPreferences(app_desc_->MediaPreferences());
 
+  page_private_->page_view_->SetUseVideoDecodeAccelerator(
+      app_desc_->UseVideoDecodeAccelerator());
+
   page_private_->page_view_->UpdatePreferences();
 
   LoadExtension();

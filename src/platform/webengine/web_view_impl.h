@@ -129,6 +129,7 @@ class WebViewImpl : public WebView {
   void SetMediaPreferences(const std::string& preferences) override;
   void SetSearchKeywordForCustomPlayer(bool enabled) override;
   void SetUseUnlimitedMediaPolicy(bool enabled) override;
+  void SetUseVideoDecodeAccelerator(bool enabled) override;
   void SetEnableBackgroundRun(bool enabled) override;
   void SetAudioGuidanceOn(bool on) override;
   void SetStandardFontFamily(const std::string& font) override;
