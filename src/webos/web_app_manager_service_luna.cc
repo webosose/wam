@@ -358,7 +358,7 @@ void WebAppManagerServiceLuna::DidConnect() {
                 "Failed to connect to settingsservice");
   }
 
-  params["serviceName"] = std::string("com.webos.memorymanager");
+  params["serviceName"] = std::string("com.webos.service.memorymanager");
   if (!GET_LS2_SERVER_STATUS(MemoryManagerConnectCallback, params)) {
     LOG_WARNING(MSGID_MEMORY_CONNECT_FAIL, 0,
                 "Failed to connect to memory manager");
@@ -446,11 +446,11 @@ void WebAppManagerServiceLuna::MemoryManagerConnectCallback(
   if (reply["connected"] == true) {
     Json::Value closeAppObj;
     closeAppObj["subscribe"] = true;
-    closeAppObj["appType"] = "web";
+    closeAppObj["type"] = "killing";
 
     if (!Call<WebAppManagerServiceLuna,
               &WebAppManagerServiceLuna::GetCloseAppIdCallback>(
-            "luna://com.webos.memorymanager/getCloseAppId", closeAppObj,
+            "luna://com.webos.service.memorymanager/getManagerEvent", closeAppObj,
             this)) {
       LOG_WARNING(MSGID_MEM_MGR_API_CALL_FAIL, 0,
                   "Failed to get close application identifier");
