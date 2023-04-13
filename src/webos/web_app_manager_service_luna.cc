@@ -50,7 +50,9 @@ LSMethod WebAppManagerServiceLuna::methods_[] = {
     LS2_METHOD_ENTRY(killApp),
     LS2_METHOD_ENTRY(pauseApp),
     LS2_METHOD_ENTRY(closeAllApps),
+#if defined(ENABLE_API_SET_INSPECTOR_ENABLE)
     LS2_METHOD_ENTRY(setInspectorEnable),
+#endif
     LS2_METHOD_ENTRY(logControl),
     LS2_METHOD_ENTRY(getWebProcessSize),
     LS2_METHOD_ENTRY(clearBrowsingData),
