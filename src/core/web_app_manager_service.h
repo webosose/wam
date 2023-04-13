@@ -36,11 +36,7 @@ enum ErrorCode {
   kErrCodeClearDataBrawsingEmptyArray = 3000,
   kErrCodeClearDataBrawsingInvalidValue = 3001,
   kErrCodeClearDataBrawsingUnknownData = 3002,
-  kErrCodeKillAppInvalidParam = 4100,
-  kErrCodePauseAppInvalidParam = 4200,
-  kErrCodeLogControlInvalidParam = 4300,
-  kErrCodeClearBrowsingDataInvalidParam = 4500,
-  kErrCodeWebProcessCreatedInvalidParam = 4600
+  kErrCodeInvalidParam = 5000
 };
 
 const std::string kErrInvalidParam =

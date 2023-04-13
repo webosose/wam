@@ -152,7 +152,7 @@ Json::Value WebAppManagerServiceLuna::killApp(const Json::Value& request) {
       (request.isMember("appId") && !request["appId"].isString()) ||
       (request.isMember("reason") && !request["reason"].isString())) {
     reply["returnValue"] = false;
-    reply["errorCode"] = kErrCodeKillAppInvalidParam;
+    reply["errorCode"] = kErrCodeInvalidParam;
     reply["errorText"] = kErrInvalidParam;
     return reply;
   }
@@ -192,7 +192,7 @@ Json::Value WebAppManagerServiceLuna::pauseApp(const Json::Value& request) {
   if (!request.isObject() ||
       (!request.isMember("instanceId") || !request["instanceId"].isString())) {
     reply["returnValue"] = false;
-    reply["errorCode"] = kErrCodePauseAppInvalidParam;
+    reply["errorCode"] = kErrCodeInvalidParam;
     reply["errorText"] = kErrInvalidParam;
     return reply;
   }
@@ -240,7 +240,7 @@ Json::Value WebAppManagerServiceLuna::logControl(const Json::Value& request) {
       (!request.isMember("value") || !request["value"].isString())) {
     Json::Value reply;
     reply["returnValue"] = false;
-    reply["errorCode"] = kErrCodeLogControlInvalidParam;
+    reply["errorCode"] = kErrCodeInvalidParam;
     reply["errorText"] = kErrInvalidParam;
     return reply;
   }
@@ -283,7 +283,7 @@ Json::Value WebAppManagerServiceLuna::clearBrowsingData(
   if (!request.isObject()) {
     Json::Value reply;
     reply["returnValue"] = false;
-    reply["errorCode"] = kErrCodeClearBrowsingDataInvalidParam;
+    reply["errorCode"] = kErrCodeInvalidParam;
     reply["errorText"] = kErrInvalidParam;
     return reply;
   }
@@ -634,7 +634,7 @@ Json::Value WebAppManagerServiceLuna::webProcessCreated(
 
   if (!request.isObject()) {
     reply["returnValue"] = false;
-    reply["errorCode"] = kErrCodeWebProcessCreatedInvalidParam;
+    reply["errorCode"] = kErrCodeInvalidParam;
     reply["errorText"] = kErrInvalidParam;
     return reply;
   }
@@ -661,7 +661,8 @@ Json::Value WebAppManagerServiceLuna::webProcessCreated(
     reply["returnValue"] = true;
   } else {
     reply["returnValue"] = false;
-    reply["errorText"] = "parameter error";
+    reply["errorCode"] = kErrCodeInvalidParam;
+    reply["errorText"] = kErrInvalidParam;
   }
 
   return reply;
