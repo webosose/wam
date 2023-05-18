@@ -19,6 +19,7 @@
 #include <unistd.h>
 
 #include <cstdlib>
+#include <filesystem>
 #include <fstream>
 #include <limits>
 #include <regex>
@@ -30,7 +31,6 @@
 #include <json/json.h>
 #include <sys/stat.h>
 
-#include "base/files/file_path.h"
 #include "log_manager.h"
 
 #include "bcp47.h"
@@ -47,9 +47,11 @@ std::vector<std::string> GetErrorPagePaths(
   if (error_page_location.empty())
     return std::vector<std::string>();
 
-  base::FilePath page_location(error_page_location);
-  base::FilePath filename = page_location.BaseName();
-  base::FilePath search_path = page_location.DirName();
+  namespace fs = std::filesystem;
+
+  fs::path error_page_path(error_page_location);
+  std::string filename = error_page_path.filename().string();
+  std::string search_path = error_page_path.parent_path().string();
   auto bcp47_pieces = BCP47::FromString(language);
 
   // search order:
@@ -64,33 +66,32 @@ std::vector<std::string> GetErrorPagePaths(
   if (bcp47_pieces) {
     if (bcp47_pieces->HasScript()) {
       std::stringstream ss;
-      ss << search_path.value() << "/resources/";
+      ss << search_path << "/resources/";
       ss << bcp47_pieces->Language() << "/";
       ss << bcp47_pieces->Script();
 
       if (bcp47_pieces->HasRegion())
         ss << "/" << bcp47_pieces->Region();
 
-      ss << "/html/" << filename.value();
+      ss << "/html/" << filename;
       result.emplace_back(ss.str());
     }
     if (bcp47_pieces->HasRegion()) {
       std::stringstream ss;
-      ss << search_path.value() << "/resources/";
+      ss << search_path << "/resources/";
       ss << bcp47_pieces->Language() << "/";
       ss << bcp47_pieces->Region() << "/html/";
-      ss << filename.value();
+      ss << filename;
       result.emplace_back(ss.str());
     }
     std::stringstream ss;
-    ss << search_path.value() << "/resources/";
+    ss << search_path << "/resources/";
     ss << bcp47_pieces->Language() << "/html/";
-    ss << filename.value();
+    ss << filename;
     result.emplace_back(ss.str());
   }
-  result.emplace_back(search_path.value() + "/resources/html/" +
-                      filename.value());
-  result.emplace_back(page_location.value());
+  result.emplace_back(search_path + "/resources/html/" + filename);
+  result.emplace_back(search_path + "/" + filename);
 
   return result;
 }
