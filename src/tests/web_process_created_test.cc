@@ -20,6 +20,7 @@
 
 #include "base_mock_initializer.h"
 #include "utils.h"
+#include "web_app_manager_service.h"
 #include "web_app_manager_service_luna.h"
 #include "web_view_mock_impl.h"
 
@@ -114,7 +115,7 @@ TEST(WebProcessCreatedTest, BadRequest) {
   EXPECT_TRUE(reply.isMember("returnValue"));
   EXPECT_FALSE(reply["returnValue"].asBool());
   EXPECT_TRUE(reply.isMember("errorText"));
-  EXPECT_STREQ(reply["errorText"].asString().c_str(), "parameter error");
+  EXPECT_EQ(reply["errorText"].asString(), kErrInvalidParam);
 }
 
 TEST(WebProcessCreatedTest, CheckSubscribe) {
