@@ -45,7 +45,7 @@ string(REPLACE ";" ", " PKGCONFIG_REQUIRES_PRIVATE "${PKGCONFIG_REQUIRES_PRIVATE
 webos_add_compiler_flags(ALL CXX -fno-rtti
                                  -fno-exceptions
                                  -funwind-tables
-                                 -std=c++14
+                                 -std=c++17
                                  -Wno-psabi
 )
 
