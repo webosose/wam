@@ -130,12 +130,13 @@ static webos::WebAppWindowBase::LocationHint GetLocationHintFromString(
 
 void WebAppWayland::Init(int width, int height) {
   if (!app_window_) {
-    if (window_factory_)
+    if (window_factory_) {
       app_window_ =
           std::unique_ptr<WebAppWindow>(window_factory_->CreateWindow());
-    else
+    } else {
       app_window_ = std::make_unique<WebAppWindowImpl>(
           std::unique_ptr<WebAppWaylandWindow>(WebAppWaylandWindow::Take()));
+    }
   }
   if (!(width && height)) {
     SetUiSize(app_window_->DisplayWidth(), app_window_->DisplayHeight());
@@ -165,8 +166,9 @@ void WebAppWayland::Init(int width, int height) {
 
   int timeout = util::StrToIntWithDefault(
       util::GetEnvVar("LAUNCH_FINISH_ASSURE_TIMEOUT"), 0);
-  if (timeout != 0)
+  if (timeout != 0) {
     kLaunchFinishAssureTimeoutMs = timeout;
+  }
 
   if (!webos::WebOSPlatform::GetInstance()->GetInputPointer()) {
     // Create InputManager instance.
@@ -345,18 +347,21 @@ void WebAppWayland::ConfigureWindow(const std::string& type) {
              GetAppDescription()->HandleExitKey());
 
   ApplicationDescription* app_desc = GetAppDescription();
-  if (!app_desc->GroupWindowDesc().empty())
+  if (!app_desc->GroupWindowDesc().empty()) {
     SetupWindowGroup(app_desc);
+  }
 }
 
 void WebAppWayland::SetupWindowGroup(ApplicationDescription* desc) {
-  if (!desc)
+  if (!desc) {
     return;
+  }
 
   ApplicationDescription::WindowGroupInfo group_info =
       desc->GetWindowGroupInfo();
-  if (group_info.name.empty())
+  if (group_info.name.empty()) {
     return;
+  }
 
   if (group_info.is_owner) {
     ApplicationDescription::WindowOwnerInfo owner_info =
@@ -419,10 +424,11 @@ void WebAppWayland::SetInputRegion(const Json::Value& value) {
 void WebAppWayland::SetWindowProperty(const std::string& name,
                                       const std::string& value) {
   webos::WebOSKeyMask mask = static_cast<webos::WebOSKeyMask>(0);
-  if (name == "_WEBOS_ACCESS_POLICY_KEYS_BACK")
+  if (name == "_WEBOS_ACCESS_POLICY_KEYS_BACK") {
     mask = webos::WebOSKeyMask::KEY_MASK_BACK;
-  else if (name == "_WEBOS_ACCESS_POLICY_KEYS_EXIT")
+  } else if (name == "_WEBOS_ACCESS_POLICY_KEYS_EXIT") {
     mask = webos::WebOSKeyMask::KEY_MASK_EXIT;
+  }
   // if mask is not set, not need to call setKeyMask
   if (mask != static_cast<webos::WebOSKeyMask>(0)) {
     SetKeyMask(mask, value == "true");
@@ -443,8 +449,9 @@ void WebAppWayland::SetCursor(const std::string& cursor_arg,
 void WebAppWayland::SetKeyMask(const Json::Value& value) {
   unsigned int key_mask = 0;
   if (value.isArray()) {
-    for (const auto& child : value)
+    for (const auto& child : value) {
       key_mask |= GetKeyMask(child.asString());
+    }
   }
 
   app_window_->SetKeyMask(static_cast<webos::WebOSKeyMask>(key_mask));
@@ -484,8 +491,9 @@ void WebAppWayland::Hide(bool forced_hide) {
 
 void WebAppWayland::Focus() {
   is_focused_ = true;
-  if (!IsMinimized())
+  if (!IsMinimized()) {
     Page()->SetFocus(true);
+  }
 }
 
 void WebAppWayland::Unfocus() {
@@ -496,8 +504,9 @@ void WebAppWayland::Unfocus() {
 void WebAppWayland::DoAttach() {
   // Do App and window things
   ApplicationDescription* app_desc = GetAppDescription();
-  if (!app_desc->GroupWindowDesc().empty())
+  if (!app_desc->GroupWindowDesc().empty()) {
     SetupWindowGroup(app_desc);
+  }
 
   app_window_->AttachWebContents(Page()->GetWebContents());
   // The attachWebContents causes visibilityState change to Visible (by default,
@@ -508,8 +517,9 @@ void WebAppWayland::DoAttach() {
   // Do Page things
   Page()->SetPageProperties();
 
-  if (KeepAlive())
+  if (KeepAlive()) {
     Page()->SetKeepAliveWebApp(KeepAlive());
+  }
 }
 
 void WebAppWayland::Raise() {
@@ -567,8 +577,9 @@ void WebAppWayland::GoBackground() {
 }
 
 void WebAppWayland::WebPageLoadFinished() {
-  if (GetHiddenWindow())
+  if (GetHiddenWindow()) {
     return;
+  }
   if (NeedReload()) {
     Page()->Reload();
     SetNeedReload(false);
@@ -580,8 +591,9 @@ void WebAppWayland::WebPageLoadFinished() {
 
 void WebAppWayland::WebPageLoadFailed(int error_code) {
   // Do not load error page while preoload app launching.
-  if (GetPreloadState() != kNonePreload)
+  if (GetPreloadState() != kNonePreload) {
     CloseAppInternal();
+  }
 }
 
 void WebAppWayland::DoClose() {
@@ -595,8 +607,9 @@ void WebAppWayland::DoClose() {
     return;
   }
 
-  if (KeepAlive() && HideWindow())
+  if (KeepAlive() && HideWindow()) {
     return;
+  }
 
   LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
@@ -667,8 +680,9 @@ void WebAppWayland::ShowWindow() {
 }
 
 bool WebAppWayland::HideWindow() {
-  if (Page()->IsLoadErrorPageFinish())
+  if (Page()->IsLoadErrorPageFinish()) {
     return false;
+  }
 
   LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
@@ -698,8 +712,9 @@ void WebAppWayland::FirstFrameVisuallyCommitted() {
              PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
              PMLOGKFV("PID", "%d", Page()->GetWebProcessPID()),
              "Not hidden window, preload, call showWindow");
-    if (GetAppDescription()->UsePrerendering())
+    if (GetAppDescription()->UsePrerendering()) {
       did_activate_stage_ = false;
+    }
     ShowWindow();
   }
 }
@@ -722,8 +737,9 @@ void WebAppWayland::WebViewRecreated() {
   app_window_->AttachWebContents(Page()->GetWebContents());
   app_window_->RecreatedWebContents();
   Page()->SetPageProperties();
-  if (KeepAlive())
+  if (KeepAlive()) {
     Page()->SetKeepAliveWebApp(KeepAlive());
+  }
   Focus();
 }
 
@@ -743,8 +759,9 @@ void WebAppWayland::DidResumeDOM() {
 }
 
 void InputManager::OnCursorVisibilityChanged(bool visible) {
-  if (IsVisible() == visible)
+  if (IsVisible() == visible) {
     return;
+  }
 
   LOG_DEBUG(
       "InputManager::onCursorVisibilityChanged; Global Cursor visibility "
@@ -788,18 +805,21 @@ void WebAppWayland::DeleteSurfaceGroup() {
 
 void WebAppWayland::SetKeepAlive(bool keep_alive) {
   WebAppBase::SetKeepAlive(keep_alive);
-  if (Page())
+  if (Page()) {
     Page()->SetKeepAliveWebApp(keep_alive);
+  }
 }
 
 void WebAppWayland::MoveInputRegion(int height) {
-  if (!enable_input_region_)
+  if (!enable_input_region_) {
     return;
+  }
 
-  if (height)
+  if (height) {
     vkb_height_ = height;
-  else
+  } else {
     vkb_height_ = -vkb_height_;
+  }
 
   std::vector<gfx::Rect> new_region;
   for (gfx::Rect rect : input_region_) {

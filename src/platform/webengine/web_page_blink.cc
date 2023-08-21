@@ -73,8 +73,9 @@ WebPageBlink::WebPageBlink(const wam::Url& url,
     : WebPageBlink(url, desc, params, nullptr) {}
 
 WebPageBlink::~WebPageBlink() {
-  if (dom_suspend_timer_.IsRunning())
+  if (dom_suspend_timer_.IsRunning()) {
     dom_suspend_timer_.Stop();
+  }
 }
 
 void WebPageBlink::Init() {
@@ -118,9 +119,10 @@ void WebPageBlink::Init() {
   SetDisallowScrolling(app_desc_->DisallowScrollingInMainFrame());
 
   if (!std::isnan(app_desc_->NetworkStableTimeout()) &&
-      (app_desc_->NetworkStableTimeout() >= 0.0))
+      (app_desc_->NetworkStableTimeout() >= 0.0)) {
     page_private_->page_view_->SetNetworkStableTimeout(
         app_desc_->NetworkStableTimeout());
+  }
 
   switch (app_desc_->GetThirdPartyCookiesPolicy()) {
     case ApplicationDescription::ThirdPartyCookiesPolicy::kAllow:
@@ -141,10 +143,11 @@ void WebPageBlink::Init() {
   }
 
   if (app_desc_->CustomSuspendDOMTime() > SuspendDelay()) {
-    if (app_desc_->CustomSuspendDOMTime() > MaxCustomSuspendDelay())
+    if (app_desc_->CustomSuspendDOMTime() > MaxCustomSuspendDelay()) {
       custom_suspend_dom_time_ = MaxCustomSuspendDelay();
-    else
+    } else {
       custom_suspend_dom_time_ = app_desc_->CustomSuspendDOMTime();
+    }
     LOG_DEBUG("[%s] set customSuspendDOMTime : %d ms", AppId().c_str(),
               custom_suspend_dom_time_);
   }
@@ -206,8 +209,9 @@ void WebPageBlink::HandleBrowserControlFunction(
 std::string WebPageBlink::HandleBrowserControlMessage(
     const std::string& command,
     const std::vector<std::string>& arguments) {
-  if (!page_private_->palm_system_)
+  if (!page_private_->palm_system_) {
     return std::string();
+  }
   return page_private_->palm_system_->HandleBrowserControlMessage(command,
                                                                   arguments);
 }
@@ -245,8 +249,9 @@ uint32_t WebPageBlink::GetWebProcessProxyID() {
 }
 
 void WebPageBlink::SetPreferredLanguages(const std::string& language) {
-  if (page_private_->palm_system_)
+  if (page_private_->palm_system_) {
     page_private_->palm_system_->SetLocale(language);
+  }
 
 #ifndef TARGET_DESKTOP
   // just set system language for accept-language for http header,
@@ -278,8 +283,9 @@ void WebPageBlink::ReloadDefaultPage() {
 std::vector<std::string> WebPageBlink::GetErrorPagePath(
     const std::string& error_page) {
   const std::string& filepath = util::UriToLocal(error_page);
-  if (filepath.empty())
+  if (filepath.empty()) {
     return std::vector<std::string>();
+  }
   std::string language;
   GetSystemLanguage(language);
 
@@ -336,17 +342,19 @@ void WebPageBlink::LoadErrorPage(int error_code) {
       }
       wam::Url::UrlQuery query;
       query.emplace_back("errorCode", std::to_string(error_code));
-      if (!load_failed_url_.empty())
+      if (!load_failed_url_.empty()) {
         query.emplace_back("failedUrl", load_failed_url_);
+      }
       error_url.SetQuery(query);
       LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", AppId().c_str()),
                PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
                PMLOGKFV("PID", "%d", GetWebProcessPID()), "LoadErrorPage : %s",
                error_url.ToString().c_str());
       page_private_->page_view_->LoadUrl(error_url.ToString());
-    } else
+    } else {
       LOG_ERROR(MSGID_ERROR_ERROR, 1, PMLOGKS("PATH", errorpage.c_str()),
                 "Error loading error page");
+    }
   }
 }
 
@@ -360,13 +368,15 @@ void WebPageBlink::LoadUrl(const std::string& url) {
 
 void WebPageBlink::SetLaunchParams(const std::string& params) {
   WebPageBase::SetLaunchParams(params);
-  if (page_private_->palm_system_)
+  if (page_private_->palm_system_) {
     page_private_->palm_system_->SetLaunchParams(params);
+  }
 }
 
 void WebPageBlink::SetUseLaunchOptimization(bool enabled, int delay_ms) {
-  if (GetWebAppManagerConfig()->IsLaunchOptimizationEnabled())
+  if (GetWebAppManagerConfig()->IsLaunchOptimizationEnabled()) {
     page_private_->page_view_->SetUseLaunchOptimization(enabled, delay_ms);
+  }
 }
 
 void WebPageBlink::SetUseSystemAppOptimization(bool enabled) {
@@ -387,8 +397,9 @@ void WebPageBlink::SuspendWebPageAll() {
            PMLOGKFV("PID", "%d", GetWebProcessPID()), "%s", __func__);
 
   page_private_->page_view_->SetVisible(false);
-  if (is_suspended_ || enable_background_run_)
+  if (is_suspended_ || enable_background_run_) {
     return;
+  }
 
   if (!(util::GetEnvVar("WAM_KEEP_RTC_CONNECTIONS_ON_SUSPEND") == "1")) {
     // On sending applications to background, disconnect RTC
@@ -500,11 +511,13 @@ void WebPageBlink::SuspendWebPagePaintingAndJSExecution() {
     dom_suspend_timer_.Stop();
   }
 
-  if (enable_background_run_)
+  if (enable_background_run_) {
     return;
+  }
 
-  if (!is_suspended_)
+  if (!is_suspended_) {
     return;
+  }
 
   // if we haven't finished loading the page yet, wait until it is loaded before
   // suspending
@@ -595,11 +608,13 @@ void WebPageBlink::UpdateExtensionData(const std::string& key,
 }
 
 void WebPageBlink::HandleDeviceInfoChanged(const std::string& device_info) {
-  if (!page_private_->palm_system_)
+  if (!page_private_->palm_system_) {
     return;
+  }
 
-  if (device_info == "LocalCountry" || device_info == "SmartServiceCountry")
+  if (device_info == "LocalCountry" || device_info == "SmartServiceCountry") {
     page_private_->palm_system_->SetCountry();
+  }
 }
 
 void WebPageBlink::EvaluateJavaScript(const std::string& js_code) {
@@ -631,22 +646,25 @@ void WebPageBlink::DidFirstFrameFocused() {
   // App load is finished, set use launching time optimization false.
   // If Launch optimization had to be done late, use delayMsForLaunchOptmization
   int delay_ms = app_desc_->DelayMsForLaunchOptimization();
-  if (delay_ms > 0)
+  if (delay_ms > 0) {
     SetUseLaunchOptimization(false, delay_ms);
-  else
+  } else {
     SetUseLaunchOptimization(false);
+  }
 }
 
 void WebPageBlink::DidDropAllPeerConnections() {}
 
 void WebPageBlink::DidSwapCompositorFrame() {
-  if (observer_)
+  if (observer_) {
     observer_->DidSwapPageCompositorFrame();
+  }
 }
 
 void WebPageBlink::DidResumeDOM() {
-  if (observer_)
+  if (observer_) {
     observer_->DidResumeDOM();
+  }
 }
 
 void WebPageBlink::LoadFinished(const std::string& url) {
@@ -786,8 +804,9 @@ void WebPageBlink::RecreateWebView() {
         WebPageBase::WebPageVisibilityState::kWebPageVisibilityStateLaunching);
   }
 
-  if (is_suspended_)
+  if (is_suspended_) {
     is_suspended_ = false;
+  }
 }
 
 void WebPageBlink::SetVisible(bool visible) {
@@ -815,8 +834,9 @@ void WebPageBlink::RenderProcessCrashed() {
     LOG_INFO(MSGID_WEBPROC_CRASH, 3, PMLOGKS("APP_ID", AppId().c_str()),
              PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
              PMLOGKFV("PID", "%d", GetWebProcessPID()), "In Closing; return");
-    if (close_callback_timer_.IsRunning())
+    if (close_callback_timer_.IsRunning()) {
       close_callback_timer_.Stop();
+    }
 
     FOR_EACH_OBSERVER(WebPageObserver, observers_,
                       ClosingAppProcessDidCrashed());
@@ -825,14 +845,16 @@ void WebPageBlink::RenderProcessCrashed() {
 
   page_private_->palm_system_->ResetInitialized();
   RecreateWebView();
-  if (!ProcessCrashed())
+  if (!ProcessCrashed()) {
     HandleForceDeleteWebPage();
+  }
 }
 
 // functions from webappmanager2
 WebView* WebPageBlink::CreatePageView() {
-  if (factory_)
+  if (factory_) {
     return factory_->CreateWebView();
+  }
   return new WebViewImpl(std::make_unique<BlinkWebView>());
 }
 
@@ -947,21 +969,25 @@ void WebPageBlink::LoadExtension() {
 }
 
 void WebPageBlink::ClearExtensions() {
-  if (page_private_ && page_private_->page_view_)
+  if (page_private_ && page_private_->page_view_) {
     page_private_->page_view_->ClearExtensions();
+  }
 }
 
 void WebPageBlink::SetCustomPluginIfNeeded() {
-  if (!app_desc_ || !app_desc_->UseCustomPlugin())
+  if (!app_desc_ || !app_desc_->UseCustomPlugin()) {
     return;
+  }
 
   std::string custom_plugin_path = app_desc_->FolderPath();
   custom_plugin_path.append("/plugins");
 
-  if (!util::DoesPathExist(custom_plugin_path.c_str()))
+  if (!util::DoesPathExist(custom_plugin_path.c_str())) {
     return;
-  if (custom_plugin_path_ == custom_plugin_path)
+  }
+  if (custom_plugin_path_ == custom_plugin_path) {
     return;
+  }
 
   custom_plugin_path_ = custom_plugin_path;
   LOG_INFO(MSGID_WAM_DEBUG, 4, PMLOGKS("APP_ID", AppId().c_str()),
@@ -1044,8 +1070,9 @@ void WebPageBlink::UpdateMediaCodecCapability() {
   const std::string& file_content =
       util::ReadFile("/etc/umediaserver/device_codec_capability_config.json");
 
-  if (!file_content.empty())
+  if (!file_content.empty()) {
     page_private_->page_view_->SetMediaCodecCapability(file_content);
+  }
 }
 
 double WebPageBlink::DevicePixelRatio() {
@@ -1053,12 +1080,15 @@ double WebPageBlink::DevicePixelRatio() {
 
   int app_width = app_desc_->WidthOverride();
   int app_height = app_desc_->HeightOverride();
-  if (app_width == 0)
+  if (app_width == 0) {
     app_width = CurrentUiWidth();
-  if (app_height == 0)
+  }
+  if (app_height == 0) {
     app_height = CurrentUiHeight();
-  if (app_width == 0 || app_height == 0)
+  }
+  if (app_width == 0 || app_height == 0) {
     return device_pixel_ratio;
+  }
 
   int device_width = 0;
   int device_height = 0;

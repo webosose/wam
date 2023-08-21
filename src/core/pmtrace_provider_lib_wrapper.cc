@@ -47,11 +47,13 @@ using FunctypeTracePosition = std::function<void(const char*, int, int)>;
 
 template <typename T, typename F>
 bool TryGetFunction(void* lib_handle, const char* func_name, F& func_handle) {
-  if (lib_handle)
+  if (lib_handle) {
     func_handle = reinterpret_cast<T>(dlsym(lib_handle, func_name));
-  if (!func_handle)
+  }
+  if (!func_handle) {
     LOG_ERROR(MSGID_DL_ERROR, 0, "Function \"%s\" address obtain error: %s",
               func_name, dlerror());
+  }
 
   return func_handle != nullptr;
 }
@@ -73,48 +75,57 @@ class PmtraceProviderLibWrapper {
   }
 
   void DoTraceMessage(const char* label) {
-    if (CheckIsReady())
+    if (CheckIsReady()) {
       func_trace_message_(label);
+    }
   }
 
   void DoTraceBefore(const char* label) {
-    if (CheckIsReady())
+    if (CheckIsReady()) {
       func_trace_before_(label);
+    }
   }
 
   void DoTraceAfter(const char* label) {
-    if (CheckIsReady())
+    if (CheckIsReady()) {
       func_trace_after_(label);
+    }
   }
 
   void DoTraceScopeEntry(const char* label) {
-    if (CheckIsReady())
+    if (CheckIsReady()) {
       func_trace_scope_entry_(label);
+    }
   }
 
   void DoTraceScopeExit(const char* label) {
-    if (CheckIsReady())
+    if (CheckIsReady()) {
       func_trace_scope_exit_(label);
+    }
   }
 
   void DoTraceFunctionEntry(const char* label) {
-    if (CheckIsReady())
+    if (CheckIsReady()) {
       func_trace_function_entry_(label);
+    }
   }
 
   void DoTraceFunctionExit(const char* label) {
-    if (CheckIsReady())
+    if (CheckIsReady()) {
       func_trace_function_exit_(label);
+    }
   }
 
   void DoTraceItem(const char* name, const char* value) {
-    if (CheckIsReady())
+    if (CheckIsReady()) {
       func_trace_item_(name, value);
+    }
   }
 
   void DoTracePosition(const char* label, int pos_x, int pos_y) {
-    if (CheckIsReady())
+    if (CheckIsReady()) {
       func_trace_position_(label, pos_x, pos_y);
+    }
   }
 
  private:

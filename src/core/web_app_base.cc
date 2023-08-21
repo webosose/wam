@@ -156,8 +156,9 @@ void WebAppBase::CloseAppInternal() {
 void WebAppBase::Attach(WebPageBase* page) {
   // connect to the signals of the WebBridge
   // parse up the ApplicationDescription
-  if (app_private_->page_)
+  if (app_private_->page_) {
     Detach();
+  }
 
   app_private_->page_ = std::unique_ptr<WebPageBase>(page);
   app_private_->page_->CreatePalmSystem(this);
@@ -182,17 +183,20 @@ void WebAppBase::Relaunch(const std::string& args,
 
     ClearPreloadState();
 
-    if (WebAppManager::Instance()->Config()->IsCheckLaunchTimeEnabled())
+    if (WebAppManager::Instance()->Config()->IsCheckLaunchTimeEnabled()) {
       StartLaunchTimer();
+    }
 
-    if (KeepAlive() && (Page()->Progress() != 100))
+    if (KeepAlive() && (Page()->Progress() != 100)) {
       added_to_window_mgr_ = false;
+    }
 
     // if we're already loaded, then show, else clear the hidden flag, and
     // show as normal when loaded and ready to render
     if (added_to_window_mgr_ ||
-        (Page()->Progress() == 100 && Page()->HasBeenShown()))
+        (Page()->Progress() == 100 && Page()->HasBeenShown())) {
       ShowWindow();
+    }
   }
 
   if (GetCrashState()) {
@@ -261,8 +265,9 @@ void WebAppBase::WebPageClosePageRequested() {
            PMLOGKFV("PID", "%d", Page()->GetWebProcessPID()), "%s%s",
            close_page_requested_ ? "duplicated window.close();" : "",
            IsClosing() ? "app is closing; drop this window.close()" : "");
-  if (IsClosing() || close_page_requested_)
+  if (IsClosing() || close_page_requested_) {
     return;
+  }
 
   close_page_requested_ = true;
   WebAppManager::Instance()->CloseApp(InstanceId());
@@ -300,8 +305,9 @@ void WebAppBase::SetAppProperties(const std::string& properties) {
   }
   SetKeepAlive(keep_alive);
 
-  if (json["launchedHidden"].isBool() && json["launchedHidden"].asBool())
+  if (json["launchedHidden"].isBool() && json["launchedHidden"].asBool()) {
     SetHiddenWindow(true);
+  }
 }
 
 void WebAppBase::SetPreloadState(const std::string& properties) {
@@ -321,12 +327,14 @@ void WebAppBase::SetPreloadState(const std::string& properties) {
     preload_state_ = kPartialPreload;
   }
 
-  if (preload_state_ != kNonePreload)
+  if (preload_state_ != kNonePreload) {
     SetHiddenWindow(true);
+  }
 
   // set PreloadEnvironment needs attaching WebPageBase.
-  if (!app_private_->page_)
+  if (!app_private_->page_) {
     return;
+  }
 
   switch (preload_state_) {
     case kFullPreload:
@@ -386,19 +394,22 @@ void WebAppBase::SetUiSize(int width, int height) {
 }
 
 void WebAppBase::SetPreferredLanguages(const std::string& language) {
-  if (!app_private_->page_)
+  if (!app_private_->page_) {
     return;
+  }
   app_private_->page_->SetPreferredLanguages(language);
   app_private_->page_->SendLocaleChangeEvent(language);
 }
 
 void WebAppBase::HandleWebAppMessage(WebAppManager::WebAppMessageType type,
                                      const std::string& message) {
-  if (!app_private_->page_)
+  if (!app_private_->page_) {
     return;
+  }
 
-  if (type == WebAppManager::WebAppMessageType::kDeviceInfoChanged)
+  if (type == WebAppManager::WebAppMessageType::kDeviceInfoChanged) {
     app_private_->page_->HandleDeviceInfoChanged(message);
+  }
 }
 
 void WebAppBase::SetUseAccessibility(bool enabled) {
@@ -470,8 +481,9 @@ void WebAppBase::ServiceCall(const std::string& url,
 }
 
 void WebAppBase::KeyboardVisibilityChanged(bool visible, int height) {
-  if (Page())
+  if (Page()) {
     Page()->KeyboardVisibilityChanged(visible);
+  }
 }
 
 bool WebAppBase::IsClosing() const {

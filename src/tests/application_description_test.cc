@@ -224,21 +224,23 @@ TEST_F(ApplicationDescriptionTest, checkGetId) {
 
 TEST_F(ApplicationDescriptionTest, checkGetEntryPoint) {
   struct stat info;
-  if (stat("/usr/palm/applications/bareapp/index.html", &info))
+  if (stat("/usr/palm/applications/bareapp/index.html", &info)) {
     EXPECT_STREQ("index.html", application_description_->EntryPoint().c_str());
-  else
+  } else {
     EXPECT_STREQ(
         "file://bareapp-webos/usr/palm/applications/bareapp/index.html",
         application_description_->EntryPoint().c_str());
+  }
 }
 
 TEST_F(ApplicationDescriptionTest, checkGetIcon) {
   struct stat info;
-  if (stat("/usr/palm/applications/bareapp/icon.png", &info))
+  if (stat("/usr/palm/applications/bareapp/icon.png", &info)) {
     EXPECT_STREQ("icon.png", application_description_->Icon().c_str());
-  else
+  } else {
     EXPECT_STREQ("/usr/palm/applications/bareapp/icon.png",
                  application_description_->Icon().c_str());
+  }
 }
 
 TEST_F(ApplicationDescriptionTest, checkGetFolderPath) {

@@ -83,16 +83,19 @@ std::string PalmSystemBlink::HandleBrowserControlMessage(
   } else if (command == "screenOrientation") {
     return ScreenOrientation();
   } else if (command == "keepAlive") {
-    if (arguments.size() > 0)
+    if (arguments.size() > 0) {
       SetKeepAlive(arguments[0] == "true");
+    }
   } else if (command == "PmLogInfoWithClock") {
-    if (arguments.size() == 3)
+    if (arguments.size() == 3) {
       LogMsgWithClock(arguments[0], arguments[1], arguments[2]);
+    }
   } else if (command == "PmLogString") {
     if (arguments.size() > 3) {
       int32_t v1;
-      if (util::StrToInt(arguments[0], v1))
+      if (util::StrToInt(arguments[0], v1)) {
         LogMsgString(v1, arguments[1], arguments[2], arguments[3]);
+      }
     }
   } else if (command == "setWindowProperty") {
     if (arguments.size() > 1) {
@@ -115,8 +118,9 @@ std::string PalmSystemBlink::HandleBrowserControlMessage(
       int32_t v2, v3;
       const bool v2_conversion = util::StrToInt(arguments[1], v2);
       const bool v3_conversion = util::StrToInt(arguments[2], v3);
-      if (v2_conversion && v3_conversion)
+      if (v2_conversion && v3_conversion) {
         app_->SetCursor(v1, v2, v3);
+      }
     }
   } else if (command == "setInputRegion") {
     std::string data;
@@ -190,8 +194,9 @@ void PalmSystemBlink::SetLocale(const std::string& params) {
 }
 
 std::string PalmSystemBlink::Identifier() const {
-  if (!app_->Page())
+  if (!app_->Page()) {
     return std::string();
+  }
 
   return static_cast<WebPageBlink*>(app_->Page())->GetIdentifier();
 }
@@ -205,12 +210,13 @@ std::string PalmSystemBlink::TrustLevel() const {
 }
 
 void PalmSystemBlink::OnCloseNotify(const std::string& params) {
-  if (params == "didSetOnCloseCallback")
+  if (params == "didSetOnCloseCallback") {
     static_cast<WebPageBlink*>(app_->Page())->SetHasOnCloseCallback(true);
-  else if (params == "didClearOnCloseCallback")
+  } else if (params == "didClearOnCloseCallback") {
     static_cast<WebPageBlink*>(app_->Page())->SetHasOnCloseCallback(false);
-  else if (params == "didRunOnCloseCallback")
+  } else if (params == "didRunOnCloseCallback") {
     static_cast<WebPageBlink*>(app_->Page())->DidRunCloseCallback();
+  }
 }
 
 double PalmSystemBlink::DevicePixelRatio() {

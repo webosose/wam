@@ -64,16 +64,18 @@ class LSCallbackHandler {
 
     if (!message) {
       if (!LSMessageReply(handle, message, "{\"returnValue\": false}",
-                          &ls_error))
+                          &ls_error)) {
         return false;
+      }
       return true;
     }
 
     Json::Value request;
     if (!util::StringToJson(LSMessageGetPayload(message), request)) {
       if (!LSMessageReply(handle, message, "{\"returnValue\": false}",
-                          &ls_error))
+                          &ls_error)) {
         return false;
+      }
       return true;
     }
 
@@ -81,11 +83,12 @@ class LSCallbackHandler {
 
     reply = static_cast<LSCallbackHandler*>(user_data)->Called(request);
 
-    if (!reply.isNull())
+    if (!reply.isNull()) {
       return LSMessageReply(handle, message, util::JsonToString(reply).c_str(),
                             &ls_error);
-    else
+    } else {
       return true;
+    }
   }
 
   std::function<Json::Value(const Json::Value&)> func_;
@@ -129,8 +132,10 @@ static bool bus_callback_json(LSHandle* handle,
   LSErrorSafe ls_error;
 
   if (!message) {
-    if (!LSMessageReply(handle, message, "{\"returnValue\": false}", &ls_error))
+    if (!LSMessageReply(handle, message, "{\"returnValue\": false}",
+                        &ls_error)) {
       return false;
+    }
     return true;
   }
 
@@ -144,8 +149,9 @@ static bool bus_callback_json(LSHandle* handle,
   reply = (static_cast<CLASS*>(user_data)->*FUNCTION)(request);
 
   if (!LSMessageReply(handle, message, util::JsonToString(reply).c_str(),
-                      &ls_error))
+                      &ls_error)) {
     return false;
+  }
 
   return true;
 }
@@ -158,15 +164,18 @@ static bool bus_subscription_callback_json(LSHandle* handle,
   LSErrorSafe ls_error;
 
   if (!message) {
-    if (!LSMessageReply(handle, message, "{\"returnValue\": false}", &ls_error))
+    if (!LSMessageReply(handle, message, "{\"returnValue\": false}",
+                        &ls_error)) {
       return false;
+    }
     return true;
   }
 
   bool subscribed = false;
   if (LSMessageIsSubscription(message)) {
-    if (!LSSubscriptionProcess(handle, message, &subscribed, &ls_error))
+    if (!LSSubscriptionProcess(handle, message, &subscribed, &ls_error)) {
       return false;
+    }
   }
 
   Json::Value request;
@@ -178,12 +187,14 @@ static bool bus_subscription_callback_json(LSHandle* handle,
 
   reply = (static_cast<CLASS*>(user_data)->*FUNCTION)(request, subscribed);
 
-  if (subscribed)
+  if (subscribed) {
     reply["subscribed"] = true;
+  }
 
   if (!LSMessageReply(handle, message, util::JsonToString(reply).c_str(),
-                      &ls_error))
+                      &ls_error)) {
     return false;
+  }
 
   return true;
 }
@@ -197,8 +208,9 @@ static bool bus_callback_json(LSHandle* handle,
                               void* user_data) {
   Json::Value reply;
   if (message) {
-    if (!util::StringToJson(LSMessageGetPayload(message), reply))
+    if (!util::StringToJson(LSMessageGetPayload(message), reply)) {
       LOG_WARNING(MSGID_LUNA_API, 0, "Failed to parse reply message.");
+    }
   }
 
   (static_cast<CLASS*>(user_data)->*FUNCTION)(reply);

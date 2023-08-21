@@ -42,8 +42,9 @@ class InputManager : public webos::InputPointer {
  public:
   static InputManager* Instance() {
     // InputManager should be globally one.
-    if (!webos::WebOSPlatform::GetInstance()->GetInputPointer())
+    if (!webos::WebOSPlatform::GetInstance()->GetInputPointer()) {
       webos::WebOSPlatform::GetInstance()->SetInputPointer(new InputManager());
+    }
     return static_cast<InputManager*>(
         webos::WebOSPlatform::GetInstance()->GetInputPointer());
   }

@@ -32,14 +32,16 @@ int WebAppWindowImpl::DisplayHeight() {
 }
 
 void WebAppWindowImpl::InitWindow(int width, int height) {
-  if (window_)
+  if (window_) {
     window_->InitWindow(width, height);
+  }
 }
 
 void WebAppWindowImpl::SetLocationHint(
     webos::WebAppWindowBase::LocationHint value) {
-  if (window_)
+  if (window_) {
     window_->SetLocationHint(value);
+  }
 }
 
 webos::NativeWindowState WebAppWindowImpl::GetWindowHostState() const {
@@ -48,14 +50,16 @@ webos::NativeWindowState WebAppWindowImpl::GetWindowHostState() const {
 
 void WebAppWindowImpl::CreateWindowGroup(
     const webos::WindowGroupConfiguration& config) {
-  if (window_)
+  if (window_) {
     window_->CreateWindowGroup(config);
+  }
 }
 
 void WebAppWindowImpl::AttachToWindowGroup(const std::string& name,
                                            const std::string& layer) {
-  if (window_)
+  if (window_) {
     window_->AttachToWindowGroup(name, layer);
+  }
 }
 
 bool WebAppWindowImpl::IsKeyboardVisible() {
@@ -63,101 +67,120 @@ bool WebAppWindowImpl::IsKeyboardVisible() {
 }
 
 void WebAppWindowImpl::SetKeyMask(webos::WebOSKeyMask key_mask) {
-  if (window_)
+  if (window_) {
     window_->SetKeyMask(key_mask);
+  }
 }
 
 void WebAppWindowImpl::SetKeyMask(webos::WebOSKeyMask key_mask, bool set) {
-  if (window_)
+  if (window_) {
     window_->SetKeyMask(key_mask, set);
+  }
 }
 
 void WebAppWindowImpl::SetInputRegion(const std::vector<gfx::Rect>& region) {
-  if (window_)
+  if (window_) {
     window_->SetInputRegion(region);
+  }
 }
 
 void WebAppWindowImpl::SetWindowProperty(const std::string& name,
                                          const std::string& value) {
-  if (window_)
+  if (window_) {
     window_->SetWindowProperty(name, value);
+  }
 }
 
 void WebAppWindowImpl::Resize(int width, int height) {
-  if (window_)
+  if (window_) {
     window_->Resize(width, height);
+  }
 }
 
 void WebAppWindowImpl::FocusWindowGroupOwner() {
-  if (window_)
+  if (window_) {
     window_->FocusWindowGroupOwner();
+  }
 }
 
 void WebAppWindowImpl::FocusWindowGroupLayer() {
-  if (window_)
+  if (window_) {
     window_->FocusWindowGroupLayer();
+  }
 }
 
 void WebAppWindowImpl::SetOpacity(float opacity) {
-  if (window_)
+  if (window_) {
     window_->SetOpacity(opacity);
+  }
 }
 
 void WebAppWindowImpl::SetWindowHostState(webos::NativeWindowState state) {
-  if (window_)
+  if (window_) {
     window_->SetWindowHostState(state);
+  }
 }
 
 void WebAppWindowImpl::RecreatedWebContents() {
-  if (window_)
+  if (window_) {
     window_->RecreatedWebContents();
+  }
 }
 
 void WebAppWindowImpl::DetachWindowGroup() {
-  if (window_)
+  if (window_) {
     window_->DetachWindowGroup();
+  }
 }
 
 void WebAppWindowImpl::SetUseVirtualKeyboard(bool enable) {
-  if (window_)
+  if (window_) {
     window_->SetUseVirtualKeyboard(enable);
+  }
 }
 
 void WebAppWindowImpl::SetFirstActivateTimeoutMs(uint32_t timeout) {
-  if (window_)
+  if (window_) {
     window_->SetFirstActivateTimeoutMs(timeout);
+  }
 }
 
 void WebAppWindowImpl::SetWebApp(WebAppWayland* w) {
-  if (window_)
+  if (window_) {
     window_->SetWebApp(w);
+  }
 }
 
 void WebAppWindowImpl::Hide() {
-  if (window_)
+  if (window_) {
     window_->HideWindow();
+  }
 }
 
 void WebAppWindowImpl::Show() {
-  if (window_)
+  if (window_) {
     window_->ShowWindow();
+  }
 }
 
 void WebAppWindowImpl::PlatformBack() {
-  if (window_)
+  if (window_) {
     window_->PlatformBack();
+  }
 }
 
 void WebAppWindowImpl::SetCursor(const std::string& cursor_arg,
                                  int hotspot_x,
                                  int hotspot_y) {
-  if (window_)
+  if (window_) {
     window_->SetCursor(cursor_arg, hotspot_x, hotspot_y);
+  }
 }
 
 void WebAppWindowImpl::AttachWebContents(void* web_contents) {
-  if (window_)
+  if (window_) {
     window_->AttachWebContentsToWindow(web_contents);
+  }
 }
 
 bool WebAppWindowImpl::Event(WebOSEvent* event) {

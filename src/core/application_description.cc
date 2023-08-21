@@ -30,12 +30,15 @@
 #include "web_app_manager.h"
 
 bool ApplicationDescription::CheckTrustLevel(std::string trust_level) {
-  if (trust_level.empty())
+  if (trust_level.empty()) {
     return false;
-  if (trust_level.compare("default") == 0)
+  }
+  if (trust_level.compare("default") == 0) {
     return true;
-  if (trust_level.compare("trusted") == 0)
+  }
+  if (trust_level.compare("trusted") == 0) {
     return true;
+  }
   return false;
 }
 
@@ -55,8 +58,9 @@ ApplicationDescription::GetWindowGroupInfo() {
       }
 
       auto is_owner = json["owner"];
-      if (is_owner.isBool())
+      if (is_owner.isBool()) {
         info.is_owner = is_owner.asBool();
+      }
     }
   }
 
@@ -71,8 +75,9 @@ ApplicationDescription::GetWindowOwnerInfo() {
 
     auto owner_info = json["ownerInfo"];
     if (owner_info.isObject()) {
-      if (owner_info["allowAnonymous"].isBool())
+      if (owner_info["allowAnonymous"].isBool()) {
         info.allow_anonymous = owner_info["allowAnonymous"].asBool();
+      }
 
       auto layers = owner_info["layers"];
       if (layers.isArray()) {
@@ -98,12 +103,14 @@ ApplicationDescription::GetWindowClientInfo() {
     auto client_info = json["clientInfo"];
     if (client_info.isObject()) {
       auto layer = client_info["layer"];
-      if (layer.isString())
+      if (layer.isString()) {
         info.layer = layer.asString();
+      }
 
       auto hint = client_info["hint"];
-      if (hint.isString())
+      if (hint.isString()) {
         info.hint = hint.asString();
+      }
     }
   }
   return info;
@@ -142,8 +149,9 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
 
   auto supported_versions = json_obj["supportedEnyoBundleVersions"];
   if (supported_versions.isArray()) {
-    for (const Json::Value& version : supported_versions)
+    for (const Json::Value& version : supported_versions) {
       app_desc->supported_enyo_bundle_versions_.insert(version.asString());
+    }
   }
 
   app_desc->id_ = json_obj["id"].asString();
@@ -188,18 +196,20 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   if (v8_snapshot_file.isString()) {
     std::string snapshot_file = v8_snapshot_file.asString();
     if (snapshot_file.length() > 0) {
-      if (snapshot_file.at(0) == '/')
+      if (snapshot_file.at(0) == '/') {
         app_desc->v8_snapshot_path_ = snapshot_file;
-      else
+      } else {
         app_desc->v8_snapshot_path_ =
             app_desc->folder_path_ + "/" + snapshot_file;
+      }
     }
   }
 
   // Handle v8 extra flags
   auto v8_extra_flags = json_obj["v8ExtraFlags"];
-  if (v8_extra_flags.isString())
+  if (v8_extra_flags.isString()) {
     app_desc->v8_extra_flags_ = v8_extra_flags.asString();
+  }
 
   // Handle resolution
   auto resolution = json_obj["resolution"];
@@ -217,16 +227,18 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   }
 
   auto location_hint = json_obj["locationHint"];
-  if (location_hint.isString())
+  if (location_hint.isString()) {
     app_desc->location_hint_ = location_hint.asString();
+  }
 
   // Handle keyFilterTable
   // Key code is changed only for facebooklogin WebApp
   auto key_filter_table = json_obj["keyFilterTable"];
   if (key_filter_table.isArray()) {
     for (const auto& k : key_filter_table) {
-      if (!k.isObject())
+      if (!k.isObject()) {
         continue;
+      }
       int from = k["from"].asInt();
       int to = k["to"].asInt();
       int modifier = k["modifier"].asInt();
@@ -235,8 +247,9 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   }
 
   // Handle trustLevel
-  if (!app_desc->CheckTrustLevel(app_desc->trust_level_))
+  if (!app_desc->CheckTrustLevel(app_desc->trust_level_)) {
     app_desc->trust_level_ = std::string("default");
+  }
 
   // Handle webAppType
   if (app_desc->sub_type_.empty()) {
@@ -253,8 +266,9 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   WindowClass class_value = kWindowClassNormal;
   auto clazz = json_obj["class"];
   if (clazz.isObject()) {
-    if (clazz["hidden"].isBool() && clazz["hidden"].asBool())
+    if (clazz["hidden"].isBool() && clazz["hidden"].asBool()) {
       class_value = kWindowClassHidden;
+    }
   }
   app_desc->window_class_value_ = class_value;
 
@@ -324,8 +338,9 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   }
 
   auto suspend_dom_time = json_obj["suspendDOMTime"];
-  if (suspend_dom_time.isInt())
+  if (suspend_dom_time.isInt()) {
     app_desc->custom_suspend_dom_time_ = suspend_dom_time.asInt();
+  }
 
   auto use_video_decode_accelerator = json_obj["useVideoDecodeAccelerator"];
   if (use_video_decode_accelerator.isBool()) {

@@ -66,35 +66,42 @@ bool Url::IsLocalFile() const {
 }
 
 std::string Url::FileName() const {
-  if (!IsLocalFile())
+  if (!IsLocalFile()) {
     return "";
+  }
   std::string local = ToLocalFile();
   auto found = local.find_last_of("/");
-  if (found == std::string::npos)
+  if (found == std::string::npos) {
     return local;
+  }
   return local.substr(found + 1, local.size() - found);
 }
 
 void Url::ParseUri(const std::string& uri) {
   auto scheme_delimiter = uri.find(':');
-  if (scheme_delimiter != std::string::npos)
+  if (scheme_delimiter != std::string::npos) {
     scheme_ = uri.substr(0, scheme_delimiter);
+  }
 
   auto authority_start = uri.find("//");
-  if (authority_start != std::string::npos)
+  if (authority_start != std::string::npos) {
     authority_start += 2;
+  }
   auto authority_end = uri.find_first_of("/?#", authority_start);
 
   if (authority_start != std::string::npos) {
     auto host_start = authority_start;
     auto user_info_end = uri.find('@', authority_start);
-    if (user_info_end != std::string::npos)
+    if (user_info_end != std::string::npos) {
       host_start = user_info_end + 1;
+    }
     auto host_end = uri.find_first_of(":/?#", host_start);
-    if (host_start != std::string::npos)
+    if (host_start != std::string::npos) {
       host_ = GetSubString(uri, host_start, host_end);
-    if (host_end != std::string::npos && uri[host_end] == ':')
+    }
+    if (host_end != std::string::npos && uri[host_end] == ':') {
       port_ = GetSubString(uri, host_end + 1, authority_end);
+    }
   }
 
   auto path_end = uri.find_first_of("?#", authority_end);
@@ -104,8 +111,9 @@ void Url::ParseUri(const std::string& uri) {
   if (authority_start == std::string::npos) {
     path_ = uri.substr(scheme_delimiter + 1, uri.size() - scheme_delimiter);
   } else if (authority_end != std::string::npos) {
-    if (uri[authority_end] == '/')
+    if (uri[authority_end] == '/') {
       path_ = GetSubString(uri, authority_end, path_end);
+    }
 
     auto query_start = uri.find("?", authority_end);
     if (query_start != std::string::npos) {

@@ -78,8 +78,9 @@ void WebPageBase::SetApplicationDescription(
 
 std::string WebPageBase::GetIdentifier() const {
   if ((is_load_error_page_finish_ && is_load_error_page_start_) ||
-      did_error_page_loaded_from_net_error_helper_)
+      did_error_page_loaded_from_net_error_helper_) {
     return std::string(kIdentifierForNetErrorPage);
+  }
   return app_id_;
 }
 
@@ -225,8 +226,9 @@ bool WebPageBase::DoHostedWebAppRelaunch(const std::string& launch_params) {
 
 bool WebPageBase::DoDeeplinking(const std::string& launch_params) {
   Json::Value obj = util::StringToJson(launch_params);
-  if (!obj.isObject() || obj["contentTarget"].isNull())
+  if (!obj.isObject() || obj["contentTarget"].isNull()) {
     return false;
+  }
 
   std::string handled_by =
       obj["handledBy"].isNull() ? "default" : obj["handledBy"].asString();
@@ -304,8 +306,9 @@ void WebPageBase::HandleLoadFailed(int error_code) {
   // http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
   // we can't handle unknown protocol like mailto.
   // Client want to not show error page with unknown protocol like chrome.
-  if (!is_preload_ && error_code != 204 && error_code != 301)
+  if (!is_preload_ && error_code != 204 && error_code != 301) {
     LoadErrorPage(error_code);
+  }
 }
 
 void WebPageBase::CleanResourcesFinished() {
@@ -446,13 +449,15 @@ std::string WebPageBase::DefaultFont() {
   GetDeviceInfo("LocalCountry", country);
 
   // for the model
-  if (country == "JPN")
+  if (country == "JPN") {
     default_font = "LG Display_JP";
-  else if (country == "HKG")
+  } else if (country == "HKG") {
     default_font = "LG Display GP4_HK";
+  }
   // for the locale(language)
-  else if (language == "ur-IN")
+  else if (language == "ur-IN") {
     default_font = "LG Display_Urdu";
+  }
 
   LOG_DEBUG("[%s] country : [%s], language : [%s], default font : [%s]",
             AppId().c_str(), country.c_str(), language.c_str(),
@@ -468,8 +473,9 @@ void WebPageBase::UpdateIsLoadErrorPageFinish() {
   // file:///usr/share/localization/webappmanager2/loaderror.html
   is_load_error_page_finish_ = false;
 
-  if (!Url().IsLocalFile())
+  if (!Url().IsLocalFile()) {
     return;
+  }
 
   fs::path url_path(Url().ToLocalFile());
   std::string url_file_name = url_path.filename();

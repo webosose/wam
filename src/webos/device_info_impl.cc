@@ -106,16 +106,19 @@ void DeviceInfoImpl::InitPlatformInfo() {
   */
 
   std::string value;
-  if (GetDeviceInfo("ModelName", value))
+  if (GetDeviceInfo("ModelName", value)) {
     model_name_ = value;
-  if (GetDeviceInfo("FirmwareVersion", value))
+  }
+  if (GetDeviceInfo("FirmwareVersion", value)) {
     platform_version_ = value;
+  }
 
   size_t major_pos = 0, minor_pos = 0;
   major_pos = platform_version_.find_first_of('.');
   if (major_pos != std::string::npos &&
-      major_pos <= platform_version_.size() - 1)
+      major_pos <= platform_version_.size() - 1) {
     minor_pos = platform_version_.find_first_of('.', major_pos + 1);
+  }
   if (major_pos == std::string::npos || minor_pos == std::string::npos) {
     version_major_ = version_minor_ = version_dot_ = -1;
   } else {

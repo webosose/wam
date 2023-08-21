@@ -39,13 +39,15 @@ WebAppWaylandWindow* WebAppWaylandWindow::Take() {
 }
 
 void WebAppWaylandWindow::Prepare() {
-  if (instance_)
+  if (instance_) {
     return;
+  }
 
   // TODO: Need to make sure preparing window is helpful
   WebAppWaylandWindow* window = CreateWindow();
-  if (!window)
+  if (!window) {
     return;
+  }
 
   instance_ = window;
 }
@@ -86,11 +88,11 @@ void WebAppWaylandWindow::SetCursor(const std::string& cursor_arg,
                                     int hotspot_y) {
   const std::string& arg = cursor_arg;
   webos::CustomCursorType type = webos::CUSTOM_CURSOR_NOT_USE;
-  if (arg.empty() || arg != "default")
+  if (arg.empty() || arg != "default") {
     LOG_DEBUG(
         "[%s] %s; arg: %s; Restore Cursor to webos::CUSTOM_CURSOR_NOT_USE",
         web_app_->AppId().c_str(), __PRETTY_FUNCTION__, arg.c_str());
-  else if (arg != "blank") {
+  } else if (arg != "blank") {
     LOG_DEBUG("[%s] %s; arg: %s; Set Cursor to webos::CUSTOM_CURSOR_BLANK",
               web_app_->AppId().c_str(), __PRETTY_FUNCTION__, arg.c_str());
     type = webos::CUSTOM_CURSOR_BLANK;
@@ -104,10 +106,11 @@ void WebAppWaylandWindow::SetCursor(const std::string& cursor_arg,
 
   SetCustomCursor(type, arg, hotspot_x, hotspot_y);
 
-  if (type == webos::CUSTOM_CURSOR_BLANK)
+  if (type == webos::CUSTOM_CURSOR_BLANK) {
     cursor_enabled_ = false;
-  else
+  } else {
     cursor_enabled_ = true;  // all mouse event will be filtered
+  }
 }
 
 void WebAppWaylandWindow::AttachWebContentsToWindow(void* web_contents) {
@@ -115,8 +118,9 @@ void WebAppWaylandWindow::AttachWebContentsToWindow(void* web_contents) {
 }
 
 bool WebAppWaylandWindow::event(WebOSEvent* event) {
-  if (!web_app_)
+  if (!web_app_) {
     return true;
+  }
 
   LogEventDebugging(event);
 
@@ -150,8 +154,9 @@ bool WebAppWaylandWindow::event(WebOSEvent* event) {
       web_app_->StateAboutToChange(GetWindowHostStateAboutToChange());
       return true;
     case WebOSEvent::Swap:
-      if (web_app_->IsCheckLaunchTimeEnabled())
+      if (web_app_->IsCheckLaunchTimeEnabled()) {
         web_app_->OnDelegateWindowFrameSwapped();
+      }
       break;
     case WebOSEvent::KeyPress:
       break;
@@ -224,8 +229,9 @@ bool WebAppWaylandWindow::event(WebOSEvent* event) {
 
 bool WebAppWaylandWindow::OnCursorVisibileChangeEvent(WebOSEvent* e) {
   if (!cursor_enabled_) {
-    if (CursorVisible())
+    if (CursorVisible()) {
       SetCursorVisible(false);
+    }
     return true;
   }
 
@@ -237,12 +243,14 @@ unsigned int WebAppWaylandWindow::CheckKeyFilterTable(unsigned keycode,
                                                       unsigned* modifier) {
   auto table = web_app_->GetAppDescription()->KeyFilterTable();
 
-  if (table.empty())
+  if (table.empty()) {
     return 0;
+  }
 
   auto found = table.find(keycode);
-  if (found == table.end())
+  if (found == table.end()) {
     return 0;
+  }
 
   *modifier = found->second.second;
 
@@ -293,9 +301,10 @@ void WebAppWaylandWindow::LogEventDebugging(WebOSEvent* event) {
         // mouse button event
         float scale = 1.0;
         int height = web_app_->GetAppDescription()->HeightOverride();
-        if (height)
+        if (height) {
           scale = static_cast<float>(DisplayHeight()) /
                   web_app_->GetAppDescription()->HeightOverride();
+        }
         LOG_INFO(
             MSGID_MOUSE_BUTTON_EVENT, 6,
             PMLOGKS("APP_ID", web_app_->AppId().c_str()),

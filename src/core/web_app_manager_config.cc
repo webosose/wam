@@ -47,8 +47,9 @@ void WebAppManagerConfig::InitConfiguration() {
   max_custom_suspend_delay_time_ = std::max(max_custom_suspend_delay_int, 0);
 
   web_process_config_path_ = WamGetEnv("WEBPROCESS_CONFIGURATION_PATH");
-  if (web_process_config_path_.empty())
+  if (web_process_config_path_.empty()) {
     web_process_config_path_ = "/etc/wam/com.webos.wam.json";
+  }
 
   error_page_url_ = WamGetEnv("WAM_ERROR_PAGE");
 
@@ -67,8 +68,9 @@ void WebAppManagerConfig::InitConfiguration() {
       WamGetEnv("ENABLE_LAUNCH_OPTIMIZATION").compare("1") == 0;
 
   user_script_path_ = WamGetEnv("USER_SCRIPT_PATH");
-  if (user_script_path_.empty())
+  if (user_script_path_.empty()) {
     user_script_path_ = "webOSUserScripts/userScript.js";
+  }
 
   name_ = WamGetEnv("WAM_NAME");
 }

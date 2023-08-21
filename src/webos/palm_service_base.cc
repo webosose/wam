@@ -69,8 +69,9 @@ bool PalmServiceBase::StartService() {
 }
 
 bool PalmServiceBase::StopService() {
-  if (!service_handle_)
+  if (!service_handle_) {
     return true;
+  }
 
   LSErrorSafe ls_error;
   if (!LSUnregister(service_handle_, &ls_error)) {
@@ -136,8 +137,9 @@ bool PalmServiceBase::Call(LSHandle* handle,
 
 GMainLoop* PalmServiceBase::MainLoop() const {
   static GMainLoop* s_main_loop = nullptr;
-  if (!s_main_loop)
+  if (!s_main_loop) {
     s_main_loop = g_main_loop_new(nullptr, FALSE);
+  }
   return s_main_loop;
 }
 

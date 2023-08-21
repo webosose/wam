@@ -59,8 +59,9 @@ WebAppBase* WebProcessManager::FindAppByInstanceId(
 bool WebProcessManager::WebProcessInfoMapReady() {
   uint32_t count = 0;
   for (const auto& it : web_process_info_map_) {
-    if (it.second.proxy_id_ != 0)
+    if (it.second.proxy_id_ != 0) {
       count++;
+    }
   }
 
   return count == maximum_number_of_processes_;
@@ -68,8 +69,9 @@ bool WebProcessManager::WebProcessInfoMapReady() {
 
 uint32_t WebProcessManager::GetWebProcessProxyID(
     const ApplicationDescription* desc) const {
-  if (!desc)
+  if (!desc) {
     return 0;
+  }
 
   std::string key = GetProcessKey(desc);
 
@@ -97,8 +99,9 @@ std::string WebProcessManager::GetWebProcessMemSize(uint32_t pid) const {
   std::string path = "/proc/" + std::to_string(pid) + "/status";
   std::ifstream in(path);
 
-  if (!in.is_open())
+  if (!in.is_open()) {
     return {};
+  }
 
   std::string line;
   while (std::getline(in, line)) {
@@ -124,14 +127,15 @@ void WebProcessManager::ReadWebProcessPolicy() {
   auto create_process_for_each_app =
       web_process_environment["createProcessForEachApp"];
   if (create_process_for_each_app.isBool() &&
-      create_process_for_each_app.asBool())
+      create_process_for_each_app.asBool()) {
     maximum_number_of_processes_ = UINT_MAX;
-  else {
+  } else {
     auto web_process_array = web_process_environment["webProcessList"];
     if (web_process_array.isArray()) {
       for (const auto& value : web_process_array) {
-        if (!value.isObject())
+        if (!value.isObject()) {
           continue;
+        }
         auto id = value["id"];
         if (id.isString()) {
           web_process_group_app_id_list_.push_back(id.asString());
@@ -180,17 +184,19 @@ void WebProcessManager::SetWebProcessCacheProperty(const Json::Value& object,
 
 std::string WebProcessManager::GetProcessKey(
     const ApplicationDescription* desc) const {
-  if (!desc)
+  if (!desc) {
     return std::string();
+  }
 
   std::string key;
-  if (maximum_number_of_processes_ == 1)
+  if (maximum_number_of_processes_ == 1) {
     key = "system";
-  else if (maximum_number_of_processes_ == UINT_MAX) {
-    if (desc->TrustLevel() == "default" || desc->TrustLevel() == "trusted")
+  } else if (maximum_number_of_processes_ == UINT_MAX) {
+    if (desc->TrustLevel() == "default" || desc->TrustLevel() == "trusted") {
       key = "system";
-    else
+    } else {
       key = desc->Id();
+    }
   } else {
     std::vector<std::string> id_list;
     for (const std::string& app_id : web_process_group_app_id_list_) {
@@ -199,19 +205,24 @@ std::string WebProcessManager::GetProcessKey(
         util::ReplaceSubstr(replaced_app_id, "*");
         auto l = util::SplitString(replaced_app_id, ',');
         id_list.insert(id_list.end(), l.begin(), l.end());
-        for (const auto& id : id_list)
-          if (!desc->Id().compare(0, id.size(), id))
+        for (const auto& id : id_list) {
+          if (!desc->Id().compare(0, id.size(), id)) {
             key = app_id;
+          }
+        }
       } else {
         auto l = util::SplitString(app_id, ',');
         id_list.insert(id_list.end(), l.begin(), l.end());
-        for (const auto& id : id_list)
-          if (id == desc->Id())
+        for (const auto& id : id_list) {
+          if (id == desc->Id()) {
             return app_id;
+          }
+        }
       }
     }
-    if (!key.empty())
+    if (!key.empty()) {
       return key;
+    }
 
     std::vector<std::string> trust_level_list;
     for (const std::string& trust_level : web_process_group_trust_level_list_) {
@@ -238,9 +249,10 @@ void WebProcessManager::KillWebProcess(uint32_t pid) {
 
   LOG_INFO(MSGID_KILL_WEBPROCESS, 1, PMLOGKFV("PID", "%u", pid), "");
   int ret = kill(pid, SIGKILL);
-  if (ret == -1)
+  if (ret == -1) {
     LOG_ERROR(MSGID_KILL_WEBPROCESS_FAILED, 1,
               PMLOGKS("ERROR", strerror(errno)), "SystemCall failed");
+  }
 }
 
 void WebProcessManager::RequestKillWebProcess(uint32_t pid) {

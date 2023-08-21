@@ -19,8 +19,9 @@
 #include "log_manager.h"
 
 void NetworkStatusManager::UpdateNetworkStatus(const NetworkStatus& status) {
-  if (current_.Type() != status.Type())
+  if (current_.Type() != status.Type()) {
     AppendLogList(status.Type(), current_.Type(), status.Type());
+  }
 
   CheckInformationChange(status.GetInformation());
   if (log_list_.size() > 0) {  // one more information was changed
@@ -32,26 +33,34 @@ void NetworkStatusManager::UpdateNetworkStatus(const NetworkStatus& status) {
 
 void NetworkStatusManager::CheckInformationChange(
     const NetworkStatus::Information& info) {
-  if (current_.GetInformation().IpAddress() != info.IpAddress())
+  if (current_.GetInformation().IpAddress() != info.IpAddress()) {
     AppendLogList("ipAddress", current_.GetInformation().IpAddress(),
                   info.IpAddress());
-  if (current_.GetInformation().Dns1() != info.Dns1())
+  }
+  if (current_.GetInformation().Dns1() != info.Dns1()) {
     AppendLogList("dns1", current_.GetInformation().Dns1(), info.Dns1());
-  if (current_.GetInformation().Dns2() != info.Dns2())
+  }
+  if (current_.GetInformation().Dns2() != info.Dns2()) {
     AppendLogList("dns2", current_.GetInformation().Dns2(), info.Dns2());
-  if (current_.GetInformation().Method() != info.Method())
+  }
+  if (current_.GetInformation().Method() != info.Method()) {
     AppendLogList("method", current_.GetInformation().Method(), info.Method());
-  if (current_.GetInformation().State() != info.State())
+  }
+  if (current_.GetInformation().State() != info.State()) {
     AppendLogList("state", current_.GetInformation().State(), info.State());
-  if (current_.GetInformation().Gateway() != info.Gateway())
+  }
+  if (current_.GetInformation().Gateway() != info.Gateway()) {
     AppendLogList("gateway", current_.GetInformation().Gateway(),
                   info.Gateway());
-  if (current_.GetInformation().InterfaceName() != info.InterfaceName())
+  }
+  if (current_.GetInformation().InterfaceName() != info.InterfaceName()) {
     AppendLogList("interfaceName", current_.GetInformation().InterfaceName(),
                   info.InterfaceName());
-  if (current_.GetInformation().OnInternet() != info.OnInternet())
+  }
+  if (current_.GetInformation().OnInternet() != info.OnInternet()) {
     AppendLogList("onInternet", current_.GetInformation().OnInternet(),
                   info.OnInternet());
+  }
 }
 
 void NetworkStatusManager::AppendLogList(const std::string& key,

@@ -44,8 +44,9 @@ static std::string GetString(const char* value) {
 std::vector<std::string> GetErrorPagePaths(
     const std::string& error_page_location,
     const std::string& language) {
-  if (error_page_location.empty())
+  if (error_page_location.empty()) {
     return std::vector<std::string>();
+  }
 
   namespace fs = std::filesystem;
 
@@ -70,8 +71,9 @@ std::vector<std::string> GetErrorPagePaths(
       ss << bcp47_pieces->Language() << "/";
       ss << bcp47_pieces->Script();
 
-      if (bcp47_pieces->HasRegion())
+      if (bcp47_pieces->HasRegion()) {
         ss << "/" << bcp47_pieces->Region();
+      }
 
       ss << "/html/" << filename;
       result.emplace_back(ss.str());
@@ -97,8 +99,9 @@ std::vector<std::string> GetErrorPagePaths(
 }
 
 std::string GetHostname(const std::string& url) {
-  if (url.empty())
+  if (url.empty()) {
     return std::string();
+  }
 
   // source https://datatracker.ietf.org/doc/html/rfc3986#appendix-B
 
@@ -107,30 +110,35 @@ std::string GetHostname(const std::string& url) {
   std::regex authority_regex(R"(^(?:[\w\:]+[@])?([\w.]+)(?:[:])?(?:[0-9]+)?)");
   std::smatch matches;
 
-  if (!std::regex_match(url, matches, rfc3986_regex))
+  if (!std::regex_match(url, matches, rfc3986_regex)) {
     return std::string();
+  }
 
   std::string authority = matches[4];
-  if (!std::regex_match(authority, matches, authority_regex))
+  if (!std::regex_match(authority, matches, authority_regex)) {
     return std::string();
+  }
 
   return matches[1];
 }
 
 bool DoesPathExist(const std::string& path) {
-  if (path.empty())
+  if (path.empty()) {
     return false;
+  }
 
   struct stat st;
-  if (stat(path.c_str(), &st))
+  if (stat(path.c_str(), &st)) {
     return false;
+  }
 
   return st.st_mode & S_IFDIR || st.st_mode & S_IFREG;
 }
 
 std::string ReadFile(const std::string& path) {
-  if (!DoesPathExist(path))
+  if (!DoesPathExist(path)) {
     return std::string();
+  }
 
   std::ifstream file(path);
   return std::string(std::istreambuf_iterator<char>(file),
@@ -195,11 +203,13 @@ std::string TrimString(const std::string& str) {
   auto begin = str.begin();
   auto end = str.end();
 
-  while (begin != end && isspace(static_cast<unsigned char>(*begin)))
+  while (begin != end && isspace(static_cast<unsigned char>(*begin))) {
     ++begin;
+  }
 
-  while (begin != end && isspace(static_cast<unsigned char>(*(end - 1))))
+  while (begin != end && isspace(static_cast<unsigned char>(*(end - 1)))) {
     --end;
+  }
 
   std::string trimmed(begin, end);
   return trimmed;

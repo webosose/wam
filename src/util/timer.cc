@@ -34,11 +34,12 @@ static int TimeoutCallbackDestroy(void* data) {
 
 void Timer::Start(int delay_in_milli_seconds, bool will_destroy) {
   is_running_ = true;
-  if (!will_destroy)
+  if (!will_destroy) {
     source_id_ = g_timeout_add(delay_in_milli_seconds, TimeoutCallback, this);
-  else
+  } else {
     source_id_ =
         g_timeout_add(delay_in_milli_seconds, TimeoutCallbackDestroy, this);
+  }
 }
 
 void Timer::Stop() {

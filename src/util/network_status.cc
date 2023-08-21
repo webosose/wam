@@ -24,8 +24,9 @@
 NetworkStatus::NetworkStatus() = default;
 
 void NetworkStatus::FromJsonObject(const Json::Value& object) {
-  if (!object.isObject())
+  if (!object.isObject()) {
     return;
+  }
   return_value_ = object["returnValue"].asBool();
   is_internet_connection_available_ =
       object["isInternetConnectionAvailable"].asBool();
@@ -52,12 +53,14 @@ void NetworkStatus::FromJsonObject(const Json::Value& object) {
 }
 
 void NetworkStatus::Information::FromJsonObject(const Json::Value& info) {
-  if (!info.isObject())
+  if (!info.isObject()) {
     return;
+  }
   netmask_ = info["netmask"].asString();
   dns1_ = info["dns1"].asString();
-  if (info["dns2"].isString())
+  if (info["dns2"].isString()) {
     dns2_ = info["dns2"].asString();
+  }
   ip_address_ = info["ipAddress"].asString();
   method_ = info["method"].asString();
   state_ = info["state"].asString();

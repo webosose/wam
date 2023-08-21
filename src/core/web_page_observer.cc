@@ -25,17 +25,21 @@ WebPageObserver::WebPageObserver(WebPageBase* page) {
 WebPageObserver::WebPageObserver() = default;
 
 void WebPageObserver::Observe(WebPageBase* page) {
-  if (page_ == page)
+  if (page_ == page) {
     return;
+  }
   page_ = page;
-  if (page_)
+  if (page_) {
     page_->AddObserver(this);
+  }
 }
 
 void WebPageObserver::Unobserve(WebPageBase* page) {
-  if (page_ != page)
+  if (page_ != page) {
     return;
-  if (page_)
+  }
+  if (page_) {
     page_->RemoveObserver(this);
+  }
   page_ = nullptr;
 }

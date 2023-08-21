@@ -49,8 +49,9 @@ class BaseTimer : public Timer {
   BaseTimer() : Timer(kIsRepeating) {}
 
   ~BaseTimer() override {
-    if (IsRunning())
+    if (IsRunning()) {
       Stop();
+    }
   }
 
   void HandleCallback() override {

@@ -24,8 +24,9 @@ WebAppWindowFactoryMock::WebAppWindowFactoryMock() = default;
 WebAppWindowFactoryMock::~WebAppWindowFactoryMock() = default;
 
 WebAppWindow* WebAppWindowFactoryMock::CreateWindow() {
-  if (web_app_window_)
+  if (web_app_window_) {
     return web_app_window_;
+  }
 
   std::cerr << "Missing WebAppWindow pointer. Method setWebAppWindow should be "
                "called prior to createWindow"

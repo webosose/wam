@@ -100,14 +100,18 @@ void WebAppManagerServiceLunaImpl::GetSystemOptionCallback(
            PMLOGKS("ScreenRotation",
                    screen_rotation.empty() ? "Empty" : screen_rotation.c_str()),
            "");
-  if (!country.empty())
+  if (!country.empty()) {
     WebAppManagerService::SetDeviceInfo("LocalCountry", country.c_str());
-  if (!smart_service_country.empty())
+  }
+  if (!smart_service_country.empty()) {
     WebAppManagerService::SetDeviceInfo("SmartServiceCountry",
                                         smart_service_country.c_str());
-  if (!audio_guidance.empty())
+  }
+  if (!audio_guidance.empty()) {
     WebAppManagerService::SetAccessibilityEnabled(audio_guidance == "on");
-  if (!screen_rotation.empty())
+  }
+  if (!screen_rotation.empty()) {
     WebAppManagerService::SetDeviceInfo("ScreenRotation",
                                         screen_rotation.c_str());
+  }
 }

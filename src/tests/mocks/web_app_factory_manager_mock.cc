@@ -33,11 +33,12 @@ WebAppBase* WebAppFactoryManagerMock::CreateWebApp(
     const std::string& win_type,
     std::shared_ptr<ApplicationDescription> desc,
     const std::string& app_type) {
-  if (window_factory_)
+  if (window_factory_) {
     return new WebAppWayland(
         win_type, std::unique_ptr<WebAppWindowFactory>(window_factory_),
         desc->WidthOverride(), desc->HeightOverride(),
         desc->GetDisplayAffinity(), desc->LocationHint());
+  }
 
   std::cerr << "Missing WindowFactory pointer. Method setWebAppWindowFactory "
                "should be called prior to createWebApp"

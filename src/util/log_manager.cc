@@ -34,20 +34,23 @@ void LogManager::SetLogControl(const std::string& keys,
       debug_bundle_messages_enable = false;
     }
   } else if (keys == "event") {
-    if (value == "on")
+    if (value == "on") {
       debug_events_enable = true;
-    else if (value == "off")
+    } else if (value == "off") {
       debug_events_enable = false;
+    }
   } else if (keys == "bundleMessage") {
-    if (value == "on")
+    if (value == "on") {
       debug_bundle_messages_enable = true;
-    else if (value == "off")
+    } else if (value == "off") {
       debug_bundle_messages_enable = false;
+    }
   } else if (keys == "mouseMove") {
-    if (value == "on")
+    if (value == "on") {
       debug_mouse_move_enable = true;
-    else if (value == "off")
+    } else if (value == "off") {
       debug_mouse_move_enable = false;
+    }
   }
 }
 

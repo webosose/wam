@@ -52,8 +52,9 @@ std::vector<std::string> GetFileList(const std::string& path) {
     struct dirent* entry;
     while ((entry = readdir(dir)) != nullptr) {
       std::string file_name = entry->d_name;
-      if (file_name == "." || file_name == "..")
+      if (file_name == "." || file_name == "..") {
         continue;
+      }
       files.emplace_back(fixed_path + file_name);
     }
     closedir(dir);
@@ -98,11 +99,13 @@ WebAppFactoryManagerImpl::WebAppFactoryManagerImpl()
 
   web_app_factory_plugin_path_ = config->GetWebAppFactoryPluginPath();
 
-  if (config->IsDynamicPluggableLoadEnabled())
+  if (config->IsDynamicPluggableLoadEnabled()) {
     load_pluggable_on_demand_ = true;
+  }
 
-  if (!load_pluggable_on_demand_)
+  if (!load_pluggable_on_demand_) {
     LoadPluggable();
+  }
 }
 
 WebAppFactoryManagerImpl::WebAppFactoryManagerImpl(
@@ -115,8 +118,9 @@ WebAppFactoryManagerImpl::WebAppFactoryManagerImpl(
       plugin_loader_(std::make_unique<PluginLoader>(std::move(lib_wrapper))) {
   factory_env_ = SplitPluginTypes(factory_env);
   factory_env_.emplace("default");
-  if (!load_pluggable_on_demand_)
+  if (!load_pluggable_on_demand_) {
     LoadPluggable();
+  }
 }
 
 WebAppFactoryManagerImpl::~WebAppFactoryManagerImpl() = default;
@@ -124,16 +128,18 @@ WebAppFactoryManagerImpl::~WebAppFactoryManagerImpl() = default;
 WebAppFactoryInterface* WebAppFactoryManagerImpl::GetPluggable(
     const std::string& app_type) {
   auto iter = interfaces_.find(app_type);
-  if (iter != interfaces_.end())
+  if (iter != interfaces_.end()) {
     return iter->second;
+  }
 
   return LoadPluggable(app_type);
 }
 
 WebAppFactoryInterface* WebAppFactoryManagerImpl::LoadPluggable(
     const std::string& app_type) {
-  if (app_type.size() && factory_env_.find(app_type) == factory_env_.end())
+  if (app_type.size() && factory_env_.find(app_type) == factory_env_.end()) {
     return nullptr;
+  }
 
   WebAppFactoryInterface* interface;
   for (const auto& file : GetFileList(web_app_factory_plugin_path_)) {
@@ -147,14 +153,16 @@ WebAppFactoryInterface* WebAppFactoryManagerImpl::LoadPluggable(
       interface = plugin_loader_->GetWebAppFactoryInstance(file);
       if (interface) {
         interfaces_.emplace(key, interface);
-        if (!app_type.empty())
+        if (!app_type.empty()) {
           return interface;
+        }
       } else {
         LOG_WARNING(MSGID_PLUGIN_LOAD_FAIL, 1,
                     PMLOGKS("ERROR", plugin_loader_->GetError().c_str()), "");
         plugin_loader_->Unload(file);
-        if (!app_type.empty())
+        if (!app_type.empty()) {
           return nullptr;
+        }
       }
     }
   }
@@ -166,8 +174,9 @@ WebAppBase* WebAppFactoryManagerImpl::CreateWebApp(
     std::shared_ptr<ApplicationDescription> desc,
     const std::string& app_type) {
   WebAppFactoryInterface* interface = GetPluggable(app_type);
-  if (interface)
+  if (interface) {
     return interface->CreateWebApp(win_type, desc);
+  }
 
   return nullptr;
 }
@@ -178,8 +187,9 @@ WebAppBase* WebAppFactoryManagerImpl::CreateWebApp(
     std::shared_ptr<ApplicationDescription> desc,
     const std::string& app_type) {
   WebAppFactoryInterface* interface = GetPluggable(app_type);
-  if (interface)
+  if (interface) {
     return interface->CreateWebApp(win_type, page, desc);
+  }
 
   return nullptr;
 }
@@ -203,7 +213,8 @@ WebPageBase* WebAppFactoryManagerImpl::CreateWebPage(
     }
   }
 
-  if (page)
+  if (page) {
     page->Init();
+  }
   return page;
 }

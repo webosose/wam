@@ -42,8 +42,9 @@ std::string PluginLibWrapper::GetAppType(void* handle) {
   const char* type = nullptr;
   const char** pointer_to_type =
       reinterpret_cast<const char**>(dlsym(handle, "kPluginApplicationType"));
-  if (pointer_to_type)
+  if (pointer_to_type) {
     type = *pointer_to_type;
+  }
   return type == nullptr ? std::string() : std::string(type);
 }
 

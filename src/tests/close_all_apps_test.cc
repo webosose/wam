@@ -210,8 +210,9 @@ WebAppWindowMock* AppTestContext::CreateWindow() {
 
 void AttachContext(WebAppFactoryManagerMock* web_app_factory,
                    AppTestContext* context) {
-  if (!web_app_factory || !context)
+  if (!web_app_factory || !context) {
     return;
+  }
 
   WebAppWindowFactoryMock* web_app_window_factory =
       new WebAppWindowFactoryMock();
@@ -223,12 +224,14 @@ void AttachContext(WebAppFactoryManagerMock* web_app_factory,
 }
 
 Json::Value LaunchApp(const char* json_body) {
-  if (!json_body)
+  if (!json_body) {
     return Json::Value();
+  }
 
   Json::Value request;
-  if (!util::StringToJson(json_body, request))
+  if (!util::StringToJson(json_body, request)) {
     return Json::Value();
+  }
 
   return WebAppManagerServiceLuna::Instance()->launchApp(request);
 }

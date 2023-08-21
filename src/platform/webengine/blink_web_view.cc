@@ -30,8 +30,9 @@ void BlinkWebView::ClearUserScripts() {
 }
 
 void BlinkWebView::ExecuteUserScripts() {
-  if (user_script_executed_)
+  if (user_script_executed_) {
     return;
+  }
 
   for (const std::string& script : user_scripts_) {
     RunJavaScript(script);
@@ -62,16 +63,18 @@ void BlinkWebView::HandleBrowserControlFunction(
 }
 
 void BlinkWebView::OnLoadProgressChanged(double progress) {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   progress_ = static_cast<int>(progress * 100);
   delegate_->LoadProgressChanged(progress);
 }
 
 void BlinkWebView::Close() {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->Close();
 }
@@ -80,44 +83,50 @@ bool BlinkWebView::DecidePolicyForResponse(bool is_main_frame,
                                            int status_code,
                                            const std::string& url,
                                            const std::string& status_text) {
-  if (!delegate_)
+  if (!delegate_) {
     return false;
+  }
 
   return delegate_->DecidePolicyForResponse(is_main_frame, status_code, url,
                                             status_text);
 }
 
 bool BlinkWebView::AcceptsVideoCapture() {
-  if (!delegate_)
+  if (!delegate_) {
     return false;
+  }
 
   return delegate_->AcceptsVideoCapture();
 }
 
 bool BlinkWebView::AcceptsAudioCapture() {
-  if (!delegate_)
+  if (!delegate_) {
     return false;
+  }
 
   return delegate_->AcceptsAudioCapture();
 }
 
 void BlinkWebView::DidDropAllPeerConnections(
     webos::DropPeerConnectionReason reason) {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->DidDropAllPeerConnections();
   LOG_DEBUG("Dropped all WebRTC peer connections with reason %d", reason);
 }
 
 void BlinkWebView::DidSwapCompositorFrame() {
-  if (delegate_)
+  if (delegate_) {
     delegate_->DidSwapCompositorFrame();
+  }
 }
 
 void BlinkWebView::DidFirstFrameFocused() {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->DidFirstFrameFocused();
 }
@@ -127,15 +136,17 @@ void BlinkWebView::DocumentLoadFinished() {
 }
 
 void BlinkWebView::LoadVisuallyCommitted() {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->LoadVisuallyCommitted();
 }
 
 void BlinkWebView::LoadFinished(const std::string& url) {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->LoadFinished(url);
 }
@@ -143,37 +154,42 @@ void BlinkWebView::LoadFinished(const std::string& url) {
 void BlinkWebView::LoadFailed(const std::string& url,
                               int err_code,
                               const std::string& err_desc) {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->LoadFailed(url, err_code, err_desc);
 }
 
 void BlinkWebView::LoadAborted(const std::string& url) {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->LoadAborted(url);
 }
 
 void BlinkWebView::LoadStarted() {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->LoadStarted();
 }
 
 void BlinkWebView::LoadStopped() {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->LoadStopped();
 }
 
 void BlinkWebView::DidStartNavigation(const std::string& url,
                                       bool is_in_main_frame) {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   user_script_executed_ = false;
 
@@ -182,47 +198,54 @@ void BlinkWebView::DidStartNavigation(const std::string& url,
 
 void BlinkWebView::DidFinishNavigation(const std::string& url,
                                        bool is_in_main_frame) {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->DidFinishNavigation(url, is_in_main_frame);
 }
 
 void BlinkWebView::RenderProcessCreated(int pid) {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->RenderProcessCreated(pid);
 }
 
 void BlinkWebView::RenderProcessGone() {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->RenderProcessCrashed();
 }
 
 void BlinkWebView::TitleChanged(const std::string& title) {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->TitleChanged(title);
 }
 
 void BlinkWebView::NavigationHistoryChanged() {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
 
   delegate_->NavigationHistoryChanged();
 }
 
 void BlinkWebView::DidResumeDOM() {
-  if (delegate_)
+  if (delegate_) {
     delegate_->DidResumeDOM();
+  }
 }
 
 void BlinkWebView::DidErrorPageLoadedFromNetErrorHelper() {
-  if (!delegate_)
+  if (!delegate_) {
     return;
+  }
   return delegate_->DidErrorPageLoadedFromNetErrorHelper();
 }

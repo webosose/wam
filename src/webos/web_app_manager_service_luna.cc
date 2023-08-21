@@ -163,8 +163,9 @@ Json::Value WebAppManagerServiceLuna::killApp(const Json::Value& request) {
   std::string app_id = request["appId"].asString();
   std::string reason;
 
-  if (request.isMember("reason"))
+  if (request.isMember("reason")) {
     reason = request["reason"].asString();
+  }
 
   LOG_INFO(MSGID_LUNA_API, 3, PMLOGKS("APP_ID", app_id.c_str()),
            PMLOGKS("INSTANCE_ID", instance_id.c_str()),
@@ -340,8 +341,9 @@ Json::Value WebAppManagerServiceLuna::clearBrowsingData(
 
   LOG_DEBUG("removeBrowsingDataMask: %d", remove_browsing_data_mask);
 
-  if (return_value)
+  if (return_value) {
     WebAppManagerService::OnClearBrowsingData(remove_browsing_data_mask);
+  }
 
   reply["returnValue"] = return_value;
   return reply;
@@ -426,11 +428,13 @@ void WebAppManagerServiceLuna::GetSystemLocalePreferencesCallback(
            PMLOGKS("LANGUAGE", language.empty() ? "None" : language.c_str()),
            "");
 
-  if (language.empty())
+  if (language.empty()) {
     return;
+  }
 
-  if (language.compare(WebAppManagerService::GetSystemLanguage()) == 0)
+  if (language.compare(WebAppManagerService::GetSystemLanguage()) == 0) {
     return;
+  }
 
   WebAppManagerService::SetSystemLanguage(language.c_str());
 }
@@ -478,8 +482,9 @@ void WebAppManagerServiceLuna::GetCloseAppIdCallback(const Json::Value& reply) {
   std::string app_id = reply["id"].asString();
   std::string instance_id = reply["instanceId"].asString();
 
-  if (!app_id.empty() && !instance_id.empty())
+  if (!app_id.empty() && !instance_id.empty()) {
     WebAppManagerService::SetForceCloseApp(app_id.c_str(), instance_id.c_str());
+  }
 }
 
 void WebAppManagerServiceLuna::ThresholdChangedCallback(
@@ -498,13 +503,14 @@ void WebAppManagerServiceLuna::ThresholdChangedCallback(
            PMLOGKS("State", current_level.c_str()), "");
 
   webos::WebViewBase::MemoryPressureLevel level;
-  if (current_level.compare("medium") == 0)
+  if (current_level.compare("medium") == 0) {
     level = webos::WebViewBase::MEMORY_PRESSURE_LOW;
-  else if (current_level.compare("critical") == 0 ||
-           current_level.compare("low") == 0)
+  } else if (current_level.compare("critical") == 0 ||
+             current_level.compare("low") == 0) {
     level = webos::WebViewBase::MEMORY_PRESSURE_CRITICAL;
-  else
+  } else {
     level = webos::WebViewBase::MEMORY_PRESSURE_NONE;
+  }
   WebAppManagerService::NotifyMemoryPressure(level);
 }
 
@@ -619,9 +625,10 @@ void WebAppManagerServiceLuna::CloseApp(const std::string& id) {
   json["instanceId"] = id;
 
   if (!LS2_CALL(CloseAppCallback, "luna://com.webos.applicationManager/close",
-                json))
+                json)) {
     LOG_WARNING(MSGID_CLOSE_CALL_FAIL, 0,
                 "Failed to send closeByAppId command to SAM");
+  }
 }
 
 void WebAppManagerServiceLuna::CloseAppCallback(const Json::Value& reply) {

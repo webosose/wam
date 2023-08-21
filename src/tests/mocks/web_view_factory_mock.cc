@@ -25,8 +25,9 @@ WebViewFactoryMock::WebViewFactoryMock() = default;
 WebViewFactoryMock::~WebViewFactoryMock() = default;
 
 WebView* WebViewFactoryMock::CreateWebView() {
-  if (web_view_)
+  if (web_view_) {
     return web_view_;
+  }
   std::cerr << "Missing WebView pointer. Method setWebView should be called "
                "prior to createWebView"
             << std::endl;

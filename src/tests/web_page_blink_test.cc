@@ -213,8 +213,9 @@ TEST_F(WebPageBlinkTestSuite, SetMediaCodecCapability) {
                         params.c_str(), std::move(factory));
   web_page.Init();
 
-  if (skip)
+  if (skip) {
     GTEST_SKIP();
+  }
 }
 
 TEST_F(WebPageBlinkTestSuite, addUserScript) {

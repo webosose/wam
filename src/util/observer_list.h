@@ -39,31 +39,36 @@ class ObserverList {
 
 template <class ObserverType>
 void ObserverList<ObserverType>::AddObserver(ObserverType* observer) {
-  if (!observer)
+  if (!observer) {
     return;
+  }
 
-  if (HasObserver(observer))
+  if (HasObserver(observer)) {
     return;
+  }
 
   observers_.push_back(observer);
 }
 
 template <class ObserverType>
 void ObserverList<ObserverType>::RemoveObserver(ObserverType* observer) {
-  if (!observer || !HasObserver(observer))
+  if (!observer || !HasObserver(observer)) {
     return;
+  }
 
   observers_.erase(std::find(observers_.begin(), observers_.end(), observer));
 }
 
 template <class ObserverType>
 bool ObserverList<ObserverType>::HasObserver(ObserverType* observer) {
-  if (!observer)
+  if (!observer) {
     return false;
+  }
 
   if (std::find(observers_.begin(), observers_.end(), observer) !=
-      observers_.end())
+      observers_.end()) {
     return true;
+  }
   return false;
 }
 

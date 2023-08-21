@@ -29,8 +29,9 @@ int WebAppManagerUtils::UpdateAndGetCpuIdle(bool update_only) {
   long cur_cpu_time[4] = {0};
   long* cpu_time = cur_cpu_time;
 
-  if (update_only)
+  if (update_only) {
     cpu_time = old_cpu_time;
+  }
 
   int fd;
   if ((fd = open("/proc/stat", O_RDONLY)) != -1) {
@@ -47,8 +48,9 @@ int WebAppManagerUtils::UpdateAndGetCpuIdle(bool update_only) {
     close(fd);
   }
 
-  if (update_only)
+  if (update_only) {
     return 1000;  // max value of percentages();
+  }
 
   long cpu_diff[4];
   int cpu_states[4];
@@ -59,10 +61,12 @@ int WebAppManagerUtils::UpdateAndGetCpuIdle(bool update_only) {
 }
 
 char* WebAppManagerUtils::SkipToken(const char* p) {
-  while (isspace(*p))
+  while (isspace(*p)) {
     p++;
-  while (*p && !isspace(*p))
+  }
+  while (*p && !isspace(*p)) {
     p++;
+  }
   return const_cast<char*>(p);
 }
 
@@ -76,19 +80,22 @@ long WebAppManagerUtils::Percentages(int cnt,
 
   for (int i = 0; i < cnt; i++) {
     long change = *now - *old;
-    if (change < 0)
+    if (change < 0) {
       change = static_cast<int>(static_cast<unsigned long>(*now) -
                                 static_cast<unsigned long>(*old));
+    }
     total_change += (*dp++ = change);
     *old++ = *now++;
   }
 
-  if (0 == total_change)
+  if (0 == total_change) {
     total_change = 1;
+  }
 
   long half_total = total_change / 2l;
-  for (int i = 0; i < cnt; i++)
+  for (int i = 0; i < cnt; i++) {
     *out++ = static_cast<int>((*diffs++ * 1000 + half_total) / total_change);
+  }
 
   return total_change;
 }
@@ -174,8 +181,9 @@ bool WebAppManagerUtils::SetGroups() {
 // For PmLog, to meet maximum length(1024) 824 is selected approximately
 #define URL_SIZE_LIMIT 824
 std::string WebAppManagerUtils::TruncateURL(const std::string& url) {
-  if (url.size() < URL_SIZE_LIMIT)
+  if (url.size() < URL_SIZE_LIMIT) {
     return url;
+  }
   std::string res = url;
   return res.erase(URL_SIZE_LIMIT, url.size() - URL_SIZE_LIMIT);
 }

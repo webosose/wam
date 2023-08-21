@@ -24,8 +24,9 @@ BCP47::BCP47() = default;
 BCP47::~BCP47() = default;
 
 std::unique_ptr<BCP47> BCP47::FromString(const std::string& bcp47_string) {
-  if (bcp47_string.empty())
+  if (bcp47_string.empty()) {
     return nullptr;
+  }
 
   // We should parse language tag according to rfc5646
   // In general the tag format is: language - script - region
@@ -43,8 +44,9 @@ std::unique_ptr<BCP47> BCP47::FromString(const std::string& bcp47_string) {
   std::regex rfc5646_regex(
       R"(^([a-z]{2,3})(?:[\-]{1}([A-z]{4}))?(?:[\-]{1}([A-Z]{2}|[0-9]{3}))?$)");
   std::smatch match;
-  if (!std::regex_match(bcp47_string, match, rfc5646_regex))
+  if (!std::regex_match(bcp47_string, match, rfc5646_regex)) {
     return nullptr;
+  }
 
   auto result = std::unique_ptr<BCP47>(new BCP47());
 

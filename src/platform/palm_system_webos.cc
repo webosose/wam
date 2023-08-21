@@ -36,10 +36,11 @@ void PalmSystemWebOS::SetLaunchParams(const std::string& params) {
 
   const bool result = util::StringToJson(params, json_doc);
 
-  if (!result || json_doc.isNull())
+  if (!result || json_doc.isNull()) {
     launch_params_.erase();
-  else
+  } else {
     launch_params_ = params;
+  }
 }
 
 bool PalmSystemWebOS::IsActivated() const {
@@ -55,16 +56,18 @@ bool PalmSystemWebOS::IsMinimal() const {
 }
 
 int PalmSystemWebOS::ActivityId() const {
-  if (!app_->Page())
+  if (!app_->Page()) {
     return -1;
+  }
 
   return 0;
 }
 
 void PalmSystemWebOS::Activate() {
   ApplicationDescription* app_desc = app_->GetAppDescription();
-  if (app_desc && !app_desc->HandlesRelaunch())
+  if (app_desc && !app_desc->HandlesRelaunch()) {
     return;
+  }
 
   // ask compositor to raise window. Compositor should raise us, then
   // give us focus, so we shouldn't have to specifically request focus.
@@ -100,11 +103,12 @@ void PalmSystemWebOS::SetInputRegion(const std::string& params) {
   // this function is not related to windowGroup anymore
   Json::Value json_doc;
   const bool result = util::StringToJson(params, json_doc);
-  if (result)
+  if (result) {
     app_->SetInputRegion(json_doc);
-  else
+  } else {
     LOG_ERROR(MSGID_TYPE_ERROR, 0, "[%s] setInputRegion failed, params='%s'",
               app_->AppId().c_str(), params.c_str());
+  }
 }
 
 void PalmSystemWebOS::SetGroupClientEnvironment(GroupClientCallKey call_key,
@@ -118,12 +122,13 @@ void PalmSystemWebOS::SetGroupClientEnvironment(GroupClientCallKey call_key,
         case kKeyMask: {
           Json::Value json_doc;
           const bool result = util::StringToJson(params, json_doc);
-          if (result)
+          if (result) {
             app_->SetKeyMask(json_doc);
-          else
+          } else {
             LOG_ERROR(MSGID_TYPE_ERROR, 0,
                       "[%s] failed to get key mask from params='%s'",
                       app_->AppId().c_str(), params.c_str());
+          }
         } break;
         case kFocusOwner:
           app_->FocusOwner();

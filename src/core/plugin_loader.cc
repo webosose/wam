@@ -26,8 +26,9 @@ PluginLoader::~PluginLoader() {
     if (plugin.second.interface) {
       auto delete_instance_func =
           lib_wrapper_->GetDeleteInstanceFunction(plugin.second.handle);
-      if (delete_instance_func)
+      if (delete_instance_func) {
         delete_instance_func(plugin.second.interface);
+      }
     }
   }
 }
@@ -35,15 +36,17 @@ PluginLoader::~PluginLoader() {
 std::string PluginLoader::GetAppType(const std::string& file_name) {
   std::string app_type;
   auto handle = plugins_.find(file_name);
-  if (handle != plugins_.end())
+  if (handle != plugins_.end()) {
     app_type = lib_wrapper_->GetAppType(handle->second.handle);
+  }
   return app_type;
 }
 
 bool PluginLoader::Load(const std::string& file_name) {
   auto exist_handle = plugins_.find(file_name);
-  if (exist_handle != plugins_.end())
+  if (exist_handle != plugins_.end()) {
     return true;
+  }
   void* handle = lib_wrapper_->Load(file_name);
   if (handle) {
     plugins_.emplace(file_name, PluginData{handle, nullptr});
@@ -56,8 +59,9 @@ WebAppFactoryInterface* PluginLoader::GetWebAppFactoryInstance(
     const std::string& file_name) {
   auto plugin = plugins_.find(file_name);
   if (plugin != plugins_.end()) {
-    if (plugin->second.interface)
+    if (plugin->second.interface) {
       return plugin->second.interface;
+    }
     auto create_instance_func =
         lib_wrapper_->GetCreateInstanceFunction(plugin->second.handle);
     if (create_instance_func) {
@@ -74,8 +78,9 @@ void PluginLoader::Unload(const std::string& file_name) {
     if (plugin->second.interface) {
       auto delete_instance_func =
           lib_wrapper_->GetDeleteInstanceFunction(plugin->second.handle);
-      if (delete_instance_func)
+      if (delete_instance_func) {
         delete_instance_func(plugin->second.interface);
+      }
     }
     lib_wrapper_->Unload(plugin->second.handle);
     plugins_.erase(plugin);

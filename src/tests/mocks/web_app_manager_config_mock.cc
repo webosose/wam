@@ -29,8 +29,9 @@ WebAppManagerConfigMock::~WebAppManagerConfigMock() {
 std::string WebAppManagerConfigMock::WamGetEnv(const char* name) {
   if (environment_variables_) {
     auto variable = environment_variables_->find(name);
-    if (variable != environment_variables_->end())
+    if (variable != environment_variables_->end()) {
       return variable->second;
+    }
   }
 
   return std::string();

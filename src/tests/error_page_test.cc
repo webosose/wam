@@ -204,8 +204,9 @@ TEST_F(ErrorPageTestSuite, ReloadOnTimeout) {
   guint id = g_timeout_add(61000, OnTimeoutFail, loop);
   web_view_delegate_->LoadFailed(app_url_, 404, {});
   g_main_loop_run(loop);
-  if (!timeout_exceeded_)
+  if (!timeout_exceeded_) {
     g_source_remove(id);
+  }
   EXPECT_FALSE(timeout_exceeded_);
   g_main_loop_unref(loop);
 }
