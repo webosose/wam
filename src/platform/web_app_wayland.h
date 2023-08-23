@@ -18,6 +18,7 @@
 #define PLATFORM_WEB_APP_WAYLAND_H_
 
 #include <memory>
+#include <optional>
 #include <string>
 
 #include "webos/common/webos_constants.h"
@@ -58,21 +59,21 @@ class InputManager : public webos::InputPointer {
 class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
  public:
   explicit WebAppWayland(const std::string& type,
-                         int width = 0,
-                         int height = 0,
+                         std::optional<int> width = std::nullopt,
+                         std::optional<int> height = std::nullopt,
                          int display_id = kUndefinedDisplayId,
                          const std::string& location_hint = {});
   WebAppWayland(const std::string& type,
                 WebAppWaylandWindow* window,
-                int width = 0,
-                int height = 0,
+                std::optional<int> width = std::nullopt,
+                std::optional<int> height = std::nullopt,
                 int display_id = kUndefinedDisplayId,
                 const std::string& location_hint = {});
 
   WebAppWayland(const std::string& type,
                 std::unique_ptr<WebAppWindowFactory> factory,
-                int width = 0,
-                int height = 0,
+                std::optional<int> width = std::nullopt,
+                std::optional<int> height = std::nullopt,
                 int display_id = kUndefinedDisplayId,
                 const std::string& location_hint = {});
 
@@ -161,7 +162,7 @@ class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
   void WebViewRecreated() override;
 
  private:
-  void Init(int width, int height);
+  void Init(std::optional<int> width, std::optional<int> height);
 
   std::unique_ptr<WebAppWindow> app_window_;
   std::string window_type_;

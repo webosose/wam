@@ -217,12 +217,14 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
     std::string override_resolution = json_obj["resolution"].asString();
     auto res_list = util::SplitString(override_resolution, 'x');
     if (res_list.size() == 2) {
-      util::StrToInt(res_list.at(0), app_desc->width_override_);
-      util::StrToInt(res_list.at(1), app_desc->height_override_);
-    }
-    if (app_desc->width_override_ < 0 || app_desc->height_override_ < 0) {
-      app_desc->width_override_ = 0;
-      app_desc->height_override_ = 0;
+      int width_override = 0;
+      int height_override = 0;
+      util::StrToInt(res_list.at(0), width_override);
+      util::StrToInt(res_list.at(1), height_override);
+      if (width_override > 0 && height_override > 0) {
+        app_desc->width_override_ = width_override;
+        app_desc->height_override_ = height_override;
+      }
     }
   }
 
@@ -329,7 +331,9 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
       json_obj["delayMsForLaunchOptimization"];
   if (delay_ms_for_launch_optimization.isInt()) {
     int delay_ms = delay_ms_for_launch_optimization.asInt();
-    app_desc->delay_ms_for_lanch_optimization_ = (delay_ms >= 0) ? delay_ms : 0;
+    if (delay_ms > 0) {
+      app_desc->delay_ms_for_launch_optimization_ = delay_ms;
+    }
   }
 
   auto use_unlimited_media_policy = json_obj["useUnlimitedMediaPolicy"];

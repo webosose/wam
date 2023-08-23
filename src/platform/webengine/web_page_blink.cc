@@ -118,10 +118,10 @@ void WebPageBlink::Init() {
   page_private_->page_view_->SetShouldSuppressDialogs(true);
   SetDisallowScrolling(app_desc_->DisallowScrollingInMainFrame());
 
-  if (!std::isnan(app_desc_->NetworkStableTimeout()) &&
-      (app_desc_->NetworkStableTimeout() >= 0.0)) {
+  if (app_desc_->NetworkStableTimeout().has_value() &&
+      (app_desc_->NetworkStableTimeout().value() >= 0.0)) {
     page_private_->page_view_->SetNetworkStableTimeout(
-        app_desc_->NetworkStableTimeout());
+        app_desc_->NetworkStableTimeout().value());
   }
 
   switch (app_desc_->GetThirdPartyCookiesPolicy()) {
@@ -142,11 +142,12 @@ void WebPageBlink::Init() {
     page_private_->page_view_->SetAllowLocalResourceLoad(true);
   }
 
-  if (app_desc_->CustomSuspendDOMTime() > SuspendDelay()) {
-    if (app_desc_->CustomSuspendDOMTime() > MaxCustomSuspendDelay()) {
+  if (app_desc_->CustomSuspendDOMTime().has_value() &&
+      app_desc_->CustomSuspendDOMTime().value() > SuspendDelay()) {
+    if (app_desc_->CustomSuspendDOMTime().value() > MaxCustomSuspendDelay()) {
       custom_suspend_dom_time_ = MaxCustomSuspendDelay();
     } else {
-      custom_suspend_dom_time_ = app_desc_->CustomSuspendDOMTime();
+      custom_suspend_dom_time_ = app_desc_->CustomSuspendDOMTime().value();
     }
     LOG_DEBUG("[%s] set customSuspendDOMTime : %d ms", AppId().c_str(),
               custom_suspend_dom_time_);
@@ -645,8 +646,8 @@ void WebPageBlink::DidFirstFrameFocused() {
             AppId().c_str());
   // App load is finished, set use launching time optimization false.
   // If Launch optimization had to be done late, use delayMsForLaunchOptmization
-  int delay_ms = app_desc_->DelayMsForLaunchOptimization();
-  if (delay_ms > 0) {
+  if (app_desc_->DelayMsForLaunchOptimization().has_value()) {
+    int delay_ms = app_desc_->DelayMsForLaunchOptimization().value();
     SetUseLaunchOptimization(false, delay_ms);
   } else {
     SetUseLaunchOptimization(false);
@@ -814,9 +815,11 @@ void WebPageBlink::SetVisible(bool visible) {
 }
 
 void WebPageBlink::SetViewportSize() {
-  if (app_desc_->WidthOverride() && app_desc_->HeightOverride()) {
-    page_private_->page_view_->SetViewportSize(app_desc_->WidthOverride(),
-                                               app_desc_->HeightOverride());
+  if (app_desc_->WidthOverride().has_value() &&
+      app_desc_->HeightOverride().has_value()) {
+    page_private_->page_view_->SetViewportSize(
+        app_desc_->WidthOverride().value(),
+        app_desc_->HeightOverride().value());
   }
 }
 
@@ -1078,12 +1081,16 @@ void WebPageBlink::UpdateMediaCodecCapability() {
 double WebPageBlink::DevicePixelRatio() {
   float device_pixel_ratio = 1.0;
 
-  int app_width = app_desc_->WidthOverride();
-  int app_height = app_desc_->HeightOverride();
-  if (app_width == 0) {
+  int app_width;
+  int app_height;
+  if (app_desc_->WidthOverride().has_value()) {
+    app_width = app_desc_->WidthOverride().value();
+  } else {
     app_width = CurrentUiWidth();
   }
-  if (app_height == 0) {
+  if (app_desc_->HeightOverride().has_value()) {
+    app_height = app_desc_->HeightOverride().value();
+  } else {
     app_height = CurrentUiHeight();
   }
   if (app_width == 0 || app_height == 0) {

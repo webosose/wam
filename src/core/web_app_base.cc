@@ -203,7 +203,7 @@ void WebAppBase::Relaunch(const std::string& args,
     LOG_INFO(MSGID_APP_RELAUNCH, 3, PMLOGKS("APP_ID", AppId().c_str()),
              PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
              PMLOGKFV("PID", "%d", Page()->GetWebProcessPID()),
-             "Crashed in Background; Reluad Default page");
+             "Crashed in Background; Reload Default page");
     Page()->ReloadDefaultPage();
     SetCrashState(false);
   }
@@ -235,7 +235,7 @@ void WebAppBase::Relaunch(const std::string& args,
       LOG_INFO(MSGID_APP_RELAUNCH, 3, PMLOGKS("APP_ID", AppId().c_str()),
                PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
                PMLOGKFV("PID", "%d", page->GetWebProcessPID()),
-               "handlesRelanch : true; Do not call raise()");
+               "handlesRelaunch : true; Do not call raise()");
     }
   }
 }

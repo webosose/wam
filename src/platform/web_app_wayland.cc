@@ -70,8 +70,8 @@ webos::WebOSKeyMask GetKeyMask(const std::string& key) {
 }  // namespace
 
 WebAppWayland::WebAppWayland(const std::string& type,
-                             int width,
-                             int height,
+                             std::optional<int> width,
+                             std::optional<int> height,
                              int display_id,
                              const std::string& location_hint)
     : window_type_(type),
@@ -82,8 +82,8 @@ WebAppWayland::WebAppWayland(const std::string& type,
 
 WebAppWayland::WebAppWayland(const std::string& type,
                              WebAppWaylandWindow* window,
-                             int width,
-                             int height,
+                             std::optional<int> width,
+                             std::optional<int> height,
                              int display_id,
                              const std::string& location_hint)
     : app_window_(std::make_unique<WebAppWindowImpl>(
@@ -96,8 +96,8 @@ WebAppWayland::WebAppWayland(const std::string& type,
 
 WebAppWayland::WebAppWayland(const std::string& type,
                              std::unique_ptr<WebAppWindowFactory> factory,
-                             int width,
-                             int height,
+                             std::optional<int> width,
+                             std::optional<int> height,
                              int display_id,
                              const std::string& location_hint)
     : window_type_(type),
@@ -128,7 +128,7 @@ static webos::WebAppWindowBase::LocationHint GetLocationHintFromString(
   return hint;
 }
 
-void WebAppWayland::Init(int width, int height) {
+void WebAppWayland::Init(std::optional<int> width, std::optional<int> height) {
   if (!app_window_) {
     if (window_factory_) {
       app_window_ =
@@ -138,13 +138,13 @@ void WebAppWayland::Init(int width, int height) {
           std::unique_ptr<WebAppWaylandWindow>(WebAppWaylandWindow::Take()));
     }
   }
-  if (!(width && height)) {
+  if (width.has_value() && height.has_value()) {
+    SetUiSize(width.value(), height.value());
+    app_window_->InitWindow(width.value(), height.value());
+  } else {
     SetUiSize(app_window_->DisplayWidth(), app_window_->DisplayHeight());
     app_window_->InitWindow(app_window_->DisplayWidth(),
                             app_window_->DisplayHeight());
-  } else {
-    SetUiSize(width, height);
-    app_window_->InitWindow(width, height);
   }
 
   webos::WebAppWindowBase::LocationHint location_hint =
@@ -228,13 +228,13 @@ void WebAppWayland::Attach(WebPageBase* page) {
   SetKeyMask(webos::WebOSKeyMask::KEY_MASK_EXIT,
              GetAppDescription()->HandleExitKey());
 
-  if (GetAppDescription()->WidthOverride() &&
-      GetAppDescription()->HeightOverride() &&
+  if (GetAppDescription()->WidthOverride().has_value() &&
+      GetAppDescription()->HeightOverride().has_value() &&
       !GetAppDescription()->IsTransparent()) {
     float scale_x = static_cast<float>(app_window_->DisplayWidth()) /
-                    GetAppDescription()->WidthOverride();
+                    GetAppDescription()->WidthOverride().value();
     float scale_y = static_cast<float>(app_window_->DisplayHeight()) /
-                    GetAppDescription()->HeightOverride();
+                    GetAppDescription()->HeightOverride().value();
     scale_factor_ = (scale_x < scale_y) ? scale_x : scale_y;
     static_cast<WebPageBlink*>(page)->SetAdditionalContentsScale(scale_x,
                                                                  scale_y);

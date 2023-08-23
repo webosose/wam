@@ -301,10 +301,9 @@ void WebAppWaylandWindow::LogEventDebugging(WebOSEvent* event) {
       } else {
         // mouse button event
         float scale = 1.0;
-        int height = web_app_->GetAppDescription()->HeightOverride();
-        if (height) {
+        if (web_app_->GetAppDescription()->HeightOverride().has_value()) {
           scale = static_cast<float>(DisplayHeight()) /
-                  web_app_->GetAppDescription()->HeightOverride();
+                  web_app_->GetAppDescription()->HeightOverride().value();
         }
         LOG_INFO(
             MSGID_MOUSE_BUTTON_EVENT, 6,

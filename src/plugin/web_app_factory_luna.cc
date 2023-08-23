@@ -47,7 +47,8 @@ WebAppBase* WebAppFactoryLuna::CreateWebApp(
       win_type == kWtFloating || win_type == kWtSystemUi) {
     app = new WebAppWaylandWebOS(win_type, desc);
   } else if (win_type == kWtOverlay || win_type == kWtNone) {
-    app = new WebAppWayland(win_type, 0, 0, desc->GetDisplayAffinity());
+    app = new WebAppWayland(win_type, std::nullopt, std::nullopt,
+                            desc->GetDisplayAffinity());
   } else {
     LOG_WARNING(MSGID_BAD_WINDOW_TYPE, 1,
                 PMLOGKS("WINDOW_TYPE", win_type.c_str()), "");

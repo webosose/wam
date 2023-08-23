@@ -17,8 +17,8 @@
 #ifndef CORE_APPLICATION_DESCRIPTION_H_
 #define CORE_APPLICATION_DESCRIPTION_H_
 
-#include <limits>
 #include <memory>
+#include <optional>
 #include <set>
 #include <string>
 #include <unordered_map>
@@ -89,8 +89,8 @@ class ApplicationDescription {
     back_history_api_disabled_ = disabled;
   }
 
-  int WidthOverride() const { return width_override_; }
-  int HeightOverride() const { return height_override_; }
+  std::optional<int> WidthOverride() const { return width_override_; }
+  std::optional<int> HeightOverride() const { return height_override_; }
 
   bool HandleExitKey() const { return handle_exit_key_; }
   bool SupportsAudioGuidance() const { return supports_audio_guidance_; }
@@ -108,12 +108,14 @@ class ApplicationDescription {
     return key_filter_table_;
   }
 
-  double NetworkStableTimeout() const { return network_stable_timeout_; }
+  std::optional<double> NetworkStableTimeout() const {
+    return network_stable_timeout_;
+  }
   bool DisallowScrollingInMainFrame() const {
     return disallow_scrolling_in_main_frame_;
   }
-  int DelayMsForLaunchOptimization() const {
-    return delay_ms_for_lanch_optimization_;
+  std::optional<int> DelayMsForLaunchOptimization() const {
+    return delay_ms_for_launch_optimization_;
   }
   bool UseUnlimitedMediaPolicy() const { return use_unlimited_media_policy_; }
   const std::string& LocationHint() const { return location_hint_; }
@@ -140,7 +142,9 @@ class ApplicationDescription {
   // To support multi display
   DisplayId GetDisplayAffinity() { return display_affinity_; }
   void SetDisplayAffinity(DisplayId display) { display_affinity_ = display; }
-  int CustomSuspendDOMTime() const { return custom_suspend_dom_time_; }
+  std::optional<int> CustomSuspendDOMTime() const {
+    return custom_suspend_dom_time_;
+  }
   std::string MediaPreferences() const { return media_preferences_; }
   void SetMediaPreferences(const std::string& pref);
 
@@ -175,8 +179,8 @@ class ApplicationDescription {
   bool inspectable_ = true;
   bool custom_plugin_ = false;
   bool back_history_api_disabled_ = false;
-  int width_override_ = 0;
-  int height_override_ = 0;
+  std::optional<int> width_override_;
+  std::optional<int> height_override_;
   std::unordered_map<int, std::pair<int, int>> key_filter_table_;
   std::string group_window_desc_;
   bool do_not_track_ = false;
@@ -188,16 +192,16 @@ class ApplicationDescription {
   bool use_native_scroll_ = false;
   uint32_t splash_dismiss_timeout_ms_ = 8000;
   bool use_prerendering_ = false;
-  double network_stable_timeout_ = std::numeric_limits<double>::quiet_NaN();
+  std::optional<double> network_stable_timeout_;
   bool disallow_scrolling_in_main_frame_ = true;
-  int delay_ms_for_lanch_optimization_ = 0;
+  std::optional<int> delay_ms_for_launch_optimization_;
   bool use_unlimited_media_policy_ = false;
   ThirdPartyCookiesPolicy third_party_cookies_policy_ =
       ThirdPartyCookiesPolicy::kDefault;
   int display_affinity_ = kUndefinedDisplayId;
   std::string location_hint_;
   bool use_virtual_keyboard_ = true;
-  int custom_suspend_dom_time_ = 0;
+  std::optional<int> custom_suspend_dom_time_;
   std::string media_preferences_;
   bool use_video_decode_accelerator_ = false;
 };
