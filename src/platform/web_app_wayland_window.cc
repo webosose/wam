@@ -168,6 +168,7 @@ bool WebAppWaylandWindow::event(WebOSEvent* event) {
       return OnCursorVisibileChangeEvent(event);
     case WebOSEvent::MouseButtonRelease:
       last_mouse_event_.SetType(WebOSEvent::MouseButtonRelease);
+      [[fallthrough]];
     case WebOSEvent::MouseMove:
       return OnCursorVisibileChangeEvent(event);
     case WebOSEvent::Wheel:
