@@ -88,7 +88,7 @@ class WebAppBase : public WebPageObserver {
   virtual bool IsKeyboardVisible() { return false; }
   static void OnCursorVisibilityChanged(const std::string& jsscript);
   virtual bool HideWindow() = 0;
-  virtual void SetDisplayFirstActivateTimeoutMs(uint32_t timeout) {}
+  virtual void SetDisplayFirstActivateTimeoutMs(uint32_t /*timeout*/) {}
   bool GetCrashState() const;
   void SetCrashState(bool state);
   bool GetHiddenWindow() const;

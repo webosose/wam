@@ -31,46 +31,46 @@ class WebAppBaseMock : public WebAppBase {
   void SuspendAppRendering() override {}
   void ResumeAppRendering() override {}
   bool IsFocused() const override { return false; }
-  void Resize(int width, int height) override {}
+  void Resize(int /*width*/, int /*height*/) override {}
   bool IsActivated() const override { return false; }
   bool IsMinimized() override { return false; }
   bool IsNormal() override { return false; }
   void OnStageActivated() override {}
   void OnStageDeactivated() override {}
   void StartLaunchTimer() override {}
-  void SetHiddenWindow(bool hidden) override {}
-  void ConfigureWindow(const std::string& type) override {}
-  void SetKeepAlive(bool keep_alive) override {}
+  void SetHiddenWindow(bool /*hidden*/) override {}
+  void ConfigureWindow(const std::string& /*type*/) override {}
+  void SetKeepAlive(bool /*keep_alive*/) override {}
   bool IsWindowed() const override { return false; }
-  void Relaunch(const std::string& args,
-                const std::string& launching_app_id) override {}
-  void SetWindowProperty(const std::string& name,
-                         const std::string& value) override {}
+  void Relaunch(const std::string& /*args*/,
+                const std::string& /*launching_app_id*/) override {}
+  void SetWindowProperty(const std::string& /*name*/,
+                         const std::string& /*value*/) override {}
   void PlatformBack() override {}
-  void SetCursor(const std::string& cursor_arg,
-                 int hotspot_x,
-                 int hotspot_y) override {}
-  void SetInputRegion(const Json::Value& json_doc) override {}
-  void SetKeyMask(const Json::Value& json_doc) override {}
-  void Hide(bool forced_hide = false) override {}
+  void SetCursor(const std::string& /*cursor_arg*/,
+                 int /*hotspot_x*/,
+                 int /*hotspot_y*/) override {}
+  void SetInputRegion(const Json::Value& /*json_doc*/) override {}
+  void SetKeyMask(const Json::Value& /*json_doc*/) override {}
+  void Hide(bool /*forced_hide*/ = false) override {}
   void Focus() override {}
   void Unfocus() override {}
-  void SetOpacity(float opacity) override {}
+  void SetOpacity(float /*opacity*/) override {}
   void SetAppDescription(std::shared_ptr<ApplicationDescription>) override {}
-  void SetPreferredLanguages(const std::string& language) override {}
+  void SetPreferredLanguages(const std::string& /*language*/) override {}
   void StagePreparing() override {}
   void StageReady() override {}
   void Raise() override {}
   void GoBackground() override {}
   void DoPendingRelaunch() override {}
   void DeleteSurfaceGroup() override {}
-  void KeyboardVisibilityChanged(bool visible, int height) override {}
+  void KeyboardVisibilityChanged(bool /*visible*/, int /*height*/) override {}
   void DoClose() override {}
-  void SetUseVirtualKeyboard(const bool enable) override {}
+  void SetUseVirtualKeyboard(const bool /*enable*/) override {}
   bool IsKeyboardVisible() override { return false; }
   bool HideWindow() override { return false; }
   void DoAttach() override {}
-  void WebPageLoadFailed(int error_code) override {}
+  void WebPageLoadFailed(int /*error_code*/) override {}
 };
 
 #endif  // TESTS_MOCKS_WEB_APP_BASE_MOCK_H_

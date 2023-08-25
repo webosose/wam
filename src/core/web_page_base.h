@@ -59,7 +59,7 @@ class WebPageBase {
   virtual void* GetWebContents() = 0;
   virtual void SetLaunchParams(const std::string& params);
   virtual void NotifyMemoryPressure(
-      webos::WebViewBase::MemoryPressureLevel level) {}
+      webos::WebViewBase::MemoryPressureLevel /*level*/) {}
 
   virtual std::string GetIdentifier() const;
   virtual wam::Url Url() const = 0;
@@ -81,7 +81,7 @@ class WebPageBase {
   virtual std::string Title() = 0;
   virtual bool CanGoBack() = 0;
   virtual void CloseVkb() = 0;
-  virtual void KeyboardVisibilityChanged(bool visible) {}
+  virtual void KeyboardVisibilityChanged(bool /*visible*/) {}
   virtual void HandleDeviceInfoChanged(const std::string& device_info) = 0;
   virtual bool Relaunch(const std::string& args,
                         const std::string& launching_app_id);
@@ -91,10 +91,11 @@ class WebPageBase {
   virtual uint32_t GetWebProcessProxyID() = 0;
   virtual uint32_t GetWebProcessPID() const = 0;
   virtual void CreatePalmSystem(WebAppBase* app) = 0;
-  virtual void SetUseLaunchOptimization(bool enabled, int delay_ms = {}) {}
-  virtual void SetUseSystemAppOptimization(bool enabled) {}
-  virtual void SetUseAccessibility(bool enabled) {}
-  virtual void SetAppPreloadHint(bool is_preload) {}
+  virtual void SetUseLaunchOptimization(bool /*enabled*/,
+                                        int /*delay_ms*/ = {}) {}
+  virtual void SetUseSystemAppOptimization(bool /*enabled*/) {}
+  virtual void SetUseAccessibility(bool /*enabled*/) {}
+  virtual void SetAppPreloadHint(bool /*is_preload*/) {}
 
   virtual void SuspendWebPageAll() = 0;
   virtual void ResumeWebPageAll() = 0;
@@ -102,18 +103,18 @@ class WebPageBase {
   virtual void ResumeWebPageMedia() = 0;
   virtual void ResumeWebPagePaintingAndJSExecution() = 0;
   virtual bool IsRegisteredCloseCallback() { return false; }
-  virtual void ExecuteCloseCallback(bool forced) {}
+  virtual void ExecuteCloseCallback(bool /*forced*/) {}
   virtual void ReloadExtensionData() {}
   virtual bool IsLoadErrorPageFinish() { return is_load_error_page_finish_; }
   virtual bool IsLoadErrorPageStart() { return is_load_error_page_start_; }
   virtual void UpdateIsLoadErrorPageFinish();
   virtual void UpdateDatabaseIdentifier() {}
   virtual void SetInspectorEnable() {}
-  virtual void SetKeepAliveWebApp(bool keep_alive) {}
+  virtual void SetKeepAliveWebApp(bool /*keep_alive*/) {}
   virtual void SetContentsScale() {}
   virtual void SetCustomUserScript();
   virtual void ForwardEvent(void* event) = 0;
-  virtual void SetAudioGuidanceOn(bool on) {}
+  virtual void SetAudioGuidanceOn(bool /*on*/) {}
   virtual bool IsInputMethodActive() const { return false; }
 
   std::string LaunchParams() const;
@@ -162,7 +163,7 @@ class WebPageBase {
   virtual bool HasLoadErrorPolicy(bool is_http_response_error, int error_code);
   virtual void LoadErrorPage(int error_code) = 0;
   virtual void RecreateWebView() = 0;
-  virtual void SetVisible(bool visible) {}
+  virtual void SetVisible(bool /*visible*/) {}
   virtual bool DoDeeplinking(const std::string& launch_params);
 
   void HandleLoadStarted();

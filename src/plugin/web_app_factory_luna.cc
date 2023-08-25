@@ -58,7 +58,7 @@ WebAppBase* WebAppFactoryLuna::CreateWebApp(
 
 WebAppBase* WebAppFactoryLuna::CreateWebApp(
     const std::string& win_type,
-    WebPageBase* page,
+    WebPageBase* /*page*/,
     std::shared_ptr<ApplicationDescription> desc) {
   return CreateWebApp(win_type, desc);
 }

@@ -29,7 +29,7 @@ class PalmSystemWebOS : public PalmSystemBase {
   explicit PalmSystemWebOS(WebAppBase* app);
 
   virtual void SetCountry() {}
-  virtual void SetFolderPath(const std::string& params) {}
+  virtual void SetFolderPath(const std::string& /*params*/) {}
   virtual void SetLaunchParams(const std::string& params);
 
  protected:
@@ -55,7 +55,7 @@ class PalmSystemWebOS : public PalmSystemBase {
   virtual void Hide();
 
   virtual void SetKeepAlive(bool keep);
-  virtual void SetLoadErrorPolicy(const std::string& params) {}
+  virtual void SetLoadErrorPolicy(const std::string& /*params*/) {}
   virtual void SetInputRegion(const std::string& params);
   virtual void SetGroupClientEnvironment(GroupClientCallKey call_key,
                                          const std::string& params);

@@ -46,10 +46,10 @@ class WebPageBlinkDelegate {
   virtual void LoadAborted(const std::string& url) = 0;
   virtual void LoadStarted() {}
   virtual void LoadProgressChanged(double progress) = 0;
-  virtual void DidStartNavigation(const std::string& url,
-                                  bool is_in_main_frame) {}
-  virtual void DidFinishNavigation(const std::string& url,
-                                   bool is_in_main_frame) {}
+  virtual void DidStartNavigation(const std::string& /*url*/,
+                                  bool /*is_in_main_frame*/) {}
+  virtual void DidFinishNavigation(const std::string& /*url*/,
+                                   bool /*is_in_main_frame*/) {}
   virtual void LoadVisuallyCommitted() = 0;
   virtual void RenderProcessCreated(int pid) = 0;
   virtual void RenderProcessCrashed() = 0;

@@ -203,7 +203,7 @@ static bool bus_subscription_callback_json(LSHandle* handle,
  * same as above, but for a void function handling the reply
  */
 template <class CLASS, void (CLASS::*FUNCTION)(const Json::Value&)>
-static bool bus_callback_json(LSHandle* handle,
+static bool bus_callback_json(LSHandle* /*handle*/,
                               LSMessage* message,
                               void* user_data) {
   Json::Value reply;

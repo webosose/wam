@@ -125,7 +125,7 @@ void WebPageBase::SetupLaunchEvent() {
   AddUserScript(launch_event.str());
 }
 
-void WebPageBase::SendLocaleChangeEvent(const std::string& language) {
+void WebPageBase::SendLocaleChangeEvent(const std::string& /*language*/) {
   // TODO(luc2.tran): This should be probably run only when
   // |enable_background_run_| is set to 'true' or the web app is not suspended.
   // The other case (app is suspended), I think we're better not to run the
@@ -143,7 +143,7 @@ void WebPageBase::CleanResources() {
 }
 
 bool WebPageBase::Relaunch(const std::string& launch_params,
-                           const std::string& launching_app_id) {
+                           const std::string& /*launching_app_id*/) {
   ResumeWebPagePaintingAndJSExecution();
 
   // for common webapp relaunch scenario

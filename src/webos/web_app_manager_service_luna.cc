@@ -217,7 +217,7 @@ Json::Value WebAppManagerServiceLuna::pauseApp(const Json::Value& request) {
 }
 
 Json::Value WebAppManagerServiceLuna::setInspectorEnable(
-    const Json::Value& request) {
+    const Json::Value& /*request*/) {
   LOG_DEBUG("WebAppManagerService::SetInspectorEnable");
   Json::Value reply;
   std::string error_message("Not supported on this platform");
@@ -228,7 +228,8 @@ Json::Value WebAppManagerServiceLuna::setInspectorEnable(
   return reply;
 }
 
-Json::Value WebAppManagerServiceLuna::closeAllApps(const Json::Value& request) {
+Json::Value WebAppManagerServiceLuna::closeAllApps(
+    const Json::Value& /*request*/) {
   bool val = WebAppManagerService::OnCloseAllApps();
 
   Json::Value reply;
@@ -252,13 +253,13 @@ Json::Value WebAppManagerServiceLuna::logControl(const Json::Value& request) {
 }
 
 Json::Value WebAppManagerServiceLuna::getWebProcessSize(
-    const Json::Value& request) {
+    const Json::Value& /*request*/) {
   return WebAppManagerService::GetWebProcessProfiling();
 }
 
 Json::Value WebAppManagerServiceLuna::listRunningApps(
     const Json::Value& request,
-    bool subscribed) {
+    bool /*subscribed*/) {
   bool include_sys_apps = request["includeSysApps"] == true;
 
   std::vector<ApplicationInfo> apps =
@@ -631,7 +632,7 @@ void WebAppManagerServiceLuna::CloseApp(const std::string& id) {
   }
 }
 
-void WebAppManagerServiceLuna::CloseAppCallback(const Json::Value& reply) {
+void WebAppManagerServiceLuna::CloseAppCallback(const Json::Value& /*reply*/) {
   // TODO: check reply and close app again.
 }
 

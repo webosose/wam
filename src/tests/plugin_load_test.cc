@@ -43,7 +43,7 @@ TEST(PluginLoadTest, Load) {
   WebAppFactoryInterfaceMock factory_interface_mock;
   EXPECT_CALL(*lib_wrapper, GetCreateInstanceFunction(fake_handle))
       .Times(1)
-      .WillRepeatedly([&](void* handle) {
+      .WillRepeatedly([&](void* /*handle*/) {
         return [&]() { return &factory_interface_mock; };
       });
   EXPECT_CALL(*lib_wrapper, GetDeleteInstanceFunction(fake_handle)).Times(1);
@@ -96,7 +96,7 @@ TEST(PluginLoadTest, DefaultWebApp) {
           });
   EXPECT_CALL(*lib_wrapper, GetCreateInstanceFunction(fake_handle))
       .Times(1)
-      .WillRepeatedly([&](void* handle) {
+      .WillRepeatedly([&](void* /*handle*/) {
         return [&]() { return &factory_interface_mock; };
       });
   EXPECT_CALL(*lib_wrapper, GetDeleteInstanceFunction(fake_handle)).Times(1);
@@ -135,7 +135,7 @@ TEST(PluginLoadTest, CustomWebApp) {
           });
   EXPECT_CALL(*lib_wrapper, GetCreateInstanceFunction(fake_handle))
       .Times(1)
-      .WillRepeatedly([&](void* handle) {
+      .WillRepeatedly([&](void* /*handle*/) {
         return [&]() { return &factory_interface_mock; };
       });
   EXPECT_CALL(*lib_wrapper, GetDeleteInstanceFunction(fake_handle)).Times(1);

@@ -85,7 +85,7 @@ TEST(PluginLoaderUnitTest, GetInstance) {
   WebAppFactoryInterfaceMock factory_interface_mock;
   EXPECT_CALL(*lib_wrapper, GetCreateInstanceFunction(fake_handle))
       .Times(1)
-      .WillRepeatedly([&](void* handle) {
+      .WillRepeatedly([&](void* /*handle*/) {
         return [&]() { return &factory_interface_mock; };
       });
   EXPECT_CALL(*lib_wrapper, GetDeleteInstanceFunction(testing::_)).Times(1);
@@ -104,7 +104,7 @@ TEST(PluginLoaderUnitTest, GetInstanceTwice) {
   WebAppFactoryInterfaceMock factory_interface_mock;
   EXPECT_CALL(*lib_wrapper, GetCreateInstanceFunction(fake_handle))
       .Times(1)
-      .WillRepeatedly([&](void* handle) {
+      .WillRepeatedly([&](void* /*handle*/) {
         return [&]() { return &factory_interface_mock; };
       });
   EXPECT_CALL(*lib_wrapper, GetDeleteInstanceFunction(testing::_)).Times(1);
@@ -146,13 +146,13 @@ TEST(PluginLoaderUnitTest, UnloadWithActiveInstance) {
   WebAppFactoryInterfaceMock factory_interface_mock;
   EXPECT_CALL(*lib_wrapper, GetCreateInstanceFunction(fake_handle))
       .Times(1)
-      .WillRepeatedly([&](void* handle) {
+      .WillRepeatedly([&](void* /*handle*/) {
         return [&]() { return &factory_interface_mock; };
       });
   bool is_instance_deleted = false;
   EXPECT_CALL(*lib_wrapper, GetDeleteInstanceFunction(fake_handle))
       .Times(1)
-      .WillRepeatedly([&](void* handle) {
+      .WillRepeatedly([&](void* /*handle*/) {
         return [&](WebAppFactoryInterface*) { is_instance_deleted = true; };
       });
   PluginLoader loader(std::move(lib_wrapper));

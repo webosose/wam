@@ -195,7 +195,7 @@ WebAppBase* WebAppFactoryManagerImpl::CreateWebApp(
 }
 
 WebPageBase* WebAppFactoryManagerImpl::CreateWebPage(
-    const std::string& win_type,
+    const std::string& /*win_type*/,
     const wam::Url& url,
     std::shared_ptr<ApplicationDescription> desc,
     const std::string& app_type,

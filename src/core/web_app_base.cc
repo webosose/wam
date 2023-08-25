@@ -480,7 +480,7 @@ void WebAppBase::ServiceCall(const std::string& url,
   WebAppManager::Instance()->ServiceCall(url, payload, app_id);
 }
 
-void WebAppBase::KeyboardVisibilityChanged(bool visible, int height) {
+void WebAppBase::KeyboardVisibilityChanged(bool visible, int /*height*/) {
   if (Page()) {
     Page()->KeyboardVisibilityChanged(visible);
   }

@@ -19,7 +19,7 @@
 #include "log_manager.h"
 #include "web_page_blink_delegate.h"
 
-BlinkWebView::BlinkWebView(bool do_initialize) {}
+BlinkWebView::BlinkWebView(bool /*do_initialize*/) {}
 
 void BlinkWebView::AddUserScript(const std::string& script) {
   user_scripts_.push_back(script);

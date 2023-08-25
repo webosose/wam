@@ -51,7 +51,7 @@ void WebAppManagerServiceLunaImpl::SystemServiceConnectCallback(
 }
 
 Json::Value WebAppManagerServiceLunaImpl::setInspectorEnable(
-    const Json::Value& request) {
+    const Json::Value& /*request*/) {
   return util::StringToJson(R"({"returnValue": true})");
 }
 

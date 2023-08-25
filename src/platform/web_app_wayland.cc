@@ -589,7 +589,7 @@ void WebAppWayland::WebPageLoadFinished() {
   DoPendingRelaunch();
 }
 
-void WebAppWayland::WebPageLoadFailed(int error_code) {
+void WebAppWayland::WebPageLoadFailed(int /*error_code*/) {
   // Do not load error page while preoload app launching.
   if (GetPreloadState() != kNonePreload) {
     CloseAppInternal();

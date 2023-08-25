@@ -17,12 +17,12 @@
 #include "blink_web_process_manager_mock.h"
 
 uint32_t BlinkWebProcessManagerMock::GetWebProcessPID(
-    const WebAppBase* app) const {
+    const WebAppBase* /*app*/) const {
   return GetWebProcessPIDMock();
 }
 
 void BlinkWebProcessManager::ClearBrowsingData(
-    const int remove_browsing_data_mask) {
+    const int /*remove_browsing_data_mask*/) {
   // Block real call of
   // BlinkWebViewProfileHelper::clearBrowsingData(removeBrowsingDataMask);
 }

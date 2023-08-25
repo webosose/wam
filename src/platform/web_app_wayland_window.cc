@@ -228,7 +228,7 @@ bool WebAppWaylandWindow::event(WebOSEvent* event) {
   return WebAppWindowDelegate::event(event);
 }
 
-bool WebAppWaylandWindow::OnCursorVisibileChangeEvent(WebOSEvent* e) {
+bool WebAppWaylandWindow::OnCursorVisibileChangeEvent(WebOSEvent* /*e*/) {
   if (!cursor_enabled_) {
     if (CursorVisible()) {
       SetCursorVisible(false);

@@ -623,7 +623,7 @@ void WebPageBlink::EvaluateJavaScript(const std::string& js_code) {
 }
 
 void WebPageBlink::EvaluateJavaScriptInAllFrames(const std::string& script,
-                                                 const char* method) {
+                                                 const char* /*method*/) {
   page_private_->page_view_->RunJavaScriptInAllFrames(script);
 }
 
@@ -705,7 +705,7 @@ void WebPageBlink::DidStartNavigation(const std::string& url,
 }
 
 void WebPageBlink::DidFinishNavigation(const std::string& url,
-                                       bool is_in_main_frame) {
+                                       bool /*is_in_main_frame*/) {
   LOG_INFO(MSGID_LOAD, 3, PMLOGKS("APP_ID", AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", GetWebProcessPID()), "[CONNECT]%s",
@@ -766,7 +766,7 @@ void WebPageBlink::RenderProcessCreated(int pid) {
   PostWebProcessCreated(pid);
 }
 
-void WebPageBlink::TitleChanged(const std::string& title) {
+void WebPageBlink::TitleChanged(const std::string& /*title*/) {
   FOR_EACH_OBSERVER(WebPageObserver, observers_, TitleChanged());
 }
 
