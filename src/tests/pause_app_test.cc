@@ -26,7 +26,6 @@
 
 namespace {
 
-static constexpr int kPid = 7236;
 static constexpr char kInstanceId[] = "de90e74a-b86b-42c8-8785-3efd927a36430";
 static constexpr char kAppId[] = "bareapp";
 constexpr char kLaunchAppJsonBody[] = R"({
