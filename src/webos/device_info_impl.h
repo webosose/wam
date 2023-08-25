@@ -39,7 +39,6 @@ class DeviceInfoImpl : public DeviceInfo {
   int version_minor_ = 0;
   int version_dot_ = 0;
 
-  bool support_3d_ = false;
   std::string ota_id_;
   std::string hardware_version_ = "0x00000001";
   std::string firmware_version_ = "00.00.01";

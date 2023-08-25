@@ -205,8 +205,6 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   bool has_been_shown_ = false;
   OneShotTimer<WebPageBlink> dom_suspend_timer_;
   std::string custom_plugin_path_;
-  double vkb_height_ = 0;
-  bool vkb_was_overlap_ = false;
   bool has_close_callback_ = false;
   OneShotTimer<WebPageBlink> close_callback_timer_;
   std::string trust_level_;

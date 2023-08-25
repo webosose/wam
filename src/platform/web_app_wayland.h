@@ -177,8 +177,6 @@ class WebAppWayland : public WebAppBase, WebPageBlinkObserver {
   ElapsedTimer elapsed_launch_timer_;
   OneShotTimer<WebAppWayland> launch_timeout_timer_;
 
-  bool lost_focus_by_set_window_property_ = false;
-
   int display_id_;
   std::string location_hint_;
 
