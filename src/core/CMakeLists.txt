@@ -62,7 +62,6 @@ set(HEADERS
     web_process_manager.h
     window_types.h
     ${WAM_ROOT_SOURCE_DIR}/util/bcp47.h
-    ${WAM_ROOT_SOURCE_DIR}/util/base_check.h
     ${WAM_ROOT_SOURCE_DIR}/util/log_manager.h
     ${WAM_ROOT_SOURCE_DIR}/util/log_msg_id.h
     ${WAM_ROOT_SOURCE_DIR}/util/network_status.h

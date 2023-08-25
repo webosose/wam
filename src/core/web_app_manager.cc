@@ -17,7 +17,9 @@
 #include "web_app_manager.h"
 
 #include <unistd.h>
+
 #include <algorithm>
+#include <cassert>
 #include <sstream>
 #include <string>
 
@@ -26,7 +28,6 @@
 #include "webos/public/runtime.h"
 
 #include "application_description.h"
-#include "base_check.h"
 #include "device_info.h"
 #include "log_manager.h"
 #include "network_status_manager.h"
@@ -360,7 +361,7 @@ void WebAppManager::RemoveClosingAppList(const std::string& instance_id) {
 void WebAppManager::CloseAppInternal(WebAppBase* app,
                                      bool ignore_clean_resource) {
   WebPageBase* page = app->Page();
-  UTIL_ASSERT(page);
+  assert(page);
   if (page->IsClosing()) {
     LOG_INFO(MSGID_CLOSE_APP_INTERNAL, 3,
              PMLOGKS("APP_ID", app->AppId().c_str()),

@@ -20,7 +20,8 @@
 
 #include <webos/app/webos_main.h>
 
-#include "base_check.h"
+#include <cassert>
+
 #include "log_manager.h"
 #include "platform_module_factory_impl.h"
 #include "utils.h"
@@ -36,20 +37,20 @@ static void ChangeUserIDGroupID() {
     struct passwd* pwd = getpwnam(uid.c_str());
     struct group* grp = getgrnam(gid.c_str());
 
-    UTIL_ASSERT(pwd);
-    UTIL_ASSERT(grp);
+    assert(pwd);
+    assert(grp);
 
-    int ret = -1;
+    [[maybe_unused]] int ret = -1;
     if (grp) {
       ret = setgid(grp->gr_gid);
-      UTIL_ASSERT(ret == 0);
+      assert(ret == 0);
       ret = initgroups(uid.c_str(), grp->gr_gid);
-      UTIL_ASSERT(ret == 0);
+      assert(ret == 0);
     }
 
     if (pwd) {
       ret = setuid(pwd->pw_uid);
-      UTIL_ASSERT(ret == 0);
+      assert(ret == 0);
       setenv("HOME", pwd->pw_dir, 1);
     }
   }
@@ -59,9 +60,9 @@ static void StartWebAppManager() {
   ChangeUserIDGroupID();
 
   WebAppManagerServiceLuna* luna_service = WebAppManagerServiceLuna::Instance();
-  UTIL_ASSERT(luna_service);
-  bool result = luna_service->StartService();
-  UTIL_ASSERT(result);
+  assert(luna_service);
+  [[maybe_unused]] bool result = luna_service->StartService();
+  assert(result);
   WebAppManager::Instance()->SetPlatformModules(
       std::make_unique<PlatformModuleFactoryImpl>());
 }
