@@ -34,9 +34,9 @@
   bus_subscription_callback_json<WebAppManagerServiceLuna, \
                                  &WebAppManagerServiceLuna::FUNC>
 #define LS2_METHOD_ENTRY(FUNC) \
-  { #FUNC, QCB(FUNC) }
+  { #FUNC, QCB(FUNC), LUNA_METHOD_FLAGS_NONE }
 #define LS2_SUBSCRIPTION_ENTRY(FUNC) \
-  { #FUNC, QCB_subscription(FUNC) }
+  { #FUNC, QCB_subscription(FUNC), LUNA_METHOD_FLAGS_NONE }
 
 #define GET_LS2_SERVER_STATUS(FUNC, PARAMS)                        \
   Call<WebAppManagerServiceLuna, &WebAppManagerServiceLuna::FUNC>( \
@@ -58,7 +58,7 @@ LSMethod WebAppManagerServiceLuna::methods_[] = {
     LS2_METHOD_ENTRY(clearBrowsingData),
     LS2_SUBSCRIPTION_ENTRY(listRunningApps),
     LS2_SUBSCRIPTION_ENTRY(webProcessCreated),
-    {nullptr, nullptr}};
+    {}};
 
 WebAppManagerServiceLuna::WebAppManagerServiceLuna() = default;
 
