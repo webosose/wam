@@ -59,13 +59,13 @@ class BaseTimer : public Timer {
     (receiver_->*method_)();
   }
 
-  void Start(int delay_in_milli_seconds,
-             Receiver* receiver,
-             ReceiverMethod method,
-             bool will_destroy = false) {
+  void StartWithReceiver(int delay_in_milli_seconds,
+                         Receiver* receiver,
+                         ReceiverMethod method,
+                         bool will_destroy = false) {
     receiver_ = receiver;
     method_ = method;
-    Timer::Start(delay_in_milli_seconds, will_destroy);
+    Start(delay_in_milli_seconds, will_destroy);
   }
 
  private:
@@ -88,7 +88,7 @@ class SingleShotTimer : public BaseTimer<Receiver, false> {
                          Receiver* receiver,
                          ReceiverMethod method) {
     SingleShotTimer<Receiver>* timer = new SingleShotTimer<Receiver>;
-    timer->Start(delay_in_milli_seconds, receiver, method, true);
+    timer->StartWithReceiver(delay_in_milli_seconds, receiver, method, true);
   }
 
  private:

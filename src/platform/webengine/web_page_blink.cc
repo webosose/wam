@@ -432,7 +432,7 @@ void WebPageBlink::SuspendWebPageAll() {
 
   is_suspended_ = true;
   if (ShouldStopJSOnSuspend()) {
-    dom_suspend_timer_.Start(
+    dom_suspend_timer_.StartWithReceiver(
         custom_suspend_dom_time_ ? custom_suspend_dom_time_ : SuspendDelay(),
         this, &WebPageBlink::SuspendWebPagePaintingAndJSExecution);
   }
@@ -1032,8 +1032,8 @@ void WebPageBlink::ExecuteCloseCallback(bool forced) {
 
   EvaluateJavaScript(script);
 
-  close_callback_timer_.Start(kExecuteCloseCallbackTimeOutMs, this,
-                              &WebPageBlink::TimeoutCloseCallback);
+  close_callback_timer_.StartWithReceiver(kExecuteCloseCallbackTimeOutMs, this,
+                                          &WebPageBlink::TimeoutCloseCallback);
 }
 
 void WebPageBlink::TimeoutCloseCallback() {
@@ -1235,8 +1235,8 @@ void WebPageBlink::UpdateIsLoadErrorPageFinish() {
              PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
              "Start reload timer");
     net_error_reload_timer_.Stop();
-    net_error_reload_timer_.Start(kReloadTimeoutMs, this,
-                                  &WebPageBlink::ReloadFailedUrl);
+    net_error_reload_timer_.StartWithReceiver(kReloadTimeoutMs, this,
+                                              &WebPageBlink::ReloadFailedUrl);
   } else if (was_error_page && !is_load_error_page_finish_) {
     LOG_INFO(MSGID_WAM_DEBUG, 2, PMLOGKS("APP_ID", AppId().c_str()),
              PMLOGKS("INSTANCE_ID", InstanceId().c_str()), "Stop reload timer");

@@ -188,8 +188,8 @@ void WebAppWayland::OnDelegateWindowFrameSwapped() {
     last_swapped_time_ = elapsed_launch_timer_.ElapsedMs();
 
     launch_timeout_timer_.Stop();
-    launch_timeout_timer_.Start(kLaunchFinishAssureTimeoutMs, this,
-                                &WebAppWayland::OnLaunchTimeout);
+    launch_timeout_timer_.StartWithReceiver(kLaunchFinishAssureTimeoutMs, this,
+                                            &WebAppWayland::OnLaunchTimeout);
   }
 }
 
