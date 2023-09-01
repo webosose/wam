@@ -31,11 +31,11 @@ set(SOURCES
     webengine/web_page_blink.cc
     webengine/web_view_impl.cc
     ${WAM_ROOT_SOURCE_DIR}/webos/device_info_impl.cc
+    ${WAM_ROOT_SOURCE_DIR}/webos/notification_service_luna.cc
     ${WAM_ROOT_SOURCE_DIR}/webos/palm_service_base.cc
     ${WAM_ROOT_SOURCE_DIR}/webos/platform_module_factory_impl.cc
     ${WAM_ROOT_SOURCE_DIR}/webos/plugin_service_luna.cc
     ${WAM_ROOT_SOURCE_DIR}/webos/service_sender_luna.cc
-    ${WAM_ROOT_SOURCE_DIR}/webos/web_app_luna.cc
     ${WAM_ROOT_SOURCE_DIR}/webos/web_app_manager_service_luna.cc
     ${WAM_ROOT_SOURCE_DIR}/webos/web_app_manager_service_luna_impl.cc
 )
@@ -61,11 +61,11 @@ set(HEADERS
     webengine/web_view_factory.h
     webengine/web_view_impl.h
     ${WAM_ROOT_SOURCE_DIR}/webos/device_info_impl.h
+    ${WAM_ROOT_SOURCE_DIR}/webos/notification_service_luna.h
     ${WAM_ROOT_SOURCE_DIR}/webos/palm_service_base.h
     ${WAM_ROOT_SOURCE_DIR}/webos/platform_module_factory_impl.h
     ${WAM_ROOT_SOURCE_DIR}/webos/plugin_service_luna.h
     ${WAM_ROOT_SOURCE_DIR}/webos/service_sender_luna.h
-    ${WAM_ROOT_SOURCE_DIR}/webos/web_app_luna.h
     ${WAM_ROOT_SOURCE_DIR}/webos/web_app_manager_service_luna.h
     ${WAM_ROOT_SOURCE_DIR}/webos/web_app_manager_service_luna_impl.h
 )

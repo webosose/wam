@@ -44,6 +44,7 @@ set(SOURCES
 set(HEADERS
     application_description.h
     device_info.h
+    notification_service.h
     palm_system_base.h
     platform_module_factory.h
     plugin_service.h
