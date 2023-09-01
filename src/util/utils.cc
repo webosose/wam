@@ -37,7 +37,7 @@
 
 namespace util {
 
-static std::string GetString(const char* value) {
+std::string GetString(const char* value) {
   return value ? std::string(value) : std::string();
 }
 

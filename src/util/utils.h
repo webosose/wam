@@ -24,6 +24,8 @@
 
 namespace util {
 
+std::string GetString(const char* value);
+
 std::vector<std::string> GetErrorPagePaths(
     const std::string& error_page_location,
     const std::string& language = {});

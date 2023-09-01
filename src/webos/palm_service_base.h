@@ -281,7 +281,7 @@ class PalmServiceBase {
     }
     if (!err) {
       LOG_WARNING(MSGID_LUNA_API, 0, "Failed to call in %s Service: %s",
-                  ServiceName(), ls_error.message);
+                  service_name_.c_str(), ls_error.message);
       return false;
     }
     return true;

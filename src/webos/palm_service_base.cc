@@ -26,15 +26,12 @@ PalmServiceBase::~PalmServiceBase() {
 }
 
 bool PalmServiceBase::StartService() {
-  const char* service_name = ServiceName();
-  if (service_name) {
-    service_name_ = service_name;
-  }
+  service_name_ = util::GetString(ServiceName());
 
   LSErrorSafe ls_error;
 
   if (!LSRegister(ServiceName(), &service_handle_, &ls_error)) {
-    LOG_ERROR(MSGID_REG_LS2_FAIL, 2, PMLOGKS("SERVICE", ServiceName()),
+    LOG_ERROR(MSGID_REG_LS2_FAIL, 2, PMLOGKS("SERVICE", service_name_.c_str()),
               PMLOGKS("ERROR", ls_error.message), "");
     return false;
   }
@@ -42,26 +39,29 @@ bool PalmServiceBase::StartService() {
   if (!LSRegisterCategory(service_handle_, Category(), Methods(),
                           nullptr,  // LSSignal - ?
                           nullptr, &ls_error)) {
-    LOG_ERROR(MSGID_REG_LS2_CAT_FAIL, 2, PMLOGKS("SERVICE", ServiceName()),
+    LOG_ERROR(MSGID_REG_LS2_CAT_FAIL, 2,
+              PMLOGKS("SERVICE", service_name_.c_str()),
               PMLOGKS("ERROR", ls_error.message), "");
     StopService();
     return false;
   }
 
   if (!LSCategorySetData(service_handle_, Category(), this, &ls_error)) {
-    LOG_ERROR(MSGID_REG_LS2_CAT_FAIL, 2, PMLOGKS("SERVICE", ServiceName()),
+    LOG_ERROR(MSGID_REG_LS2_CAT_FAIL, 2,
+              PMLOGKS("SERVICE", service_name_.c_str()),
               PMLOGKS("ERROR", ls_error.message), "");
     StopService();
     return false;
   }
 
   if (!LSGmainAttach(service_handle_, MainLoop(), &ls_error)) {
-    LOG_ERROR(MSGID_REG_LS2_ATTACH_FAIL, 2, PMLOGKS("SERVICE", ServiceName()),
+    LOG_ERROR(MSGID_REG_LS2_ATTACH_FAIL, 2,
+              PMLOGKS("SERVICE", service_name_.c_str()),
               PMLOGKS("ERROR", ls_error.message), "");
     StopService();
     return false;
   }
-  LOG_DEBUG("Successfully registered %s on service bus", ServiceName());
+  LOG_DEBUG("Successfully registered %s on service bus", service_name_.c_str());
 
   DidConnect();
 
@@ -93,7 +93,8 @@ bool PalmServiceBase::Call(LSHandle* handle,
                            LSCalloutContext* context = nullptr) {
   std::string parameters_str = util::JsonToString(parameters);
   if (!parameters.isObject()) {
-    LOG_WARNING(MSGID_LS2_CALL_FAIL, 2, PMLOGKS("SERVICE", ServiceName()),
+    LOG_WARNING(MSGID_LS2_CALL_FAIL, 2,
+                PMLOGKS("SERVICE", service_name_.c_str()),
                 PMLOGKFV("parameters", "%s", parameters_str.c_str()), "");
     return false;
   }
@@ -128,7 +129,8 @@ bool PalmServiceBase::Call(LSHandle* handle,
     }
   }
   if (!call_ret) {
-    LOG_WARNING(MSGID_LS2_CALL_FAIL, 2, PMLOGKS("SERVICE", ServiceName()),
+    LOG_WARNING(MSGID_LS2_CALL_FAIL, 2,
+                PMLOGKS("SERVICE", service_name_.c_str()),
                 PMLOGKS("ERROR", ls_error.message), "");
     return false;
   }
