@@ -42,6 +42,7 @@ class NotificationService {
   static NotificationService* Instance();
 
   virtual bool Display(const NotificationData& notification) = 0;
+  virtual bool Close(const std::string& notification_id) = 0;
 };
 
 #endif  // CORE_NOTIFICATION_SERVICE_H_

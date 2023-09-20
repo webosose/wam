@@ -42,10 +42,15 @@ void NotificationPlatformBridge::Display(
   NotificationService::Instance()->Display(data);
 }
 
-void NotificationPlatformBridge::Close(const std::string& notificationId) {}
+void NotificationPlatformBridge::Close(const std::string& notification_id) {
+  NotificationService::Instance()->Close(notification_id);
+}
 
 void NotificationPlatformBridge::GetDisplayed(
-    neva_app_runtime::GetDisplayedNotificationsCallback callback) const {}
+    neva_app_runtime::GetDisplayedNotificationsCallback callback) const {
+  std::move(callback).Run(/*notification_ids=*/{},
+                          /*supports_synchronization=*/false);
+}
 
 void NotificationPlatformBridge::SetReadyCallback(
     neva_app_runtime::NotificationPlatformBridge::

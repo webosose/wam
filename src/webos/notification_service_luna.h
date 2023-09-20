@@ -35,6 +35,7 @@ class NotificationServiceLuna : public PalmServiceBase,
 
   // NotificationService
   bool Display(const NotificationData& notification) override;
+  bool Close(const std::string& notification_id) override;
 
  private:
   NotificationServiceLuna();
@@ -42,6 +43,10 @@ class NotificationServiceLuna : public PalmServiceBase,
 
   bool CreateToast(const NotificationData& notification);
   bool CreateAlert(const NotificationData& notification);
+  bool Close(const std::string& notification_id,
+             std::map<std::string, std::string>& map,
+             const std::string& name,
+             const std::string& uri);
 };
 
 #endif  // WEBOS_NOTIFICATION_SERVICE_LUNA_H_

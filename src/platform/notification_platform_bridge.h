@@ -25,7 +25,7 @@ class NotificationPlatformBridge
   NotificationPlatformBridge();
   ~NotificationPlatformBridge() override;
   void Display(const neva_app_runtime::Notification& notification) override;
-  void Close(const std::string& notificationId) override;
+  void Close(const std::string& notification_id) override;
   void GetDisplayed(neva_app_runtime::GetDisplayedNotificationsCallback
                         callback) const override;
   void SetReadyCallback(neva_app_runtime::NotificationPlatformBridge::
