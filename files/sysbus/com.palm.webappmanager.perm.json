@@ -30,5 +30,13 @@
         "application.launcher",
         "application.operation",
         "settings.query"
+    ],
+    "com.webos.chromium.installablemanager.*": [
+        "applicationinstall.management",
+        "application.operation"
+    ],
+    "com.webos.chromium.pwa.*": [
+        "application.launcher",
+        "application.operation"
     ]
 }

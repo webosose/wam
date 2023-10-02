@@ -10,6 +10,8 @@
         "com.webos.notification.client*",
         "com.webos.service.webappmanager",
         "com.webos.rm.client.*",
+        "com.webos.chromium.installablemanager.*",
+        "com.webos.chromium.pwa.*",
         "com.webos.settingsservice.client-*"
     ],
     "permissions": [
@@ -55,6 +57,17 @@
           "com.webos.applicationManager",
           "com.webos.settingsservice"
         ]
+      },
+      {
+        "service": "com.webos.chromium.installablemanager.*",
+        "outbound": [
+          "com.webos.appInstallService",
+          "com.webos.applicationManager"
+        ]
+      },
+      {
+        "service":"com.webos.chromium.pwa.*",
+        "outbound":["com.webos.applicationManager"]
       }
     ]
 }
