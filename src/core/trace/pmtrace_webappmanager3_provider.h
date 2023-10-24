@@ -33,17 +33,17 @@ extern "C" {
 /* "message" tracepoint should be used for single event trace points */
 TRACEPOINT_EVENT(pmtrace_webappmanager3,
                  message,
-                 TP_ARGS(char*, text),
+                 TP_ARGS(const char*, text),
                  TP_FIELDS(ctf_string(scope, text)))
 /* "item" tracepoint should be used for name/value pairs */
 TRACEPOINT_EVENT(pmtrace_webappmanager3,
                  item,
-                 TP_ARGS(char*, text1, char*, text2),
+                 TP_ARGS(const char*, text1, const char*, text2),
                  TP_FIELDS(ctf_string(name, text1) ctf_string(value, text2)))
 /* "position" tracepoint records a message and two integer parameters */
 TRACEPOINT_EVENT(pmtrace_webappmanager3,
                  position,
-                 TP_ARGS(char*, text, int, x, int, y),
+                 TP_ARGS(const char*, text, int, x, int, y),
                  TP_FIELDS(ctf_string(scope, text) ctf_integer(int, xPos, x)
                                ctf_integer(int, yPos, y)))
 /* "before"/"after" tracepoint should be used for measuring the
@@ -51,11 +51,11 @@ TRACEPOINT_EVENT(pmtrace_webappmanager3,
  */
 TRACEPOINT_EVENT(pmtrace_webappmanager3,
                  before,
-                 TP_ARGS(char*, text),
+                 TP_ARGS(const char*, text),
                  TP_FIELDS(ctf_string(scope, text)))
 TRACEPOINT_EVENT(pmtrace_webappmanager3,
                  after,
-                 TP_ARGS(char*, text),
+                 TP_ARGS(const char*, text),
                  TP_FIELDS(ctf_string(scope, text)))
 /* "scope_entry"/"scope_exit" tracepoints should be used only by
    PmtraceTraceScope class to measure the duration of a scope within
@@ -64,11 +64,11 @@ TRACEPOINT_EVENT(pmtrace_webappmanager3,
    scope such as break statements or gotos.  */
 TRACEPOINT_EVENT(pmtrace_webappmanager3,
                  scope_entry,
-                 TP_ARGS(char*, text),
+                 TP_ARGS(const char*, text),
                  TP_FIELDS(ctf_string(scope, text)))
 TRACEPOINT_EVENT(pmtrace_webappmanager3,
                  scope_exit,
-                 TP_ARGS(char*, text),
+                 TP_ARGS(const char*, text),
                  TP_FIELDS(ctf_string(scope, text)))
 /* "function_entry"/"function_exit" tracepoints should be used only by
    PmtraceTraceFunction class to measure the duration of a function
@@ -77,11 +77,11 @@ TRACEPOINT_EVENT(pmtrace_webappmanager3,
    function such as return statements. */
 TRACEPOINT_EVENT(pmtrace_webappmanager3,
                  function_entry,
-                 TP_ARGS(char*, text),
+                 TP_ARGS(const char*, text),
                  TP_FIELDS(ctf_string(scope, text)))
 TRACEPOINT_EVENT(pmtrace_webappmanager3,
                  function_exit,
-                 TP_ARGS(char*, text),
+                 TP_ARGS(const char*, text),
                  TP_FIELDS(ctf_string(scope, text)))
 
 #endif /* _PMTRACE_WEBAPPMANAGER3_PROVIDER_H */

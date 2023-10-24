@@ -19,37 +19,37 @@
 #include "pmtrace_webappmanager3_provider.h"
 
 void TraceMessage(const char* label) {
-  tracepoint(pmtrace_webappmanager3, message, (char*)label);
+  tracepoint(pmtrace_webappmanager3, message, label);
 }
 
 void TraceBefore(const char* label) {
-  tracepoint(pmtrace_webappmanager3, before, (char*)label);
+  tracepoint(pmtrace_webappmanager3, before, label);
 }
 
 void TraceAfter(const char* label) {
-  tracepoint(pmtrace_webappmanager3, after, (char*)label);
+  tracepoint(pmtrace_webappmanager3, after, label);
 }
 
 void TraceScopeEntry(const char* label) {
-  tracepoint(pmtrace_webappmanager3, scope_entry, (char*)label);
+  tracepoint(pmtrace_webappmanager3, scope_entry, label);
 }
 
 void TraceScopeExit(const char* label) {
-  tracepoint(pmtrace_webappmanager3, scope_exit, (char*)label);
+  tracepoint(pmtrace_webappmanager3, scope_exit, label);
 }
 
 void TraceFunctionEntry(const char* label) {
-  tracepoint(pmtrace_webappmanager3, function_entry, (char*)label);
+  tracepoint(pmtrace_webappmanager3, function_entry, label);
 }
 
 void TraceFunctionExit(const char* label) {
-  tracepoint(pmtrace_webappmanager3, function_exit, (char*)label);
+  tracepoint(pmtrace_webappmanager3, function_exit, label);
 }
 
 void TraceItem(const char* name, const char* value) {
-  tracepoint(pmtrace_webappmanager3, item, (char*)name, (char*)value);
+  tracepoint(pmtrace_webappmanager3, item, name, value);
 }
 
 void TracePosition(const char* label, int pos_x, int pos_y) {
-  tracepoint(pmtrace_webappmanager3, position, (char*)label, pos_x, pos_y);
+  tracepoint(pmtrace_webappmanager3, position, label, pos_x, pos_y);
 }
