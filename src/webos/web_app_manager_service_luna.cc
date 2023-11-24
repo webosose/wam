@@ -428,11 +428,6 @@ void WebAppManagerServiceLuna::DidConnect() {
                 "Failed to connect to application manager");
   }
 
-  params["serviceName"] = std::string("com.webos.bootManager");
-  if (!GET_LS2_SERVER_STATUS(BootdConnectCallback, params)) {
-    LOG_WARNING(MSGID_BOOTD_CONNECT_FAIL, 0, "Failed to connect to bootd");
-  }
-
   params["serviceName"] = std::string("com.webos.service.connectionmanager");
   if (!GET_LS2_SERVER_STATUS(NetworkConnectionStatusCallback,
                              std::move(params))) {
@@ -640,33 +635,6 @@ void WebAppManagerServiceLuna::GetForegroundAppInfoCallback(
           WebAppManagerService::IsEnyoApp(app_id.c_str()));
     }
   }
-}
-
-void WebAppManagerServiceLuna::BootdConnectCallback(const Json::Value& reply) {
-  if (!reply.isObject()) {
-    LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", kErrInvalidParam.c_str());
-    return;
-  }
-
-  if (reply["connected"] == true) {
-    Json::Value subscribe;
-    subscribe["subscribe"] = true;
-    if (!LS2_CALL(GetBootStatusCallback,
-                  "luna://com.webos.bootManager/getBootStatus",
-                  std::move(subscribe))) {
-      LOG_WARNING(MSGID_BOOTD_SUBSCRIBE_FAIL, 0,
-                  "Failed to subscribe to bootManager");
-    }
-  }
-}
-
-void WebAppManagerServiceLuna::GetBootStatusCallback(const Json::Value& reply) {
-  if (!reply.isObject() || !reply["signals"].isObject()) {
-    LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0, "%s", kErrInvalidParam.c_str());
-    return;
-  }
-
-  boot_done_ = reply["signals"]["boot-done"] == true;
 }
 
 void WebAppManagerServiceLuna::CloseApp(const std::string& id) {

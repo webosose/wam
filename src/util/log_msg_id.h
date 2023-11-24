@@ -90,11 +90,9 @@
 #define MSGID_DISPLAY_CONNECT_FAIL      "DISPLAY_CONNECT_FAIL" /* Failed to connect to display manager */
 #define MSGID_MEMORY_CONNECT_FAIL       "MEMORY_CONNECT_FAIL" /* Failed to connect to memory manager */
 #define MSGID_APPMANAGER_CONNECT_FAIL   "APPMANAGER_CONNECT_FAIL" /* Failed to connect to application manager */
-#define MSGID_BOOTD_CONNECT_FAIL        "BOOTD_CONNECT_FAIL" /* Failed to connect to bootd */
 #define MSGID_SECURITYMANAGER_CONNECT_FAIL        "SECURITYMANAGER_CONNECT_FAIL" /* Failed to connect to security manager */
 #define MSGID_NETWORK_CONNECT_FAIL      "NETWORK_CONNECT_FAIL" /* Failed to connect to connection manager */
 #define MSGID_INVALID_EVENT             "INVALID_EVENT" /* Received QEvents for a window with no app */
-#define MSGID_BOOTD_SUBSCRIBE_FAIL      "BOOTD_SUBSCRIBE_FAIL" /* Failed to subscribe to bootd */
 #define MSGID_ACTIVITY_MANAGER_CREATE_FAIL "ACTIVITY_MANAGER_CREATE_FAIL" /* Failed to call activitymanager create */
 #define MSGID_WAM_INVALID_USER_PERMISSION  "WAM_INVALID_USER_PERMISSION" /* Failed to set valid User Privileges for webappmanager */
 

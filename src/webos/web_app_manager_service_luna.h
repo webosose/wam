@@ -69,9 +69,6 @@ class WebAppManagerServiceLuna : public PalmServiceBase,
   void GetAppStatusCallback(const Json::Value& reply);
   void GetForegroundAppInfoCallback(const Json::Value& reply);
 
-  void BootdConnectCallback(const Json::Value& reply);
-  void GetBootStatusCallback(const Json::Value& reply);
-
   void NetworkConnectionStatusCallback(const Json::Value& reply);
   void GetNetworkConnectionStatusCallback(const Json::Value& reply);
 
@@ -84,9 +81,6 @@ class WebAppManagerServiceLuna : public PalmServiceBase,
   const char* ServiceName() const override { return "com.palm.webappmanager"; }
 
   static LSMethod methods_[];
-
-  bool boot_done_ = false;
-  std::string debug_level_ = "release";
 
  private:
   bool IsValidInstanceId(const std::string& instance_id);

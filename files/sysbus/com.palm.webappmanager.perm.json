@@ -3,7 +3,6 @@
         "activity.operation",
         "application.launcher",
         "application.operation",
-        "boot.query",
         "memorymanager.query",
         "networkconnection.query",
         "settings.query"
