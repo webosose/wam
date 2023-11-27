@@ -701,8 +701,8 @@ std::string WebAppManager::Launch(const std::string& app_desc_string,
                   launching_app_id.c_str());
   } else {
     // Run as a normal app
-    if (!OnLaunchUrl(url, win_type, desc, instance_id, params, launching_app_id,
-                     err_code, err_msg)) {
+    if (!OnLaunchUrl(url, win_type, std::move(desc), instance_id, params,
+                     launching_app_id, err_code, err_msg)) {
       return std::string();
     }
   }

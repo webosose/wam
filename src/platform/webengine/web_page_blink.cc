@@ -70,7 +70,7 @@ WebPageBlink::WebPageBlink(const wam::Url& url,
 WebPageBlink::WebPageBlink(const wam::Url& url,
                            std::shared_ptr<ApplicationDescription> desc,
                            const std::string& params)
-    : WebPageBlink(url, desc, params, nullptr) {}
+    : WebPageBlink(url, std::move(desc), params, nullptr) {}
 
 WebPageBlink::~WebPageBlink() {
   if (dom_suspend_timer_.IsRunning()) {
@@ -992,7 +992,7 @@ void WebPageBlink::SetCustomPluginIfNeeded() {
     return;
   }
 
-  custom_plugin_path_ = custom_plugin_path;
+  custom_plugin_path_ = std::move(custom_plugin_path);
   LOG_INFO(MSGID_WAM_DEBUG, 4, PMLOGKS("APP_ID", AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", GetWebProcessPID()),

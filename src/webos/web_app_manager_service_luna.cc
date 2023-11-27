@@ -274,7 +274,7 @@ Json::Value WebAppManagerServiceLuna::listRunningApps(
     app_json["webprocessid"] = std::to_string(app_info.pid_);
     running_apps.append(app_json);
   }
-  reply["running"] = running_apps;
+  reply["running"] = std::move(running_apps);
   reply["returnValue"] = true;
   return reply;
 }
@@ -378,7 +378,8 @@ void WebAppManagerServiceLuna::DidConnect() {
   }
 
   params["serviceName"] = std::string("com.webos.service.connectionmanager");
-  if (!GET_LS2_SERVER_STATUS(NetworkConnectionStatusCallback, params)) {
+  if (!GET_LS2_SERVER_STATUS(NetworkConnectionStatusCallback,
+                             std::move(params))) {
     LOG_WARNING(MSGID_NETWORK_CONNECT_FAIL, 0,
                 "Failed to connect to connectionmanager");
   }
@@ -396,10 +397,10 @@ void WebAppManagerServiceLuna::SystemServiceConnectCallback(
     locale_params["subscribe"] = true;
     Json::Value locale_list;
     locale_list.append(std::string("localeInfo"));
-    locale_params["keys"] = locale_list;
+    locale_params["keys"] = std::move(locale_list);
     LS2_CALL(GetSystemLocalePreferencesCallback,
              "luna://com.webos.settingsservice/getSystemSettings",
-             locale_params);
+             std::move(locale_params));
   }
 }
 
@@ -455,7 +456,7 @@ void WebAppManagerServiceLuna::MemoryManagerConnectCallback(
     if (!Call<WebAppManagerServiceLuna,
               &WebAppManagerServiceLuna::GetCloseAppIdCallback>(
             "luna://com.webos.service.memorymanager/getManagerEvent",
-            close_app_obj, this)) {
+            std::move(close_app_obj), this)) {
       LOG_WARNING(MSGID_MEM_MGR_API_CALL_FAIL, 0,
                   "Failed to get close application identifier");
     }
@@ -466,7 +467,8 @@ void WebAppManagerServiceLuna::MemoryManagerConnectCallback(
     threshold_changed["method"] = "thresholdChanged";
     if (!Call<WebAppManagerServiceLuna,
               &WebAppManagerServiceLuna::ThresholdChangedCallback>(
-            "luna://com.palm.bus/signal/addmatch", threshold_changed, this)) {
+            "luna://com.palm.bus/signal/addmatch", std::move(threshold_changed),
+            this)) {
       LOG_WARNING(MSGID_SIGNAL_REGISTRATION_FAIL, 0,
                   "Failed to register a client for thresholdChanged");
     }
@@ -536,8 +538,8 @@ void WebAppManagerServiceLuna::ApplicationManagerConnectCallback(
     params["extraInfo"] = true;
     if (!Call<WebAppManagerServiceLuna,
               &WebAppManagerServiceLuna::GetForegroundAppInfoCallback>(
-            "luna://com.webos.applicationManager/getForegroundAppInfo", params,
-            this)) {
+            "luna://com.webos.applicationManager/getForegroundAppInfo",
+            std::move(params), this)) {
       LOG_WARNING(MSGID_APP_MGR_API_CALL_FAIL, 0,
                   "Failed to get foreground application Information");
     }
@@ -605,7 +607,8 @@ void WebAppManagerServiceLuna::BootdConnectCallback(const Json::Value& reply) {
     Json::Value subscribe;
     subscribe["subscribe"] = true;
     if (!LS2_CALL(GetBootStatusCallback,
-                  "luna://com.webos.bootManager/getBootStatus", subscribe)) {
+                  "luna://com.webos.bootManager/getBootStatus",
+                  std::move(subscribe))) {
       LOG_WARNING(MSGID_BOOTD_SUBSCRIBE_FAIL, 0,
                   "Failed to subscribe to bootManager");
     }
@@ -626,7 +629,7 @@ void WebAppManagerServiceLuna::CloseApp(const std::string& id) {
   json["instanceId"] = id;
 
   if (!LS2_CALL(CloseAppCallback, "luna://com.webos.applicationManager/close",
-                json)) {
+                std::move(json))) {
     LOG_WARNING(MSGID_CLOSE_CALL_FAIL, 0,
                 "Failed to send closeByAppId command to SAM");
   }
@@ -689,7 +692,8 @@ void WebAppManagerServiceLuna::NetworkConnectionStatusCallback(
     Json::Value subscribe;
     subscribe["subscribe"] = true;
     if (!LS2_CALL(GetNetworkConnectionStatusCallback,
-                  "luna://com.palm.connectionmanager/getStatus", subscribe)) {
+                  "luna://com.palm.connectionmanager/getStatus",
+                  std::move(subscribe))) {
       LOG_WARNING(MSGID_LS2_CALL_FAIL, 0,
                   "Fail to subscribe to connection manager");
     }

@@ -43,10 +43,10 @@ void WebAppManagerServiceLunaImpl::SystemServiceConnectCallback(
     option_list.append("smartServiceCountryCode3");
     option_list.append("audioGuidance");
     option_list.append("screenRotation");
-    option_params["keys"] = option_list;
+    option_params["keys"] = std::move(option_list);
     LS2_CALL(GetSystemOptionCallback,
              "luna://com.webos.settingsservice/getSystemSettings",
-             option_params);
+             std::move(option_params));
   }
 }
 

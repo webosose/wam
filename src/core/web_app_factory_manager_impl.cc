@@ -175,7 +175,7 @@ WebAppBase* WebAppFactoryManagerImpl::CreateWebApp(
     const std::string& app_type) {
   WebAppFactoryInterface* interface = GetPluggable(app_type);
   if (interface) {
-    return interface->CreateWebApp(win_type, desc);
+    return interface->CreateWebApp(win_type, std::move(desc));
   }
 
   return nullptr;
@@ -188,7 +188,7 @@ WebAppBase* WebAppFactoryManagerImpl::CreateWebApp(
     const std::string& app_type) {
   WebAppFactoryInterface* interface = GetPluggable(app_type);
   if (interface) {
-    return interface->CreateWebApp(win_type, page, desc);
+    return interface->CreateWebApp(win_type, page, std::move(desc));
   }
 
   return nullptr;
@@ -204,12 +204,13 @@ WebPageBase* WebAppFactoryManagerImpl::CreateWebPage(
 
   WebAppFactoryInterface* interface = GetPluggable(app_type);
   if (interface) {
-    page = interface->CreateWebPage(url, desc, launch_params);
+    page = interface->CreateWebPage(url, std::move(desc), launch_params);
   } else {
     auto default_interface = interfaces_.find("default");
     if (default_interface != interfaces_.end()) {
       // use default factory if cannot find app_type.
-      page = default_interface->second->CreateWebPage(url, desc, launch_params);
+      page = default_interface->second->CreateWebPage(url, std::move(desc),
+                                                      launch_params);
     }
   }
 

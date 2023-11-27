@@ -197,7 +197,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
     std::string snapshot_file = v8_snapshot_file.asString();
     if (snapshot_file.length() > 0) {
       if (snapshot_file.at(0) == '/') {
-        app_desc->v8_snapshot_path_ = snapshot_file;
+        app_desc->v8_snapshot_path_ = std::move(snapshot_file);
       } else {
         app_desc->v8_snapshot_path_ =
             app_desc->folder_path_ + "/" + snapshot_file;
@@ -287,7 +287,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
     temp_path.clear();
     temp_path = app_desc->folder_path_ + "/" + app_desc->icon_;
     if (!stat(temp_path.c_str(), &stat_ent_pt)) {
-      app_desc->icon_ = temp_path;
+      app_desc->icon_ = std::move(temp_path);
     }
   }
   app_desc->use_native_scroll_ = json_obj["useNativeScroll"].isBool() &&

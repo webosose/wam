@@ -827,7 +827,7 @@ void WebAppWayland::MoveInputRegion(int height) {
     new_region.push_back(rect);
   }
   input_region_.clear();
-  input_region_ = new_region;
+  input_region_ = std::move(new_region);
   app_window_->SetInputRegion(input_region_);
 }
 

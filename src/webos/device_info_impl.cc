@@ -110,7 +110,7 @@ void DeviceInfoImpl::InitPlatformInfo() {
     model_name_ = value;
   }
   if (GetDeviceInfo("FirmwareVersion", value)) {
-    platform_version_ = value;
+    platform_version_ = std::move(value);
   }
 
   size_t major_pos = 0, minor_pos = 0;

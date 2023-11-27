@@ -81,7 +81,8 @@ class LSCallbackHandler {
 
     Json::Value reply;
 
-    reply = static_cast<LSCallbackHandler*>(user_data)->Called(request);
+    reply =
+        static_cast<LSCallbackHandler*>(user_data)->Called(std::move(request));
 
     if (!reply.isNull()) {
       return LSMessageReply(handle, message, util::JsonToString(reply).c_str(),
@@ -236,7 +237,8 @@ class PalmServiceBase {
                    Json::Value parameters,
                    const char* application_id = nullptr,
                    LSCalloutContext* context = nullptr) {
-    return Call(service_handle_, what, parameters, application_id, context);
+    return Call(service_handle_, what, std::move(parameters), application_id,
+                context);
   }
 
   /*

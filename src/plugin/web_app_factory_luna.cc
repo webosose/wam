@@ -45,7 +45,7 @@ WebAppBase* WebAppFactoryLuna::CreateWebApp(
 
   if (win_type == kWtCard || win_type == kWtPopup || win_type == kWtMinimal ||
       win_type == kWtFloating || win_type == kWtSystemUi) {
-    app = new WebAppWaylandWebOS(win_type, desc);
+    app = new WebAppWaylandWebOS(win_type, std::move(desc));
   } else if (win_type == kWtOverlay || win_type == kWtNone) {
     app = new WebAppWayland(win_type, std::nullopt, std::nullopt,
                             desc->GetDisplayAffinity());
@@ -60,12 +60,12 @@ WebAppBase* WebAppFactoryLuna::CreateWebApp(
     const std::string& win_type,
     WebPageBase* /*page*/,
     std::shared_ptr<ApplicationDescription> desc) {
-  return CreateWebApp(win_type, desc);
+  return CreateWebApp(win_type, std::move(desc));
 }
 
 WebPageBase* WebAppFactoryLuna::CreateWebPage(
     const wam::Url& url,
     std::shared_ptr<ApplicationDescription> desc,
     const std::string& launch_params) {
-  return new WebPageBlink(url, desc, launch_params);
+  return new WebPageBlink(url, std::move(desc), launch_params);
 }

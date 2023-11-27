@@ -34,11 +34,11 @@ void ServiceSenderLuna::PostlistRunningApps(
     app_json["webprocessid"] = std::to_string(app_info.pid_);
     running_apps.append(app_json);
   }
-  reply["running"] = running_apps;
+  reply["running"] = std::move(running_apps);
   reply["returnValue"] = true;
 
   WebAppManagerServiceLuna::Instance()->PostSubscription("listRunningApps",
-                                                         reply);
+                                                         std::move(reply));
 }
 
 void ServiceSenderLuna::PostWebProcessCreated(const std::string& app_id,
@@ -51,7 +51,7 @@ void ServiceSenderLuna::PostWebProcessCreated(const std::string& app_id,
   reply["returnValue"] = true;
 
   WebAppManagerServiceLuna::Instance()->PostSubscription("webProcessCreated",
-                                                         reply);
+                                                         std::move(reply));
 }
 
 void ServiceSenderLuna::ServiceCall(const std::string& url,
@@ -60,7 +60,7 @@ void ServiceSenderLuna::ServiceCall(const std::string& url,
   Json::Value json_payload = util::StringToJson(payload);
 
   bool ret = WebAppManagerServiceLuna::Instance()->Call(
-      url.c_str(), json_payload, app_id.c_str());
+      url.c_str(), std::move(json_payload), app_id.c_str());
   if (!ret) {
     LOG_WARNING(MSGID_SERVICE_CALL_FAIL, 2, PMLOGKS("APP_ID", app_id.c_str()),
                 PMLOGKS("URL", url.c_str()),

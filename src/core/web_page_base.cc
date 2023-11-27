@@ -72,7 +72,7 @@ void WebPageBase::SetLaunchParams(const std::string& params) {
 
 void WebPageBase::SetApplicationDescription(
     std::shared_ptr<ApplicationDescription> desc) {
-  app_desc_ = desc;
+  app_desc_ = std::move(desc);
   SetPageProperties();
 }
 

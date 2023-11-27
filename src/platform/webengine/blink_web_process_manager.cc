@@ -62,11 +62,11 @@ Json::Value BlinkWebProcessManager::GetWebProcessProfiling() {
       app_object["instanceId"] = app->second->InstanceId();
       app_array.append(app_object);
     }
-    process_object["runningApps"] = app_array;
+    process_object["runningApps"] = std::move(app_array);
     process_array.append(process_object);
   }
 
-  reply["WebProcesses"] = process_array;
+  reply["WebProcesses"] = std::move(process_array);
   reply["returnValue"] = true;
   return reply;
 }

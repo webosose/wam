@@ -236,7 +236,8 @@ bool StringToJson(const std::string& str, Json::Value& value) {
 
 Json::Value StringToJson(const std::string& str) {
   Json::Value result;
-  return StringToJson(str, result) ? result : Json::Value(Json::nullValue);
+  return StringToJson(str, result) ? std::move(result)
+                                   : Json::Value(Json::nullValue);
 }
 
 std::string JsonToString(const Json::Value& value) {
