@@ -27,7 +27,6 @@
 
 #include "log_manager.h"
 #include "utils.h"
-#include "web_app_manager.h"
 
 bool ApplicationDescription::CheckTrustLevel(std::string trust_level) {
   if (trust_level.empty()) {
@@ -280,9 +279,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
         app_desc->folder_path_ + "/" + app_desc->entry_point_;
     struct stat stat_ent_pt;
     if (!stat(temp_path.c_str(), &stat_ent_pt)) {
-      std::string origin =
-          WebAppManager::Instance()->IdentifierForSecurityOrigin(app_desc->id_);
-      app_desc->entry_point_ = "file://" + origin + temp_path;
+      app_desc->entry_point_ = "file://" + temp_path;
     }
     temp_path.clear();
     temp_path = app_desc->folder_path_ + "/" + app_desc->icon_;
