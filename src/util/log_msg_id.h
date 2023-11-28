@@ -98,24 +98,12 @@
 #define MSGID_ACTIVITY_MANAGER_CREATE_FAIL "ACTIVITY_MANAGER_CREATE_FAIL" /* Failed to call activitymanager create */
 #define MSGID_WAM_INVALID_USER_PERMISSION  "WAM_INVALID_USER_PERMISSION" /* Failed to set valid User Privileges for webappmanager */
 
-#define MSGID_KILL_WEBPROCESS_DELAYED       "KILL_WEBPROCESS_DELAYED" /** Kill WebProcess when MM requests delayed until app is closed completely */
 #define MSGID_APPID_HAS_UPPERCASE       "APPID_HAS_UPPERCASE" /** the application id has uppercase letters */
 
 #define MSGID_ERROR_ERROR               "ERROR_PAGE_ERROR" /** Error loop -- failed to load error page! */
 #define MSGID_CLOSE_CALL_FAIL           "CLOSE_CALL_FAIL" /** Failed to send closeByAppId call to sam */
 
 #define MSGID_LOCALEINFO_READ_FAIL      "LOCALEINFO_FILE_READ_FAIL" /** Fail to read locale info from /var/luna/preferences/localInfo */
-
-// MultiWebProcess Model
-#define MSGID_SET_WEBPROCESS_ENVIRONMENT    "SET_WEBPROCESS_ENVIRONMENT" /** Set environment for WebProcess forking */
-#define MSGID_KILL_WEBPROCESS               "KILL_WEBPROCESS" /** Kill WebProcess when MM requests */
-#define MSGID_KILL_WEBPROCESS_FAILED        "KILL_WEBPROCESS_FAILED" /** Failed to kill WebProcess */
-
-#define MSGID_WEBPROCESSENV_READ_FAIL       "WEBPROCESSENV_FILE_READ_FAIL" /** Fail to read WebProcess environment setting from /etc/wam/com.webos.wam.json */
-#define MSGID_WEBPROCESS_INFO_ADDED         "WEBPROCESS_INFO_ADDED" /** New WebProcess info is added to WebProcess info map */
-#define MSGID_WEBPROCESS_PROXYID_SET        "WEBPROCESS_PROXYID_SET" /** WebProcess ProxyID is set from default value(0) */
-#define MSGID_WEBPAGE_ADDED                 "WEBPAGE_ADDED" /** New web page is added to WebProcess info */
-#define MSGID_WEBPAGE_REMOVED               "WEBPAGE_REMOVED" /** Web page is removed from WebProcess info */
 
 #define MSGID_EXECUTE_CLOSECALLBACK         "EXECUTE_CLOSECALLBACK" /** Execute close callback */
 #define MSGID_CLEANRESOURCE_COMPLETED       "CLEANRESOURCE_COMPLETED" /** Complete clean resource by callback or unload event*/

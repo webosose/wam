@@ -20,72 +20,28 @@
 #include <cstdint>
 #include <list>
 #include <string>
-#include <unordered_map>
-#include <vector>
 
 namespace Json {
 class Value;
 }
 
-class ApplicationDescription;
-class WebPageBase;
 class WebAppBase;
 
 class WebProcessManager {
  public:
-  WebProcessManager();
+  WebProcessManager() = default;
   virtual ~WebProcessManager() = default;
 
-  uint32_t GetWebProcessProxyID(const ApplicationDescription* desc) const;
-  uint32_t GetWebProcessProxyID(uint32_t pid) const;
   virtual std::string GetWebProcessMemSize(uint32_t pid) const;
-  void KillWebProcess(uint32_t pid);
-  void RequestKillWebProcess(uint32_t pid);
-  bool WebProcessInfoMapReady();
-  void SetWebProcessCacheProperty(const Json::Value& object,
-                                  const std::string& key);
-  void ReadWebProcessPolicy();
-  std::string GetProcessKey(const ApplicationDescription* desc) const;
 
   virtual Json::Value GetWebProcessProfiling() = 0;
   virtual uint32_t GetWebProcessPID(const WebAppBase* app) const = 0;
-  virtual uint32_t GetInitialWebViewProxyID() const = 0;
   virtual void ClearBrowsingData(const int remove_browsing_data_mask) = 0;
   virtual int MaskForBrowsingDataType(const char* type) = 0;
 
  protected:
   std::list<const WebAppBase*> RunningApps();
-  std::list<const WebAppBase*> RunningApps(uint32_t pid);
-  WebAppBase* FindAppById(const std::string& app_id);
   WebAppBase* FindAppByInstanceId(const std::string& instance_id);
-
-  class WebProcessInfo {
-   public:
-    // FIXME: Fix default cache values when WebKit defaults change.
-    static const uint32_t kDefaultMemoryCache = 32;
-    static const uint32_t kDefaultCodeCache = 8;
-
-    WebProcessInfo(uint32_t id,
-                   uint32_t pid,
-                   uint32_t memory_cache = kDefaultMemoryCache,
-                   uint32_t code_cache = kDefaultCodeCache)
-        : proxy_id_(id),
-          web_process_pid_(pid),
-          memory_cache_size_(memory_cache),
-          code_cache_size_(code_cache) {}
-
-    uint32_t proxy_id_;
-    uint32_t web_process_pid_;
-    uint32_t number_of_apps_ = 1;
-    uint32_t memory_cache_size_;
-    uint32_t code_cache_size_;
-    bool request_kill_ = false;
-  };
-  std::unordered_map<std::string, WebProcessInfo> web_process_info_map_;
-
-  uint32_t maximum_number_of_processes_ = 1;
-  std::vector<std::string> web_process_group_app_id_list_;
-  std::vector<std::string> web_process_group_trust_level_list_;
 };
 
 #endif  // CORE_WEB_PROCESS_MANAGER_H_

@@ -32,7 +32,6 @@ class BlinkWebProcessManager : public WebProcessManager {
   // WebProcessManager
   Json::Value GetWebProcessProfiling() override;
   uint32_t GetWebProcessPID(const WebAppBase* app) const override;
-  uint32_t GetInitialWebViewProxyID() const override;
   void ClearBrowsingData(const int remove_browsing_data_mask) override;
   int MaskForBrowsingDataType(const char* type) override;
 };

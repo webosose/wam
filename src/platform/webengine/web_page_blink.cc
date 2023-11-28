@@ -245,10 +245,6 @@ wam::Url WebPageBlink::Url() const {
   return wam::Url(page_private_->page_view_->GetUrl());
 }
 
-uint32_t WebPageBlink::GetWebProcessProxyID() {
-  return 0;
-}
-
 void WebPageBlink::SetPreferredLanguages(const std::string& language) {
   if (page_private_->palm_system_) {
     page_private_->palm_system_->SetLocale(language);

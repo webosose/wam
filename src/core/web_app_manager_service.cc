@@ -105,15 +105,6 @@ void WebAppManagerService::SetForceCloseApp(const std::string& app_id,
   WebAppManager::Instance()->SetForceCloseApp(app_id, instance_id);
 }
 
-void WebAppManagerService::KillCustomPluginProcess(
-    const std::string& app_base_path) {
-  WebAppManager::Instance()->KillCustomPluginProcess(app_base_path);
-}
-
-void WebAppManagerService::RequestKillWebProcess(uint32_t pid) {
-  WebAppManager::Instance()->RequestKillWebProcess(pid);
-}
-
 std::list<const WebAppBase*> WebAppManagerService::RunningApps() {
   return WebAppManager::Instance()->RunningApps();
 }

@@ -101,8 +101,6 @@ class WebAppManagerService {
   std::string GetSystemLanguage();
   void SetForceCloseApp(const std::string& app_id,
                         const std::string& instance_id);
-  void KillCustomPluginProcess(const std::string& app_base_path);
-  void RequestKillWebProcess(uint32_t pid);
   void UpdateNetworkStatus(const Json::Value& object);
   void NotifyMemoryPressure(webos::WebViewBase::MemoryPressureLevel level);
   void SetAccessibilityEnabled(bool enable);

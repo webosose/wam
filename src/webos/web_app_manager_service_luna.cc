@@ -568,17 +568,6 @@ void WebAppManagerServiceLuna::GetAppStatusCallback(const Json::Value& reply) {
     LOG_INFO(MSGID_WAM_DEBUG, 0, "Application installed %s", app_id.c_str());
     WebAppManagerService::OnAppInstalled(app_id);
   }
-  if (change_kind.compare("removed") == 0 ||
-      change_kind.compare("updated") == 0) {
-    std::string app_base_path = app_object["folderPath"].isString()
-                                    ? app_object["folderPath"].asString()
-                                    : "";
-    bool is_custom_plugin = app_object["customPlugin"] == true;
-
-    if (is_custom_plugin) {
-      WebAppManagerService::KillCustomPluginProcess(app_base_path.c_str());
-    }
-  }
 }
 
 void WebAppManagerServiceLuna::GetForegroundAppInfoCallback(

@@ -78,7 +78,6 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   void EvaluateJavaScript(const std::string& js_code) override;
   void EvaluateJavaScriptInAllFrames(const std::string& js_code,
                                      const char* method = {}) override;
-  uint32_t GetWebProcessProxyID() override;
   uint32_t GetWebProcessPID() const override { return RenderProcessPid(); }
   void CreatePalmSystem(WebAppBase* app) override;
   void SetUseLaunchOptimization(bool enabled, int delay_ms = 0) override;

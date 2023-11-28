@@ -71,10 +71,6 @@ Json::Value BlinkWebProcessManager::GetWebProcessProfiling() {
   return reply;
 }
 
-uint32_t BlinkWebProcessManager::GetInitialWebViewProxyID() const {
-  return 0;
-}
-
 void BlinkWebProcessManager::ClearBrowsingData(
     const int remove_browsing_data_mask) {
   BlinkWebViewProfileHelper::ClearBrowsingData(remove_browsing_data_mask);

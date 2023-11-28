@@ -115,11 +115,9 @@ class WebAppManager {
   bool CloseAllApps(uint32_t pid = 0);
   void SetForceCloseApp(const std::string& app_id,
                         const std::string& instance_id);
-  void RequestKillWebProcess(uint32_t pid);
 
   int GetSuspendDelay() { return suspend_delay_; }
   int GetMaxCustomSuspendDelay() const { return max_custom_suspend_delay_; }
-  void KillCustomPluginProcess(const std::string& base_path);
   bool ProcessCrashed(const std::string& app_id,
                       const std::string& instance_id);
 

@@ -88,7 +88,6 @@ class WebPageBase {
   virtual void EvaluateJavaScript(const std::string& js_code) = 0;
   virtual void EvaluateJavaScriptInAllFrames(const std::string& js_code,
                                              const char* method = {}) = 0;
-  virtual uint32_t GetWebProcessProxyID() = 0;
   virtual uint32_t GetWebProcessPID() const = 0;
   virtual void CreatePalmSystem(WebAppBase* app) = 0;
   virtual void SetUseLaunchOptimization(bool /*enabled*/,

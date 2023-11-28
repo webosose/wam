@@ -624,14 +624,6 @@ void WebAppManager::SetForceCloseApp(const std::string& app_id,
   app->SetForceClose();
 }
 
-void WebAppManager::RequestKillWebProcess(uint32_t /*pid*/) {
-  // Deprecated (2016-0401)
-}
-
-void WebAppManager::KillCustomPluginProcess(const std::string& /*base_path*/) {
-  // Deprecated (2016-04-01)
-}
-
 /**
  * Launch an application (webApps only, not native).
  *
