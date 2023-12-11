@@ -16,7 +16,14 @@
         "camera.operation",
         "camera.query"
     ],
-    "com.webos.notification.client*": ["private"],
+    "com.webos.chromium.service_worker": [
+        "application.launcher"
+    ],
+    "com.webos.notification.client*": [
+        "notification.operation",
+        "notification.management",
+        "webapplication.push"
+    ],
     "com.webos.rm.client.*": [
         "media.operation"
     ],

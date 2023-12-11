@@ -66,7 +66,7 @@ const char* NotificationServiceLuna::ServiceName() const {
 bool NotificationServiceLuna::Display(const NotificationData& notification) {
   // Close the previous notification with the same tag, if possible.
   Close(notification.id);
-  return CreateToast(notification) && CreateAlert(notification);
+  return CreateAlert(notification);
 }
 
 bool NotificationServiceLuna::CreateToast(

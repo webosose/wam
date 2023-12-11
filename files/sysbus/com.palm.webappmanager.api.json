@@ -11,5 +11,8 @@
     "com.palm.webappmanager/pauseApp",
     "com.palm.webappmanager/setInspectorEnable",
     "com.palm.webappmanager/webProcessCreated"
+  ],
+  "webapplication.push": [
+    "com.webos.service.webappmanager/fireNotificationEvent"
   ]
 }

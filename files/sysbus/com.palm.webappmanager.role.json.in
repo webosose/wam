@@ -6,7 +6,8 @@
         "com.palm.webappmanager",
         "com.webos.chromium.audio-*",
         "com.webos.chromium.camera-*",
-        "com.webos.notification.client.*",
+        "com.webos.chromium.service_worker",
+        "com.webos.notification.client*",
         "com.webos.service.webappmanager",
         "com.webos.rm.client.*",
         "com.webos.settingsservice.client-*"
@@ -37,7 +38,11 @@
         ]
       },
       {
-          "service":"com.webos.notification.client.*",
+        "service":"com.webos.chromium.service_worker",
+        "outbound":[ "com.webos.applicationManager" ]
+      },
+      {
+          "service":"com.webos.notification.client*",
           "outbound":["com.webos.notification"]
       },
       {
