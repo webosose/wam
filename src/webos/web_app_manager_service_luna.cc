@@ -519,8 +519,8 @@ void WebAppManagerServiceLuna::MemoryManagerConnectCallback(
 
     Json::Value threshold_changed;
     threshold_changed["subscribe"] = true;
-    threshold_changed["category"] = "/com/webos/memory";
-    threshold_changed["method"] = "thresholdChanged";
+    threshold_changed["category"] = "/com/webos/service/memorymanager";
+    threshold_changed["method"] = "levelChanged";
     if (!Call<WebAppManagerServiceLuna,
               &WebAppManagerServiceLuna::ThresholdChangedCallback>(
             "luna://com.palm.bus/signal/addmatch", std::move(threshold_changed),
