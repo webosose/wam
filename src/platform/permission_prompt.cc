@@ -23,8 +23,6 @@
 #include "core/web_app_manager.h"
 #include "util/log_manager.h"
 
-using PermissionRequest = neva_app_runtime::PermissionRequest;
-
 namespace {
 const char* PermissionRequestTypeToString(PermissionRequest::RequestType type) {
   switch (type) {
@@ -61,9 +59,10 @@ void PermissionPrompt::SetDecisions() {
   for (const PermissionRequest* request : delegate_->Requests()) {
     PermissionRequest::RequestType type = request->GetRequestType();
     switch (type) {
+      case PermissionRequest::RequestType::kCameraStream:
+      case PermissionRequest::RequestType::kMicStream:
       case PermissionRequest::RequestType::kNotifications: {
-        bool status =
-            GetPermissionStatusFromAppDesc(PermissionRequestTypeToString(type));
+        bool status = GetPermissionStatusFromAppDesc(type);
         if (status)
           delegate_->Accept();
         else
@@ -76,12 +75,26 @@ void PermissionPrompt::SetDecisions() {
   }
 }
 
-bool PermissionPrompt::GetPermissionStatusFromAppDesc(const char* type) {
+bool PermissionPrompt::GetPermissionStatusFromAppDesc(
+    PermissionRequest::RequestType type) {
   const std::string app_id = delegate_->GetAppId();
   WebAppBase* app = WebAppManager::Instance()->FindAppById(app_id);
+  ApplicationDescription* app_desc = app->GetAppDescription();
 
-  auto& permissions = app->GetAppDescription()->WebAppPermissions();
-  bool status = (permissions.find(type) != permissions.end());
+  bool status;
+  switch (type) {
+    case PermissionRequest::RequestType::kCameraStream: {
+      status = app_desc->AllowVideoCapture();
+    } break;
+    case PermissionRequest::RequestType::kMicStream: {
+      status = app_desc->AllowAudioCapture();
+    } break;
+    default: {
+      auto& permissions = app_desc->WebAppPermissions();
+      status = (permissions.find(PermissionRequestTypeToString(type)) !=
+                permissions.end());
+    } break;
+  }
   LOG_INFO(MSGID_SET_PERMISSION, 2, PMLOGKS("APP_ID", app_id.c_str()),
            PMLOGKS("PERMISSION_STATUS", (status ? "granted" : "denied")), "");
   return status;

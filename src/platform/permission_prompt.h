@@ -19,6 +19,8 @@
 
 #include "neva/app_runtime/public/permission_prompt.h"
 
+using PermissionRequest = neva_app_runtime::PermissionRequest;
+
 class PermissionPrompt : public neva_app_runtime::PermissionPrompt {
  public:
   PermissionPrompt(neva_app_runtime::PermissionPrompt::Delegate* delegate);
@@ -28,7 +30,7 @@ class PermissionPrompt : public neva_app_runtime::PermissionPrompt {
   void Show();
   void Close();
   void SetDecisions();
-  bool GetPermissionStatusFromAppDesc(const char* type);
+  bool GetPermissionStatusFromAppDesc(PermissionRequest::RequestType type);
   neva_app_runtime::PermissionPrompt::Delegate* delegate_;
 };
 
