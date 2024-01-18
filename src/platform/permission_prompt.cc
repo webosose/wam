@@ -81,7 +81,7 @@ bool PermissionPrompt::GetPermissionStatusFromAppDesc(
   WebAppBase* app = WebAppManager::Instance()->FindAppById(app_id);
   ApplicationDescription* app_desc = app->GetAppDescription();
 
-  bool status;
+  bool status = false;
   switch (type) {
     case PermissionRequest::RequestType::kCameraStream: {
       status = app_desc->AllowVideoCapture();
@@ -91,8 +91,10 @@ bool PermissionPrompt::GetPermissionStatusFromAppDesc(
     } break;
     default: {
       auto& permissions = app_desc->WebAppPermissions();
-      status = (permissions.find(PermissionRequestTypeToString(type)) !=
-                permissions.end());
+      const char* str_type = PermissionRequestTypeToString(type);
+      if (str_type != nullptr) {
+        status = (permissions.find(str_type) != permissions.end());
+      }
     } break;
   }
   LOG_INFO(MSGID_SET_PERMISSION, 2, PMLOGKS("APP_ID", app_id.c_str()),
