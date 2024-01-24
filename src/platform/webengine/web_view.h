@@ -128,8 +128,6 @@ class WebView {
   virtual void SetSecurityOrigin(const std::string& identifier) = 0;
   virtual void SetAcceptLanguages(const std::string& lauguages) = 0;
   virtual void SetBoardType(const std::string& board_type) = 0;
-  virtual void SetMediaCodecCapability(const std::string& capability) = 0;
-  virtual void SetMediaPreferences(const std::string& preferences) = 0;
   virtual void SetSearchKeywordForCustomPlayer(bool enabled) = 0;
   virtual void SetUseUnlimitedMediaPolicy(bool enabled) = 0;
   virtual void SetUseVideoDecodeAccelerator(bool enabled) = 0;

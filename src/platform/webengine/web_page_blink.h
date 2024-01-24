@@ -149,10 +149,8 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   int RenderProcessPid() const;
   static void SetFileAccessBlocked(bool blocked);
   void UpdateBoardType();
-  void UpdateMediaCodecCapability();
   double DevicePixelRatio();
   void SetAdditionalContentsScale(float scale_x, float scale_y);
-  void SetSupportDolbyHDRContents();
   void UpdateHardwareResolution();
 
   // Timer callback

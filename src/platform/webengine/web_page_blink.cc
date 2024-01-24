@@ -169,10 +169,8 @@ void WebPageBlink::Init() {
   UpdateHardwareResolution();
   UpdateBoardType();
   UpdateDatabaseIdentifier();
-  UpdateMediaCodecCapability();
   SetupStaticUserScripts();
   SetCustomPluginIfNeeded();
-  SetSupportDolbyHDRContents();
   SetCustomUserScript();
   page_private_->page_view_->SetAudioGuidanceOn(IsAccessibilityEnabled());
   UpdateBackHistoryAPIDisabled();
@@ -180,7 +178,6 @@ void WebPageBlink::Init() {
       app_desc_->UseUnlimitedMediaPolicy());
   page_private_->page_view_->SetEnableBackgroundRun(
       app_desc_->IsEnableBackgroundRun());
-  page_private_->page_view_->SetMediaPreferences(app_desc_->MediaPreferences());
 
   page_private_->page_view_->SetUseVideoDecodeAccelerator(
       app_desc_->UseVideoDecodeAccelerator());
@@ -1065,15 +1062,6 @@ void WebPageBlink::UpdateBoardType() {
   page_private_->page_view_->SetBoardType(board_type);
 }
 
-void WebPageBlink::UpdateMediaCodecCapability() {
-  const std::string& file_content =
-      util::ReadFile("/etc/umediaserver/device_codec_capability_config.json");
-
-  if (!file_content.empty()) {
-    page_private_->page_view_->SetMediaCodecCapability(file_content);
-  }
-}
-
 double WebPageBlink::DevicePixelRatio() {
   float device_pixel_ratio = 1.0;
 
@@ -1129,19 +1117,6 @@ double WebPageBlink::DevicePixelRatio() {
       AppId().c_str(), device_pixel_ratio, device_width, device_height,
       app_width, app_height);
   return device_pixel_ratio;
-}
-
-void WebPageBlink::SetSupportDolbyHDRContents() {
-  std::string support_dolby_hdr_contents;
-  GetDeviceInfo("supportDolbyHDRContents", support_dolby_hdr_contents);
-  LOG_INFO(MSGID_WAM_DEBUG, 3, PMLOGKS("APP_ID", AppId().c_str()),
-           PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
-           PMLOGKFV("PID", "%d", GetWebProcessPID()),
-           "supportDolbyHDRContents:%s", support_dolby_hdr_contents.c_str());
-
-  Json::Value preferences = util::StringToJson(app_desc_->MediaPreferences());
-  preferences["supportDolbyHDR"] = support_dolby_hdr_contents == "true";
-  app_desc_->SetMediaPreferences(util::JsonToString(preferences));
 }
 
 void WebPageBlink::UpdateDatabaseIdentifier() {

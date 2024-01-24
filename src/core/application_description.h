@@ -148,8 +148,6 @@ class ApplicationDescription {
   std::optional<int> CustomSuspendDOMTime() const {
     return custom_suspend_dom_time_;
   }
-  std::string MediaPreferences() const { return media_preferences_; }
-  void SetMediaPreferences(const std::string& pref);
 
   bool UseVideoDecodeAccelerator() const {
     return use_video_decode_accelerator_;
@@ -205,7 +203,6 @@ class ApplicationDescription {
   std::string location_hint_;
   bool use_virtual_keyboard_ = true;
   std::optional<int> custom_suspend_dom_time_;
-  std::string media_preferences_;
   bool use_video_decode_accelerator_ = false;
   std::set<std::string> web_app_permissions_;
 };

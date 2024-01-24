@@ -178,10 +178,6 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   app_desc->disallow_scrolling_in_main_frame_ =
       disallow_scrolling.isBool() ? disallow_scrolling.asBool() : true;
 
-  auto media_extension =
-      json_obj.get("mediaExtension", Json::Value(Json::objectValue));
-  app_desc->media_preferences_ = util::JsonToString(media_extension);
-
   // Handle accessibility, supportsAudioGuidance
   auto accessibility = json_obj["accessibility"];
   if (accessibility.isObject()) {
@@ -359,8 +355,4 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   }
 
   return app_desc;
-}
-
-void ApplicationDescription::SetMediaPreferences(const std::string& pref) {
-  media_preferences_ = pref;
 }

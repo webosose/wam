@@ -125,8 +125,6 @@ class WebViewImpl : public WebView {
   void SetSecurityOrigin(const std::string& identifier) override;
   void SetAcceptLanguages(const std::string& lauguages) override;
   void SetBoardType(const std::string& board_type) override;
-  void SetMediaCodecCapability(const std::string& capability) override;
-  void SetMediaPreferences(const std::string& preferences) override;
   void SetSearchKeywordForCustomPlayer(bool enabled) override;
   void SetUseUnlimitedMediaPolicy(bool enabled) override;
   void SetUseVideoDecodeAccelerator(bool enabled) override;
