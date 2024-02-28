@@ -65,6 +65,7 @@ WebPageBlink::WebPageBlink(const wam::Url& url,
     : WebPageBase(url, desc, params),
       page_private_(std::make_unique<WebPageBlinkPrivate>(this)),
       trust_level_(desc->TrustLevel()),
+      has_custom_policy_for_error_page_(false),
       factory_(std::move(factory)) {}
 
 WebPageBlink::WebPageBlink(const wam::Url& url,
@@ -1142,34 +1143,32 @@ void WebPageBlink::SetLoadErrorPolicy(const std::string& policy) {
   load_error_policy_ = policy;
   if (!policy.compare("event")) {
     // policy : event
-    has_custom_policy_for_response_ = true;
+    has_custom_policy_for_error_page_ = true;
   } else if (!policy.compare("default")) {
     // policy : default, WAM and blink handle all load errors
-    has_custom_policy_for_response_ = false;
+    has_custom_policy_for_error_page_ = false;
   }
 }
 
-bool WebPageBlink::DecidePolicyForResponse(bool is_main_frame,
-                                           int status_code,
-                                           const std::string& url,
-                                           const std::string& status_text) {
+bool WebPageBlink::DecidePolicyForErrorPage(bool is_main_frame,
+                                            int error_code,
+                                            const std::string& url,
+                                            const std::string& error_text) {
   LOG_INFO(MSGID_WAM_DEBUG, 8, PMLOGKS("APP_ID", AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", GetWebProcessPID()),
-           PMLOGKFV("STATUS_CODE", "%d", status_code),
-           PMLOGKS("URL", url.c_str()), PMLOGKS("TEXT", status_text.c_str()),
+           PMLOGKFV("STATUS_CODE", "%d", error_code),
+           PMLOGKS("URL", url.c_str()), PMLOGKS("TEXT", error_text.c_str()),
            PMLOGKS("MAIN_FRAME", is_main_frame ? "true" : "false"),
-           PMLOGKS("RESPONSE_POLICY",
-                   has_custom_policy_for_response_ ? "event" : "default"),
-           "");
+           PMLOGKS("RESPONSE_POLICY", is_main_frame ? "event" : "default"), "");
 
   // how to WAM3 handle this response
-  ApplyPolicyForUrlResponse(is_main_frame, url, status_code);
+  ApplyPolicyForErrorPage(is_main_frame, url, error_code);
 
   // how to blink handle this response
   // ACR requirement : even if received error response from subframe(iframe)ACR
   // app should handle that as a error
-  return has_custom_policy_for_response_;
+  return has_custom_policy_for_error_page_;
 }
 
 bool WebPageBlink::AcceptsVideoCapture() {

@@ -381,13 +381,16 @@ bool WebPageBase::HasLoadErrorPolicy(bool is_http_response_error,
   return false;
 }
 
-void WebPageBase::ApplyPolicyForUrlResponse(bool is_main_frame,
-                                            const std::string& url,
-                                            int status_code) {
+void WebPageBase::ApplyPolicyForErrorPage(bool is_main_frame,
+                                          const std::string& url,
+                                          int error_code) {
+  // error_code can be both HTTP Status and Network Error
+  // HTTP Status : Positive values
+  // Network Error : Negative values
   wam::Url response_url(url);
   static const int http_error_status_code = 400;
   if (response_url.Scheme() != "file" &&
-      !HasLoadErrorPolicy(status_code >= http_error_status_code, status_code) &&
+      !HasLoadErrorPolicy(error_code >= http_error_status_code, error_code) &&
       is_main_frame) {
     // If app does not have policy for load error and
     // this error response is from main frame document

@@ -24,10 +24,10 @@ class WebPageBlinkDelegate {
  public:
   virtual ~WebPageBlinkDelegate() = default;
   virtual void Close() = 0;
-  virtual bool DecidePolicyForResponse(bool is_main_frame,
-                                       int status_code,
-                                       const std::string& url,
-                                       const std::string& status_text) = 0;
+  virtual bool DecidePolicyForErrorPage(bool is_main_frame,
+                                        int error_code,
+                                        const std::string& url,
+                                        const std::string& error_text) = 0;
   virtual bool AcceptsVideoCapture() = 0;
   virtual bool AcceptsAudioCapture() = 0;
   virtual void DidFirstFrameFocused() = 0;

@@ -179,9 +179,9 @@ class WebPageBase {
   virtual int MaxCustomSuspendDelay();
   std::string TelluriumNubPath();
 
-  void ApplyPolicyForUrlResponse(bool is_main_frame,
-                                 const std::string& url,
-                                 int status_code);
+  void ApplyPolicyForErrorPage(bool is_main_frame,
+                               const std::string& url,
+                               int error_code);
   void PostRunningAppList();
   void PostWebProcessCreated(uint32_t pid);
   bool IsAccessibilityEnabled() const;

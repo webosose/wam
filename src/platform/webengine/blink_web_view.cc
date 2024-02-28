@@ -79,16 +79,16 @@ void BlinkWebView::Close() {
   delegate_->Close();
 }
 
-bool BlinkWebView::DecidePolicyForResponse(bool is_main_frame,
-                                           int status_code,
-                                           const std::string& url,
-                                           const std::string& status_text) {
+bool BlinkWebView::DecidePolicyForErrorPage(bool is_main_frame,
+                                            int error_code,
+                                            const std::string& url,
+                                            const std::string& error_text) {
   if (!delegate_) {
     return false;
   }
 
-  return delegate_->DecidePolicyForResponse(is_main_frame, status_code, url,
-                                            status_text);
+  return delegate_->DecidePolicyForErrorPage(is_main_frame, error_code, url,
+                                             error_text);
 }
 
 bool BlinkWebView::AcceptsVideoCapture() {

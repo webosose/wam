@@ -43,10 +43,10 @@ class BlinkWebView : public webos::WebViewBase {
   void TitleChanged(const std::string& title) override;
   void NavigationHistoryChanged() override;
   void Close() override;
-  bool DecidePolicyForResponse(bool is_main_frame,
-                               int status_code,
-                               const std::string& url,
-                               const std::string& status_text) override;
+  bool DecidePolicyForErrorPage(bool is_main_frame,
+                                int error_code,
+                                const std::string& url,
+                                const std::string& error_text) override;
   bool AcceptsVideoCapture() override;
   bool AcceptsAudioCapture() override;
   void LoadAborted(const std::string& url) override;
