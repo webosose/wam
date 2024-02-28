@@ -727,14 +727,11 @@ void WebPageBlink::LoadAborted(const std::string& url) {
            WebAppManagerUtils::TruncateURL(url).c_str());
 }
 
-void WebPageBlink::LoadFailed(const std::string& url,
-                              int err_code,
-                              const std::string& err_desc) {
+void WebPageBlink::LoadFailed(const std::string& url, int err_code) {
   LOG_INFO(MSGID_LOAD, 3, PMLOGKS("APP_ID", AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
-           PMLOGKFV("PID", "%d", GetWebProcessPID()), "[FAILED ][%d/%s]%s",
-           err_code, err_desc.c_str(),
-           WebAppManagerUtils::TruncateURL(url).c_str());
+           PMLOGKFV("PID", "%d", GetWebProcessPID()), "[FAILED ][%d]%s",
+           err_code, WebAppManagerUtils::TruncateURL(url).c_str());
 
   FOR_EACH_OBSERVER(WebPageObserver, observers_, WebPageLoadFailed(err_code));
 

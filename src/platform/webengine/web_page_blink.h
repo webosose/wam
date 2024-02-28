@@ -119,9 +119,7 @@ class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
   void DidFirstFrameFocused() override;
   void DidDropAllPeerConnections() override;
   void LoadFinished(const std::string& url) override;
-  void LoadFailed(const std::string& url,
-                  int err_code,
-                  const std::string& err_desc) override;
+  void LoadFailed(const std::string& url, int err_code) override;
   void LoadStopped() override;
   void LoadAborted(const std::string& url) override;
   void LoadProgressChanged(double progress) override;

@@ -151,14 +151,12 @@ void BlinkWebView::LoadFinished(const std::string& url) {
   delegate_->LoadFinished(url);
 }
 
-void BlinkWebView::LoadFailed(const std::string& url,
-                              int err_code,
-                              const std::string& err_desc) {
+void BlinkWebView::LoadFailed(const std::string& url, int err_code) {
   if (!delegate_) {
     return;
   }
 
-  delegate_->LoadFailed(url, err_code, err_desc);
+  delegate_->LoadFailed(url, err_code);
 }
 
 void BlinkWebView::LoadAborted(const std::string& url) {

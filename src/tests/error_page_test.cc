@@ -158,7 +158,7 @@ TEST_F(ErrorPageTestSuite, LoadErrorPage) {
   EXPECT_EQ(static_cast<WebPageBlink*>(page)->TrustLevel(),
             std::string("default"));
 
-  web_view_delegate_->LoadFailed(app_url_, 404, {});
+  web_view_delegate_->LoadFailed(app_url_, 404);
 
   EXPECT_TRUE(page->IsLoadErrorPageStart());
   EXPECT_TRUE(page->IsLoadErrorPageFinish());
@@ -174,7 +174,7 @@ TEST_F(ErrorPageTestSuite, ReloadOnRelaunch) {
   auto view_mock = mock_initializer_->GetWebViewMock();
   EXPECT_CALL(*view_mock, RunJavaScript(::testing::HasSubstr("webOSRelaunch")))
       .Times(1);
-  web_view_delegate_->LoadFailed(app_url_, 404, {});
+  web_view_delegate_->LoadFailed(app_url_, 404);
   LaunchApp();
 }
 
@@ -185,7 +185,7 @@ TEST_F(ErrorPageTestSuite, ReloadOnNetworkRecovery) {
   EXPECT_CALL(*view_mock, LoadUrl(app_url_))
       .WillOnce(testing::Invoke(
           [this](const std::string& url) { ProcessLoading(url); }));
-  web_view_delegate_->LoadFailed(app_url_, 404, {});
+  web_view_delegate_->LoadFailed(app_url_, 404);
   Json::Value status;
   status["isInternetConnectionAvailable"] = true;
   WebAppManager::Instance()->UpdateNetworkStatus(status);
@@ -202,7 +202,7 @@ TEST_F(ErrorPageTestSuite, ReloadOnTimeout) {
         g_main_loop_quit(loop);
       }));
   guint id = g_timeout_add(61000, OnTimeoutFail, loop);
-  web_view_delegate_->LoadFailed(app_url_, 404, {});
+  web_view_delegate_->LoadFailed(app_url_, 404);
   g_main_loop_run(loop);
   if (!timeout_exceeded_) {
     g_source_remove(id);

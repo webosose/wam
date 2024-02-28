@@ -357,8 +357,7 @@ TEST_F(LaunchAppTestSuite, LaunchAppsWithError) {
         web_view_delegate_->LoadStarted();
         web_view_delegate_->LoadProgressChanged(100.0);
         web_view_delegate_->LoadVisuallyCommitted();
-        web_view_delegate_->LoadFailed("https://www.youtube.com/", 404,
-                                       "SSL_ERROR");
+        web_view_delegate_->LoadFailed("https://www.youtube.com/", 404);
       }));
   EXPECT_CALL(*web_view_, LoadUrl(::testing::HasSubstr("loaderror.html")))
       .WillOnce(Invoke([&](const std::string& url) {

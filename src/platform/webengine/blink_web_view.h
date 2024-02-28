@@ -52,9 +52,7 @@ class BlinkWebView : public webos::WebViewBase {
   void LoadAborted(const std::string& url) override;
   void LoadStarted() override;
   void LoadFinished(const std::string& url) override;
-  void LoadFailed(const std::string& url,
-                  int err_code,
-                  const std::string& err_desc) override;
+  void LoadFailed(const std::string& url, int err_code) override;
   void LoadStopped() override;
   void DocumentLoadFinished() override;
   void DidStartNavigation(const std::string& url,
