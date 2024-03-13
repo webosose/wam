@@ -71,13 +71,15 @@ static void StartWebAppManager() {
 
 class WebOSMainDelegateWAM : public webos::WebOSMainDelegate {
  public:
+  void BasicStartupComplete() override {
+    webos::Runtime::GetInstance()->SetPlatformFactory(
+        std::make_unique<PlatformFactory>());
+  }
   void AboutToCreateContentBrowserClient() override { StartWebAppManager(); }
 };
 
 int main(int argc, const char** argv) {
   WebOSMainDelegateWAM delegate;
-  webos::Runtime::GetInstance()->SetPlatformFactory(
-      std::make_unique<PlatformFactory>());
   webos::WebOSMain webos_main(&delegate);
   return webos_main.Run(argc, argv);
 }
