@@ -7,11 +7,11 @@
         "networkconnection.query",
         "settings.query"
     ],
-    "com.webos.chromium.audio-*": [
+    "com.webos.chromium.audio*": [
         "audio.operation",
         "audio.query"
     ],
-    "com.webos.chromium.camera-*": [
+    "com.webos.chromium.camera*": [
         "camera.operation",
         "camera.query"
     ],
