@@ -46,11 +46,6 @@ void WebAppManagerConfig::InitConfiguration() {
       util::StrToIntWithDefault(max_custom_suspend_delay, 0);
   max_custom_suspend_delay_time_ = std::max(max_custom_suspend_delay_int, 0);
 
-  web_process_config_path_ = WamGetEnv("WEBPROCESS_CONFIGURATION_PATH");
-  if (web_process_config_path_.empty()) {
-    web_process_config_path_ = "/etc/wam/com.webos.wam.json";
-  }
-
   error_page_url_ = WamGetEnv("WAM_ERROR_PAGE");
 
   dynamic_pluggable_load_enabled_ =
@@ -100,7 +95,6 @@ void WebAppManagerConfig::ResetConfiguration() {
 
   web_app_factory_plugin_types_.clear();
   web_app_factory_plugin_path_.clear();
-  web_process_config_path_.clear();
   error_page_url_.clear();
   tellurium_nub_path_.clear();
   user_script_path_.clear();

@@ -34,9 +34,6 @@ class WebAppManagerConfig {
   virtual int GetMaxCustomSuspendDelayTime() const {
     return max_custom_suspend_delay_time_;
   }
-  virtual std::string GetWebProcessConfigPath() const {
-    return web_process_config_path_;
-  }
   virtual bool IsInspectorEnabled() const { return inspector_enabled_; }
   virtual bool IsDevModeEnabled() const { return dev_mode_enabled_; }
   virtual std::string GetErrorPageUrl() const { return error_page_url_; }
@@ -74,7 +71,6 @@ class WebAppManagerConfig {
   std::string web_app_factory_plugin_path_;
   int suspend_delay_time_ = 0;
   int max_custom_suspend_delay_time_ = 0;
-  std::string web_process_config_path_;
   bool dev_mode_enabled_ = false;
   bool inspector_enabled_ = false;
   std::string error_page_url_;

@@ -30,7 +30,6 @@ const std::map<std::string, std::string> kEnvironmentVariables = {
     {"ENABLE_LAUNCH_OPTIMIZATION", "1"},
     {"WEBAPPFACTORY", "Some.types.definition.string"},
     {"WEBAPPFACTORY_PLUGIN_PATH", "/usr/lib/webappmanager/alternate_plugins"},
-    {"WEBPROCESS_CONFIGURATION_PATH", "/etc/wam/com.webos.wam.extended.json"},
     {"WAM_ERROR_PAGE", "https://www.lg.com/uk/support"},
     {"USER_SCRIPT_PATH", "webOSUserScripts/userScriptModified.js"},
     {"WAM_NAME", "Testing"}};
@@ -123,16 +122,6 @@ TEST_F(WebAppManagerConfigTest, checkWebAppFactoryPluginPathIfNotDefined) {
 TEST_F(WebAppManagerConfigTest, checkWebAppFactoryPluginPathIfDefined) {
   EXPECT_STREQ("/usr/lib/webappmanager/alternate_plugins",
                config_with_set_variables_.GetWebAppFactoryPluginPath().c_str());
-}
-
-TEST_F(WebAppManagerConfigTest, checkWebProcessConfigPathIfNotDefined) {
-  EXPECT_STREQ("/etc/wam/com.webos.wam.json",
-               config_with_no_variables_.GetWebProcessConfigPath().c_str());
-}
-
-TEST_F(WebAppManagerConfigTest, checkWebProcessConfigPathIfDefined) {
-  EXPECT_STREQ("/etc/wam/com.webos.wam.extended.json",
-               config_with_set_variables_.GetWebProcessConfigPath().c_str());
 }
 
 TEST_F(WebAppManagerConfigTest, checkErrorPageUrlIfNotDefined) {
