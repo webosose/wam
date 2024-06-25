@@ -109,7 +109,9 @@ void Url::ParseUri(const std::string& uri) {
   uri_ = GetSubString(uri, 0, path_end);
 
   if (authority_start == std::string::npos) {
-    path_ = uri.substr(scheme_delimiter + 1, uri.size() - scheme_delimiter);
+    if (uri.size() > scheme_delimiter) {
+      path_ = uri.substr(scheme_delimiter + 1, uri.size() - scheme_delimiter);
+    }
   } else if (authority_end != std::string::npos) {
     if (uri[authority_end] == '/') {
       path_ = GetSubString(uri, authority_end, path_end);
