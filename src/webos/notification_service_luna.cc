@@ -151,5 +151,5 @@ bool NotificationServiceLuna::Close(const std::string& notification_id,
   Json::Value close_params;
   close_params[name] = id;
 
-  return Call(uri.c_str(), close_params);
+  return Call(uri.c_str(), std::move(close_params));
 }
