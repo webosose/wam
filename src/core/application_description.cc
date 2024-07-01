@@ -51,12 +51,12 @@ ApplicationDescription::GetWindowGroupInfo() {
     Json::Value json = util::StringToJson(group_window_desc_);
 
     if (json.isObject()) {
-      auto name = json["name"];
+      const auto& name = json["name"];
       if (name.isString()) {
         info.name = name.asString();
       }
 
-      auto is_owner = json["owner"];
+      const auto& is_owner = json["owner"];
       if (is_owner.isBool()) {
         info.is_owner = is_owner.asBool();
       }
@@ -81,8 +81,8 @@ ApplicationDescription::GetWindowOwnerInfo() {
       auto layers = owner_info["layers"];
       if (layers.isArray()) {
         for (const auto& layer : layers) {
-          auto name = layer["name"];
-          auto z = layer["z"];
+          const auto& name = layer["name"];
+          const auto& z = layer["z"];
           if (name.isString() && z.isInt()) {
             info.layers.emplace(name.asString(), z.asInt());
           }
@@ -101,12 +101,12 @@ ApplicationDescription::GetWindowClientInfo() {
 
     auto client_info = json["clientInfo"];
     if (client_info.isObject()) {
-      auto layer = client_info["layer"];
+      const auto& layer = client_info["layer"];
       if (layer.isString()) {
         info.layer = layer.asString();
       }
 
-      auto hint = client_info["hint"];
+      const auto& hint = client_info["hint"];
       if (hint.isString()) {
         info.hint = hint.asString();
       }
@@ -166,28 +166,28 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   app_desc->allow_video_capture_ = json_obj["allowVideoCapture"].asBool();
   app_desc->allow_audio_capture_ = json_obj["allowAudioCapture"].asBool();
 
-  auto enable_keyboard = json_obj["enableKeyboard"];
+  const auto& enable_keyboard = json_obj["enableKeyboard"];
   app_desc->use_virtual_keyboard_ =
       enable_keyboard.isBool() && enable_keyboard.asBool();
 
-  auto use_prerendering = json_obj["usePrerendering"];
+  const auto& use_prerendering = json_obj["usePrerendering"];
   app_desc->use_prerendering_ =
       use_prerendering.isBool() && use_prerendering.asBool();
 
-  auto disallow_scrolling = json_obj["disallowScrollingInMainFrame"];
+  const auto& disallow_scrolling = json_obj["disallowScrollingInMainFrame"];
   app_desc->disallow_scrolling_in_main_frame_ =
       disallow_scrolling.isBool() ? disallow_scrolling.asBool() : true;
 
   // Handle accessibility, supportsAudioGuidance
   auto accessibility = json_obj["accessibility"];
   if (accessibility.isObject()) {
-    auto audio_guidance = accessibility["supportsAudioGuidance"];
+    const auto& audio_guidance = accessibility["supportsAudioGuidance"];
     app_desc->supports_audio_guidance_ =
         audio_guidance.isBool() && audio_guidance.asBool();
   }
 
   // Handle v8 snapshot file
-  auto v8_snapshot_file = json_obj["v8SnapshotFile"];
+  const auto& v8_snapshot_file = json_obj["v8SnapshotFile"];
   if (v8_snapshot_file.isString()) {
     std::string snapshot_file = v8_snapshot_file.asString();
     if (snapshot_file.length() > 0) {
@@ -201,13 +201,13 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   }
 
   // Handle v8 extra flags
-  auto v8_extra_flags = json_obj["v8ExtraFlags"];
+  const auto& v8_extra_flags = json_obj["v8ExtraFlags"];
   if (v8_extra_flags.isString()) {
     app_desc->v8_extra_flags_ = v8_extra_flags.asString();
   }
 
   // Handle resolution
-  auto resolution = json_obj["resolution"];
+  const auto& resolution = json_obj["resolution"];
   if (resolution.isString()) {
     std::string override_resolution = json_obj["resolution"].asString();
     auto res_list = util::SplitString(override_resolution, 'x');
@@ -223,7 +223,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
     }
   }
 
-  auto location_hint = json_obj["locationHint"];
+  const auto& location_hint = json_obj["locationHint"];
   if (location_hint.isString()) {
     app_desc->location_hint_ = location_hint.asString();
   }
@@ -288,7 +288,8 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
 
   // Third party cookies policy
   if (json_obj.isMember("thirdPartyCookiesPolicy")) {
-    auto third_party_cookies_policy = json_obj["thirdPartyCookiesPolicy"];
+    const auto& third_party_cookies_policy =
+        json_obj["thirdPartyCookiesPolicy"];
     if (third_party_cookies_policy.isString()) {
       auto policy_as_string = third_party_cookies_policy.asString();
       if (policy_as_string == "allow") {
@@ -301,7 +302,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
 
   // Set splash dismiss timeout
   if (json_obj.isMember("splashDismissTimeout")) {
-    auto splash_dismiss_timeout_ms = json_obj["splashDismissTimeout"];
+    const auto& splash_dismiss_timeout_ms = json_obj["splashDismissTimeout"];
     if (splash_dismiss_timeout_ms.isUInt()) {
       app_desc->splash_dismiss_timeout_ms_ = splash_dismiss_timeout_ms.asUInt();
     }
@@ -309,7 +310,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
 
   // Set network stable timeout
   if (json_obj.isMember("networkStableTimeout")) {
-    auto network_stable_timeout = json_obj["networkStableTimeout"];
+    const auto& network_stable_timeout = json_obj["networkStableTimeout"];
     if (!network_stable_timeout.isDouble()) {
       LOG_ERROR(MSGID_TYPE_ERROR, 2, PMLOGKS("APP_ID", app_desc->Id().c_str()),
                 PMLOGKFV("DATA_TYPE", "%d", network_stable_timeout.type()),
@@ -320,7 +321,7 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   }
 
   // Set delay millisecond for launch optimization
-  auto delay_ms_for_launch_optimization =
+  const auto& delay_ms_for_launch_optimization =
       json_obj["delayMsForLaunchOptimization"];
   if (delay_ms_for_launch_optimization.isInt()) {
     int delay_ms = delay_ms_for_launch_optimization.asInt();
@@ -329,17 +330,18 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
     }
   }
 
-  auto use_unlimited_media_policy = json_obj["useUnlimitedMediaPolicy"];
+  const auto& use_unlimited_media_policy = json_obj["useUnlimitedMediaPolicy"];
   if (use_unlimited_media_policy.isBool()) {
     app_desc->use_unlimited_media_policy_ = use_unlimited_media_policy.asBool();
   }
 
-  auto suspend_dom_time = json_obj["suspendDOMTime"];
+  const auto& suspend_dom_time = json_obj["suspendDOMTime"];
   if (suspend_dom_time.isInt()) {
     app_desc->custom_suspend_dom_time_ = suspend_dom_time.asInt();
   }
 
-  auto use_video_decode_accelerator = json_obj["useVideoDecodeAccelerator"];
+  const auto& use_video_decode_accelerator =
+      json_obj["useVideoDecodeAccelerator"];
   if (use_video_decode_accelerator.isBool()) {
     app_desc->use_video_decode_accelerator_ =
         use_video_decode_accelerator.asBool();

@@ -679,7 +679,7 @@ std::string WebAppManager::Launch(const std::string& app_desc_string,
 
   // Replace entryPoint if launching from service worker
   if (json.isMember("sw_clients_openwindow")) {
-    auto sw_clients_openwindow = json["sw_clients_openwindow"];
+    const auto& sw_clients_openwindow = json["sw_clients_openwindow"];
     if (sw_clients_openwindow.isString()) {
       url = sw_clients_openwindow.asString();
       LOG_DEBUG("[%s] service worker clients.openWindow(%s)",
