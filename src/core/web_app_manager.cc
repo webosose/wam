@@ -91,6 +91,10 @@ void WebAppManager::SetPlatformModules(
   device_info_->Initialize();
 
   LoadEnvironmentVariable();
+  std::string lang;
+  if (device_info_->GetSystemLanguage(lang)) {
+    webos::Runtime::GetInstance()->SetLocale(lang);
+  }
 }
 
 void WebAppManager::SetWebAppFactory(
@@ -517,6 +521,8 @@ void WebAppManager::SetSystemLanguage(const std::string& language) {
   }
 
   device_info_->SetSystemLanguage(language);
+
+  webos::Runtime::GetInstance()->SetLocale(language);
 
   for (WebAppBase* app : app_list_) {
     app->SetPreferredLanguages(language);
