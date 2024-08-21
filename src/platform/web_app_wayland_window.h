@@ -46,8 +46,7 @@ class WebAppWaylandWindow : public webos::WebAppWindowBase {
   void DidSwapPageCompositorFrame();
 
   // webos::WebAppWindowBase
-  // TODO Marked as deprecated in webapp_window_delegate.h
-  bool event(WebOSEvent* event) override;
+  bool HandleWebOSEvent(WebOSEvent* event) override;
   unsigned int CheckKeyFilterTable(unsigned key_code,
                                    unsigned* modifier) override;
 

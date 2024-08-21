@@ -184,5 +184,5 @@ void WebAppWindowImpl::AttachWebContents(void* web_contents) {
 }
 
 bool WebAppWindowImpl::Event(WebOSEvent* event) {
-  return window_ ? window_->event(event) : false;
+  return window_ ? window_->HandleWebOSEvent(event) : false;
 }

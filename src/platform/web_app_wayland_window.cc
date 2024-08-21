@@ -117,15 +117,13 @@ void WebAppWaylandWindow::AttachWebContentsToWindow(void* web_contents) {
   WebAppWindowBase::AttachWebContents(web_contents);
 }
 
-bool WebAppWaylandWindow::event(WebOSEvent* event) {
+bool WebAppWaylandWindow::HandleWebOSEvent(WebOSEvent* event) {
   if (!web_app_) {
     return true;
   }
 
   LogEventDebugging(event);
 
-  // TODO: Implement each event handler and
-  // remove above event() function used for qtwebengine.
   switch (event->GetType()) {
     case WebOSEvent::Close:
       LOG_INFO(MSGID_WINDOW_CLOSED, 2,
@@ -225,7 +223,7 @@ bool WebAppWaylandWindow::event(WebOSEvent* event) {
       break;
   }
 
-  return WebAppWindowDelegate::event(event);
+  return WebAppWindowDelegate::HandleWebOSEvent(event);
 }
 
 bool WebAppWaylandWindow::OnCursorVisibileChangeEvent(WebOSEvent* /*e*/) {
