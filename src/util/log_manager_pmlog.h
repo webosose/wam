@@ -32,23 +32,25 @@
 
 // Use these to log using PmLogLib v3 API
 #define LOG_INFO(__msgid, ...) \
-  PmLogInfo(GetWAMPmLogContext(), __msgid, ##__VA_ARGS__)
+  PmLogInfo(GetWAMPmLogContext(), __msgid __VA_OPT__(, ) __VA_ARGS__)
 #define LOG_INFO_WITH_CLOCK(__msgid, ...) \
-  PmLogInfoWithClock(GetWAMPmLogContext(), __msgid, ##__VA_ARGS__)
-#define LOG_DEBUG(...) PmLogDebug(GetWAMPmLogContext(), ##__VA_ARGS__)
+  PmLogInfoWithClock(GetWAMPmLogContext(), __msgid __VA_OPT__(, ) __VA_ARGS__)
+#define LOG_DEBUG(...) \
+  PmLogDebug(GetWAMPmLogContext() __VA_OPT__(, ) __VA_ARGS__)
 #define LOG_WARNING(__msgid, ...) \
-  PmLogWarning(GetWAMPmLogContext(), __msgid, ##__VA_ARGS__)
+  PmLogWarning(GetWAMPmLogContext(), __msgid __VA_OPT__(, ) __VA_ARGS__)
 #define LOG_ERROR(__msgid, ...) \
-  PmLogError(GetWAMPmLogContext(), __msgid, ##__VA_ARGS__)
+  PmLogError(GetWAMPmLogContext(), __msgid __VA_OPT__(, ) __VA_ARGS__)
 #define LOG_CRITICAL(__msgid, ...) \
-  PmLogCritical(GetWAMPmLogContext(), __msgid, ##__VA_ARGS__)
+  PmLogCritical(GetWAMPmLogContext(), __msgid __VA_OPT__(, ) __VA_ARGS__)
 
 #define LOG_STRING(__context_id, __level, __msgid, ...) \
   PmLogString(GetCustomPmLogContext(__context_id),      \
-              static_cast<PmLogLevel>(__level), __msgid, ##__VA_ARGS__)
+              static_cast<PmLogLevel>(__level),         \
+              __msgid __VA_OPT__(, ) __VA_ARGS__)
 #define LOG_INFO_WITH_CLOCK_TO_CUSTOM_CONTEXT(__context_id, __msgid, ...) \
-  PmLogInfoWithClock(GetCustomPmLogContext(__context_id), __msgid,        \
-                     ##__VA_ARGS__)
+  PmLogInfoWithClock(GetCustomPmLogContext(__context_id),                 \
+                     __msgid __VA_OPT__(, ) __VA_ARGS__)
 
 PmLogContext GetWAMPmLogContext();
 PmLogContext GetCustomPmLogContext(const char* context_id);
