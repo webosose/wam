@@ -140,8 +140,7 @@ bool NotificationServiceLuna::Close(const std::string& notification_id,
                                     std::map<std::string, std::string>& map,
                                     const std::string& name,
                                     const std::string& uri) {
-  // TODO: Use std::map::contains when C++20 is everywhere.
-  if (map.find(notification_id) == map.end()) {
+  if (!map.contains(notification_id)) {
     return false;
   }
 

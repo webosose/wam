@@ -43,8 +43,7 @@ std::string PluginLoader::GetAppType(const std::string& file_name) {
 }
 
 bool PluginLoader::Load(const std::string& file_name) {
-  auto exist_handle = plugins_.find(file_name);
-  if (exist_handle != plugins_.end()) {
+  if (plugins_.contains(file_name)) {
     return true;
   }
   void* handle = lib_wrapper_->Load(file_name);

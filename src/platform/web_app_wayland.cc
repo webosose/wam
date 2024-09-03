@@ -122,7 +122,7 @@ static webos::WebAppWindowBase::LocationHint GetLocationHintFromString(
 
   webos::WebAppWindowBase::LocationHint hint =
       webos::WebAppWindowBase::LocationHint::kUnknown;
-  if (hints.find(value) != hints.end()) {
+  if (hints.contains(value)) {
     hint = hints[value];
   }
   return hint;

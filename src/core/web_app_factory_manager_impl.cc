@@ -137,7 +137,7 @@ WebAppFactoryInterface* WebAppFactoryManagerImpl::GetPluggable(
 
 WebAppFactoryInterface* WebAppFactoryManagerImpl::LoadPluggable(
     const std::string& app_type) {
-  if (app_type.size() && factory_env_.find(app_type) == factory_env_.end()) {
+  if (app_type.size() && !factory_env_.contains(app_type)) {
     return nullptr;
   }
 

@@ -335,7 +335,7 @@ WebAppBase* WebAppManager::OnLaunchUrl(
 
   app_list_.push_back(app);
 
-  if (app_version_.find(app_desc->Id()) != app_version_.end()) {
+  if (app_version_.contains(app_desc->Id())) {
     if (app_version_[app_desc->Id()] != app_desc->Version()) {
       app->SetNeedReload(true);
       app_version_[app_desc->Id()] = app_desc->Version();
@@ -357,7 +357,7 @@ void WebAppManager::ForceCloseAppInternal(WebAppBase* app) {
 }
 
 void WebAppManager::RemoveClosingAppList(const std::string& instance_id) {
-  while (closing_app_list_.find(instance_id) != closing_app_list_.end()) {
+  while (closing_app_list_.contains(instance_id)) {
     closing_app_list_.erase(instance_id);
   }
 }

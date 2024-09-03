@@ -94,7 +94,7 @@ bool PermissionPrompt::GetPermissionStatusFromAppDesc(
       auto& permissions = app_desc->WebAppPermissions();
       const char* str_type = PermissionRequestTypeToString(type);
       if (str_type != nullptr) {
-        status = (permissions.find(str_type) != permissions.end());
+        status = permissions.contains(str_type);
       }
     } break;
   }
