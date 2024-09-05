@@ -38,13 +38,11 @@ const char kIdentifierForNetErrorPage[] = "com.webos.settingsservice.client";
 
 }  // namespace
 
-WebPageBase::WebPageBase() = default;
-
 WebPageBase::WebPageBase(const wam::Url& url,
-                         std::shared_ptr<ApplicationDescription> desc,
+                         const ApplicationDescription& desc,
                          const std::string& params)
     : app_desc_(desc),
-      app_id_(desc->Id()),
+      app_id_(desc.Id()),
       default_url_(url),
       launch_params_(params) {
   Json::Value json = util::StringToJson(params);
@@ -68,12 +66,6 @@ std::string WebPageBase::LaunchParams() const {
 
 void WebPageBase::SetLaunchParams(const std::string& params) {
   launch_params_ = params;
-}
-
-void WebPageBase::SetApplicationDescription(
-    std::shared_ptr<ApplicationDescription> desc) {
-  app_desc_ = std::move(desc);
-  SetPageProperties();
 }
 
 std::string WebPageBase::GetIdentifier() const {
@@ -202,8 +194,7 @@ bool WebPageBase::DoHostedWebAppRelaunch(const std::string& launch_params) {
   if (Url().Scheme() == "file" || default_url_.Scheme() != "file" ||
       !obj.isObject() /* no launchParams, { }, and this should be check with
                          object().isEmpty()*/
-      || obj["contentTarget"].isNull() ||
-      (app_desc_ && !app_desc_->HandlesDeeplinking())) {
+      || obj["contentTarget"].isNull() || app_desc_.HandlesDeeplinking()) {
     LOG_INFO(MSGID_WEBPAGE_RELAUNCH, 3, PMLOGKS("APP_ID", AppId().c_str()),
              PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
              PMLOGKFV("PID", "%d", GetWebProcessPID()),
@@ -483,7 +474,7 @@ void WebPageBase::UpdateIsLoadErrorPageFinish() {
 void WebPageBase::SetCustomUserScript() {
   // 1. check app folder has userScripts
   // 2. check userscript.js there is, appfolder/webOSUserScripts/*.js
-  auto user_script_file_path = fs::path(app_desc_->FolderPath()) /
+  auto user_script_file_path = fs::path(app_desc_.FolderPath()) /
                                GetWebAppManagerConfig()->GetUserScriptPath();
 
   if (!fs::exists(user_script_file_path) ||

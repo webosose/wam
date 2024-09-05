@@ -29,18 +29,16 @@ class WebAppFactoryInterfaceMock : public WebAppFactoryInterface {
 
   MOCK_METHOD(WebAppBase*,
               CreateWebApp,
-              (const std::string&, std::shared_ptr<ApplicationDescription>),
+              (const std::string&, const ApplicationDescription&),
               (override));
   MOCK_METHOD(WebAppBase*,
               CreateWebApp,
-              (const std::string&,
-               WebPageBase*,
-               std::shared_ptr<ApplicationDescription>),
+              (const std::string&, WebPageBase*, const ApplicationDescription&),
               (override));
   MOCK_METHOD(WebPageBase*,
               CreateWebPage,
               (const wam::Url&,
-               std::shared_ptr<ApplicationDescription>,
+               const ApplicationDescription&,
                const std::string&),
               (override));
 };

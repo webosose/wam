@@ -42,18 +42,16 @@ class WebAppFactoryManagerImpl : public WebAppFactoryManager {
       bool load_plugin_on_demand,
       std::unique_ptr<PluginLibWrapper> lib_wrapper);
 
-  WebAppBase* CreateWebApp(
-      const std::string& win_type,
-      std::shared_ptr<ApplicationDescription> desc = nullptr,
-      const std::string& app_type = {}) override;
-  WebAppBase* CreateWebApp(
-      const std::string& win_type,
-      WebPageBase* page,
-      std::shared_ptr<ApplicationDescription> desc = nullptr,
-      const std::string& app_type = {}) override;
+  WebAppBase* CreateWebApp(const std::string& win_type,
+                           const ApplicationDescription& desc,
+                           const std::string& app_type = {}) override;
+  WebAppBase* CreateWebApp(const std::string& win_type,
+                           WebPageBase* page,
+                           const ApplicationDescription& desc,
+                           const std::string& app_type = {}) override;
   WebPageBase* CreateWebPage(const std::string& win_type,
                              const wam::Url& url,
-                             std::shared_ptr<ApplicationDescription> desc,
+                             const ApplicationDescription& desc,
                              const std::string& app_type = {},
                              const std::string& launch_params = {}) override;
   WebAppFactoryInterface* GetPluggable(const std::string& app_type);

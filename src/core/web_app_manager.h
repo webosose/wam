@@ -167,7 +167,7 @@ class WebAppManager {
 
   WebAppBase* OnLaunchUrl(const std::string& url,
                           const std::string& win_type,
-                          std::shared_ptr<ApplicationDescription> app_desc,
+                          std::unique_ptr<ApplicationDescription> app_desc,
                           const std::string& instance_id,
                           const std::string& args,
                           const std::string& launching_app_id,

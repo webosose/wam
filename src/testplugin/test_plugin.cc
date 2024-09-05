@@ -29,24 +29,21 @@ void DeleteInstance(WebAppFactoryInterface* interface) {
   delete interface;
 }
 
-WebAppBase* TestPlugin::CreateWebApp(
-    const std::string& /*win_type*/,
-    std::shared_ptr<ApplicationDescription> /*desc*/) {
+WebAppBase* TestPlugin::CreateWebApp(const std::string& /*win_type*/,
+                                     const ApplicationDescription& /*desc*/) {
   WebAppBase* app = new WebAppBaseMock();
   app->SetAppId("pluginTestID");
   return app;
 }
 
-WebAppBase* TestPlugin::CreateWebApp(
-    const std::string& /*win_type*/,
-    WebPageBase* /*page*/,
-    std::shared_ptr<ApplicationDescription> /*desc*/) {
+WebAppBase* TestPlugin::CreateWebApp(const std::string& /*win_type*/,
+                                     WebPageBase* /*page*/,
+                                     const ApplicationDescription& /*desc*/) {
   return nullptr;
 }
 
-WebPageBase* TestPlugin::CreateWebPage(
-    const wam::Url& /*url*/,
-    std::shared_ptr<ApplicationDescription> /*desc*/,
-    const std::string& /*launch_params*/) {
+WebPageBase* TestPlugin::CreateWebPage(const wam::Url& /*url*/,
+                                       const ApplicationDescription& /*desc*/,
+                                       const std::string& /*launch_params*/) {
   return nullptr;
 }

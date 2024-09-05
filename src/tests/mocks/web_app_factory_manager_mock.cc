@@ -31,13 +31,13 @@ WebAppFactoryManagerMock::~WebAppFactoryManagerMock() = default;
 
 WebAppBase* WebAppFactoryManagerMock::CreateWebApp(
     const std::string& win_type,
-    std::shared_ptr<ApplicationDescription> desc,
+    const ApplicationDescription& desc,
     const std::string& /*app_type*/) {
   if (window_factory_) {
     return new WebAppWayland(
         win_type, std::unique_ptr<WebAppWindowFactory>(window_factory_),
-        desc->WidthOverride(), desc->HeightOverride(),
-        desc->GetDisplayAffinity(), desc->LocationHint());
+        desc.WidthOverride(), desc.HeightOverride(), desc.GetDisplayAffinity(),
+        desc.LocationHint());
   }
 
   std::cerr << "Missing WindowFactory pointer. Method setWebAppWindowFactory "
@@ -49,7 +49,7 @@ WebAppBase* WebAppFactoryManagerMock::CreateWebApp(
 WebAppBase* WebAppFactoryManagerMock::CreateWebApp(
     const std::string& win_type,
     WebPageBase* /*page*/,
-    std::shared_ptr<ApplicationDescription> desc,
+    const ApplicationDescription& desc,
     const std::string& app_type) {
   return CreateWebApp(win_type, desc, app_type);
 }
@@ -57,7 +57,7 @@ WebAppBase* WebAppFactoryManagerMock::CreateWebApp(
 WebPageBase* WebAppFactoryManagerMock::CreateWebPage(
     const std::string& /*win_type*/,
     const wam::Url& url,
-    std::shared_ptr<ApplicationDescription> desc,
+    const ApplicationDescription& desc,
     const std::string& /*app_type*/,
     const std::string& launch_params) {
   if (!view_factory_) {

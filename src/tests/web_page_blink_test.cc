@@ -135,7 +135,7 @@ TEST_F(WebPageBlinkTestSuite, CheckWebViewInitializeCall) {
                          "/usr/palm/applications/com.webos.app.test.webrtc",
                          "default", "", "", false));
 
-  WebPageBlink web_page(wam::Url(description->EntryPoint()), description,
+  WebPageBlink web_page(wam::Url(description->EntryPoint()), *description,
                         params.c_str(), std::move(factory));
   web_page.Init();
 }
@@ -145,7 +145,7 @@ TEST_F(WebPageBlinkTestSuite, CheckWebViewLoad) {
               LoadUrl("file:///usr/palm/applications/com.webos.app.test.webrtc/"
                       "index.html"));
 
-  WebPageBlink web_page(wam::Url(description->EntryPoint()), description,
+  WebPageBlink web_page(wam::Url(description->EntryPoint()), *description,
                         params.c_str(), std::move(factory));
   web_page.Init();
   web_page.Load();
@@ -161,7 +161,7 @@ TEST_F(WebPageBlinkTestSuite, AddCustomPluginDir) {
   EXPECT_CALL(*factory->web_view_, AddCustomPluginDir(path));
   EXPECT_CALL(*factory->web_view_, AddAvailablePluginDir(path));
 
-  WebPageBlink web_page(wam::Url(description->EntryPoint()), description,
+  WebPageBlink web_page(wam::Url(description->EntryPoint()), *description,
                         params.c_str(), std::move(factory));
   web_page.Init();
 
@@ -183,7 +183,7 @@ TEST_F(WebPageBlinkTestSuite, PriviledgetPluginPath) {
 
   EXPECT_CALL(*factory->web_view_, AddAvailablePluginDir(test_value));
 
-  WebPageBlink web_page(wam::Url(description->EntryPoint()), description,
+  WebPageBlink web_page(wam::Url(description->EntryPoint()), *description,
                         params.c_str(), std::move(factory));
   web_page.Init();
 
@@ -209,7 +209,7 @@ TEST_F(WebPageBlinkTestSuite, addUserScript) {
 
   EXPECT_CALL(*factory->web_view_,
               AddUserScript(HasSubstr("@class Telluriumnub")));
-  WebPageBlink web_page(wam::Url(description->EntryPoint()), description,
+  WebPageBlink web_page(wam::Url(description->EntryPoint()), *description,
                         params.c_str(), std::move(factory));
   web_page.Init();
 

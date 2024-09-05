@@ -17,11 +17,10 @@
 #include "web_app_wayland_webos.h"
 #include "application_description.h"
 
-WebAppWaylandWebOS::WebAppWaylandWebOS(
-    const std::string& win_type,
-    std::shared_ptr<ApplicationDescription> desc)
+WebAppWaylandWebOS::WebAppWaylandWebOS(const std::string& win_type,
+                                       const ApplicationDescription& desc)
     : WebAppWayland(win_type,
-                    desc->WidthOverride(),
-                    desc->HeightOverride(),
-                    desc->GetDisplayAffinity(),
-                    desc->LocationHint()) {}
+                    desc.WidthOverride(),
+                    desc.HeightOverride(),
+                    desc.GetDisplayAffinity(),
+                    desc.LocationHint()) {}

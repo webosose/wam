@@ -287,7 +287,7 @@ std::list<const WebAppBase*> WebAppManager::RunningApps(uint32_t pid) {
 WebAppBase* WebAppManager::OnLaunchUrl(
     const std::string& url,
     const std::string& win_type,
-    std::shared_ptr<ApplicationDescription> app_desc,
+    std::unique_ptr<ApplicationDescription> app_desc,
     const std::string& instance_id,
     const std::string& args,
     const std::string& launching_app_id,
@@ -296,7 +296,7 @@ WebAppBase* WebAppManager::OnLaunchUrl(
   PMTRACE_FUNCTION;
 
   WebAppFactoryManager* factory = GetWebAppFactory();
-  WebAppBase* app = factory->CreateWebApp(win_type.c_str(), app_desc,
+  WebAppBase* app = factory->CreateWebApp(win_type.c_str(), *app_desc,
                                           app_desc->SubType().c_str());
 
   if (!app) {
@@ -306,7 +306,7 @@ WebAppBase* WebAppManager::OnLaunchUrl(
   }
 
   WebPageBase* page =
-      factory->CreateWebPage(win_type.c_str(), wam::Url(url.c_str()), app_desc,
+      factory->CreateWebPage(win_type.c_str(), wam::Url(url.c_str()), *app_desc,
                              app_desc->SubType().c_str(), args.c_str());
 
   // set use launching time optimization true while app loading.
@@ -319,14 +319,15 @@ WebAppBase* WebAppManager::OnLaunchUrl(
     page->SetEnableBackgroundRun(app_desc->IsEnableBackgroundRun());
   }
 
-  app->SetAppDescription(app_desc);
+  app->SetAppDescription(std::move(app_desc));
   app->SetAppProperties(args);
   app->SetInstanceId(instance_id);
   app->SetLaunchingAppId(launching_app_id);
   if (web_app_manager_config_->IsCheckLaunchTimeEnabled()) {
     app->StartLaunchTimer();
   }
-  app->SetDisplayFirstActivateTimeoutMs(app_desc->SplashDismissTimeoutMs());
+  app->SetDisplayFirstActivateTimeoutMs(
+      app->GetAppDescription()->SplashDismissTimeoutMs());
   app->Attach(page);
   app->SetPreloadState(args);
 
@@ -335,13 +336,16 @@ WebAppBase* WebAppManager::OnLaunchUrl(
 
   app_list_.push_back(app);
 
-  if (app_version_.contains(app_desc->Id())) {
-    if (app_version_[app_desc->Id()] != app_desc->Version()) {
+  if (app_version_.contains(app->GetAppDescription()->Id())) {
+    if (app_version_[app->GetAppDescription()->Id()] !=
+        app->GetAppDescription()->Version()) {
       app->SetNeedReload(true);
-      app_version_[app_desc->Id()] = app_desc->Version();
+      app_version_[app->GetAppDescription()->Id()] =
+          app->GetAppDescription()->Version();
     }
   } else {
-    app_version_[app_desc->Id()] = app_desc->Version();
+    app_version_[app->GetAppDescription()->Id()] =
+        app->GetAppDescription()->Version();
   }
 
   LOG_INFO(MSGID_START_LAUNCHURL, 3, PMLOGKS("APP_ID", app->AppId().c_str()),
@@ -657,7 +661,7 @@ std::string WebAppManager::Launch(const std::string& app_desc_string,
   LOG_DEBUG("WAM compiled with gcc - Start app");
 #endif  // defined(__clang__)
 
-  std::shared_ptr<ApplicationDescription> desc(
+  std::unique_ptr<ApplicationDescription> desc(
       ApplicationDescription::FromJsonString(app_desc_string.c_str()));
   if (!desc) {
     return std::string();

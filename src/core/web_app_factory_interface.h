@@ -31,17 +31,14 @@ class WebPageBase;
 
 class WebAppFactoryInterface {
  public:
-  virtual WebAppBase* CreateWebApp(
-      const std::string& win_type,
-      std::shared_ptr<ApplicationDescription> desc = nullptr) = 0;
-  virtual WebAppBase* CreateWebApp(
-      const std::string& win_type,
-      WebPageBase* page,
-      std::shared_ptr<ApplicationDescription> desc = nullptr) = 0;
-  virtual WebPageBase* CreateWebPage(
-      const wam::Url& url,
-      std::shared_ptr<ApplicationDescription> desc,
-      const std::string& launch_params = {}) = 0;
+  virtual WebAppBase* CreateWebApp(const std::string& win_type,
+                                   const ApplicationDescription& desc) = 0;
+  virtual WebAppBase* CreateWebApp(const std::string& win_type,
+                                   WebPageBase* page,
+                                   const ApplicationDescription& desc) = 0;
+  virtual WebPageBase* CreateWebPage(const wam::Url& url,
+                                     const ApplicationDescription& desc,
+                                     const std::string& launch_params = {}) = 0;
   virtual ~WebAppFactoryInterface() = default;
 };
 

@@ -59,18 +59,18 @@ class WebPageBlinkPrivate {
 };
 
 WebPageBlink::WebPageBlink(const wam::Url& url,
-                           std::shared_ptr<ApplicationDescription> desc,
+                           const ApplicationDescription& desc,
                            const std::string& params,
                            std::unique_ptr<WebViewFactory> factory)
     : WebPageBase(url, desc, params),
       page_private_(std::make_unique<WebPageBlinkPrivate>(this)),
-      trust_level_(desc->TrustLevel()),
+      trust_level_(desc.TrustLevel()),
       factory_(std::move(factory)) {}
 
 WebPageBlink::WebPageBlink(const wam::Url& url,
-                           std::shared_ptr<ApplicationDescription> desc,
+                           const ApplicationDescription& desc,
                            const std::string& params)
-    : WebPageBlink(url, std::move(desc), params, nullptr) {}
+    : WebPageBlink(url, desc, params, nullptr) {}
 
 WebPageBlink::~WebPageBlink() {
   if (dom_suspend_timer_.IsRunning()) {
@@ -82,10 +82,10 @@ void WebPageBlink::Init() {
   page_private_->page_view_ = std::unique_ptr<WebView>(CreatePageView());
   page_private_->page_view_->SetDelegate(this);
   page_private_->page_view_->Initialize(
-      app_desc_->Id() + std::to_string(app_desc_->GetDisplayAffinity()),
-      app_desc_->FolderPath(), app_desc_->TrustLevel(),
-      app_desc_->V8SnapshotPath(), app_desc_->V8ExtraFlags(),
-      app_desc_->UseNativeScroll());
+      app_desc_.Id() + std::to_string(app_desc_.GetDisplayAffinity()),
+      app_desc_.FolderPath(), app_desc_.TrustLevel(),
+      app_desc_.V8SnapshotPath(), app_desc_.V8ExtraFlags(),
+      app_desc_.UseNativeScroll());
   SetViewportSize();
 
   page_private_->page_view_->SetVisible(false);
@@ -109,22 +109,22 @@ void WebPageBlink::Init() {
   page_private_->page_view_->SetSuppressesIncrementalRendering(true);
   page_private_->page_view_->SetDisallowScrollbarsInMainFrame(true);
   page_private_->page_view_->SetDisallowScrollingInMainFrame(true);
-  page_private_->page_view_->SetDoNotTrack(app_desc_->DoNotTrack());
+  page_private_->page_view_->SetDoNotTrack(app_desc_.DoNotTrack());
   page_private_->page_view_->SetJavascriptCanOpenWindows(true);
   page_private_->page_view_->SetSupportsMultipleWindows(false);
   page_private_->page_view_->SetCSSNavigationEnabled(true);
   page_private_->page_view_->SetV8DateUseSystemLocaloffset(false);
   page_private_->page_view_->SetLocalStorageEnabled(true);
   page_private_->page_view_->SetShouldSuppressDialogs(true);
-  SetDisallowScrolling(app_desc_->DisallowScrollingInMainFrame());
+  SetDisallowScrolling(app_desc_.DisallowScrollingInMainFrame());
 
-  if (app_desc_->NetworkStableTimeout().has_value() &&
-      (app_desc_->NetworkStableTimeout().value() >= 0.0)) {
+  if (app_desc_.NetworkStableTimeout().has_value() &&
+      (app_desc_.NetworkStableTimeout().value() >= 0.0)) {
     page_private_->page_view_->SetNetworkStableTimeout(
-        app_desc_->NetworkStableTimeout().value());
+        app_desc_.NetworkStableTimeout().value());
   }
 
-  switch (app_desc_->GetThirdPartyCookiesPolicy()) {
+  switch (app_desc_.GetThirdPartyCookiesPolicy()) {
     case ApplicationDescription::ThirdPartyCookiesPolicy::kAllow:
       page_private_->page_view_->SetAllowThirdPartyCookies(true);
       break;
@@ -136,18 +136,18 @@ void WebPageBlink::Init() {
           !(util::GetEnvVar("WAM_DEFAULT_ALLOW_THIRD_PARTY_COOKIES") == "0"));
   }
 
-  if (app_desc_->TrustLevel() == "trusted") {
+  if (app_desc_.TrustLevel() == "trusted") {
     LOG_DEBUG("[%s] trustLevel : trusted; allow load local Resources",
               AppId().c_str());
     page_private_->page_view_->SetAllowLocalResourceLoad(true);
   }
 
-  if (app_desc_->CustomSuspendDOMTime().has_value() &&
-      app_desc_->CustomSuspendDOMTime().value() > SuspendDelay()) {
-    if (app_desc_->CustomSuspendDOMTime().value() > MaxCustomSuspendDelay()) {
+  if (app_desc_.CustomSuspendDOMTime().has_value() &&
+      app_desc_.CustomSuspendDOMTime().value() > SuspendDelay()) {
+    if (app_desc_.CustomSuspendDOMTime().value() > MaxCustomSuspendDelay()) {
       custom_suspend_dom_time_ = MaxCustomSuspendDelay();
     } else {
-      custom_suspend_dom_time_ = app_desc_->CustomSuspendDOMTime().value();
+      custom_suspend_dom_time_ = app_desc_.CustomSuspendDOMTime().value();
     }
     LOG_DEBUG("[%s] set customSuspendDOMTime : %d ms", AppId().c_str(),
               custom_suspend_dom_time_);
@@ -163,7 +163,7 @@ void WebPageBlink::Init() {
   GetSystemLanguage(language);
   SetPreferredLanguages(language);
   page_private_->page_view_->SetAppId(
-      AppId() + std::to_string(app_desc_->GetDisplayAffinity()));
+      AppId() + std::to_string(app_desc_.GetDisplayAffinity()));
   page_private_->page_view_->SetSecurityOrigin(
       GetIdentifierForSecurityOrigin());
   UpdateHardwareResolution();
@@ -175,12 +175,12 @@ void WebPageBlink::Init() {
   page_private_->page_view_->SetAudioGuidanceOn(IsAccessibilityEnabled());
   UpdateBackHistoryAPIDisabled();
   page_private_->page_view_->SetUseUnlimitedMediaPolicy(
-      app_desc_->UseUnlimitedMediaPolicy());
+      app_desc_.UseUnlimitedMediaPolicy());
   page_private_->page_view_->SetEnableBackgroundRun(
-      app_desc_->IsEnableBackgroundRun());
+      app_desc_.IsEnableBackgroundRun());
 
   page_private_->page_view_->SetUseVideoDecodeAccelerator(
-      app_desc_->UseVideoDecodeAccelerator());
+      app_desc_.UseVideoDecodeAccelerator());
 
   page_private_->page_view_->UpdatePreferences();
 
@@ -639,8 +639,8 @@ void WebPageBlink::DidFirstFrameFocused() {
             AppId().c_str());
   // App load is finished, set use launching time optimization false.
   // If Launch optimization had to be done late, use delayMsForLaunchOptmization
-  if (app_desc_->DelayMsForLaunchOptimization().has_value()) {
-    int delay_ms = app_desc_->DelayMsForLaunchOptimization().value();
+  if (app_desc_.DelayMsForLaunchOptimization().has_value()) {
+    int delay_ms = app_desc_.DelayMsForLaunchOptimization().value();
     SetUseLaunchOptimization(false, delay_ms);
   } else {
     SetUseLaunchOptimization(false);
@@ -805,11 +805,10 @@ void WebPageBlink::SetVisible(bool visible) {
 }
 
 void WebPageBlink::SetViewportSize() {
-  if (app_desc_->WidthOverride().has_value() &&
-      app_desc_->HeightOverride().has_value()) {
+  if (app_desc_.WidthOverride().has_value() &&
+      app_desc_.HeightOverride().has_value()) {
     page_private_->page_view_->SetViewportSize(
-        app_desc_->WidthOverride().value(),
-        app_desc_->HeightOverride().value());
+        app_desc_.WidthOverride().value(), app_desc_.HeightOverride().value());
   }
 }
 
@@ -928,12 +927,12 @@ bool WebPageBlink::IsInputMethodActive() const {
 }
 
 void WebPageBlink::SetPageProperties() {
-  if (app_desc_->IsTransparent()) {
+  if (app_desc_.IsTransparent()) {
     page_private_->page_view_->SetTransparentBackground(true);
   }
 
   // set inspectable
-  if (app_desc_->IsInspectable() || Inspectable()) {
+  if (app_desc_.IsInspectable() || Inspectable()) {
     LOG_DEBUG(
         "[%s] inspectable : true or 'debug_system_apps' mode; "
         "setInspectablePage(true)",
@@ -952,7 +951,7 @@ void WebPageBlink::CreatePalmSystem(WebAppBase* app) {
 }
 
 std::string WebPageBlink::DefaultTrustLevel() const {
-  return app_desc_->TrustLevel();
+  return app_desc_.TrustLevel();
 }
 
 void WebPageBlink::LoadExtension() {
@@ -968,11 +967,11 @@ void WebPageBlink::ClearExtensions() {
 }
 
 void WebPageBlink::SetCustomPluginIfNeeded() {
-  if (!app_desc_ || !app_desc_->UseCustomPlugin()) {
+  if (!app_desc_.UseCustomPlugin()) {
     return;
   }
 
-  std::string custom_plugin_path = app_desc_->FolderPath();
+  std::string custom_plugin_path = app_desc_.FolderPath();
   custom_plugin_path.append("/plugins");
 
   if (!util::DoesPathExist(custom_plugin_path.c_str())) {
@@ -1064,13 +1063,13 @@ double WebPageBlink::DevicePixelRatio() {
 
   int app_width;
   int app_height;
-  if (app_desc_->WidthOverride().has_value()) {
-    app_width = app_desc_->WidthOverride().value();
+  if (app_desc_.WidthOverride().has_value()) {
+    app_width = app_desc_.WidthOverride().value();
   } else {
     app_width = CurrentUiWidth();
   }
-  if (app_desc_->HeightOverride().has_value()) {
-    app_height = app_desc_->HeightOverride().value();
+  if (app_desc_.HeightOverride().has_value()) {
+    app_height = app_desc_.HeightOverride().value();
   } else {
     app_height = CurrentUiHeight();
   }
@@ -1168,11 +1167,11 @@ bool WebPageBlink::DecidePolicyForErrorPage(bool is_main_frame,
 }
 
 bool WebPageBlink::AcceptsVideoCapture() {
-  return app_desc_->AllowVideoCapture();
+  return app_desc_.AllowVideoCapture();
 }
 
 bool WebPageBlink::AcceptsAudioCapture() {
-  return app_desc_->AllowAudioCapture();
+  return app_desc_.AllowAudioCapture();
 }
 
 void WebPageBlink::KeyboardVisibilityChanged(bool visible) {
@@ -1241,7 +1240,7 @@ void WebPageBlink::SetAudioGuidanceOn(bool on) {
 
 void WebPageBlink::UpdateBackHistoryAPIDisabled() {
   page_private_->page_view_->SetBackHistoryAPIDisabled(
-      app_desc_->BackHistoryAPIDisabled());
+      app_desc_.BackHistoryAPIDisabled());
 }
 
 void WebPageBlink::SetVisibilityState(WebPageVisibilityState visibility_state) {

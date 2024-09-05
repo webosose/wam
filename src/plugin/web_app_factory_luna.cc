@@ -40,15 +40,15 @@ void DeleteInstance(WebAppFactoryInterface* interface) {
 
 WebAppBase* WebAppFactoryLuna::CreateWebApp(
     const std::string& win_type,
-    std::shared_ptr<ApplicationDescription> desc) {
+    const ApplicationDescription& desc) {
   WebAppBase* app = nullptr;
 
   if (win_type == kWtCard || win_type == kWtPopup || win_type == kWtMinimal ||
       win_type == kWtFloating || win_type == kWtSystemUi) {
-    app = new WebAppWaylandWebOS(win_type, std::move(desc));
+    app = new WebAppWaylandWebOS(win_type, desc);
   } else if (win_type == kWtOverlay || win_type == kWtNone) {
     app = new WebAppWayland(win_type, std::nullopt, std::nullopt,
-                            desc->GetDisplayAffinity());
+                            desc.GetDisplayAffinity());
   } else {
     LOG_WARNING(MSGID_BAD_WINDOW_TYPE, 1,
                 PMLOGKS("WINDOW_TYPE", win_type.c_str()), "");
@@ -59,13 +59,13 @@ WebAppBase* WebAppFactoryLuna::CreateWebApp(
 WebAppBase* WebAppFactoryLuna::CreateWebApp(
     const std::string& win_type,
     WebPageBase* /*page*/,
-    std::shared_ptr<ApplicationDescription> desc) {
-  return CreateWebApp(win_type, std::move(desc));
+    const ApplicationDescription& desc) {
+  return CreateWebApp(win_type, desc);
 }
 
 WebPageBase* WebAppFactoryLuna::CreateWebPage(
     const wam::Url& url,
-    std::shared_ptr<ApplicationDescription> desc,
+    const ApplicationDescription& desc,
     const std::string& launch_params) {
-  return new WebPageBlink(url, std::move(desc), launch_params);
+  return new WebPageBlink(url, desc, launch_params);
 }

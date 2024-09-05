@@ -48,9 +48,8 @@ class WebPageBase {
     kWebPageVisibilityStateLast = kWebPageVisibilityStatePrerender
   };
 
-  WebPageBase();
   WebPageBase(const wam::Url& url,
-              std::shared_ptr<ApplicationDescription> desc,
+              const ApplicationDescription& desc,
               const std::string& params);
   virtual ~WebPageBase();
 
@@ -117,7 +116,6 @@ class WebPageBase {
   virtual bool IsInputMethodActive() const { return false; }
 
   std::string LaunchParams() const;
-  void SetApplicationDescription(std::shared_ptr<ApplicationDescription> desc);
   void Load();
   void SetEnableBackgroundRun(bool enable) { enable_background_run_ = enable; }
   void SendLocaleChangeEvent(const std::string& language);
@@ -133,7 +131,7 @@ class WebPageBase {
     instance_id_ = instance_id;
   }
   const std::string& InstanceId() const { return instance_id_; }
-  ApplicationDescription* GetAppDescription() { return app_desc_.get(); }
+  const ApplicationDescription& GetAppDescription() { return app_desc_; }
 
   void SetClosing(bool status) { is_closing_ = status; }
   bool IsClosing() { return is_closing_; }
@@ -186,7 +184,8 @@ class WebPageBase {
   void PostWebProcessCreated(uint32_t pid);
   bool IsAccessibilityEnabled() const;
 
-  std::shared_ptr<ApplicationDescription> app_desc_;
+  // Owned by WebAppBasePrivate
+  const ApplicationDescription& app_desc_;
   std::string app_id_;
   std::string instance_id_;
   bool suspend_at_load_ = false;

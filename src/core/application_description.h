@@ -143,7 +143,7 @@ class ApplicationDescription {
   const WindowClientInfo GetWindowClientInfo();
 
   // To support multi display
-  DisplayId GetDisplayAffinity() { return display_affinity_; }
+  DisplayId GetDisplayAffinity() const { return display_affinity_; }
   void SetDisplayAffinity(DisplayId display) { display_affinity_ = display; }
   std::optional<int> CustomSuspendDOMTime() const {
     return custom_suspend_dom_time_;

@@ -25,9 +25,8 @@ class ApplicationDescription;
 
 class WebAppWaylandWebOS : public WebAppWayland {
  public:
-  explicit WebAppWaylandWebOS(
-      const std::string& win_type,
-      std::shared_ptr<ApplicationDescription> desc = nullptr);
+  explicit WebAppWaylandWebOS(const std::string& win_type,
+                              const ApplicationDescription& desc);
 };
 
 #endif  // PLUGIN_WEB_APP_WAYLAND_WEBOS_H_

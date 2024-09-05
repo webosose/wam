@@ -171,11 +171,11 @@ WebAppFactoryInterface* WebAppFactoryManagerImpl::LoadPluggable(
 
 WebAppBase* WebAppFactoryManagerImpl::CreateWebApp(
     const std::string& win_type,
-    std::shared_ptr<ApplicationDescription> desc,
+    const ApplicationDescription& desc,
     const std::string& app_type) {
   WebAppFactoryInterface* interface = GetPluggable(app_type);
   if (interface) {
-    return interface->CreateWebApp(win_type, std::move(desc));
+    return interface->CreateWebApp(win_type, desc);
   }
 
   return nullptr;
@@ -184,11 +184,11 @@ WebAppBase* WebAppFactoryManagerImpl::CreateWebApp(
 WebAppBase* WebAppFactoryManagerImpl::CreateWebApp(
     const std::string& win_type,
     WebPageBase* page,
-    std::shared_ptr<ApplicationDescription> desc,
+    const ApplicationDescription& desc,
     const std::string& app_type) {
   WebAppFactoryInterface* interface = GetPluggable(app_type);
   if (interface) {
-    return interface->CreateWebApp(win_type, page, std::move(desc));
+    return interface->CreateWebApp(win_type, page, desc);
   }
 
   return nullptr;
@@ -197,20 +197,19 @@ WebAppBase* WebAppFactoryManagerImpl::CreateWebApp(
 WebPageBase* WebAppFactoryManagerImpl::CreateWebPage(
     const std::string& /*win_type*/,
     const wam::Url& url,
-    std::shared_ptr<ApplicationDescription> desc,
+    const ApplicationDescription& desc,
     const std::string& app_type,
     const std::string& launch_params) {
   WebPageBase* page = nullptr;
 
   WebAppFactoryInterface* interface = GetPluggable(app_type);
   if (interface) {
-    page = interface->CreateWebPage(url, std::move(desc), launch_params);
+    page = interface->CreateWebPage(url, desc, launch_params);
   } else {
     auto default_interface = interfaces_.find("default");
     if (default_interface != interfaces_.end()) {
       // use default factory if cannot find app_type.
-      page = default_interface->second->CreateWebPage(url, std::move(desc),
-                                                      launch_params);
+      page = default_interface->second->CreateWebPage(url, desc, launch_params);
     }
   }
 

@@ -74,7 +74,7 @@ class WebAppBase : public WebPageObserver {
   virtual void Focus() = 0;
   virtual void Unfocus() = 0;
   virtual void SetOpacity(float opacity) = 0;
-  virtual void SetAppDescription(std::shared_ptr<ApplicationDescription>);
+  virtual void SetAppDescription(std::unique_ptr<ApplicationDescription>);
   virtual void SetPreferredLanguages(const std::string& language);
   virtual void StagePreparing();
   virtual void StageReady();
@@ -116,7 +116,6 @@ class WebAppBase : public WebPageObserver {
   static int CurrentUiWidth();
   static int CurrentUiHeight();
 
-  void CleanResources();
   void ExecuteCloseCallback();
   void DispatchUnload();
 

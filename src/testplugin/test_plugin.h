@@ -21,15 +21,13 @@
 
 class TestPlugin : public WebAppFactoryInterface {
  public:
-  WebAppBase* CreateWebApp(
-      const std::string& win_type,
-      std::shared_ptr<ApplicationDescription> desc = nullptr) override;
-  WebAppBase* CreateWebApp(
-      const std::string& win_type,
-      WebPageBase* page,
-      std::shared_ptr<ApplicationDescription> desc = nullptr) override;
+  WebAppBase* CreateWebApp(const std::string& win_type,
+                           const ApplicationDescription& desc) override;
+  WebAppBase* CreateWebApp(const std::string& win_type,
+                           WebPageBase* page,
+                           const ApplicationDescription& desc) override;
   WebPageBase* CreateWebPage(const wam::Url& url,
-                             std::shared_ptr<ApplicationDescription> desc,
+                             const ApplicationDescription& desc,
                              const std::string& launch_params = {}) override;
 };
 

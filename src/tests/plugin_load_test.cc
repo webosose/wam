@@ -90,10 +90,9 @@ TEST(PluginLoadTest, DefaultWebApp) {
   EXPECT_CALL(factory_interface_mock,
               CreateWebApp(std::string("_WEBOS_WINDOW_TYPE_CARD"), testing::_))
       .Times(1)
-      .WillRepeatedly(
-          [&](const std::string&, std::shared_ptr<ApplicationDescription>) {
-            return &app_base_mock;
-          });
+      .WillRepeatedly([&](const std::string&, const ApplicationDescription&) {
+        return &app_base_mock;
+      });
   EXPECT_CALL(*lib_wrapper, GetCreateInstanceFunction(fake_handle))
       .Times(1)
       .WillRepeatedly([&](void* /*handle*/) {
@@ -107,8 +106,8 @@ TEST(PluginLoadTest, DefaultWebApp) {
                                              "", load_plugin_on_demand,
                                              std::move(lib_wrapper));
   ASSERT_NE(factory_manager, nullptr);
-  WebAppBase* app_base = factory_manager->CreateWebApp(
-      "_WEBOS_WINDOW_TYPE_CARD", nullptr, "default");
+  WebAppBase* app_base =
+      factory_manager->CreateWebApp("_WEBOS_WINDOW_TYPE_CARD", {}, "default");
   EXPECT_EQ(app_base, &app_base_mock);
 }
 
@@ -129,10 +128,9 @@ TEST(PluginLoadTest, CustomWebApp) {
   EXPECT_CALL(factory_interface_mock,
               CreateWebApp(std::string("_WEBOS_WINDOW_TYPE_CARD"), testing::_))
       .Times(1)
-      .WillRepeatedly(
-          [&](const std::string&, std::shared_ptr<ApplicationDescription>) {
-            return &app_base_mock;
-          });
+      .WillRepeatedly([&](const std::string&, const ApplicationDescription&) {
+        return &app_base_mock;
+      });
   EXPECT_CALL(*lib_wrapper, GetCreateInstanceFunction(fake_handle))
       .Times(1)
       .WillRepeatedly([&](void* /*handle*/) {
@@ -146,8 +144,8 @@ TEST(PluginLoadTest, CustomWebApp) {
           "/usr/lib/webappmanager/plugins", "extended:custom:minimal",
           load_plugin_on_demand, std::move(lib_wrapper));
   ASSERT_NE(factory_manager, nullptr);
-  WebAppBase* app_base = factory_manager->CreateWebApp(
-      "_WEBOS_WINDOW_TYPE_CARD", nullptr, "custom");
+  WebAppBase* app_base =
+      factory_manager->CreateWebApp("_WEBOS_WINDOW_TYPE_CARD", {}, "custom");
   EXPECT_EQ(app_base, &app_base_mock);
 }
 
@@ -164,8 +162,8 @@ TEST(PluginLoadTest, NotAllowedCustomWebApp) {
           "/usr/lib/webappmanager/plugins", "extended:minimal",
           load_plugin_on_demand, std::move(lib_wrapper));
   ASSERT_NE(factory_manager, nullptr);
-  WebAppBase* app_base = factory_manager->CreateWebApp(
-      "_WEBOS_WINDOW_TYPE_CARD", nullptr, "custom");
+  WebAppBase* app_base =
+      factory_manager->CreateWebApp("_WEBOS_WINDOW_TYPE_CARD", {}, "custom");
   EXPECT_EQ(app_base, nullptr);
 }
 
@@ -177,8 +175,7 @@ TEST(PluginLoadTest, LoadTestPlugin) {
           "/usr/libexec/tests/webappmanager/plugins", "testplugin",
           load_plugin_on_demand, std::move(lib_wrapper));
   ASSERT_NE(factory_manager, nullptr);
-  WebAppBase* app_base =
-      factory_manager->CreateWebApp("", nullptr, "testplugin");
+  WebAppBase* app_base = factory_manager->CreateWebApp("", {}, "testplugin");
   ASSERT_NE(app_base, nullptr);
   EXPECT_EQ(app_base->AppId(), "pluginTestID");
 }

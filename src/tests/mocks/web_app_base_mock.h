@@ -56,7 +56,7 @@ class WebAppBaseMock : public WebAppBase {
   void Focus() override {}
   void Unfocus() override {}
   void SetOpacity(float /*opacity*/) override {}
-  void SetAppDescription(std::shared_ptr<ApplicationDescription>) override {}
+  void SetAppDescription(std::unique_ptr<ApplicationDescription>) override {}
   void SetPreferredLanguages(const std::string& /*language*/) override {}
   void StagePreparing() override {}
   void StageReady() override {}

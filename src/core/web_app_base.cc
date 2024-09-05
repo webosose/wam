@@ -36,6 +36,8 @@ class WebAppBasePrivate {
   }
 
   WebAppBase* parent_;
+  // page_ has a reference to app_desc_
+  std::unique_ptr<ApplicationDescription> app_desc_;
   std::unique_ptr<WebPageBase> page_;
   bool keep_alive_ = false;
   bool force_close_ = false;
@@ -43,7 +45,6 @@ class WebAppBasePrivate {
   std::string app_id_;
   std::string instance_id_;
   std::string url_;
-  std::shared_ptr<ApplicationDescription> app_desc_;
 };
 
 WebAppBase::WebAppBase()
@@ -54,7 +55,6 @@ WebAppBase::~WebAppBase() {
            PMLOGKS("APP_ID", AppId().empty() ? "unknown" : AppId().c_str()),
            PMLOGKS("INSTANCE_ID", InstanceId().c_str()),
            PMLOGKFV("PID", "%d", Page() ? Page()->GetWebProcessPID() : 0), "");
-  CleanResources();
 }
 
 bool WebAppBase::GetCrashState() const {
@@ -127,10 +127,6 @@ std::string WebAppBase::LaunchingAppId() const {
 
 ApplicationDescription* WebAppBase::GetAppDescription() const {
   return app_private_->app_desc_.get();
-}
-
-void WebAppBase::CleanResources() {
-  app_private_->app_desc_.reset();
 }
 
 int WebAppBase::CurrentUiWidth() {
@@ -289,11 +285,11 @@ void WebAppBase::ShowWindow() {
 }
 
 void WebAppBase::SetAppDescription(
-    std::shared_ptr<ApplicationDescription> app_desc) {
-  app_private_->app_desc_ = app_desc;
+    std::unique_ptr<ApplicationDescription> app_desc) {
+  app_private_->app_desc_ = std::move(app_desc);
 
   // set appId here from appDesc
-  app_private_->app_id_ = app_desc->Id();
+  app_private_->app_id_ = GetAppDescription()->Id();
 }
 
 void WebAppBase::SetAppProperties(const std::string& properties) {

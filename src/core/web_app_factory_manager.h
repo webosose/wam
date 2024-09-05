@@ -33,21 +33,18 @@ class WebAppFactoryManager {
   WebAppFactoryManager() = default;
   virtual ~WebAppFactoryManager() = default;
 
-  virtual WebAppBase* CreateWebApp(
-      const std::string& win_type,
-      std::shared_ptr<ApplicationDescription> desc = nullptr,
-      const std::string& app_type = {}) = 0;
-  virtual WebAppBase* CreateWebApp(
-      const std::string& win_type,
-      WebPageBase* page,
-      std::shared_ptr<ApplicationDescription> desc = nullptr,
-      const std::string& app_type = {}) = 0;
-  virtual WebPageBase* CreateWebPage(
-      const std::string& win_type,
-      const wam::Url& url,
-      std::shared_ptr<ApplicationDescription> desc,
-      const std::string& app_type = {},
-      const std::string& launch_params = {}) = 0;
+  virtual WebAppBase* CreateWebApp(const std::string& win_type,
+                                   const ApplicationDescription& desc,
+                                   const std::string& app_type = {}) = 0;
+  virtual WebAppBase* CreateWebApp(const std::string& win_type,
+                                   WebPageBase* page,
+                                   const ApplicationDescription& desc,
+                                   const std::string& app_type = {}) = 0;
+  virtual WebPageBase* CreateWebPage(const std::string& win_type,
+                                     const wam::Url& url,
+                                     const ApplicationDescription& desc,
+                                     const std::string& app_type = {},
+                                     const std::string& launch_params = {}) = 0;
 };
 
 #endif  // CORE_WEB_APP_FACTORY_MANAGER_H_

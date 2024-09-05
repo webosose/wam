@@ -40,11 +40,11 @@ class WebViewFactory;
 class WebPageBlink : public WebPageBase, public WebPageBlinkDelegate {
  public:
   WebPageBlink(const wam::Url& url,
-               std::shared_ptr<ApplicationDescription> desc,
+               const ApplicationDescription& desc,
                const std::string& launch_params,
                std::unique_ptr<WebViewFactory> factory);
   WebPageBlink(const wam::Url& url,
-               std::shared_ptr<ApplicationDescription> desc,
+               const ApplicationDescription& desc,
                const std::string& launch_params);
   ~WebPageBlink() override;
 
