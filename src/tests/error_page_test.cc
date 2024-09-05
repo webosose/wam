@@ -197,7 +197,7 @@ TEST_F(ErrorPageTestSuite, ReloadOnTimeout) {
   auto view_mock = mock_initializer_->GetWebViewMock();
   GMainLoop* loop = g_main_loop_new(nullptr, FALSE);
   EXPECT_CALL(*view_mock, LoadUrl(app_url_))
-      .WillOnce(testing::Invoke([=](const std::string& url) {
+      .WillOnce(testing::Invoke([this, loop](const std::string& url) {
         ProcessLoading(url);
         g_main_loop_quit(loop);
       }));

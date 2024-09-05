@@ -65,7 +65,6 @@ WebPageBlink::WebPageBlink(const wam::Url& url,
     : WebPageBase(url, desc, params),
       page_private_(std::make_unique<WebPageBlinkPrivate>(this)),
       trust_level_(desc->TrustLevel()),
-      has_custom_policy_for_error_page_(false),
       factory_(std::move(factory)) {}
 
 WebPageBlink::WebPageBlink(const wam::Url& url,

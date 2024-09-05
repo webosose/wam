@@ -54,4 +54,4 @@ void NotificationPlatformBridge::GetDisplayed(
 
 void NotificationPlatformBridge::SetReadyCallback(
     neva_app_runtime::NotificationPlatformBridge::
-        NotificationBridgeReadyCallback callback) {}
+        NotificationBridgeReadyCallback /*callback*/) {}
