@@ -63,10 +63,11 @@ void PermissionPrompt::SetDecisions() {
       case PermissionRequest::RequestType::kMicStream:
       case PermissionRequest::RequestType::kNotifications: {
         bool status = GetPermissionStatusFromAppDesc(type);
-        if (status)
+        if (status) {
           delegate_->Accept();
-        else
+        } else {
           delegate_->Deny();
+        }
       } break;
       default:
         LOG_ERROR(MSGID_ERROR_ERROR, 0,

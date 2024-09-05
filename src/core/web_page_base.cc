@@ -103,24 +103,16 @@ void WebPageBase::SetupLaunchEvent() {
   std::stringstream launch_event;
   std::string params = LaunchParams().empty() ? "{}" : LaunchParams();
   launch_event
-      << "(function() {"
-      << "    var dispatchLaunchEvent = function() {"
+      << "(function() {" << "    var dispatchLaunchEvent = function() {"
       << "        var launchEvent = new CustomEvent('webOSLaunch', { detail: "
-      << params << " });"
-      << "        setTimeout(function() {"
-      << "            document.dispatchEvent(launchEvent);"
-      << "        }, 1);"
-      << "    };"
-      << "    if (document.readyState === 'complete') {"
-      << "        dispatchLaunchEvent();"
-      << "    } else {"
+      << params << " });" << "        setTimeout(function() {"
+      << "            document.dispatchEvent(launchEvent);" << "        }, 1);"
+      << "    };" << "    if (document.readyState === 'complete') {"
+      << "        dispatchLaunchEvent();" << "    } else {"
       << "        document.onreadystatechange = function() {"
       << "            if (document.readyState === 'complete') {"
-      << "                dispatchLaunchEvent();"
-      << "            }"
-      << "        };"
-      << "    }"
-      << "})();";
+      << "                dispatchLaunchEvent();" << "            }"
+      << "        };" << "    }" << "})();";
 
   AddUserScript(launch_event.str());
 }
@@ -272,8 +264,7 @@ void WebPageBase::SendRelaunchEvent() {
       << "setTimeout(function () {"
       << "    console.log('[WAM] fires webOSRelaunch event');"
       << "    var launchEvent=new CustomEvent('webOSRelaunch', { detail: "
-      << detail << " });"
-      << "    document.dispatchEvent(launchEvent);"
+      << detail << " });" << "    document.dispatchEvent(launchEvent);"
       << "}, 1);";
   EvaluateJavaScript(relaunch_event.str().c_str());
 }
@@ -367,13 +358,11 @@ bool WebPageBase::HasLoadErrorPolicy(bool is_http_response_error,
   if (load_error_policy_ == "event") {
     std::stringstream jss;
     std::string generic_error = is_http_response_error ? "false" : "true";
-    jss << "{"
-        << "    console.log('[WAM3] create webOSLoadError event');"
+    jss << "{" << "    console.log('[WAM3] create webOSLoadError event');"
         << "    var launchEvent=new CustomEvent('webOSLoadError',"
         << "        { detail : { genericError : " << generic_error
         << ", errorCode : " << error_code << " }});"
-        << "    document.dispatchEvent(launchEvent);"
-        << "}";
+        << "    document.dispatchEvent(launchEvent);" << "}";
     // App has load error policy, do not show platform load error page
     EvaluateJavaScript(jss.str());
     return true;
@@ -422,10 +411,8 @@ void WebPageBase::SetBackgroundColorOfBody(const std::string& color) {
       << "       else {"
       << "           console.log('[Server Error] set background Color of body "
          "to "
-      << color << "');"
-      << "           document.body.style.backgroundColor = '" << color << "';"
-      << "       }"
-      << "     } else {"
+      << color << "');" << "           document.body.style.backgroundColor = '"
+      << color << "';" << "       }" << "     } else {"
       << "        document.addEventListener('DOMContentLoaded', function() {"
       << "           if(document.body.style.backgroundColor)"
       << "               console.log('[Server Error] Already set "
@@ -435,11 +422,7 @@ void WebPageBase::SetBackgroundColorOfBody(const std::string& color) {
          "body to "
       << color << "');"
       << "               document.body.style.backgroundColor = '" << color
-      << "';"
-      << "           }"
-      << "        });"
-      << "    }"
-      << "})();";
+      << "';" << "           }" << "        });" << "    }" << "})();";
 
   EvaluateJavaScript(background_color_of_body.str());
 }

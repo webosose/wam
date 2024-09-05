@@ -351,8 +351,9 @@ std::unique_ptr<ApplicationDescription> ApplicationDescription::FromJsonString(
   if (json_obj.isMember("webAppPermissions") &&
       json_obj["webAppPermissions"].isArray()) {
     for (const Json::Value& perm : json_obj["webAppPermissions"]) {
-      if (perm.isString())
+      if (perm.isString()) {
         app_desc->web_app_permissions_.insert(perm.asString());
+      }
     }
   }
 

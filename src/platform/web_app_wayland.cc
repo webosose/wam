@@ -773,8 +773,7 @@ void InputManager::OnCursorVisibilityChanged(bool visible) {
   const std::string str = visible ? "true" : "false";
   ss << "var cursorEvent=new CustomEvent('cursorStateChange', { detail: { "
         "'visibility' :"
-     << str << "} });"
-     << "cursorEvent.visibility = " << str << ";"
+     << str << "} });" << "cursorEvent.visibility = " << str << ";"
      << " if(document) document.dispatchEvent(cursorEvent);";
 
   // send javascript event : cursorStateChange with param to All app
@@ -790,8 +789,7 @@ void WebAppWayland::SendWebOSMouseEvent(const std::string& event_name) {
     std::stringstream ss;
     ss << "console.log('[WAM] fires webOSMouse event : " << event_name << "');"
        << "var mouseEvent =new CustomEvent('webOSMouse', { detail: { type : '"
-       << event_name << "' }});"
-       << "document.dispatchEvent(mouseEvent);";
+       << event_name << "' }});" << "document.dispatchEvent(mouseEvent);";
     LOG_DEBUG(
         "[%s] WebAppWayland::sendWebOSMouseEvent; dispatch webOSMouse; %s",
         AppId().c_str(), event_name.c_str());
