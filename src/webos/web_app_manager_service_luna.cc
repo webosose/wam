@@ -355,14 +355,14 @@ Json::Value WebAppManagerServiceLuna::clearBrowsingData(
 
 Json::Value WebAppManagerServiceLuna::fireNotificationEvent(
     const Json::Value& request) {
-  std::string appId;
+  std::string app_id;
   if (request.isMember("appId") && request["appId"].isString()) {
-    appId = request["appId"].asString();
+    app_id = request["appId"].asString();
   }
-  std::string notificationId;
+  std::string notification_id;
   if (request.isMember("notificationId") &&
       request["notificationId"].isString()) {
-    notificationId = request["notificationId"].asString();
+    notification_id = request["notificationId"].asString();
   }
   std::string origin;
   if (request.isMember("origin") && request["origin"].isString()) {
@@ -372,7 +372,7 @@ Json::Value WebAppManagerServiceLuna::fireNotificationEvent(
   if (request.isMember("type") && request["type"].isString()) {
     type = request["type"].asString();
   }
-  if (appId.empty() || notificationId.empty() || origin.empty() ||
+  if (app_id.empty() || notification_id.empty() || origin.empty() ||
       type.empty()) {
     Json::Value response;
     response["returnValue"] = false;
@@ -387,10 +387,10 @@ Json::Value WebAppManagerServiceLuna::fireNotificationEvent(
     response["errorText"] = kErrFireNotificationEventUnsupportedType;
     return response;
   }
-  auto actionIndex = std::make_pair(0, false);
+  auto action_index = std::make_pair(0, false);
   if (request.isMember("actionIndex") && request["actionIndex"].isInt()) {
-    actionIndex.first = request["actionIndex"].asInt();
-    actionIndex.second = true;
+    action_index.first = request["actionIndex"].asInt();
+    action_index.second = true;
   }
   auto reply = std::make_pair(std::u16string(), false);
   if (request.isMember("reply") && request["reply"].isString()) {
@@ -399,7 +399,7 @@ Json::Value WebAppManagerServiceLuna::fireNotificationEvent(
     reply.second = true;
   }
   auto dispatcher = neva_app_runtime::GetNotificationEventDispatcher();
-  dispatcher->Click(notificationId, std::move(origin), actionIndex, reply);
+  dispatcher->Click(notification_id, std::move(origin), action_index, reply);
 
   Json::Value response;
   response["returnValue"] = true;
