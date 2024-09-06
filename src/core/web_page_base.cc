@@ -472,8 +472,7 @@ void WebPageBase::UpdateIsLoadErrorPageFinish() {
   std::string err_file_name = err_path.filename();
   std::string err_dir_path = err_path.remove_filename();
 
-  // urlDirPath starts with errDirPath
-  if ((url_dir_path.find(err_dir_path) == 0) &&
+  if (url_dir_path.starts_with(err_dir_path) &&
       url_file_name == err_file_name) {
     LOG_DEBUG("[%s] This is WAM ErrorPage; URL: %s ", AppId().c_str(),
               Url().ToString().c_str());
