@@ -153,6 +153,7 @@ export WAM_COMMON_SWITCHES=" \
     --disable-extensions \
     --disable-gpu-rasterization \
     --disable-low-res-tiling \
+    --disable-font-subpixel-positioning \
     --disk-cache-size=$WAM_DISKCACHE_MAXSIZE \
     --enable-accelerated-plugin-rendering \
     --enable-aggressive-release-policy \
