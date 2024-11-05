@@ -145,7 +145,7 @@ export ENABLE_FEATURES=MediaControllerService
 export WAM_EXTRA_FLAGS=""
 export WAM_JS_FLAGS=""
 export WAM_COMMON_SWITCHES=" \
-    --accelerated-plugin-rendering-blacklist=device;drmAgent;sound;service \
+    --accelerated-plugin-rendering-blocklist=device;drmAgent;sound;service \
     --autoplay-policy=no-user-gesture-required \
     --browser-subprocess-path=$WAM_EXE_PATH \
     --deadline-to-synchronize-surfaces=40 \
@@ -169,7 +169,7 @@ export WAM_COMMON_SWITCHES=" \
     --force-gpu-mem-available-mb=$MAX_GPU_MEM_LIMIT \
     --fps-counter-layout=tl \
     --hide-selection-handles \
-    --ignore-gpu-blacklist \
+    --ignore-gpu-blocklist \
     --ignore-netif=p2p \
     --in-process-gpu \
     --max-timeupdate-event-frequency=150 \
